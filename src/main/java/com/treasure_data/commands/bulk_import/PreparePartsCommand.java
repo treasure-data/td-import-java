@@ -21,7 +21,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.commands.Command;
-import com.treasure_data.commands.CommandContext;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.utils.CSVFileReader;
 import com.treasure_data.utils.FileConverter;
@@ -33,35 +32,28 @@ public class PreparePartsCommand extends
             .getLogger(PreparePartsCommand.class.getName());
 
     @Override
-    public void execute(
-            CommandContext<PreparePartsRequest, PreparePartsResult> context)
+    public void execute(PreparePartsRequest request, PreparePartsResult result)
             throws CommandException {
-        LOG.fine(context.getRequest().getName() + " command started");
+        LOG.fine(request.getName() + " command started");
 
-        Properties props = context.getProperties();
-        PreparePartsRequest request = context.getRequest();
-        PreparePartsResult result = context.getResult();
-
+        Properties props = request.getProperties();
         String fileName = request.getFileName();
 
         CSVFileReader r = new CSVFileReader(props, fileName);
         MsgpackGzipFileWriter w = new MsgpackGzipFileWriter(props, fileName);
         FileConverter conv = new FileConverter(props);
-        conv.convert(r, w);
+        conv.convertFile(r, w);
 
-        LOG.fine(context.getRequest().getName() + " command finished");
+        LOG.fine(request.getName() + " command finished");
     }
 
     public static void main(String[] args) throws Exception {
         Properties props = System.getProperties();
 
         PreparePartsCommand command = new PreparePartsCommand();
-        PreparePartsRequest request = new PreparePartsRequest();
+        PreparePartsRequest request = new PreparePartsRequest(props);
         PreparePartsResult result = new PreparePartsResult();
-        CommandContext<PreparePartsRequest, PreparePartsResult> context =
-                new CommandContext<PreparePartsRequest, PreparePartsResult>(
-                        props, request, result);
 
-        command.execute(context);
+        command.execute(request, result);
     }
 }

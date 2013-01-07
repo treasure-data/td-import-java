@@ -17,6 +17,8 @@
 //
 package com.treasure_data.commands.bulk_import;
 
+import java.util.Properties;
+
 import com.treasure_data.commands.CommandRequest;
 
 public class PreparePartsRequest extends CommandRequest {
@@ -24,6 +26,10 @@ public class PreparePartsRequest extends CommandRequest {
     private static final String COMMAND_NAME = "prepare_parts";
 
     private String fileName;
+
+    public PreparePartsRequest(Properties props) {
+        super(props);
+    }
 
     @Override
     public String getName() {
@@ -37,4 +43,5 @@ public class PreparePartsRequest extends CommandRequest {
     public String getFileName() {
         return fileName;
     }
+
 }

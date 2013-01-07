@@ -17,7 +17,19 @@
 //
 package com.treasure_data.commands;
 
+import java.util.Properties;
+
 public abstract class CommandRequest {
 
+    private Properties props;
+
+    protected CommandRequest(Properties props) {
+        this.props = props;
+    }
+
     protected abstract String getName();
+
+    public Properties getProperties() {
+        return props;
+    }
 }

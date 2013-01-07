@@ -19,7 +19,11 @@ package com.treasure_data.utils;
 
 import java.util.Properties;
 
+import org.msgpack.MessagePack;
+
 public class MsgpackGzipFileWriter extends FileWriter {
+
+    private MessagePack msgpack;
 
     public MsgpackGzipFileWriter(Properties props, String fileName) {
         // TODO Auto-generated constructor stub

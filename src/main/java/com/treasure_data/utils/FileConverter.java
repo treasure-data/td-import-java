@@ -17,6 +17,7 @@
 //
 package com.treasure_data.utils;
 
+import java.util.Map;
 import java.util.Properties;
 
 import com.treasure_data.commands.CommandException;
@@ -27,9 +28,15 @@ public class FileConverter {
         // TODO
     }
 
-    public void convert(FileReader r, FileWriter w) throws CommandException {
-        // TODO Auto-generated method stub
-        
+    public void convertFile(FileReader r, FileWriter w) throws CommandException {
+        Map<String, Object> record;
+        while ((record = r.readRecord()) != null) {
+            convertRecord(record, w);
+        }
     }
 
+    public void convertRecord(Map<String, Object> record, FileWriter w)
+            throws CommandException {
+        // TODO
+    }
 }

@@ -19,6 +19,6 @@ package com.treasure_data.commands;
 
 public abstract class Command<REQ extends CommandRequest, RET extends CommandResult> {
 
-    protected abstract void execute(CommandContext<REQ, RET> context)
+    protected abstract void execute(REQ request, RET result)
             throws CommandException;
 }

@@ -17,8 +17,11 @@
 //
 package com.treasure_data.utils;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import com.treasure_data.commands.CommandException;
 
 public class CSVFileReader extends FileReader {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class
@@ -38,5 +41,10 @@ public class CSVFileReader extends FileReader {
 
     public void validateProperties(Properties props) {
         // TODO
+    }
+
+    public Map<String, Object> readRecord() throws CommandException {
+        // TODO
+        return null;
     }
 }
