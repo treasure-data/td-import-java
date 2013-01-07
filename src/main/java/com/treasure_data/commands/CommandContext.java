@@ -17,6 +17,28 @@
 //
 package com.treasure_data.commands;
 
-public class BulkImportPrepareParts {
+import java.util.Properties;
 
+public class CommandContext<REQ extends CommandRequest, RET extends CommandResult> {
+    private Properties props;
+    private REQ request;
+    private RET result;
+
+    public CommandContext(Properties props, REQ request, RET result) {
+        this.props = props;
+        this.request = request;
+        this.result = result;
+    }
+
+    public Properties getProperties() {
+        return props;
+    }
+
+    public REQ getRequest() {
+        return request;
+    }
+
+    public RET getResult() {
+        return result;
+    }
 }
