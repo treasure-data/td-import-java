@@ -1,4 +1,4 @@
 td-java
 =======
 
-CUI Interface for Treasure Data
+Java Extension to CUI for Treasure Data
