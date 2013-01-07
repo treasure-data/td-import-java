@@ -19,9 +19,12 @@ package com.treasure_data.utils;
 
 import java.util.Properties;
 
+import com.treasure_data.commands.CommandException;
+
 public class FileReaderFactory {
 
-    public static FileReader newInstance(Properties props, String fileName) {
+    public static FileReader newInstance(Properties props, String fileName)
+            throws CommandException {
         // TODO #MN should extend it for other file readers
         return new CSVFileReader(props, fileName);
     }

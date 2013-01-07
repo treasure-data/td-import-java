@@ -45,15 +45,33 @@ public class PreparePartsCommand extends
         FileWriter w = FileWriterFactory.newInstance(props, fileName);
         FileConverter conv = new FileConverter(props);
         conv.convertFile(r, w);
-
+        if (r != null) {
+            try {
+                r.close();
+            } catch (CommandException e) {
+                e.printStackTrace(); // TODO
+            }
+        }
+        if (w != null) {
+            try {
+                w.close();
+            } catch (CommandException e) {
+                e.printStackTrace(); // TODO
+            }
+        }
         LOG.fine(request.getName() + " command finished");
     }
 
     public static void main(String[] args) throws Exception {
         Properties props = System.getProperties();
+        props.setProperty("td.bulk_import.prepare_parts.columns", "time,name,price");
+        props.setProperty("td.bulk_import.prepare_parts.columntypes", "long,string,long");
+        props.setProperty("td.bulk_import.prepare_parts.time_column", "time");
+        props.setProperty("td.bulk_import.prepare_parts.output_dir", "./out/");
 
         PreparePartsCommand command = new PreparePartsCommand();
         PreparePartsRequest request = new PreparePartsRequest(props);
+        request.setFileName("./in/test.csv");
         PreparePartsResult result = new PreparePartsResult();
 
         command.execute(request, result);

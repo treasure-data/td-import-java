@@ -17,6 +17,17 @@
 //
 package com.treasure_data.utils;
 
-public abstract class FileWriter {
+import java.util.Map;
+import java.util.Properties;
 
+import com.treasure_data.commands.CommandException;
+
+public abstract class FileWriter {
+    protected abstract void initWriter(Properties props, String fileName)
+            throws CommandException;
+
+    public abstract void writeRecord(Map<String, Object> record)
+            throws CommandException;
+
+    public abstract void close() throws CommandException;
 }

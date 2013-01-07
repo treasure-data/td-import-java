@@ -19,4 +19,15 @@ package com.treasure_data.commands;
 
 public class CommandException extends Exception {
 
+    public CommandException(String msg, Throwable t) {
+        super(msg, t);
+    }
+
+    public CommandException(Throwable t) {
+        super(t);
+    }
+
+    public CommandException(String msg) {
+        super(msg);
+    }
 }

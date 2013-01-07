@@ -19,9 +19,12 @@ package com.treasure_data.utils;
 
 import java.util.Properties;
 
+import com.treasure_data.commands.CommandException;
+
 public class FileWriterFactory {
 
-    public static FileWriter newInstance(Properties props, String fileName) {
+    public static FileWriter newInstance(Properties props, String fileName)
+            throws CommandException {
         // TODO #MN should extend it for other file writers.
         return new MsgpackGzipFileWriter(props, fileName);
     }

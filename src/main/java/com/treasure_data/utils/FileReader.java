@@ -27,5 +27,7 @@ public abstract class FileReader {
     protected abstract void initReader(Properties props, String fileName)
             throws CommandException;
 
-    protected abstract Map<String, Object> readRecord() throws CommandException;
+    public abstract Map<String, Object> readRecord() throws CommandException;
+
+    public abstract void close() throws CommandException;
 }

@@ -19,10 +19,13 @@ package com.treasure_data.utils;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.treasure_data.commands.CommandException;
 
 public class FileConverter {
+    private static final Logger LOG = Logger.getLogger(FileConverter.class
+            .getName());
 
     public FileConverter(Properties props) {
         // TODO
@@ -37,6 +40,6 @@ public class FileConverter {
 
     public void convertRecord(Map<String, Object> record, FileWriter w)
             throws CommandException {
-        // TODO
+        w.writeRecord(record);
     }
 }
