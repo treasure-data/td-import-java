@@ -17,6 +17,19 @@
 //
 package com.treasure_data.utils;
 
+import java.util.Properties;
+
+import com.treasure_data.commands.CommandException;
+
 public class FileConverter {
+
+    public FileConverter(Properties props) {
+        // TODO
+    }
+
+    public void convert(FileReader r, FileWriter w) throws CommandException {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

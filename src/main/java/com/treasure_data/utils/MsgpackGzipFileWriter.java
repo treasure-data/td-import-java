@@ -18,25 +18,11 @@
 package com.treasure_data.utils;
 
 import java.util.Properties;
-import java.util.logging.Logger;
 
-public class CSVFileReader extends FileReader {
-    private static final Logger LOG = Logger.getLogger(CSVFileReader.class
-            .getName());
+public class MsgpackGzipFileWriter extends FileWriter {
 
-    private String fileName;
-
-    public CSVFileReader(Properties props, String fileName) {
-        validateProperties(props);
-        initReader(props, fileName);
+    public MsgpackGzipFileWriter(Properties props, String fileName) {
+        // TODO Auto-generated constructor stub
     }
 
-    @Override
-    public void initReader(Properties props, String fileName) {
-        // TODO
-    }
-
-    public void validateProperties(Properties props) {
-        // TODO
-    }
 }

@@ -23,8 +23,18 @@ public class PreparePartsRequest extends CommandRequest {
 
     private static final String COMMAND_NAME = "prepare_parts";
 
+    private String fileName;
+
     @Override
     public String getName() {
         return COMMAND_NAME;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }

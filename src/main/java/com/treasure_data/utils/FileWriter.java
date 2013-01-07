@@ -17,26 +17,6 @@
 //
 package com.treasure_data.utils;
 
-import java.util.Properties;
-import java.util.logging.Logger;
+public abstract class FileWriter {
 
-public class CSVFileReader extends FileReader {
-    private static final Logger LOG = Logger.getLogger(CSVFileReader.class
-            .getName());
-
-    private String fileName;
-
-    public CSVFileReader(Properties props, String fileName) {
-        validateProperties(props);
-        initReader(props, fileName);
-    }
-
-    @Override
-    public void initReader(Properties props, String fileName) {
-        // TODO
-    }
-
-    public void validateProperties(Properties props) {
-        // TODO
-    }
 }

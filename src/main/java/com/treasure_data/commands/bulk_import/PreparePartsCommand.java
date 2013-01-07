@@ -23,6 +23,9 @@ import java.util.logging.Logger;
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandContext;
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.utils.CSVFileReader;
+import com.treasure_data.utils.FileConverter;
+import com.treasure_data.utils.MsgpackGzipFileWriter;
 
 public class PreparePartsCommand extends
         Command<PreparePartsRequest, PreparePartsResult> {
@@ -35,7 +38,16 @@ public class PreparePartsCommand extends
             throws CommandException {
         LOG.fine(context.getRequest().getName() + " command started");
 
-        // TODO
+        Properties props = context.getProperties();
+        PreparePartsRequest request = context.getRequest();
+        PreparePartsResult result = context.getResult();
+
+        String fileName = request.getFileName();
+
+        CSVFileReader r = new CSVFileReader(props, fileName);
+        MsgpackGzipFileWriter w = new MsgpackGzipFileWriter(props, fileName);
+        FileConverter conv = new FileConverter(props);
+        conv.convert(r, w);
 
         LOG.fine(context.getRequest().getName() + " command finished");
     }
@@ -51,6 +63,5 @@ public class PreparePartsCommand extends
                         props, request, result);
 
         command.execute(context);
-        LOG.info("exit " + result.getErrorCode());
     }
 }

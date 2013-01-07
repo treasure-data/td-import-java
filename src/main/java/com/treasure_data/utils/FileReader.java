@@ -17,6 +17,12 @@
 //
 package com.treasure_data.utils;
 
-public class FileReader {
+import java.util.Properties;
 
+import com.treasure_data.commands.CommandException;
+
+public abstract class FileReader {
+
+    protected abstract void initReader(Properties props, String fileName)
+            throws CommandException;
 }

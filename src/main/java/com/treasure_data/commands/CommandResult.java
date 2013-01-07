@@ -19,15 +19,4 @@ package com.treasure_data.commands;
 
 public abstract class CommandResult {
 
-    private int ecode = 0;
-
-    public void setErrorCode(int ecode) {
-        this.ecode = ecode;
-    }
-
-    public int getErrorCode() {
-        return ecode;
-    }
-
-
 }
