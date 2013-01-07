@@ -22,9 +22,11 @@ import java.util.logging.Logger;
 
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
-import com.treasure_data.utils.CSVFileReader;
 import com.treasure_data.utils.FileConverter;
-import com.treasure_data.utils.MsgpackGzipFileWriter;
+import com.treasure_data.utils.FileReader;
+import com.treasure_data.utils.FileReaderFactory;
+import com.treasure_data.utils.FileWriter;
+import com.treasure_data.utils.FileWriterFactory;
 
 public class PreparePartsCommand extends
         Command<PreparePartsRequest, PreparePartsResult> {
@@ -39,8 +41,8 @@ public class PreparePartsCommand extends
         Properties props = request.getProperties();
         String fileName = request.getFileName();
 
-        CSVFileReader r = new CSVFileReader(props, fileName);
-        MsgpackGzipFileWriter w = new MsgpackGzipFileWriter(props, fileName);
+        FileReader r = FileReaderFactory.newInstance(props, fileName);
+        FileWriter w = FileWriterFactory.newInstance(props, fileName);
         FileConverter conv = new FileConverter(props);
         conv.convertFile(r, w);
 
