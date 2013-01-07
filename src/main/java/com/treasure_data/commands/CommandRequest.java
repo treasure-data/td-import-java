@@ -17,6 +17,7 @@
 //
 package com.treasure_data.commands;
 
-public interface CommandRequest {
+public abstract class CommandRequest {
 
+    protected abstract String getName();
 }

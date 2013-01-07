@@ -19,6 +19,12 @@ package com.treasure_data.commands.bulk_import;
 
 import com.treasure_data.commands.CommandRequest;
 
-public class PreparePartsRequest implements CommandRequest {
+public class PreparePartsRequest extends CommandRequest {
 
+    private static final String COMMAND_NAME = "prepare_parts";
+
+    @Override
+    public String getName() {
+        return COMMAND_NAME;
+    }
 }

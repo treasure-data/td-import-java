@@ -19,6 +19,6 @@ package com.treasure_data.commands.bulk_import;
 
 import com.treasure_data.commands.CommandResult;
 
-public class PreparePartsResult implements CommandResult {
+public class PreparePartsResult extends CommandResult {
 
 }

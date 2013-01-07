@@ -17,7 +17,8 @@
 //
 package com.treasure_data.commands;
 
-public interface Command<REQ extends CommandRequest, RET extends CommandResult> {
+public abstract class Command<REQ extends CommandRequest, RET extends CommandResult> {
 
-    void execute(CommandContext<REQ, RET> context) throws CommandException;
+    protected abstract void execute(CommandContext<REQ, RET> context)
+            throws CommandException;
 }

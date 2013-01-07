@@ -17,20 +17,40 @@
 //
 package com.treasure_data.commands.bulk_import;
 
+import java.util.Properties;
+import java.util.logging.Logger;
+
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandContext;
 import com.treasure_data.commands.CommandException;
 
-public class PreparePartsCommand implements
+public class PreparePartsCommand extends
         Command<PreparePartsRequest, PreparePartsResult> {
+    private static final Logger LOG = Logger
+            .getLogger(PreparePartsCommand.class.getName());
 
+    @Override
     public void execute(
             CommandContext<PreparePartsRequest, PreparePartsResult> context)
             throws CommandException {
+        LOG.fine(context.getRequest().getName() + " command started");
+
         // TODO
+
+        LOG.fine(context.getRequest().getName() + " command finished");
     }
 
     public static void main(String[] args) throws Exception {
-        // TODO
+        Properties props = System.getProperties();
+
+        PreparePartsCommand command = new PreparePartsCommand();
+        PreparePartsRequest request = new PreparePartsRequest();
+        PreparePartsResult result = new PreparePartsResult();
+        CommandContext<PreparePartsRequest, PreparePartsResult> context =
+                new CommandContext<PreparePartsRequest, PreparePartsResult>(
+                        props, request, result);
+
+        command.execute(context);
+        LOG.info("exit " + result.getErrorCode());
     }
 }
