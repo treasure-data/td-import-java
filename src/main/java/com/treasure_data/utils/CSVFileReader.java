@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.constraint.NotNull;
@@ -57,7 +58,8 @@ public class CSVFileReader extends FileReader {
                 CellProcessor cproc;
                 String type = columnTypes[i];
                 if (type.equals("string")) {
-                    cproc = new NotNull();
+                    //cproc = new NotNull();
+                    cproc = new Optional();
                 } else if (type.equals("int")) {
                     cproc = new ParseInt();
                 } else if (type.equals("long")) {
@@ -76,6 +78,7 @@ public class CSVFileReader extends FileReader {
 
     private CsvListReader listReader;
     private int timeIndex = -1;
+    private long timeValue = -1;
     private String[] columnNames;
     private String[] columnTypes;
     private CellProcessor[] cprocessors;
@@ -119,7 +122,13 @@ public class CSVFileReader extends FileReader {
             }
         }
         if (timeIndex < 0) {
-            throw new CommandException("Time column not found");
+            timeValue = request.getTimeValue();
+            if (timeValue < 0) {
+                throw new CommandException(
+                        "Time column not found. --time-column or --time-value option is required");
+            } else {
+                timeIndex = columnNames.length;
+            }
         }
 
         // "long,string,long"
@@ -141,13 +150,17 @@ public class CSVFileReader extends FileReader {
                 return null;
             }
 
-            Map<String, Object> map = new HashMap<String, Object>(record.size());
-            for (int i = 0; i < record.size(); i++) {
+            int size = record.size();
+            Map<String, Object> map = new HashMap<String, Object>(size);
+            for (int i = 0; i < size; i++) {
                 if (i == timeIndex) {
                     map.put("time", record.get(i));
                 } else {
                     map.put(columnNames[i], record.get(i));
                 }
+            }
+            if (size == timeIndex) {
+                map.put("time", timeValue);
             }
 
             return map;

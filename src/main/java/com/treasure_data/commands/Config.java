@@ -13,6 +13,8 @@ public interface Config {
     String BI_PREPARE_PARTS_TIMECOLUMN = "td.bulk_import.prepare_parts.time-column";
     String BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE = "time";
 
+    String BI_PREPARE_PARTS_TIMEVALUE = "td.bulk_import.prepare_parts.time-value";
+
     String BI_PREPARE_PARTS_OUTPUTDIR = "td.bulk_import.prepare_parts.output-dir";
     String BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE = ".";
 
