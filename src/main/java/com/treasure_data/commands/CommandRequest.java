@@ -23,7 +23,7 @@ public abstract class CommandRequest {
 
     private Properties props;
 
-    protected CommandRequest(Properties props) {
+    protected CommandRequest(Properties props) throws CommandException {
         this.props = props;
     }
 

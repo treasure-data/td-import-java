@@ -17,15 +17,16 @@
 //
 package com.treasure_data.utils;
 
+import java.io.InputStream;
 import java.util.Map;
-import java.util.Properties;
 
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public abstract class FileReader {
 
-    protected abstract void initReader(Properties props, String fileName)
-            throws CommandException;
+    protected abstract void initReader(PreparePartsRequest request,
+            InputStream in) throws CommandException;
 
     public abstract Map<String, Object> readRecord() throws CommandException;
 

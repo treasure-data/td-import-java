@@ -18,17 +18,21 @@
 package com.treasure_data.utils;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class FileConverter {
     private static final Logger LOG = Logger.getLogger(FileConverter.class
             .getName());
 
-    public FileConverter(Properties props) {
-        // TODO
+    public FileConverter(PreparePartsRequest request) {
+        initConverter(request);
+    }
+
+    public void initConverter(PreparePartsRequest request) {
+        // TOOD
     }
 
     public void convertFile(FileReader r, FileWriter w) throws CommandException {
@@ -41,5 +45,25 @@ public class FileConverter {
     public void convertRecord(Map<String, Object> record, FileWriter w)
             throws CommandException {
         w.writeRecord(record);
+    }
+
+    private void close0(FileReader r) throws CommandException {
+        if (r != null) {
+            r.close();
+        }
+    }
+
+    private void close0(FileWriter w) throws CommandException {
+        if (w != null) {
+            w.close();
+        }
+    }
+
+    public void close(FileReader r) throws CommandException {
+        close0(r);
+    }
+
+    public void close(FileWriter w) throws CommandException {
+        close0(w);
     }
 }

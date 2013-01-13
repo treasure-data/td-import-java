@@ -17,15 +17,16 @@
 //
 package com.treasure_data.utils;
 
-import java.util.Properties;
+import java.io.File;
 
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class FileReaderFactory {
 
-    public static FileReader newInstance(Properties props, String fileName)
+    public static FileReader newInstance(PreparePartsRequest request, File file)
             throws CommandException {
         // TODO #MN should extend it for other file readers
-        return new CSVFileReader(props, fileName);
+        return new CSVFileReader(request, file);
     }
 }

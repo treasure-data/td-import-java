@@ -17,6 +17,7 @@
 //
 package com.treasure_data.commands.bulk_import;
 
+import java.io.File;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -26,7 +27,6 @@ import com.treasure_data.utils.FileConverter;
 import com.treasure_data.utils.FileReader;
 import com.treasure_data.utils.FileReaderFactory;
 import com.treasure_data.utils.FileWriter;
-import com.treasure_data.utils.FileWriterFactory;
 
 public class PreparePartsCommand extends
         Command<PreparePartsRequest, PreparePartsResult> {
@@ -36,44 +36,27 @@ public class PreparePartsCommand extends
     @Override
     public void execute(PreparePartsRequest request, PreparePartsResult result)
             throws CommandException {
-        LOG.fine(request.getName() + " command started");
+        LOG.info("Execute " + request.getName() + " command");
 
         Properties props = request.getProperties();
-        String fileName = request.getFileName();
+        File[] files = request.getFiles();
 
-        FileReader r = FileReaderFactory.newInstance(props, fileName);
-        FileWriter w = FileWriterFactory.newInstance(props, fileName);
-        FileConverter conv = new FileConverter(props);
-        conv.convertFile(r, w);
-        if (r != null) {
-            try {
-                r.close();
-            } catch (CommandException e) {
-                e.printStackTrace(); // TODO
-            }
+        for (File f : files) {
+            execute(props, request, result, f);
         }
-        if (w != null) {
-            try {
-                w.close();
-            } catch (CommandException e) {
-                e.printStackTrace(); // TODO
-            }
-        }
-        LOG.fine(request.getName() + " command finished");
+
+        LOG.info("Finish " + request.getName() + " command");
     }
 
-    public static void main(String[] args) throws Exception {
-        Properties props = System.getProperties();
-        props.setProperty("td.bulk_import.prepare_parts.columns", "time,name,price");
-        props.setProperty("td.bulk_import.prepare_parts.columntypes", "long,string,long");
-        props.setProperty("td.bulk_import.prepare_parts.time_column", "time");
-        props.setProperty("td.bulk_import.prepare_parts.output_dir", "./out/");
+    protected void execute(Properties props, PreparePartsRequest request,
+            PreparePartsResult result, File file) throws CommandException {
+        LOG.info("Read file: " + file.getName());
 
-        PreparePartsCommand command = new PreparePartsCommand();
-        PreparePartsRequest request = new PreparePartsRequest(props);
-        request.setFileName("./in/test.csv");
-        PreparePartsResult result = new PreparePartsResult();
-
-        command.execute(request, result);
+        FileReader r = FileReaderFactory.newInstance(request, file);
+        FileWriter w = new FileWriter(request, file);
+        FileConverter conv = new FileConverter(request);
+        conv.convertFile(r, w);
+        conv.close(r);
+        conv.close(w);
     }
 }

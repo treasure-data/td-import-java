@@ -17,22 +17,27 @@
 //
 package com.treasure_data.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvMapReader;
-import org.supercsv.io.ICsvMapReader;
+import org.supercsv.io.CsvListReader;
 import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class CSVFileReader extends FileReader {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class
@@ -69,63 +74,92 @@ public class CSVFileReader extends FileReader {
         }
     }
 
-    private ICsvMapReader mapReader;
-    private String[] header;
+    private CsvListReader listReader;
+    private int timeIndex = -1;
+    private String[] columnNames;
+    private String[] columnTypes;
     private CellProcessor[] cprocessors;
 
-    public CSVFileReader(Properties props, String fileName)
+    public CSVFileReader(PreparePartsRequest request, File file)
             throws CommandException {
-        initReader(props, fileName);
+        try {
+            initReader(request, new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    public CSVFileReader(PreparePartsRequest request, InputStream in)
+            throws CommandException {
+        initReader(request, in);
     }
 
     @Override
-    public void initReader(Properties props, String fileName)
-            throws CommandException {
-        // TODO refine
-        try {
-            mapReader = new CsvMapReader(new java.io.FileReader(fileName),
-                    CsvPreference.STANDARD_PREFERENCE);
-        } catch (IOException e) {
-            throw new CommandException(e);
-        }
-
-        try {
-            // the header columns are used as the keys to the Map
-            header = mapReader.getHeader(true);
-        } catch (IOException e) {
-            throw new CommandException(e);
-        }
+    public void initReader(PreparePartsRequest request, InputStream in) throws CommandException {
+        listReader = new CsvListReader(new InputStreamReader(in),
+                CsvPreference.STANDARD_PREFERENCE);
 
         // "time,name,price"
-        String columnNameList = props
-                .getProperty("td.bulk_import.prepare_parts.columns");
-        String[] columnNames = columnNameList.split(","); // TODO
+        try {
+            if (request.hasColumnHeader()) {
+                // the header columns are used as the keys to the Map
+                columnNames = listReader.getHeader(true);
+            } else {
+                columnNames = request.getColumnNames();
+            }
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+
+        String timeColumn = request.getTimeColumn();
+        for (int i = 0; i < columnNames.length; i++) {
+            if (columnNames[i].equals(timeColumn)) {
+                timeIndex = i;
+                break;
+            }
+        }
+        if (timeIndex < 0) {
+            throw new CommandException("Time column not found");
+        }
+
         // "long,string,long"
-        String columnTypeList = props
-                .getProperty("td.bulk_import.prepare_parts.columntypes");
-        String[] columnTypes = columnTypeList.split(","); // TODO
+        columnTypes = request.getColumnTypes();
 
         cprocessors = new CellProcessorGen(columnNames, columnTypes).gen();
     }
 
     public Map<String, Object> readRecord() throws CommandException {
         try {
-            Map<String, Object> record = mapReader.read(header, cprocessors);
-            LOG.finer(String.format("lineNo=%s, rowNo=%s, customerMap=%s",
-                    mapReader.getLineNumber(), mapReader.getRowNumber(), record));
+            List<Object> record = listReader.read(cprocessors);
+            LOG.finer(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+                    listReader.getLineNumber(), listReader.getRowNumber(), record));
             // TODO debug
-            System.out.println(String.format("lineNo=%s, rowNo=%s, customerMap=%s",
-                    mapReader.getLineNumber(), mapReader.getRowNumber(), record));
-            return record;
+            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+                    listReader.getLineNumber(), listReader.getRowNumber(), record));
+
+            if (record == null || record.isEmpty()) {
+                return null;
+            }
+
+            Map<String, Object> map = new HashMap<String, Object>(record.size());
+            for (int i = 0; i < record.size(); i++) {
+                if (i == timeIndex) {
+                    map.put("time", record.get(i));
+                } else {
+                    map.put(columnNames[i], record.get(i));
+                }
+            }
+
+            return map;
         } catch (IOException e) {
             throw new CommandException(e);
         }
     }
 
     public void close() throws CommandException {
-        if (mapReader != null) {
+        if (listReader != null) {
             try {
-                mapReader.close();
+                listReader.close();
             } catch (IOException e) {
                 throw new CommandException(e);
             }
