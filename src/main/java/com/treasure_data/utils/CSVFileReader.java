@@ -19,11 +19,8 @@ package com.treasure_data.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
 import org.msgpack.type.Value;
@@ -50,24 +47,16 @@ public class CSVFileReader extends FileReader {
 
     public CSVFileReader(PreparePartsRequest request, File file)
             throws CommandException {
-        try {
-            initReader(request, new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            throw new CommandException(e);
-        }
-    }
-
-    public CSVFileReader(PreparePartsRequest request, InputStream in)
-            throws CommandException {
-        initReader(request, in);
+        initReader(request, file);
     }
 
     @Override
-    public void initReader(PreparePartsRequest request, InputStream in) throws CommandException {
-//        listReader = new CsvListReader(new InputStreamReader(in),
-//                CsvPreference.STANDARD_PREFERENCE);
-
-        reader = new BufferedReader(new InputStreamReader(in));
+    public void initReader(PreparePartsRequest request, File file) throws CommandException {
+        try {
+            reader = new BufferedReader(new java.io.FileReader(file));
+        } catch (FileNotFoundException e) {
+            throw new CommandException(e);
+        }
 
         // "time,name,price"
         try {

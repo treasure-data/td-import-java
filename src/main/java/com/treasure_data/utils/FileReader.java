@@ -17,7 +17,7 @@
 //
 package com.treasure_data.utils;
 
-import java.io.InputStream;
+import java.io.File;
 
 import org.msgpack.type.Value;
 
@@ -26,8 +26,8 @@ import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public abstract class FileReader {
 
-    protected abstract void initReader(PreparePartsRequest request,
-            InputStream in) throws CommandException;
+    protected abstract void initReader(PreparePartsRequest request, File file)
+            throws CommandException;
 
     public abstract Value[] readRecord() throws CommandException;
 
