@@ -19,8 +19,6 @@ package com.treasure_data.utils;
 
 import java.util.logging.Logger;
 
-import org.msgpack.type.Value;
-
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
@@ -35,19 +33,13 @@ public class FileConverter {
     public void initConverter(PreparePartsRequest request) {
     }
 
-    public void convertFile(FileReader r, FileWriter w) throws CommandException {
-        Value[] record;
-        while ((record = r.readRecord()) != null) {
-            convertRecord(record, w);
+    public void convertFile(FileParser r, FileWriter w) throws CommandException {
+        while (r.parseRow(w)) {
+            ;
         }
     }
 
-    public void convertRecord(Value[] kvs, FileWriter w)
-            throws CommandException {
-        w.writeRecord(kvs);
-    }
-
-    public void close(FileReader r) throws CommandException {
+    public void close(FileParser r) throws CommandException {
         if (r != null) {
             r.close();
         }
