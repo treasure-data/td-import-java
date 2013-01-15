@@ -167,9 +167,9 @@ public class CSVFileParser extends FileParser {
             int size = row.size();
 
             if (size == timeIndex) {
-                w.startRow(size + 1);
+                w.writeBeginRow(size + 1);
             } else {
-                w.startRow(size);
+                w.writeBeginRow(size);
             }
 
             for (int i = 0; i < size; i++) {
@@ -181,12 +181,13 @@ public class CSVFileParser extends FileParser {
                     w.write(row.get(i));
                 }
             }
+
             if (size == timeIndex) {
                 w.write(timeColumnName);
                 w.write(timeValue);
             }
-            w.endRow();
 
+            w.writeEndRow();
             return true;
         } catch (IOException e) {
             throw new CommandException(e);

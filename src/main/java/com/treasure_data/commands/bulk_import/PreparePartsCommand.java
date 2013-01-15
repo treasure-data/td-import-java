@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
-import com.treasure_data.utils.FileConverter;
 import com.treasure_data.utils.FileParser;
 import com.treasure_data.utils.FileParserFactory;
 import com.treasure_data.utils.FileWriter;
@@ -54,9 +53,10 @@ public class PreparePartsCommand extends
 
         FileParser r = FileParserFactory.newInstance(request, file);
         FileWriter w = new FileWriter(request, file);
-        FileConverter conv = new FileConverter(request);
-        conv.convertFile(r, w);
-        conv.close(r);
-        conv.close(w);
+        while (r.parseRow(w)) {
+            ;
+        }
+        r.close();
+        w.close();
     }
 }

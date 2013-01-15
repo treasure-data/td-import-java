@@ -111,7 +111,7 @@ public class FileWriter {
         }
     }
 
-    public void startRow(int size) throws CommandException {
+    public void writeBeginRow(int size) throws CommandException {
         try {
             packer.writeMapBegin(size);
         } catch (IOException e) {
@@ -135,7 +135,7 @@ public class FileWriter {
         }
     }
 
-    public void endRow() throws CommandException {
+    public void writeEndRow() throws CommandException {
         try {
             packer.writeMapEnd();
             if (dout.size() > splitSize) {
