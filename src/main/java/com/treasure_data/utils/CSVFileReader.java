@@ -35,7 +35,6 @@ public class CSVFileReader extends FileReader {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class
             .getName());
 
-    //private CsvListReader listReader;
     private BufferedReader reader;
     private int timeIndex = -1;
     private long timeValue = -1;
@@ -105,9 +104,6 @@ public class CSVFileReader extends FileReader {
         try {
             String line = reader.readLine();
 
-//            List<Object> record = listReader.read(cprocessors);
-//            LOG.finer(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-//                    listReader.getLineNumber(), listReader.getRowNumber(), record));
 //            // TODO debug
 //            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
 //                    listReader.getLineNumber(), listReader.getRowNumber(), record));

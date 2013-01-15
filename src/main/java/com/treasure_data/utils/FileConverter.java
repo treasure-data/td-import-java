@@ -17,7 +17,6 @@
 //
 package com.treasure_data.utils;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.msgpack.type.Value;
@@ -34,7 +33,6 @@ public class FileConverter {
     }
 
     public void initConverter(PreparePartsRequest request) {
-        // TOOD
     }
 
     public void convertFile(FileReader r, FileWriter w) throws CommandException {
@@ -49,23 +47,15 @@ public class FileConverter {
         w.writeRecord(kvs);
     }
 
-    private void close0(FileReader r) throws CommandException {
+    public void close(FileReader r) throws CommandException {
         if (r != null) {
             r.close();
         }
     }
 
-    private void close0(FileWriter w) throws CommandException {
+    public void close(FileWriter w) throws CommandException {
         if (w != null) {
             w.close();
         }
-    }
-
-    public void close(FileReader r) throws CommandException {
-        close0(r);
-    }
-
-    public void close(FileWriter w) throws CommandException {
-        close0(w);
     }
 }
