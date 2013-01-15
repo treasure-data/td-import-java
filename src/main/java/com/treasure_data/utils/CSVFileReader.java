@@ -129,7 +129,6 @@ public class CSVFileReader extends FileReader {
                 } else {
                     kvs[2 * i] = columnNameValues[i];
                     kvs[2 * i + 1] = cprocessors[i].doIt(columnValues[i]);
-                    //kvs[2 * i + 1] = ValueFactory.createRawValue((String) columnValues[i]); // TODO
                 }
             }
             if (size == timeIndex) {
