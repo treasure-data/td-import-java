@@ -95,10 +95,8 @@ public class CSVFileReader extends FileReader {
                 } else if (type.equals("long")) {
                     cproc = new LongProc();
                     // TODO any more...
-                    // TODO any more...
-                    // TODO any more...
                 } else {
-                    throw new CommandException("Not such type: " + type);
+                    throw new CommandException("Unsupported type: " + type);
                 }
                 cprocs.add(cproc);
             }
@@ -211,7 +209,8 @@ public class CSVFileReader extends FileReader {
                     kvs[2 * i + 1] = ValueFactory.createIntegerValue(Long.parseLong(columnValues[i]));
                 } else {
                     kvs[2 * i] = columnNameValues[i];
-                    kvs[2 * i + 1] = ValueFactory.createRawValue((String) columnValues[i]); // TODO
+                    kvs[2 * i + 1] = cprocessors[i].doIt(columnValues[i]);
+                    //kvs[2 * i + 1] = ValueFactory.createRawValue((String) columnValues[i]); // TODO
                 }
             }
             if (size == timeIndex) {
