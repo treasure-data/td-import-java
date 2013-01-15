@@ -21,19 +21,47 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
+import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.ParseLong;
+import org.supercsv.cellprocessor.ift.CellProcessor;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
-import com.treasure_data.commands.bulk_import.cellproc.CellProcessor;
-import com.treasure_data.commands.bulk_import.cellproc.CellProcessorGen;
 
 public class CSVFileReader extends FileReader {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class
             .getName());
+
+    private static class CellProcessorGen {
+        public CellProcessor[] gen(String[] columnTypes)
+                throws CommandException {
+            int len = columnTypes.length;
+            List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
+            for (int i = 0; i < len; i++) {
+                CellProcessor cproc;
+                String type = columnTypes[i];
+                if (type.equals("string")) {
+                    cproc = new Optional();
+                } else if (type.equals("int")) {
+                    cproc = new ParseInt();
+                } else if (type.equals("long")) {
+                    cproc = new ParseLong();
+                    // TODO any more...
+                } else {
+                    throw new CommandException("Unsupported type: " + type);
+                }
+                cprocs.add(cproc);
+            }
+            return cprocs.toArray(new CellProcessor[0]);
+        }
+    }
 
     private BufferedReader reader;
     private int timeIndex = -1;
@@ -103,6 +131,7 @@ public class CSVFileReader extends FileReader {
     public Value[] readRecord() throws CommandException {
         try {
             String line = reader.readLine();
+            // TODO
 
 //            // TODO debug
 //            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
@@ -128,7 +157,7 @@ public class CSVFileReader extends FileReader {
                     kvs[2 * i + 1] = ValueFactory.createIntegerValue(Long.parseLong(columnValues[i]));
                 } else {
                     kvs[2 * i] = columnNameValues[i];
-                    kvs[2 * i + 1] = cprocessors[i].doIt(columnValues[i]);
+                    //kvs[2 * i + 1] = cprocessors[i].doIt(columnValues[i]);
                 }
             }
             if (size == timeIndex) {
