@@ -31,6 +31,9 @@ import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.io.ICsvListReader;
+import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
@@ -63,12 +66,12 @@ public class CSVFileParser extends FileParser {
         }
     }
 
-    private BufferedReader reader;
+    private ICsvListReader listReader;
     private int timeIndex = -1;
     private long timeValue = -1;
     private String[] columnNames;
-    private Value[] columnNameValues;
-    private Value timeColumnValue = ValueFactory.createRawValue("time");
+    private final String timeColumnName = "time";
+
     private String[] columnTypes;
     private CellProcessor[] cprocessors;
 
@@ -78,31 +81,52 @@ public class CSVFileParser extends FileParser {
     }
 
     @Override
-    public void initReader(PreparePartsRequest request, File file) throws CommandException {
+    public void initReader(PreparePartsRequest request, File file)
+            throws CommandException {
+        // create reader
         try {
-            reader = new BufferedReader(new java.io.FileReader(file));
+            listReader = new CsvListReader(new java.io.FileReader(file),
+                    CsvPreference.STANDARD_PREFERENCE);
         } catch (FileNotFoundException e) {
             throw new CommandException(e);
         }
 
-        // "time,name,price"
-        try {
-            if (request.hasColumnHeader()) {
-                // the header columns are used as the keys to the Map
-                String line = reader.readLine();
-                columnNames = line.split(",");
-                //columnNames = listReader.getHeader(true);
-            } else {
-                columnNames = request.getColumnNames();
+        // column name e.g. "time,name,price"
+        if (request.hasColumnHeader()) {
+            /**
+            try {
+                columnNames = listReader.getHeader(true);
+            } catch (IOException e) {
+                throw new CommandException(e);
+            } finally {
+                try {
+                    listReader.close();
+                } catch (IOException e) {
+                    throw new CommandException(e);
+                }
             }
-        } catch (IOException e) {
-            throw new CommandException(e);
-        }
+            */
+            BufferedReader r = null;
+            try {
+                // the header columns are used
+                r = new BufferedReader(new java.io.FileReader(file));
+                String line = r.readLine();
+                columnNames = line.split(",");
 
-        // column name values
-        columnNameValues = new Value[columnNames.length];
-        for (int i = 0; i < columnNames.length; i++) {
-            columnNameValues[i] = ValueFactory.createRawValue(columnNames[i]);
+                listReader.read();
+            } catch (IOException e) {
+                throw new CommandException(e);
+            } finally {
+                if (r != null) {
+                    try {
+                        r.close();
+                    } catch (IOException e) {
+                        throw new CommandException(e);
+                    }
+                }
+            }
+        } else {
+            columnNames = request.getColumnNames();
         }
 
         String timeColumn = request.getTimeColumn();
@@ -130,40 +154,38 @@ public class CSVFileParser extends FileParser {
 
     public boolean parseRow(FileWriter w) throws CommandException {
         try {
-            String line = reader.readLine();
-            // TODO
+            List<Object> row = listReader.read(cprocessors);
 
-//            // TODO debug
+            // TODO debug
 //            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-//                    listReader.getLineNumber(), listReader.getRowNumber(), record));
+//                    listReader.getLineNumber(), listReader.getRowNumber(), row));
 
-            if (line == null || line.isEmpty()) {
+            if (row == null || row.isEmpty()) {
                 return false;
             }
 
-            String[] columnValues = line.split(",");
-            int size = columnValues.length;
+            int size = row.size();
 
-            Value[] kvs;
             if (size == timeIndex) {
-                kvs = new Value[2 * (size + 1)];
+                w.startRow(size + 1);
             } else {
-                kvs = new Value[2 * size];
+                w.startRow(size);
             }
 
             for (int i = 0; i < size; i++) {
                 if (i == timeIndex) {
-                    kvs[2 * i] = timeColumnValue;
-                    kvs[2 * i + 1] = ValueFactory.createIntegerValue(Long.parseLong(columnValues[i]));
+                    w.write(timeColumnName);
+                    w.write(row.get(i));
                 } else {
-                    kvs[2 * i] = columnNameValues[i];
-                    //kvs[2 * i + 1] = cprocessors[i].doIt(columnValues[i]);
+                    w.write(columnNames[i]);
+                    w.write(row.get(i));
                 }
             }
             if (size == timeIndex) {
-                kvs[2 * size] = timeColumnValue;
-                kvs[2 * size + 1] = ValueFactory.createIntegerValue(timeValue);
+                w.write(timeColumnName);
+                w.write(timeValue);
             }
+            w.endRow();
 
             return true;
         } catch (IOException e) {
@@ -172,9 +194,9 @@ public class CSVFileParser extends FileParser {
     }
 
     public void close() throws CommandException {
-        if (reader != null) {
+        if (listReader != null) {
             try {
-                reader.close();
+                listReader.close();
             } catch (IOException e) {
                 throw new CommandException(e);
             }

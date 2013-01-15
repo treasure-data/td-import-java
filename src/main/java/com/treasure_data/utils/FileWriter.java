@@ -27,8 +27,6 @@ import java.util.zip.GZIPOutputStream;
 
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
-import org.msgpack.type.Value;
-import org.msgpack.type.ValueFactory;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
@@ -113,6 +111,41 @@ public class FileWriter {
         }
     }
 
+    public void startRow(int size) throws CommandException {
+        try {
+            packer.writeMapBegin(size);
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    public void write(Object o) throws CommandException {
+        try {
+            packer.write(o);
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    public void write(long o) throws CommandException {
+        try {
+            packer.write(o);
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    public void endRow() throws CommandException {
+        try {
+            packer.writeMapEnd();
+            if (dout.size() > splitSize) {
+                reopenOutputFile();
+            }
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
     public void close() throws CommandException {
         if (gzout != null) {
             try {
@@ -124,16 +157,5 @@ public class FileWriter {
             dout = null;
         }
         packer = null;
-    }
-
-    public void writeRecord(Value[] kvs) throws CommandException {
-        try {
-            packer.write(ValueFactory.createMapValue(kvs, true));
-            if (dout.size() > splitSize) {
-                reopenOutputFile();
-            }
-        } catch (IOException e) {
-            throw new CommandException(e);
-        }
     }
 }
