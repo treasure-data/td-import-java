@@ -20,6 +20,8 @@ package com.treasure_data.utils;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.msgpack.type.Value;
+
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
@@ -36,15 +38,15 @@ public class FileConverter {
     }
 
     public void convertFile(FileReader r, FileWriter w) throws CommandException {
-        Map<String, Object> record;
+        Value[] record;
         while ((record = r.readRecord()) != null) {
             convertRecord(record, w);
         }
     }
 
-    public void convertRecord(Map<String, Object> record, FileWriter w)
+    public void convertRecord(Value[] kvs, FileWriter w)
             throws CommandException {
-        w.writeRecord(record);
+        w.writeRecord(kvs);
     }
 
     private void close0(FileReader r) throws CommandException {

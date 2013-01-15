@@ -17,6 +17,7 @@
 //
 package com.treasure_data.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.msgpack.type.Value;
+import org.msgpack.type.ValueFactory;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ParseLong;
@@ -76,12 +79,68 @@ public class CSVFileReader extends FileReader {
         }
     }
 
-    private CsvListReader listReader;
+    private static interface CellProcessor2 {
+        public Value doIt(String text);
+    }
+
+    private static class StringProc implements CellProcessor2 {
+        public Value doIt(String text) {
+            return null; // TODO
+        }
+    }
+
+    private static class IntProc implements CellProcessor2 {
+        public Value doIt(String text) {
+            return null; // TODO
+        }
+    }
+
+    private static class LongProc implements CellProcessor2 {
+        public Value doIt(String text) {
+            return null; // TODO
+        }
+    }
+
+    private static class CellProcessorGen2 {
+        private String[] columnTypes;
+
+        public CellProcessorGen2(String[] columnTypes) {
+            this.columnTypes = columnTypes;
+        }
+
+        public CellProcessor2[] gen() throws CommandException {
+            int len = columnTypes.length;
+            List<CellProcessor2> cprocs = new ArrayList<CellProcessor2>(len);
+            for (int i = 0; i < len; i++) {
+                CellProcessor2 cproc;
+                String type = columnTypes[i];
+                if (type.equals("string")) {
+                    cproc = new StringProc();
+                } else if (type.equals("int")) {
+                    cproc = new IntProc();
+                } else if (type.equals("long")) {
+                    cproc = new LongProc();
+                    // TODO any more...
+                    // TODO any more...
+                    // TODO any more...
+                } else {
+                    throw new CommandException("Not such type: " + type);
+                }
+                cprocs.add(cproc);
+            }
+            return cprocs.toArray(new CellProcessor2[0]);
+        }
+    }
+
+    //private CsvListReader listReader;
+    private BufferedReader reader;
     private int timeIndex = -1;
     private long timeValue = -1;
     private String[] columnNames;
+    private Value[] columnNameValues;
+    private Value timeColumnValue = ValueFactory.createRawValue("time");
     private String[] columnTypes;
-    private CellProcessor[] cprocessors;
+    private CellProcessor2[] cprocessors;
 
     public CSVFileReader(PreparePartsRequest request, File file)
             throws CommandException {
@@ -99,19 +158,29 @@ public class CSVFileReader extends FileReader {
 
     @Override
     public void initReader(PreparePartsRequest request, InputStream in) throws CommandException {
-        listReader = new CsvListReader(new InputStreamReader(in),
-                CsvPreference.STANDARD_PREFERENCE);
+//        listReader = new CsvListReader(new InputStreamReader(in),
+//                CsvPreference.STANDARD_PREFERENCE);
+
+        reader = new BufferedReader(new InputStreamReader(in));
 
         // "time,name,price"
         try {
             if (request.hasColumnHeader()) {
                 // the header columns are used as the keys to the Map
-                columnNames = listReader.getHeader(true);
+                String line = reader.readLine();
+                columnNames = line.split(",");
+                //columnNames = listReader.getHeader(true);
             } else {
                 columnNames = request.getColumnNames();
             }
         } catch (IOException e) {
             throw new CommandException(e);
+        }
+
+        // column name values
+        columnNameValues = new Value[columnNames.length];
+        for (int i = 0; i < columnNames.length; i++) {
+            columnNameValues[i] = ValueFactory.createRawValue(columnNames[i]);
         }
 
         String timeColumn = request.getTimeColumn();
@@ -134,45 +203,58 @@ public class CSVFileReader extends FileReader {
         // "long,string,long"
         columnTypes = request.getColumnTypes();
 
-        cprocessors = new CellProcessorGen(columnNames, columnTypes).gen();
+        cprocessors = new CellProcessorGen2(columnTypes).gen();
     }
 
-    public Map<String, Object> readRecord() throws CommandException {
+    public Value[] readRecord() throws CommandException {
         try {
-            List<Object> record = listReader.read(cprocessors);
-            LOG.finer(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-                    listReader.getLineNumber(), listReader.getRowNumber(), record));
-            // TODO debug
-            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-                    listReader.getLineNumber(), listReader.getRowNumber(), record));
+            String line = reader.readLine();
 
-            if (record == null || record.isEmpty()) {
+//            List<Object> record = listReader.read(cprocessors);
+//            LOG.finer(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+//                    listReader.getLineNumber(), listReader.getRowNumber(), record));
+//            // TODO debug
+//            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+//                    listReader.getLineNumber(), listReader.getRowNumber(), record));
+
+            if (line == null || line.isEmpty()) {
                 return null;
             }
 
-            int size = record.size();
-            Map<String, Object> map = new HashMap<String, Object>(size);
+            String[] columnValues = line.split(",");
+            int size = columnValues.length;
+
+            Value[] kvs;
+            if (size == timeIndex) {
+                kvs = new Value[2 * (size + 1)];
+            } else {
+                kvs = new Value[2 * size];
+            }
+
             for (int i = 0; i < size; i++) {
                 if (i == timeIndex) {
-                    map.put("time", record.get(i));
+                    kvs[2 * i] = timeColumnValue;
+                    kvs[2 * i + 1] = ValueFactory.createIntegerValue(Long.parseLong(columnValues[i]));
                 } else {
-                    map.put(columnNames[i], record.get(i));
+                    kvs[2 * i] = columnNameValues[i];
+                    kvs[2 * i + 1] = ValueFactory.createRawValue((String) columnValues[i]); // TODO
                 }
             }
             if (size == timeIndex) {
-                map.put("time", timeValue);
+                kvs[2 * size] = timeColumnValue;
+                kvs[2 * size + 1] = ValueFactory.createIntegerValue(timeValue);
             }
 
-            return map;
+            return kvs;
         } catch (IOException e) {
             throw new CommandException(e);
         }
     }
 
     public void close() throws CommandException {
-        if (listReader != null) {
+        if (reader != null) {
             try {
-                listReader.close();
+                reader.close();
             } catch (IOException e) {
                 throw new CommandException(e);
             }

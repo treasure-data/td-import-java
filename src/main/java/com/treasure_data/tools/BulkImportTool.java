@@ -34,9 +34,9 @@ public class BulkImportTool {
      *   $ java BulkImportTool prepare_parts <files...>
      * example:
      *   $ java BulkImportTool prepareParts logs/*.csv \
-     *         -Dtd.bulk_import.preparee_parts.format=csv \
-     *         -Dtd.bulk_import.preparee_parts.columns=time,uid,price,count \
-     *         -Dtd.bulk_import.preparee_parts.columntypes=long,string,long,int \
+     *         -Dtd.bulk_import.prepare_parts.format=csv \
+     *         -Dtd.bulk_import.prepare_parts.columns=time,uid,price,count \
+     *         -Dtd.bulk_import.prepare_parts.columntypes=long,string,long,int \
      *         -Dtd.bulk_import.prepare_parts.time_column=time \
      *         -Dtd.bulk_import.prepare_parts.output_dir=./parts/
      * description:
@@ -54,8 +54,9 @@ public class BulkImportTool {
      * @param props
      * @throws Exception
      */
-    public static void prepareParts(String[] args, Properties props) throws Exception {
-        if (args.length <= 1) {
+    public static void prepareParts(final String[] args, Properties props)
+            throws Exception {
+        if (args.length < 2) {
             throw new IllegalArgumentException("File names not specified");
         }
 
@@ -75,7 +76,11 @@ public class BulkImportTool {
         LOG.info("Finish prepare_parts command");
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
+        if (args.length < 1) {
+            throw new IllegalArgumentException("Command not specified");
+        }
+
         String commandName = args[0];
         Properties props = System.getProperties();
         if (commandName.equals("prepare_parts")) {

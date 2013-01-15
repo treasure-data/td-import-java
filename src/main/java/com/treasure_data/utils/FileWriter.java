@@ -17,17 +17,18 @@
 //
 package com.treasure_data.utils;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
-import org.msgpack.template.Templates;
+import org.msgpack.type.Value;
+import org.msgpack.type.ValueFactory;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
@@ -42,15 +43,7 @@ public class FileWriter {
         }
 
         @Override
-        public void write(int b) throws IOException {
-            System.out.println("# write(int)");
-            size++;
-            super.write(b);
-        }
-
-        @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            System.out.println("# write(byte[], int, int)");
             size += len;
             super.write(b, off, len);
         }
@@ -89,7 +82,7 @@ public class FileWriter {
         String infileName = infile.getName();
         int lastSepIndex = infileName.lastIndexOf(File.pathSeparator);
         outputFilePrefix = infileName.substring(lastSepIndex + 1,
-                infileName.length());
+                infileName.length()).replace('.', '_');
 
         // outputDir
         outputDirName = request.getOutputDirName();
@@ -108,9 +101,11 @@ public class FileWriter {
 
         // create msgpack packer
         try {
-            String outputFileName = outputFilePrefix + "_" + outputFileIndex + ".msgpack.gz";
+            String outputFileName = outputFilePrefix + "_" + outputFileIndex
+                    + ".msgpack.gz";
             outputFileIndex++;
-            dout = new DataSizeChecker(new FileOutputStream(new File(outputDirName, outputFileName)));
+            dout = new DataSizeChecker(new BufferedOutputStream(
+                    new FileOutputStream(new File(outputDirName, outputFileName))));
             gzout = new GZIPOutputStream(dout);
             packer = msgpack.createPacker(gzout);
         } catch (IOException e) {
@@ -131,16 +126,9 @@ public class FileWriter {
         packer = null;
     }
 
-    public void writeRecord(Map<String, Object> record) throws CommandException {
+    public void writeRecord(Value[] kvs) throws CommandException {
         try {
-            packer.writeMapBegin(record.size());
-            for (Map.Entry<String, Object> pair : record.entrySet()) {
-                Templates.TString.write(packer, pair.getKey());
-                packer.write(pair.getValue());
-            }
-            packer.writeMapEnd();
-
-            System.out.println(dout.size()); // TODO
+            packer.write(ValueFactory.createMapValue(kvs, true));
             if (dout.size() > splitSize) {
                 reopenOutputFile();
             }

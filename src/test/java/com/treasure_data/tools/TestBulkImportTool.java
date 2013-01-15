@@ -29,7 +29,8 @@ public class TestBulkImportTool {
     @Test
     public void testSample2() throws Exception {
         Properties props = System.getProperties();
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "date_code,customer_code,product_code,employee_code,pay_method_code,credit_company_code,amount_of_sales,total_sales,original_price,discount_amount,card_point,motivate_code,delete_flag");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "date_code,customer_code,product_code,employee_code,pay_method_code,credit_company_code,amount_of_sales,total_sales,original_price,discount_amount,card_point,motivate_code,delete_flag");
         //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
         props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "1358069100");
@@ -39,6 +40,24 @@ public class TestBulkImportTool {
         final String[] args = new String[] {
                 "prepare_parts",
                 "./from_SQLServer_to_csv_10.csv",
+        };
+        BulkImportTool.prepareParts(args, props);
+    }
+
+    @Test @Ignore
+    public void testSample3() throws Exception {
+        Properties props = System.getProperties();
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "date_code,customer_code,product_code,employee_code,pay_method_code,credit_company_code,amount_of_sales,total_sales,original_price,discount_amount,card_point,motivate_code,delete_flag");
+        //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "1358069100");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + 1024 * 100);
+
+        final String[] args = new String[] {
+                "prepare_parts",
+                "./from_SQLServer_to_csv_10000000.csv",
         };
         BulkImportTool.prepareParts(args, props);
     }

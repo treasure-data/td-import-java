@@ -18,6 +18,8 @@
 package com.treasure_data.commands.bulk_import;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -33,6 +35,14 @@ public class PreparePartsRequest extends CommandRequest {
 
     private File[] files;
 
+    private String[] columnNames;
+    private String[] columnTypes;
+    private boolean hasColumnHeader = false;
+    private String timeColumn;
+    private long timeValue = -1;
+    private String outputDirName;
+    private int splitSize;
+
     public PreparePartsRequest(String[] fileNames, Properties props)
             throws CommandException {
         super(props);
@@ -47,51 +57,40 @@ public class PreparePartsRequest extends CommandRequest {
 
     private void setFiles(String[] fileNames) throws CommandException {
         // validation for file names
-        files = new File[fileNames.length];
+        List<File> fileList = new ArrayList<File>(fileNames.length);
         for (int i = 0; i < fileNames.length; i++) {
             String fname = fileNames[i];
             File f = new File(fname);
             if (!f.isFile()) {
-                String msg = "Invalid file name: " + fname;
-                LOG.severe(msg);
-                throw new CommandException(msg);
+                LOG.severe("No such file: " + fname);
             }
-            files[i] = f;
+            fileList.add(f);
         }
+        files = fileList.toArray(new File[0]);
     }
 
     public File[] getFiles() {
         return files;
     }
 
-    private String[] columnNames;
-    private String[] columnTypes;
-    private boolean hasColumnHeader = false;
-    private String timeColumn;
-    private long timeValue = -1;
-    private String outputDirName;
-    private int splitSize;
-
     private void setOptions(Properties props) throws CommandException {
         // format
         String format = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT);
-        if (format == null) {
-            throw new CommandException("Format not specified: "
+        if (format == null || format.isEmpty()) {
+            throw new CommandException("Format is required: "
                     + Config.BI_PREPARE_PARTS_FORMAT);
-        } else {
-            if (!format.equals("csv")) {
-                throw new CommandException("Invalid format: "
-                        + Config.BI_PREPARE_PARTS_FORMAT);
-            }
+        } else if (!format.equals("csv")) { // csv
+            throw new CommandException("Invalid format: "
+                    + Config.BI_PREPARE_PARTS_FORMAT);
         }
 
         boolean setColumns = false;
 
         // columns
-        String columns = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNS);
-        if (columns != null) {
+        String cs = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNS);
+        if (cs != null) {
             setColumns = true;
-            columnNames = columns.split(",");
+            columnNames = cs.split(",");
         }
 
         // column header
@@ -106,18 +105,21 @@ public class PreparePartsRequest extends CommandRequest {
         }
 
         // column types
-        String columntypes = props
+        String ctypes = props
                 .getProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES);
-        if (columntypes == null) {
-            throw new CommandException("Column types not specified: "
+        if (ctypes == null || ctypes.isEmpty()) {
+            throw new CommandException("Column types is required: "
                     + Config.BI_PREPARE_PARTS_COLUMNTYPES);
         } else {
-            columnTypes = columntypes.split(",");
+            columnTypes = ctypes.split(",");
         }
 
         // output dir
-        outputDirName = props.getProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR,
-                Config.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
+        outputDirName = props.getProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR);
+        if (outputDirName == null || outputDirName.isEmpty()) {
+            throw new CommandException("Output dir is required: "
+                    + Config.BI_PREPARE_PARTS_OUTPUTDIR);
+        }
 
         // time column
         timeColumn = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN,
