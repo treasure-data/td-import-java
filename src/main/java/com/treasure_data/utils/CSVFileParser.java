@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.msgpack.type.Value;
@@ -66,7 +67,7 @@ public class CSVFileParser extends FileParser {
         }
     }
 
-    private ICsvListReader listReader;
+    private ICsvListReader reader;
     private int timeIndex = -1;
     private long timeValue = -1;
     private String[] columnNames;
@@ -85,7 +86,7 @@ public class CSVFileParser extends FileParser {
             throws CommandException {
         // create reader
         try {
-            listReader = new CsvListReader(new java.io.FileReader(file),
+            reader = new CsvListReader(new java.io.FileReader(file),
                     CsvPreference.STANDARD_PREFERENCE);
         } catch (FileNotFoundException e) {
             throw new CommandException(e);
@@ -113,7 +114,7 @@ public class CSVFileParser extends FileParser {
                 String line = r.readLine();
                 columnNames = line.split(",");
 
-                listReader.read();
+                reader.read();
             } catch (IOException e) {
                 throw new CommandException(e);
             } finally {
@@ -154,8 +155,13 @@ public class CSVFileParser extends FileParser {
 
     public boolean parseRow(FileWriter w) throws CommandException {
         try {
-            List<Object> row = listReader.read(cprocessors);
+            List<Object> row = reader.read(cprocessors);
 
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+                        reader.getLineNumber(), reader.getRowNumber(),
+                        row));
+            }
             // TODO debug
 //            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
 //                    listReader.getLineNumber(), listReader.getRowNumber(), row));
@@ -195,9 +201,9 @@ public class CSVFileParser extends FileParser {
     }
 
     public void close() throws CommandException {
-        if (listReader != null) {
+        if (reader != null) {
             try {
-                listReader.close();
+                reader.close();
             } catch (IOException e) {
                 throw new CommandException(e);
             }
