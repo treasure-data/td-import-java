@@ -38,25 +38,40 @@ public class CSVFileReader extends FileReader {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class
             .getName());
 
-    private static interface CellProcessor {
-        public Value doIt(String text);
+    private static abstract class CellProcessor {
+        public abstract Value doIt(String text);
     }
 
-    private static class StringProc implements CellProcessor {
+    private static class StringProc extends CellProcessor {
+        private static Value NIL = ValueFactory.createNilValue();
+
         public Value doIt(String text) {
-            return null; // TODO
+            if (text == null || text.isEmpty()) {
+                return NIL;
+            }
+            return ValueFactory.createRawValue(text);
         }
     }
 
-    private static class IntProc implements CellProcessor {
+    private static class IntProc extends CellProcessor {
+        private static Value ZERO = ValueFactory.createIntegerValue(0);
+
         public Value doIt(String text) {
-            return null; // TODO
+            if (text == null || text.isEmpty()) {
+                return ZERO;
+            }
+            return ValueFactory.createIntegerValue(Integer.parseInt(text));
         }
     }
 
-    private static class LongProc implements CellProcessor {
+    private static class LongProc extends CellProcessor {
+        private static Value ZERO = ValueFactory.createIntegerValue(0L);
+
         public Value doIt(String text) {
-            return null; // TODO
+            if (text == null || text.isEmpty()) {
+                return ZERO;
+            }
+            return ValueFactory.createIntegerValue(Long.parseLong(text));
         }
     }
 
