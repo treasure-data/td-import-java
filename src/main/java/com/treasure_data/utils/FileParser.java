@@ -19,8 +19,6 @@ package com.treasure_data.utils;
 
 import java.io.File;
 
-import org.msgpack.type.Value;
-
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 

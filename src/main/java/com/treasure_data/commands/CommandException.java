@@ -17,6 +17,7 @@
 //
 package com.treasure_data.commands;
 
+@SuppressWarnings("serial")
 public class CommandException extends Exception {
 
     public CommandException(String msg, Throwable t) {
