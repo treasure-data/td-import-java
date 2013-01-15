@@ -75,10 +75,10 @@ public class CSVFileReader extends FileReader {
         }
     }
 
-    private static class CellProcessorGen2 {
+    private static class CellProcessorGen {
         private String[] columnTypes;
 
-        public CellProcessorGen2(String[] columnTypes) {
+        public CellProcessorGen(String[] columnTypes) {
             this.columnTypes = columnTypes;
         }
 
@@ -177,7 +177,7 @@ public class CSVFileReader extends FileReader {
         // "long,string,long"
         columnTypes = request.getColumnTypes();
 
-        cprocessors = new CellProcessorGen2(columnTypes).gen();
+        cprocessors = new CellProcessorGen(columnTypes).gen();
     }
 
     public Value[] readRecord() throws CommandException {
