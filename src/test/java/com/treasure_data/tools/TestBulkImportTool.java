@@ -26,7 +26,7 @@ public class TestBulkImportTool {
         BulkImportTool.prepareParts(args, props);
     }
 
-    @Test
+    @Test @Ignore
     public void testSample2() throws Exception {
         Properties props = System.getProperties();
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
@@ -40,6 +40,32 @@ public class TestBulkImportTool {
         final String[] args = new String[] {
                 "prepare_parts",
                 "./from_SQLServer_to_csv_10.csv",
+        };
+        BulkImportTool.prepareParts(args, props);
+    }
+
+    @Test
+    public void testSample4() throws Exception {
+        Properties props = System.getProperties();
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "date_code,customer_code,product_code,employee_code,pay_method_code,credit_company_code,amount_of_sales,total_sales,original_price,discount_amount,card_point,motivate_code,delete_flag");
+        //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "1358069100");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+
+        final String[] args = new String[] {
+                "prepare_parts",
+                "./in/from_SQLServer_to_csv_10_v01.csv",
+                "./in/from_SQLServer_to_csv_10_v02.csv",
+                "./in/from_SQLServer_to_csv_10_v03.csv",
+                "./in/from_SQLServer_to_csv_10_v04.csv",
+                "./in/from_SQLServer_to_csv_10_v05.csv",
+                "./in/from_SQLServer_to_csv_10_v06.csv",
+                "./in/from_SQLServer_to_csv_10_v07.csv",
+                "./in/from_SQLServer_to_csv_10_v08.csv",
+                "./in/from_SQLServer_to_csv_10_v09.csv",
         };
         BulkImportTool.prepareParts(args, props);
     }
