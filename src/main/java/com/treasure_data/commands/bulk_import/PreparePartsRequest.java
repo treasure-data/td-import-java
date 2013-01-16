@@ -43,11 +43,15 @@ public class PreparePartsRequest extends CommandRequest {
     private String outputDirName;
     private int splitSize;
 
+    public PreparePartsRequest() throws CommandException {
+        super(null);
+    }
+
     public PreparePartsRequest(String[] fileNames, Properties props)
             throws CommandException {
         super(props);
         setFiles(fileNames);
-        setOptions(props);
+        setOptions(getProperties());
     }
 
     @Override
@@ -55,7 +59,7 @@ public class PreparePartsRequest extends CommandRequest {
         return COMMAND_NAME;
     }
 
-    private void setFiles(String[] fileNames) throws CommandException {
+    void setFiles(String[] fileNames) throws CommandException {
         // validation for file names
         List<File> fileList = new ArrayList<File>(fileNames.length);
         for (int i = 0; i < fileNames.length; i++) {
@@ -73,7 +77,7 @@ public class PreparePartsRequest extends CommandRequest {
         return files;
     }
 
-    private void setOptions(Properties props) throws CommandException {
+    void setOptions(Properties props) throws CommandException {
         // format
         String format = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT);
         if (format == null || format.isEmpty()) {
