@@ -122,7 +122,9 @@ public class PreparePartsCommand extends
                     try {
                         execute(props, request, result, t.file);
                     } catch (CommandException e) {
-                        LOG.severe(e.getMessage());
+                        LOG.severe("Failed command by " + getName() + ": "
+                                + e.getMessage());
+
                         e.printStackTrace();
                     }
                 }

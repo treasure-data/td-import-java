@@ -126,8 +126,10 @@ public class PreparePartsRequest extends CommandRequest {
                 Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
 
         // time column value
-        timeValue = Long.parseLong(props
-                .getProperty(Config.BI_PREPARE_PARTS_TIMEVALUE));
+        String tv = props.getProperty(Config.BI_PREPARE_PARTS_TIMEVALUE);
+        if (tv != null) {
+            timeValue = Long.parseLong(tv);
+        }
 
         // split size
         String splitsize = props.getProperty(
