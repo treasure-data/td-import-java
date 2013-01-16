@@ -44,9 +44,10 @@ public class BulkImportTool {
      * options:
      *   -f, --format NAME                source file format [csv]
      *   -h, --columns NAME,NAME,...      column names (use --column-header instead if the first line has column names)
-     *   -T, --column-types TYPE,TYPE,... column types
+     *       --column-types TYPE,TYPE,... column types [string, long, int]
      *   -H, --column-header              first line includes column names
      *   -t, --time-column NAME           name of the time column
+     *       --time-value TIME            long value of the time column
      *   -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)
      *   -o, --output DIR                 output directory
      *
