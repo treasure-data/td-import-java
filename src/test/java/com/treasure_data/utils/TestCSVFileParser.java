@@ -93,11 +93,14 @@ public class TestCSVFileParser {
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "v2", "c02", "time", 12345L });
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "v2", "c02", "time",
+                12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "v2", "c12", "time", 12345L });
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "v2", "c12", "time",
+                12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "v2", "c22", "time", 12345L });
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "v2", "c22", "time",
+                12345L });
 
         assertTrue(p.parseRow(w));
         assertTrue(p.parseRow(w));
@@ -130,11 +133,14 @@ public class TestCSVFileParser {
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "v2", "c02", "time", 12345L });
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "v2", "c02", "time",
+                12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "v2", "c12", "time", 12345L });
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "v2", "c12", "time",
+                12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "v2", "c22", "time", 12345L });
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "v2", "c22", "time",
+                12345L });
 
         assertTrue(p.parseRow(w));
         assertTrue(p.parseRow(w));
