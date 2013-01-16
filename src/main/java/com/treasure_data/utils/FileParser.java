@@ -17,17 +17,42 @@
 //
 package com.treasure_data.utils;
 
-import java.io.File;
+import java.io.InputStream;
+import java.util.logging.Logger;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public abstract class FileParser {
+    private static final Logger LOG = Logger.getLogger(FileParser.class
+            .getName());
 
-    protected abstract void initReader(PreparePartsRequest request, File file)
-            throws CommandException;
+    private long rowNum = 0;
+
+    public void incrRowNum() {
+        rowNum++;
+    }
+
+    public void decrRowNum() {
+        rowNum--;
+    }
+
+    public long getRowNum() {
+        return rowNum;
+    }
+
+    protected abstract void initReader(PreparePartsRequest request,
+            InputStream in) throws CommandException;
 
     public abstract boolean parseRow(FileWriter w) throws CommandException;
 
     public abstract void close() throws CommandException;
+
+    public void closeSilently() {
+        try {
+            close();
+        } catch (CommandException e) {
+            LOG.severe(e.getMessage());
+        }
+    }
 }
