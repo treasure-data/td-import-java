@@ -32,7 +32,7 @@ import org.msgpack.packer.Packer;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
-public class FileWriter {
+public class MsgpackGZIPFileWriter {
     static class DataSizeChecker extends FilterOutputStream {
 
         private int size = 0;
@@ -59,7 +59,7 @@ public class FileWriter {
     }
 
     private static final Logger LOG = Logger
-            .getLogger(FileWriter.class.getName());
+            .getLogger(MsgpackGZIPFileWriter.class.getName());
 
     private MessagePack msgpack;
     private Packer packer;
@@ -71,7 +71,7 @@ public class FileWriter {
     private String outputDirName;
     private String outputFilePrefix;
 
-    public FileWriter(PreparePartsRequest request, File file)
+    public MsgpackGZIPFileWriter(PreparePartsRequest request, File file)
             throws CommandException {
         initWriter(request, file);
     }
