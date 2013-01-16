@@ -35,6 +35,7 @@ public class PreparePartsRequest extends CommandRequest {
 
     private File[] files;
 
+    private String format;
     private String[] columnNames;
     private String[] columnTypes;
     private boolean hasColumnHeader = false;
@@ -67,8 +68,9 @@ public class PreparePartsRequest extends CommandRequest {
             File f = new File(fname);
             if (!f.isFile()) {
                 LOG.severe("No such file: " + fname);
+            } else {
+                fileList.add(f);
             }
-            fileList.add(f);
         }
         files = fileList.toArray(new File[0]);
     }
@@ -79,11 +81,10 @@ public class PreparePartsRequest extends CommandRequest {
 
     void setOptions(Properties props) throws CommandException {
         // format
-        String format = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT);
-        if (format == null || format.isEmpty()) {
-            throw new CommandException("Format is required: "
-                    + Config.BI_PREPARE_PARTS_FORMAT);
-        } else if (!format.equals("csv")) { // csv
+        format = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT,
+                Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
+        if (!format.equals(Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE)) {
+            // throw exception if it is not 'csv'
             throw new CommandException("Invalid format: "
                     + Config.BI_PREPARE_PARTS_FORMAT);
         }
@@ -109,8 +110,7 @@ public class PreparePartsRequest extends CommandRequest {
         }
 
         // column types
-        String ctypes = props
-                .getProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES);
+        String ctypes = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES);
         if (ctypes == null || ctypes.isEmpty()) {
             throw new CommandException("Column types is required: "
                     + Config.BI_PREPARE_PARTS_COLUMNTYPES);
@@ -142,6 +142,10 @@ public class PreparePartsRequest extends CommandRequest {
         splitSize = Integer.parseInt(splitsize);
     }
 
+    public String getFormat() {
+        return format;
+    }
+
     public String[] getColumnNames() {
         return columnNames;
     }
@@ -165,6 +169,7 @@ public class PreparePartsRequest extends CommandRequest {
     public String getOutputDirName() {
         return outputDirName;
     }
+
     public long getTimeValue() {
         return timeValue;
     }
