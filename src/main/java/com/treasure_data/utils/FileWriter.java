@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
 import org.msgpack.MessagePack;
@@ -56,6 +57,9 @@ public class FileWriter {
             return size;
         }
     }
+
+    private static final Logger LOG = Logger
+            .getLogger(FileWriter.class.getName());
 
     private MessagePack msgpack;
     private Packer packer;
@@ -106,6 +110,8 @@ public class FileWriter {
                     new FileOutputStream(new File(outputDirName, outputFileName))));
             gzout = new GZIPOutputStream(dout);
             packer = msgpack.createPacker(gzout);
+
+            LOG.info("Created output file: " + outputFileName);
         } catch (IOException e) {
             throw new CommandException(e);
         }
@@ -157,5 +163,13 @@ public class FileWriter {
             dout = null;
         }
         packer = null;
+    }
+
+    public void closeSilently() {
+        try {
+            close();
+        } catch (CommandException e) {
+            LOG.severe(e.getMessage());
+        }
     }
 }

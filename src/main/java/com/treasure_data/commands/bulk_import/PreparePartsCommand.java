@@ -97,6 +97,7 @@ public class PreparePartsCommand extends
     static class Worker extends Thread {
         static class Task {
             File file;
+
             Task(File file) {
                 this.file = file;
             }
@@ -105,6 +106,7 @@ public class PreparePartsCommand extends
         Properties props;
         PreparePartsRequest request;
         PreparePartsResult result;
+
         public Worker(Properties props, PreparePartsRequest request,
                 PreparePartsResult result) {
             this.props = props;
@@ -132,16 +134,30 @@ public class PreparePartsCommand extends
         }
 
         private void execute(Properties props, PreparePartsRequest request,
-                PreparePartsResult result, final File file) throws CommandException {
+                PreparePartsResult result, final File file)
+                throws CommandException {
             LOG.info("Read file: " + file.getName() + " by " + getName());
 
-            FileParser p = FileParserFactory.newInstance(request, file);
-            FileWriter w = new FileWriter(request, file);
-            while (p.parseRow(w)) {
-                ;
+            FileParser p = null;
+            FileWriter w = null;
+            try {
+                p = FileParserFactory.newInstance(request, file);
+                w = new FileWriter(request, file);
+                while (p.parseRow(w)) {
+                    ;
+                }
+            } finally {
+                if (p != null) {
+                    p.closeSilently();
+                }
+                if (w != null) {
+                    w.closeSilently();
+                }
             }
-            p.close();
-            w.close();
+            p.decrRowNum();
+
+            LOG.info("file: " + file.getName() + ": " + p.getRowNum()
+                    + " entries by " + getName());
         }
     }
 }

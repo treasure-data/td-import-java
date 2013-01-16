@@ -17,10 +17,12 @@
 //
 package com.treasure_data.utils;
 
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -76,57 +78,32 @@ public class CSVFileParser extends FileParser {
 
     public CSVFileParser(PreparePartsRequest request, File file)
             throws CommandException {
-        initReader(request, file);
-    }
-
-    @Override
-    public void initReader(PreparePartsRequest request, File file)
-            throws CommandException {
-        // create reader
         try {
-            reader = new CsvListReader(new java.io.FileReader(file),
-                    CsvPreference.STANDARD_PREFERENCE);
+            initReader(request, new FileInputStream(file));
         } catch (FileNotFoundException e) {
             throw new CommandException(e);
         }
+    }
+
+    @Override
+    public void initReader(PreparePartsRequest request, InputStream in)
+            throws CommandException {
+        // create reader
+        reader = new CsvListReader(new InputStreamReader(in),
+                CsvPreference.STANDARD_PREFERENCE);
 
         // column name e.g. "time,name,price"
         if (request.hasColumnHeader()) {
-            /**
             try {
-                columnNames = listReader.getHeader(true);
+                List<String> columnList = reader.read();
+                columnNames = columnList.toArray(new String[0]);
             } catch (IOException e) {
                 throw new CommandException(e);
-            } finally {
-                try {
-                    listReader.close();
-                } catch (IOException e) {
-                    throw new CommandException(e);
-                }
-            }
-            */
-            BufferedReader r = null;
-            try {
-                // the header columns are used
-                r = new BufferedReader(new java.io.FileReader(file));
-                String line = r.readLine();
-                columnNames = line.split(",");
-
-                reader.read();
-            } catch (IOException e) {
-                throw new CommandException(e);
-            } finally {
-                if (r != null) {
-                    try {
-                        r.close();
-                    } catch (IOException e) {
-                        throw new CommandException(e);
-                    }
-                }
             }
         } else {
             columnNames = request.getColumnNames();
         }
+
 
         String timeColumn = request.getTimeColumn();
         for (int i = 0; i < columnNames.length; i++) {
@@ -152,22 +129,30 @@ public class CSVFileParser extends FileParser {
     }
 
     public boolean parseRow(FileWriter w) throws CommandException {
+        List<Object> row = null;
         try {
-            List<Object> row = reader.read(cprocessors);
+            row = reader.read(cprocessors);
+            incrRowNum();
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOG.severe("Skip row number: " + getRowNum());
+            return true;
+        }
 
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-                        reader.getLineNumber(), reader.getRowNumber(),
-                        row));
-            }
-            // TODO debug
-//            System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-//                    listReader.getLineNumber(), listReader.getRowNumber(), row));
+        if (row == null || row.isEmpty()) {
+            return false;
+        }
 
-            if (row == null || row.isEmpty()) {
-                return false;
-            }
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+                    reader.getLineNumber(), reader.getRowNumber(),
+                    row));
+        }
+//        // TODO debug
+//        System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+//                reader.getLineNumber(), reader.getRowNumber(), row));
 
+        try {
             int size = row.size();
 
             if (size == timeIndex) {
@@ -193,7 +178,7 @@ public class CSVFileParser extends FileParser {
 
             w.writeEndRow();
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new CommandException(e);
         }
     }
