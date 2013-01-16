@@ -101,6 +101,21 @@
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.2</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.3</version>
@@ -117,10 +132,12 @@
           </descriptorRefs>
         </configuration>
       </plugin>
+
       <plugin>
       	<artifactId>maven-eclipse-plugin</artifactId>
       	<version>2.5.1</version>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -134,7 +151,33 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- include jars for msgpack -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>net.sf.supercsv</include>
+                  <include>com.googlecode.json-simple:json-simple</include>
+                  <include>org.msgpack</include>
+                  <include>org.javassist:javassist</include>
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
+
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
