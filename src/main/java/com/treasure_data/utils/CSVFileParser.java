@@ -85,6 +85,11 @@ public class CSVFileParser extends FileParser {
         }
     }
 
+    public CSVFileParser(PreparePartsRequest request, InputStream in)
+            throws CommandException {
+        initReader(request, in);
+    }
+
     @Override
     public void initReader(PreparePartsRequest request, InputStream in)
             throws CommandException {
@@ -128,16 +133,18 @@ public class CSVFileParser extends FileParser {
         cprocessors = new CellProcessorGen().gen(columnTypes);
     }
 
-    public boolean parseRow(FileWriter w) throws CommandException {
+    public boolean parseRow(MsgpackGZIPFileWriter w) throws CommandException {
         List<Object> row = null;
         try {
             row = reader.read(cprocessors);
-            incrRowNum();
         } catch (IOException e) {
             e.printStackTrace();
             LOG.severe("Skip row number: " + getRowNum());
             return true;
         }
+
+        // increment row number
+        incrRowNum();
 
         if (row == null || row.isEmpty()) {
             return false;
