@@ -29,7 +29,7 @@ import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.utils.FileParser;
 import com.treasure_data.utils.FileParserFactory;
-import com.treasure_data.utils.FileWriter;
+import com.treasure_data.utils.MsgpackGZIPFileWriter;
 
 public class PreparePartsCommand extends
         Command<PreparePartsRequest, PreparePartsResult> {
@@ -126,7 +126,6 @@ public class PreparePartsCommand extends
                     } catch (CommandException e) {
                         LOG.severe("Failed command by " + getName() + ": "
                                 + e.getMessage());
-
                         e.printStackTrace();
                     }
                 }
@@ -134,15 +133,15 @@ public class PreparePartsCommand extends
         }
 
         private void execute(Properties props, PreparePartsRequest request,
-                PreparePartsResult result, final File file)
+                PreparePartsResult result, final File infile)
                 throws CommandException {
-            LOG.info("Read file: " + file.getName() + " by " + getName());
+            LOG.info("Read file: " + infile.getName() + " by " + getName());
 
             FileParser p = null;
-            FileWriter w = null;
+            MsgpackGZIPFileWriter w = null;
             try {
-                p = FileParserFactory.newInstance(request, file);
-                w = new FileWriter(request, file);
+                p = FileParserFactory.newInstance(request, infile);
+                w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
                     ;
                 }
@@ -156,7 +155,7 @@ public class PreparePartsCommand extends
             }
             p.decrRowNum();
 
-            LOG.info("file: " + file.getName() + ": " + p.getRowNum()
+            LOG.info("file: " + infile.getName() + ": " + p.getRowNum()
                     + " entries by " + getName());
         }
     }

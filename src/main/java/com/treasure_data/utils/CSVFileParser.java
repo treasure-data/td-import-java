@@ -180,7 +180,7 @@ public class CSVFileParser extends FileParser {
 
             if (size == timeIndex) {
                 w.write(timeColumnName);
-                w.write(timeValue);
+                w.write((Long) timeValue);
             }
 
             w.writeEndRow();

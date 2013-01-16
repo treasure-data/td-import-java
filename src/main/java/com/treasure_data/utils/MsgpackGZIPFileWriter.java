@@ -71,17 +71,16 @@ public class MsgpackGZIPFileWriter {
     private String outputDirName;
     private String outputFilePrefix;
 
-    public MsgpackGZIPFileWriter(PreparePartsRequest request, File file)
+    public MsgpackGZIPFileWriter(PreparePartsRequest request, String infileName)
             throws CommandException {
-        initWriter(request, file);
+        initWriter(request, infileName);
     }
 
-    public void initWriter(PreparePartsRequest request, File infile)
+    public void initWriter(PreparePartsRequest request, String infileName)
             throws CommandException {
         msgpack = new MessagePack();
 
         // outputFilePrefix
-        String infileName = infile.getName();
         int lastSepIndex = infileName.lastIndexOf(File.pathSeparator);
         outputFilePrefix = infileName.substring(lastSepIndex + 1,
                 infileName.length()).replace('.', '_');
@@ -95,7 +94,7 @@ public class MsgpackGZIPFileWriter {
         reopenOutputFile();
     }
 
-    private void reopenOutputFile() throws CommandException {
+    protected void reopenOutputFile() throws CommandException {
         // close stream
         if (outputFileIndex != 0) {
             close();
@@ -126,14 +125,6 @@ public class MsgpackGZIPFileWriter {
     }
 
     public void write(Object o) throws CommandException {
-        try {
-            packer.write(o);
-        } catch (IOException e) {
-            throw new CommandException(e);
-        }
-    }
-
-    public void write(long o) throws CommandException {
         try {
             packer.write(o);
         } catch (IOException e) {
