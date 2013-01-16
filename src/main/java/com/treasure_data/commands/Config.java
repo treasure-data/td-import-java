@@ -20,6 +20,7 @@ package com.treasure_data.commands;
 public interface Config {
 
     String BI_PREPARE_PARTS_FORMAT = "td.bulk_import.prepare_parts.format";
+    String BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE = "csv";
 
     String BI_PREPARE_PARTS_COLUMNS = "td.bulk_import.prepare_parts.columns";
 
