@@ -44,7 +44,7 @@ public abstract class FileParser {
     protected abstract void initReader(PreparePartsRequest request,
             InputStream in) throws CommandException;
 
-    public abstract boolean parseRow(FileWriter w) throws CommandException;
+    public abstract boolean parseRow(MsgpackGZIPFileWriter w) throws CommandException;
 
     public abstract void close() throws CommandException;
 
