@@ -33,10 +33,6 @@ public abstract class FileParser {
         rowNum++;
     }
 
-    public void decrRowNum() {
-        rowNum--;
-    }
-
     public long getRowNum() {
         return rowNum;
     }
