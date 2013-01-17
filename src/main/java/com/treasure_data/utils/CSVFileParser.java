@@ -152,12 +152,12 @@ public class CSVFileParser extends FileParser {
             return true;
         }
 
-        // increment row number
-        incrRowNum();
-
         if (row == null || row.isEmpty()) {
             return false;
         }
+
+        // increment row number
+        incrRowNum();
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
