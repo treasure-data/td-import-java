@@ -83,11 +83,6 @@ public class PreparePartsRequest extends CommandRequest {
         // format
         format = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT,
                 Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
-        if (!format.equals(Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE)) {
-            // throw exception if it is not 'csv'
-            throw new CommandException("Invalid format: "
-                    + Config.BI_PREPARE_PARTS_FORMAT);
-        }
 
         boolean setColumns = false;
 

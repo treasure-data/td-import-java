@@ -20,13 +20,22 @@ package com.treasure_data.utils;
 import java.io.File;
 
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class FileParserFactory {
 
+    private static final String CSV = "csv";
+
     public static FileParser newInstance(PreparePartsRequest request, File file)
             throws CommandException {
-        // TODO #MN should extend it for other file readers
-        return new CSVFileParser(request, file);
+        String format = request.getFormat();
+        if (format.equals(CSV)) {
+            return new CSVFileParser(request, file);
+        } else {
+            // TODO any more type...
+            throw new CommandException("Invalid format: "
+                    + Config.BI_PREPARE_PARTS_FORMAT);
+        }
     }
 }
