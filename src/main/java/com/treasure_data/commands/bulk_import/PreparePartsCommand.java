@@ -153,7 +153,9 @@ public class PreparePartsCommand extends
                     w.closeSilently();
                 }
             }
-            p.decrRowNum();
+
+            result.setParsedRowNum(p.getRowNum());
+            result.setWrittenRowNum(w.getRowNum());
 
             LOG.info("file: " + infile.getName() + ": " + p.getRowNum()
                     + " entries by " + getName());

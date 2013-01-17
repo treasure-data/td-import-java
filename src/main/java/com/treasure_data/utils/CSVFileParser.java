@@ -204,6 +204,8 @@ public class CSVFileParser extends FileParser {
             }
 
             w.writeEndRow();
+
+            w.incrRowNum();
             return true;
         } catch (Exception e) {
             throw new CommandException(e);
