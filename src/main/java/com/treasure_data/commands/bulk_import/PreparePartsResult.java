@@ -21,4 +21,25 @@ import com.treasure_data.commands.CommandResult;
 
 public class PreparePartsResult extends CommandResult {
 
+    private long parsedRowNum = 0;
+    private long writtenRowNum = 0;
+
+    public PreparePartsResult() {
+    }
+
+    public void setParsedRowNum(long parsedRowNum) {
+        this.parsedRowNum = parsedRowNum;
+    }
+
+    public long getParsedRowNum() {
+        return parsedRowNum;
+    }
+
+    public void setWrittenRowNum(long writtenRowNum) {
+        this.writtenRowNum = writtenRowNum;
+    }
+
+    public long getWrittenRowNum() {
+        return writtenRowNum;
+    }
 }
