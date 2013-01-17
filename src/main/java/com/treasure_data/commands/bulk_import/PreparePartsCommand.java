@@ -68,7 +68,7 @@ public class PreparePartsCommand extends
         workers = new ArrayList<Worker>(numOfProcs);
         for (int i = 0; i < numOfProcs; i++) {
             Worker w = new Worker(props, request, result);
-            LOG.info("Created worker thread: " + w.getName());
+            LOG.fine("Created worker thread: " + w.getName());
             workers.add(w);
         }
         // start workers
