@@ -39,7 +39,7 @@ public class PreparePartsRequest extends CommandRequest {
     private String[] columnNames;
     private String[] columnTypes;
     private boolean hasColumnHeader = false;
-    private String timeColumn;
+    private String aliasTimeColumn;
     private long timeValue = -1;
     private String outputDirName;
     private int splitSize;
@@ -126,8 +126,10 @@ public class PreparePartsRequest extends CommandRequest {
         }
 
         // time column
-        timeColumn = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN,
-                Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+        String tc = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN);
+        if (tc != null) {
+            aliasTimeColumn = tc;
+        }
 
         // time column value
         String tv = props.getProperty(Config.BI_PREPARE_PARTS_TIMEVALUE);
@@ -154,8 +156,8 @@ public class PreparePartsRequest extends CommandRequest {
         return columnTypes;
     }
 
-    public String getTimeColumn() {
-        return timeColumn;
+    public String getAliasTimeColumn() {
+        return aliasTimeColumn;
     }
 
     public int getSplitSize() {

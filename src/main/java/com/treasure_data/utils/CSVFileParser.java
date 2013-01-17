@@ -37,6 +37,7 @@ import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class CSVFileParser extends FileParser {
@@ -69,9 +70,9 @@ public class CSVFileParser extends FileParser {
 
     private ICsvListReader reader;
     private int timeIndex = -1;
-    private long timeValue = -1;
+    private Long timeValue = new Long(-1);
+    private int aliasTimeIndex = -1;
     private String[] columnNames;
-    private final String timeColumnName = "time";
 
     private String[] columnTypes;
     private CellProcessor[] cprocessors;
@@ -109,21 +110,29 @@ public class CSVFileParser extends FileParser {
             columnNames = request.getColumnNames();
         }
 
-
-        String timeColumn = request.getTimeColumn();
+        String aliasTimeColumnName = request.getAliasTimeColumn();
+        if (aliasTimeColumnName != null) {
+            for (int i = 0; i < columnNames.length; i++) {
+                if (columnNames[i].equals(aliasTimeColumnName)) {
+                    aliasTimeIndex = i;
+                    break;
+                }
+            }
+        }
         for (int i = 0; i < columnNames.length; i++) {
-            if (columnNames[i].equals(timeColumn)) {
+            if (columnNames[i]
+                    .equals(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
                 timeIndex = i;
                 break;
             }
         }
         if (timeIndex < 0) {
             timeValue = request.getTimeValue();
-            if (timeValue < 0) {
+            if (aliasTimeIndex > 0 || timeValue > 0) {
+                timeIndex = columnNames.length;
+            } else {
                 throw new CommandException(
                         "Time column not found. --time-column or --time-value option is required");
-            } else {
-                timeIndex = columnNames.length;
             }
         }
 
@@ -168,19 +177,23 @@ public class CSVFileParser extends FileParser {
                 w.writeBeginRow(size);
             }
 
+            long time = 0;
             for (int i = 0; i < size; i++) {
-                if (i == timeIndex) {
-                    w.write(timeColumnName);
-                    w.write(row.get(i));
-                } else {
-                    w.write(columnNames[i]);
-                    w.write(row.get(i));
+                if (i == aliasTimeIndex) {
+                    time = (Long) row.get(i);
                 }
+
+                w.write(columnNames[i]);
+                w.write(row.get(i));
             }
 
             if (size == timeIndex) {
-                w.write(timeColumnName);
-                w.write((Long) timeValue);
+                w.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+                if (aliasTimeIndex > 0) {
+                    w.write(time);
+                } else {
+                    w.write((Long) timeValue);
+                }
             }
 
             w.writeEndRow();
