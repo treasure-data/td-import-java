@@ -115,7 +115,7 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseInvalidTypes() throws Exception {
+    public void parseInvalidTypesAndHandleErrors() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,time");
