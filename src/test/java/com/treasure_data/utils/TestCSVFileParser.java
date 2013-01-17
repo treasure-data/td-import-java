@@ -18,6 +18,7 @@ import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class TestCSVFileParser {
 
+    @Ignore
     static class MockFileWriter extends MsgpackGZIPFileWriter {
         private List<Integer> colSizeList;
         private List<Object> objectList;
