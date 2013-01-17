@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.treasure_data.commands.CommandException;
@@ -76,36 +77,111 @@ public class TestCSVFileParser {
     public void parseHeaderlessCSVText() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,v2,time");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,time");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,string,string,long");
+                "string,string,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        PreparePartsRequest request = new PreparePartsRequest(new String[0], props);
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
 
-        String text = "c00,c01,c02,12345\n" +
-                      "c10,c11,c12,12345\n" +
-                      "c20,c21,c22,12345\n";
+        String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
+        byte[] bytes = text.getBytes();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        CSVFileParser p = new CSVFileParser(request, in);
+
+        MockFileWriter w = new MockFileWriter(request);
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
+
+        p.close();
+        w.close();
+    }
+
+    @Test
+    public void parseNotSpecifiedTimeColumnHeaderlessCSVTextWithAliasColumnName()
+            throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,timestamp");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
+                "string,string,long");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
+
+        String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         CSVFileParser p = new CSVFileParser(request, in);
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "v2", "c02", "time",
-                12345L });
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "timestamp", 12345L,
+                "time", 12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "v2", "c12", "time",
-                12345L });
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "timestamp", 12345L,
+                "time", 12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "v2", "c22", "time",
-                12345L });
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "timestamp", 12345L,
+                "time", 12345L });
 
         assertTrue(p.parseRow(w));
         assertTrue(p.parseRow(w));
         assertTrue(p.parseRow(w));
         assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
+
+        p.close();
+        w.close();
+    }
+
+    @Test
+    public void parseNotSpecifiedTimeColumnHeaderlessCSVTextWithTimeValue()
+            throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
+
+        String text = "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
+        byte[] bytes = text.getBytes();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        CSVFileParser p = new CSVFileParser(request, in);
+
+        MockFileWriter w = new MockFileWriter(request);
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
 
         p.close();
         w.close();
@@ -117,35 +193,111 @@ public class TestCSVFileParser {
         props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,string,string,long");
+                "string,string,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        PreparePartsRequest request = new PreparePartsRequest(new String[0], props);
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
 
-        String text = "v0,v1,v2,time\n" +
-                      "c00,c01,c02,12345\n" +
-                      "c10,c11,c12,12345\n" +
-                      "c20,c21,c22,12345\n";
+        String text = "v0,v1,time\n" + "c00,c01,12345\n" + "c10,c11,12345\n"
+                + "c20,c21,12345\n";
+        byte[] bytes = text.getBytes();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        CSVFileParser p = new CSVFileParser(request, in);
+
+        MockFileWriter w = new MockFileWriter(request);
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
+
+        p.close();
+        w.close();
+    }
+
+    @Test
+    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithAliasColumnName()
+            throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
+                "string,string,long");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
+
+        String text = "v0,v1,timestamp\n" + "c00,c01,12345\n"
+                + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         CSVFileParser p = new CSVFileParser(request, in);
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "v2", "c02", "time",
-                12345L });
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "timestamp", 12345L,
+                "time", 12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "v2", "c12", "time",
-                12345L });
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "timestamp", 12345L,
+                "time", 12345L });
         w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "v2", "c22", "time",
-                12345L });
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "timestamp", 12345L,
+                "time", 12345L });
 
         assertTrue(p.parseRow(w));
         assertTrue(p.parseRow(w));
         assertTrue(p.parseRow(w));
         assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
+
+        p.close();
+        w.close();
+    }
+
+    @Test
+    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithTimeValue()
+            throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
+
+        String text = "v0,v1\n" + "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
+        byte[] bytes = text.getBytes();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        CSVFileParser p = new CSVFileParser(request, in);
+
+        MockFileWriter w = new MockFileWriter(request);
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
 
         p.close();
         w.close();
