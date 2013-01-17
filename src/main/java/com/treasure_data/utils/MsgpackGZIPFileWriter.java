@@ -61,6 +61,8 @@ public class MsgpackGZIPFileWriter {
     private static final Logger LOG = Logger
             .getLogger(MsgpackGZIPFileWriter.class.getName());
 
+    private long rowNum = 0;
+
     private MessagePack msgpack;
     private Packer packer;
     private GZIPOutputStream gzout;
@@ -114,6 +116,14 @@ public class MsgpackGZIPFileWriter {
         } catch (IOException e) {
             throw new CommandException(e);
         }
+    }
+
+    public void incrRowNum() {
+        rowNum++;
+    }
+
+    public long getRowNum() {
+        return rowNum;
     }
 
     public void writeBeginRow(int size) throws CommandException {
