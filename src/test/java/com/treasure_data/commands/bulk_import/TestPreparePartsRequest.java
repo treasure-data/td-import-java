@@ -233,7 +233,7 @@ public class TestPreparePartsRequest {
 
         PreparePartsRequest req = new PreparePartsRequest();
         req.setOptions(props);
-        assertEquals(tc, req.getTimeColumn());
+        assertEquals(tc, req.getAliasTimeColumn());
     }
 
     @Test
@@ -251,11 +251,9 @@ public class TestPreparePartsRequest {
         PreparePartsRequest req = new PreparePartsRequest();
         req.setOptions(props);
         /**
-         * it works fine. if time columns is not specified, default value 'time'
-         * is used.
+         * it works fine.
          */
-        assertEquals(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE,
-                req.getTimeColumn());
+        assertTrue(null == req.getAliasTimeColumn());
     }
 
     @Test
