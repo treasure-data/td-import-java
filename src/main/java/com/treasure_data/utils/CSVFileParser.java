@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -50,6 +51,8 @@ public class CSVFileParser extends FileParser {
             int len = columnTypes.length;
             List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
             for (int i = 0; i < len; i++) {
+                // TODO any more types...
+
                 CellProcessor cproc;
                 String type = columnTypes[i];
                 if (type.equals("string")) {
@@ -58,7 +61,8 @@ public class CSVFileParser extends FileParser {
                     cproc = new ParseInt();
                 } else if (type.equals("long")) {
                     cproc = new ParseLong();
-                    // TODO any more...
+                } else if (type.equals("double")) {
+                    cproc = new ParseDouble();
                 } else {
                     throw new CommandException("Unsupported type: " + type);
                 }
@@ -164,9 +168,11 @@ public class CSVFileParser extends FileParser {
                     reader.getLineNumber(), reader.getRowNumber(),
                     row));
         }
-//        // TODO debug
-//        System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-//                reader.getLineNumber(), reader.getRowNumber(), row));
+
+        /** DEBUG
+        System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
+                reader.getLineNumber(), reader.getRowNumber(), row));
+         */
 
         try {
             int size = row.size();
@@ -192,7 +198,7 @@ public class CSVFileParser extends FileParser {
                 if (aliasTimeIndex > 0) {
                     w.write(time);
                 } else {
-                    w.write((Long) timeValue);
+                    w.write(timeValue);
                 }
             }
 
