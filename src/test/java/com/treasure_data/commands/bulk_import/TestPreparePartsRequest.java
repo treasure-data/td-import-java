@@ -67,8 +67,9 @@ public class TestPreparePartsRequest {
 
     @Test
     public void passInvalidFormat() throws Exception {
+        String invalidFormat = "muga";
         Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "muga"); // not csv
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, invalidFormat);
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
@@ -78,12 +79,11 @@ public class TestPreparePartsRequest {
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
 
         PreparePartsRequest req = new PreparePartsRequest();
-        try {
-            req.setOptions(props);
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof CommandException);
-        }
+        /**
+         * it works fine. but file parser is not created.
+         */
+        req.setOptions(props);
+        assertEquals(invalidFormat, req.getFormat());
     }
 
     @Test
