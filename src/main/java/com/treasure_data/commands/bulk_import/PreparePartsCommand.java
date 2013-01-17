@@ -157,8 +157,8 @@ public class PreparePartsCommand extends
             result.setParsedRowNum(p.getRowNum());
             result.setWrittenRowNum(w.getRowNum());
 
-            LOG.info("file: " + infile.getName() + ": " + p.getRowNum()
-                    + " entries by " + getName());
+            LOG.info("file: " + infile.getName() + ": "
+                    + result.getParsedRowNum() + " entries by " + getName());
         }
     }
 }
