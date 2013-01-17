@@ -150,7 +150,8 @@ public class CSVFileParser extends FileParser {
         List<Object> row = null;
         try {
             row = reader.read(cprocessors);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            // catch IOException and SuperCsvCellProcessorException
             e.printStackTrace();
             LOG.severe("Skip row number: " + getRowNum());
             return true;
