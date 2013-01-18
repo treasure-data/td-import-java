@@ -63,12 +63,12 @@ public class MsgpackGZIPFileWriter {
 
     private long rowNum = 0;
 
-    private MessagePack msgpack;
-    private Packer packer;
-    private GZIPOutputStream gzout;
+    protected MessagePack msgpack;
+    protected Packer packer;
+    protected GZIPOutputStream gzout;
 
     private int splitSize;
-    private DataSizeChecker dout;
+    protected DataSizeChecker dout;
     private int outputFileIndex = 0;
     private String outputDirName;
     private String outputFilePrefix;
