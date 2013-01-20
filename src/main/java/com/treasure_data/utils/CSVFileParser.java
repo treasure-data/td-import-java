@@ -23,19 +23,29 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.catalina.util.Strftime;
+import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.cellprocessor.ift.DateCellProcessor;
+import org.supercsv.cellprocessor.ift.StringCellProcessor;
+import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
+import org.supercsv.util.CsvContext;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
@@ -53,6 +63,7 @@ public class CSVFileParser extends FileParser {
             for (int i = 0; i < len; i++) {
                 // TODO any more types...
 
+                // TODO parser for time
                 CellProcessor cproc;
                 String type = columnTypes[i];
                 if (type.equals("string")) {
@@ -69,6 +80,53 @@ public class CSVFileParser extends FileParser {
                 cprocs.add(cproc);
             }
             return cprocs.toArray(new CellProcessor[0]);
+        }
+    }
+
+    private static class ExtStrftime extends Strftime {
+        public ExtStrftime(String origFormat) {
+            super(origFormat);
+        }
+
+        public SimpleDateFormat getSimpleDateFormat() {
+            return simpleDateFormat;
+        }
+    }
+
+    private static class ParseStrftimeDate extends CellProcessorAdaptor
+            implements StringCellProcessor {
+        private static SimpleDateFormat simpleFormat;
+
+        public ParseStrftimeDate(String dateFormat) {
+            super();
+            if (dateFormat == null) {
+                throw new NullPointerException("dateFormat should not be null");
+            }
+            simpleFormat = new ExtStrftime(dateFormat).getSimpleDateFormat();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @throws SuperCsvCellProcessorException
+         *             if value is null, isn't a String, or can't be parsed to a Date
+         */
+        public Object execute(final Object value, final CsvContext context) {
+            validateInputNotNull(value, context);
+
+            if (!(value instanceof String)) {
+                throw new SuperCsvCellProcessorException(String.class, value,
+                        context, this);
+            }
+
+            try {
+                Long result = simpleFormat.parse((String) value).getTime() / 1000;
+                return next.execute(result, context);
+            } catch (final ParseException e) {
+                throw new SuperCsvCellProcessorException(String.format(
+                        "'%s' could not be parsed as a Date", value), context,
+                        this, e);
+            }
         }
     }
 
