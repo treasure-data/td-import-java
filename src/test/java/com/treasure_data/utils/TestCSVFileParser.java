@@ -297,7 +297,7 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithAliasColumnName()
+    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithAliasColumnName01()
             throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
@@ -325,6 +325,48 @@ public class TestCSVFileParser {
                 "time", 12345L });
         w.setColSize(4);
         w.setRow(new Object[] { "v0", "c20", "v1", "c21", "timestamp", 12345L,
+                "time", 12345L });
+
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
+
+        p.close();
+        w.close();
+    }
+
+    @Test
+    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithAliasColumnName02()
+            throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
+                "long,string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
+
+        String text = "timestamp,v0,v1\n" + "12345,c00,c01\n"
+                + "12345,c10,c11\n" + "12345,c20,c21\n";
+        byte[] bytes = text.getBytes();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        CSVFileParser p = new CSVFileParser(request, in);
+
+        MockFileWriter w = new MockFileWriter(request);
+        w.setColSize(4);
+        w.setRow(new Object[] { "timestamp", 12345L, "v0", "c00", "v1", "c01",
+                "time", 12345L });
+        w.setColSize(4);
+        w.setRow(new Object[] { "timestamp", 12345L, "v0", "c10", "v1", "c11",
+                "time", 12345L });
+        w.setColSize(4);
+        w.setRow(new Object[] { "timestamp", 12345L, "v0", "c20", "v1", "c21",
                 "time", 12345L });
 
         assertTrue(p.parseRow(w));
