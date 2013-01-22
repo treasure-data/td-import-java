@@ -190,7 +190,7 @@ public class CSVFileParser extends FileParser {
         }
         if (timeIndex < 0) {
             timeValue = request.getTimeValue();
-            if (aliasTimeIndex > 0 || timeValue > 0) {
+            if (aliasTimeIndex >= 0 || timeValue > 0) {
                 timeIndex = columnNames.length;
             } else {
                 throw new CommandException(
