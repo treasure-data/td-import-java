@@ -32,12 +32,11 @@ public class TestBulkImportTool {
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "date_code,customer_code,product_code,employee_code,pay_method_code,credit_company_code,amount_of_sales,total_sales,original_price,discount_amount,card_point,motivate_code,delete_flag");
         //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "time,name,count");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
+        //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string,string,string,string,string,string,string,string,string,string,string,string");
         //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "long,string,int");
-        //props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "int,int,int,int,int,int,int,string,string,string,string,string,string");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "1358069100");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "long,string,string,string,string,string,string,string,string,string,string,string,string");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
 
         final String[] args = new String[] {
                 "prepare_parts",
