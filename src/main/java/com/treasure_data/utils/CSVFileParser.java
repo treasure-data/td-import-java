@@ -254,7 +254,7 @@ public class CSVFileParser extends FileParser {
 
             if (size == timeIndex) {
                 w.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-                if (aliasTimeIndex > 0) {
+                if (aliasTimeIndex >= 0) {
                     w.write(time);
                 } else {
                     w.write(timeValue);
