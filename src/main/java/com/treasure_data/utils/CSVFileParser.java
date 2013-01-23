@@ -211,7 +211,7 @@ public class CSVFileParser extends FileParser {
         } catch (Exception e) {
             // catch IOException and SuperCsvCellProcessorException
             e.printStackTrace();
-            LOG.severe("Skip row number: " + getRowNum());
+            LOG.warning("Skip row number: " + getRowNum());
             return true;
         }
 
