@@ -110,7 +110,7 @@ public class MsgpackGZIPFileWriter {
             dout = new DataSizeChecker(new BufferedOutputStream(
                     new FileOutputStream(new File(outputDirName, outputFileName))));
             gzout = new GZIPOutputStream(dout);
-            packer = msgpack.createPacker(gzout);
+            packer = msgpack.createPacker(new BufferedOutputStream(gzout));
 
             LOG.info("Created output file: " + outputFileName);
         } catch (IOException e) {
