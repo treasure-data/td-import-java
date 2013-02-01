@@ -18,6 +18,7 @@
 package com.treasure_data.utils;
 
 import java.io.File;
+import java.io.InputStream;
 
 import org.supercsv.prefs.CsvPreference;
 
@@ -34,13 +35,33 @@ public class FileParserFactory {
             throws CommandException {
         String format = request.getFormat();
         if (format.equals(CSV)) {
-            return new CSVFileParser(request, file, new CsvPreference.Builder('"', ',', "\r\n").build());
+            return new CSVFileParser(request, file, createCsvPreference('"', ',', "\r\n"));
         } else if (format.equals(TSV)) {
-            return new CSVFileParser(request, file, new CsvPreference.Builder('"', '\t', "\n").build());
+            return new CSVFileParser(request, file, createCsvPreference('"', '\t', "\n"));
         } else {
             // TODO any more type...
             throw new CommandException("Invalid format: "
                     + Config.BI_PREPARE_PARTS_FORMAT);
         }
+    }
+
+    public static FileParser newInstance(PreparePartsRequest request, InputStream in)
+            throws CommandException {
+        String format = request.getFormat();
+        if (format.equals(CSV)) {
+            return new CSVFileParser(request, in, createCsvPreference('"', ',', "\r\n"));
+        } else if (format.equals(TSV)) {
+            return new CSVFileParser(request, in, createCsvPreference('"', '\t', "\n"));
+        } else {
+            // TODO any more type...
+            throw new CommandException("Invalid format: "
+                    + Config.BI_PREPARE_PARTS_FORMAT);
+        }
+    }
+
+    private static CsvPreference createCsvPreference(final char quoteChar,
+            final int delimiterChar, final String endOfLineSymbols) {
+        return new CsvPreference.Builder(quoteChar, delimiterChar,
+                endOfLineSymbols).build();
     }
 }
