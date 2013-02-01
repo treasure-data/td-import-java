@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -161,6 +162,42 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         CSVFileParser p = new CSVFileParser(request, in);
+
+        MockFileWriter w = new MockFileWriter(request);
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
+        w.setColSize(3);
+        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
+
+        p.close();
+        w.close();
+    }
+
+    @Test
+    public void parseHeaderlessTSVText() throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "tsv");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,time");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
+                "string,string,long");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
+
+        String text = "c00\tc01\t12345\n" + "c10\tc11\t12345\r\n" + "c20\tc21\t12345\r\n";
+        byte[] bytes = text.getBytes();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        FileParser p = FileParserFactory.newInstance(request, in);
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
