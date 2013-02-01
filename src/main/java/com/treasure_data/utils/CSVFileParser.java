@@ -142,7 +142,17 @@ public class CSVFileParser extends FileParser {
     public CSVFileParser(PreparePartsRequest request, File file)
             throws CommandException {
         try {
-            initReader(request, new FileInputStream(file));
+            initReader(request, new FileInputStream(file),
+                    CsvPreference.STANDARD_PREFERENCE);
+        } catch (FileNotFoundException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    public CSVFileParser(PreparePartsRequest request, File file,
+            CsvPreference pref) throws CommandException {
+        try {
+            initReader(request, new FileInputStream(file), pref);
         } catch (FileNotFoundException e) {
             throw new CommandException(e);
         }
@@ -150,15 +160,19 @@ public class CSVFileParser extends FileParser {
 
     public CSVFileParser(PreparePartsRequest request, InputStream in)
             throws CommandException {
-        initReader(request, in);
+        initReader(request, in, CsvPreference.STANDARD_PREFERENCE);
+    }
+
+    public CSVFileParser(PreparePartsRequest request, InputStream in,
+            CsvPreference pref) throws CommandException {
+        initReader(request, in, pref);
     }
 
     @Override
-    public void initReader(PreparePartsRequest request, InputStream in)
-            throws CommandException {
+    public void initReader(PreparePartsRequest request, InputStream in,
+            CsvPreference pref) throws CommandException {
         // create reader
-        reader = new CsvListReader(new InputStreamReader(in),
-                CsvPreference.STANDARD_PREFERENCE);
+        reader = new CsvListReader(new InputStreamReader(in), pref);
 
         // column name e.g. "time,name,price"
         if (request.hasColumnHeader()) {

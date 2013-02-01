@@ -19,6 +19,8 @@ package com.treasure_data.utils;
 
 import java.io.File;
 
+import org.supercsv.prefs.CsvPreference;
+
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
@@ -26,12 +28,15 @@ import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 public class FileParserFactory {
 
     private static final String CSV = "csv";
+    private static final String TSV = "tsv";
 
     public static FileParser newInstance(PreparePartsRequest request, File file)
             throws CommandException {
         String format = request.getFormat();
         if (format.equals(CSV)) {
-            return new CSVFileParser(request, file);
+            return new CSVFileParser(request, file, new CsvPreference.Builder('"', ',', "\r\n").build());
+        } else if (format.equals(TSV)) {
+            return new CSVFileParser(request, file, new CsvPreference.Builder('"', '\t', "\n").build());
         } else {
             // TODO any more type...
             throw new CommandException("Invalid format: "

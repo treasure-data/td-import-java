@@ -20,6 +20,8 @@ package com.treasure_data.utils;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
+import org.supercsv.prefs.CsvPreference;
+
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
@@ -38,7 +40,7 @@ public abstract class FileParser {
     }
 
     protected abstract void initReader(PreparePartsRequest request,
-            InputStream in) throws CommandException;
+            InputStream in, CsvPreference pref) throws CommandException;
 
     public abstract boolean parseRow(MsgpackGZIPFileWriter w) throws CommandException;
 
