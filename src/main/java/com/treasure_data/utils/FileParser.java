@@ -20,10 +20,7 @@ package com.treasure_data.utils;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
-import org.supercsv.prefs.CsvPreference;
-
 import com.treasure_data.commands.CommandException;
-import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public abstract class FileParser {
     private static final Logger LOG = Logger.getLogger(FileParser.class
@@ -39,10 +36,12 @@ public abstract class FileParser {
         return rowNum;
     }
 
-    protected abstract void initReader(PreparePartsRequest request,
-            InputStream in, CsvPreference pref) throws CommandException;
+    public abstract void initReader(InputStream in) throws CommandException;
 
-    public abstract boolean parseRow(MsgpackGZIPFileWriter w) throws CommandException;
+    public abstract void doPreExecute(InputStream in) throws CommandException;
+
+    public abstract boolean parseRow(MsgpackGZIPFileWriter w)
+            throws CommandException;
 
     public abstract void close() throws CommandException;
 

@@ -17,51 +17,30 @@
 //
 package com.treasure_data.utils;
 
-import java.io.File;
-import java.io.InputStream;
-
-import org.supercsv.prefs.CsvPreference;
-
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class FileParserFactory {
 
+    private static final String MSGPACK = "msgpack";
+    private static final String JSON = "json";
     private static final String CSV = "csv";
     private static final String TSV = "tsv";
 
-    public static FileParser newInstance(PreparePartsRequest request, File file)
+    public static FileParser newInstance(PreparePartsRequest request)
             throws CommandException {
         String format = request.getFormat();
-        if (format.equals(CSV)) {
-            return new CSVFileParser(request, file, createCsvPreference('"', ',', "\r\n"));
-        } else if (format.equals(TSV)) {
-            return new CSVFileParser(request, file, createCsvPreference('"', '\t', "\n"));
+        if (format.equals(CSV) || format.equals(TSV)) {
+            return new CSVFileParser(request);
+        } else if (format.equals(JSON)) {
+            throw new CommandException("JSON format not supported");
+        } else if (format.equals(MSGPACK)) {
+            throw new CommandException("msgpack format not supported");
         } else {
             // TODO any more type...
             throw new CommandException("Invalid format: "
                     + Config.BI_PREPARE_PARTS_FORMAT);
         }
-    }
-
-    public static FileParser newInstance(PreparePartsRequest request, InputStream in)
-            throws CommandException {
-        String format = request.getFormat();
-        if (format.equals(CSV)) {
-            return new CSVFileParser(request, in, createCsvPreference('"', ',', "\r\n"));
-        } else if (format.equals(TSV)) {
-            return new CSVFileParser(request, in, createCsvPreference('"', '\t', "\n"));
-        } else {
-            // TODO any more type...
-            throw new CommandException("Invalid format: "
-                    + Config.BI_PREPARE_PARTS_FORMAT);
-        }
-    }
-
-    private static CsvPreference createCsvPreference(final char quoteChar,
-            final int delimiterChar, final String endOfLineSymbols) {
-        return new CsvPreference.Builder(quoteChar, delimiterChar,
-                endOfLineSymbols).build();
     }
 }

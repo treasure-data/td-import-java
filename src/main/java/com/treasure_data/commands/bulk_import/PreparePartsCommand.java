@@ -18,6 +18,9 @@
 package com.treasure_data.commands.bulk_import;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -140,11 +143,15 @@ public class PreparePartsCommand extends
             FileParser p = null;
             MsgpackGZIPFileWriter w = null;
             try {
-                p = FileParserFactory.newInstance(request, infile);
+                p = FileParserFactory.newInstance(request);
+                p.doPreExecute(new FileInputStream(infile));
+                p.initReader(new FileInputStream(infile));
                 w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
                     ;
                 }
+            } catch (IOException e) {
+                throw new CommandException(e);
             } finally {
                 if (p != null) {
                     p.closeSilently();
