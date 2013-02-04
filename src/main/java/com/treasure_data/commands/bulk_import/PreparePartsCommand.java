@@ -145,6 +145,13 @@ public class PreparePartsCommand extends
             try {
                 p = FileParserFactory.newInstance(request);
                 p.doPreExecute(new FileInputStream(infile));
+
+                if (request.dryRun()) {
+                    // if this processing is dry-run mode, thread of control
+                    // returns back
+                    return;
+                }
+
                 p.initReader(new FileInputStream(infile));
                 w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
