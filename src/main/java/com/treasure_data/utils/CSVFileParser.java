@@ -245,8 +245,6 @@ public class CSVFileParser extends FileParser {
         }
     }
 
-    private int preExecuteRowNumber = 30;
-
     private PreparePartsRequest request;
     private ICsvListReader reader;
     private int timeIndex = -1;
@@ -313,11 +311,11 @@ public class CSVFileParser extends FileParser {
             columnTypeHints = request.getColumnTypeHints();
 
             cprocessors = new CellProcessorGen().genForSampleReader(
-                    columnTypeHints, preExecuteRowNumber);
+                    columnTypeHints, request.getSampleRowSize());
 
             List<Object> firstRow = null;
             boolean isFirstRow = false;
-            for (int i = 0; i < preExecuteRowNumber; i++) {
+            for (int i = 0; i < request.getSampleRowSize(); i++) {
                 List<Object> row = sampleReader.read(cprocessors);
                 if (!isFirstRow) {
                     firstRow = row;
