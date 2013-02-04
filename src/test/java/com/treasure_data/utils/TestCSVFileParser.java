@@ -5,19 +5,198 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.utils.CSVFileParser.TypeSuggestionProcessor;
 
 public class TestCSVFileParser {
+
+    @Test
+    public void testTypeSuggestion() throws Exception {
+        {
+            String[] values = new String[] {
+                    "v0\n", "v1\n", "v2\n", "v3\n", "v4\n",
+            };
+            StringBuilder sbuf = new StringBuilder();
+            for (int i = 0; i < values.length; i++) {
+                sbuf.append(values[i]);
+            }
+
+            String text = sbuf.toString();
+            byte[] bytes = text.getBytes();
+            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+            CsvPreference pref = new CsvPreference.Builder('"', ',', "\n").build();
+            CsvListReader sampleReader = new CsvListReader(
+                    new InputStreamReader(in), pref);
+
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TSP.addHint("string");
+            CellProcessor[] procs = new CellProcessor[] { TSP };
+
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.close();
+
+            assertEquals(TSP.getScore(CSVFileParser.INT), 0);
+            assertEquals(TSP.getScore(CSVFileParser.LONG), 0);
+            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
+            assertEquals(TSP.getScore(CSVFileParser.STRING),
+                    TypeSuggestionProcessor.HINT_SCORE + values.length);
+
+            assertEquals(CSVFileParser.STRING, TSP.getSuggestedType());
+        }
+        {
+            String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n",
+                    "v4\n", };
+            StringBuilder sbuf = new StringBuilder();
+            for (int i = 0; i < values.length; i++) {
+                sbuf.append(values[i]);
+            }
+
+            String text = sbuf.toString();
+            byte[] bytes = text.getBytes();
+            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+            CsvPreference pref = new CsvPreference.Builder('"', ',', "\n")
+                    .build();
+            CsvListReader sampleReader = new CsvListReader(
+                    new InputStreamReader(in), pref);
+
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TSP.addHint("int"); // int
+            CellProcessor[] procs = new CellProcessor[] { TSP };
+
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.close();
+
+            assertEquals(TSP.getScore(CSVFileParser.INT),
+                    TypeSuggestionProcessor.HINT_SCORE);
+            assertEquals(TSP.getScore(CSVFileParser.LONG), 0);
+            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
+            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+
+            assertEquals(CSVFileParser.STRING, TSP.getSuggestedType());
+        }
+        {
+            String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n",
+                    "v4\n", };
+            StringBuilder sbuf = new StringBuilder();
+            for (int i = 0; i < values.length; i++) {
+                sbuf.append(values[i]);
+            }
+
+            String text = sbuf.toString();
+            byte[] bytes = text.getBytes();
+            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+            CsvPreference pref = new CsvPreference.Builder('"', ',', "\n")
+                    .build();
+            CsvListReader sampleReader = new CsvListReader(
+                    new InputStreamReader(in), pref);
+
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TSP.addHint("long");
+            CellProcessor[] procs = new CellProcessor[] { TSP };
+
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.close();
+
+            assertEquals(TSP.getScore(CSVFileParser.INT), 0);
+            assertEquals(TSP.getScore(CSVFileParser.LONG),
+                    TypeSuggestionProcessor.HINT_SCORE);
+            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
+            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+
+            assertEquals(CSVFileParser.STRING, TSP.getSuggestedType());
+        }
+        {
+            String[] values = new String[] { "0\n", "1\n", "2\n", "3\n", "4\n", };
+            StringBuilder sbuf = new StringBuilder();
+            for (int i = 0; i < values.length; i++) {
+                sbuf.append(values[i]);
+            }
+
+            String text = sbuf.toString();
+            byte[] bytes = text.getBytes();
+            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+            CsvPreference pref = new CsvPreference.Builder('"', ',', "\n")
+                    .build();
+            CsvListReader sampleReader = new CsvListReader(
+                    new InputStreamReader(in), pref);
+
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TSP.addHint("int"); // int
+            CellProcessor[] procs = new CellProcessor[] { TSP };
+
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.read(procs);
+            sampleReader.close();
+
+            assertEquals(TSP.getScore(CSVFileParser.INT),
+                    TypeSuggestionProcessor.HINT_SCORE + values.length);
+            assertEquals(TSP.getScore(CSVFileParser.LONG), values.length);
+            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), values.length);
+            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+
+            assertEquals(CSVFileParser.INT, TSP.getSuggestedType());
+        }
+        {
+            String[] values = new String[] { "0\n", "1\n", "2\n", "3\n", "4\n", };
+            StringBuilder sbuf = new StringBuilder();
+            for (int i = 0; i < values.length; i++) {
+                sbuf.append(values[i]);
+            }
+
+            String text = sbuf.toString();
+            byte[] bytes = text.getBytes();
+            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+            CsvPreference pref = new CsvPreference.Builder('"', ',', "\n")
+                    .build();
+            CsvListReader sampleReader = new CsvListReader(
+                    new InputStreamReader(in), pref);
+
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
+            TSP.addHint("int"); // int
+            CellProcessor[] procs = new CellProcessor[] { TSP };
+
+            for (int i = 0; i < values.length; i++) {
+                sampleReader.read(procs);
+            }
+            sampleReader.close();
+
+            assertEquals(TSP.getScore(CSVFileParser.INT),
+                    TypeSuggestionProcessor.HINT_SCORE + values.length);
+            assertEquals(TSP.getScore(CSVFileParser.LONG), values.length);
+            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), values.length);
+            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+
+            assertEquals(CSVFileParser.INT, TSP.getSuggestedType());
+        }
+    }
 
     @Ignore
     static class MockFileWriter extends MsgpackGZIPFileWriter {
@@ -90,8 +269,9 @@ public class TestCSVFileParser {
         String text = "c00,0,0,0.0,12345\n" + "c10,1,1,1.1,12345\n"
                 + "c20,2,2,2.2,12345\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(5);
@@ -128,8 +308,9 @@ public class TestCSVFileParser {
 
         String text = "0,0,12345\n" + "c10,1,12345\n" + "2,c21,12345\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -160,8 +341,9 @@ public class TestCSVFileParser {
 
         String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -197,7 +379,9 @@ public class TestCSVFileParser {
         String text = "c00\tc01\t12345\n" + "c10\tc11\t12345\r\n" + "c20\tc21\t12345\r\n";
         byte[] bytes = text.getBytes();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        FileParser p = FileParserFactory.newInstance(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -234,8 +418,9 @@ public class TestCSVFileParser {
 
         String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -274,8 +459,9 @@ public class TestCSVFileParser {
 
         String text = "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -311,8 +497,9 @@ public class TestCSVFileParser {
         String text = "v0,v1,time\n" + "c00,c01,12345\n" + "c10,c11,12345\n"
                 + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -350,8 +537,9 @@ public class TestCSVFileParser {
         String text = "v0,v1,timestamp\n" + "c00,c01,12345\n"
                 + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -392,8 +580,9 @@ public class TestCSVFileParser {
         String text = "timestamp,v0,v1\n" + "12345,c00,c01\n"
                 + "12345,c10,c11\n" + "12345,c20,c21\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -432,8 +621,9 @@ public class TestCSVFileParser {
 
         String text = "v0,v1\n" + "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request, in);
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
