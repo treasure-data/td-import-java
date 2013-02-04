@@ -263,7 +263,6 @@ public class CSVFileParser extends FileParser {
 
     @Override
     public void doPreExecute(InputStream in) throws CommandException {
-        // TODO processing for final close
         // TODO more testing
 
         // CSV preference

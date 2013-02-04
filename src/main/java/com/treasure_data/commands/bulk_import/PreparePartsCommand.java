@@ -21,12 +21,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
@@ -142,9 +144,10 @@ public class PreparePartsCommand extends
 
             FileParser p = null;
             MsgpackGZIPFileWriter w = null;
+            String compressType = getCompressType(request, infile);
             try {
                 p = FileParserFactory.newInstance(request);
-                p.doPreExecute(new FileInputStream(infile));
+                p.doPreExecute(createFileInputStream(compressType, infile));
 
                 if (request.dryRun()) {
                     // if this processing is dry-run mode, thread of control
@@ -152,13 +155,11 @@ public class PreparePartsCommand extends
                     return;
                 }
 
-                p.initReader(new FileInputStream(infile));
+                p.initReader(createFileInputStream(compressType, infile));
                 w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
                     ;
                 }
-            } catch (IOException e) {
-                throw new CommandException(e);
             } finally {
                 if (p != null) {
                     p.closeSilently();
@@ -174,5 +175,80 @@ public class PreparePartsCommand extends
             LOG.info("file: " + infile.getName() + ": "
                     + result.getParsedRowNum() + " entries by " + getName());
         }
+    }
+
+    private static InputStream createFileInputStream(String compressType,
+            final File infile) throws CommandException {
+        try {
+            if (compressType.equals("gzip")) {
+                return new GZIPInputStream(new FileInputStream(infile));
+            } else if (compressType.equals("none")) {
+                return new FileInputStream(infile);
+            } else {
+                throw new CommandException("unsupported compress type: "
+                        + compressType);
+            }
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    private static String getCompressType(PreparePartsRequest request,
+            final File infile) throws CommandException {
+        String fileName = infile.getName();
+        String userCompressType = request.getCompressType();
+        if (userCompressType == null) {
+            throw new CommandException("fatal error");
+        }
+
+        String[] candidateCompressTypes;
+        if (userCompressType.equals("gzip")) {
+            candidateCompressTypes = new String[] { "gzip" };
+        } else if (userCompressType.equals("none")) {
+            candidateCompressTypes = new String[] { "none" };
+        } else if (userCompressType.equals("auto")) {
+            candidateCompressTypes = new String[] { "gzip", "none" };
+        } else {
+            throw new CommandException("unsupported compression type: "
+                    + userCompressType);
+        }
+
+        String compressType = null;
+        for (int i = 0; i < candidateCompressTypes.length; i++) {
+            InputStream in = null;
+            try {
+                if (candidateCompressTypes[i].equals("gzip")) {
+                    in = new GZIPInputStream(new FileInputStream(fileName));
+                } else if (candidateCompressTypes[i].equals("none")) {
+                    in = new FileInputStream(fileName);
+                } else {
+                    throw new CommandException("fatal error");
+                }
+                byte[] b = new byte[2];
+                in.read(b);
+
+                compressType = candidateCompressTypes[i];
+                break;
+            } catch (IOException e) {
+                LOG.info(String.format("file %s is %s", fileName,
+                        e.getMessage()));
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        // ignore
+                    }
+                }
+            }
+        }
+
+        if (compressType == null) {
+            throw new CommandException(new IOException(String.format(
+                    "cannot read file %s with specified compress type: %s",
+                    fileName, userCompressType)));
+        }
+
+        return compressType;
     }
 }
