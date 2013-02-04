@@ -58,6 +58,9 @@ public interface Config {
     String BI_PREPARE_PARTS_DRYRUN = "td.bulk_import.prepare_parts.dry-run";
     String BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE = "false";
 
+    String BI_PREPARE_PARTS_SAMPLE_ROWSIZE = "td.bulk_import.prepare_parts.sample.rowsize";
+    String BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE = "30";
+
     String BI_PREPARE_PARTS_SPLIT_SIZE = "td.bulk_import.prepare_parts.split-size";
     String BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE ="16384";
 
