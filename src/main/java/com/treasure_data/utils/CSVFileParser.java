@@ -55,9 +55,18 @@ public class CSVFileParser extends FileParser {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class
             .getName());
 
-    private static class CellProcessorGen {
-        public CellProcessor[] gen(int[] columnTypes)
-                throws CommandException {
+    static class CellProcessorGen {
+        public CellProcessor[] genForSampleReader(String[] typeHints,
+                int sampleRowSize) throws CommandException {
+            TypeSuggestionProcessor[] cprocs = new TypeSuggestionProcessor[typeHints.length];
+            for (int i = 0; i < cprocs.length; i++) {
+                cprocs[i] = new TypeSuggestionProcessor(sampleRowSize);
+                cprocs[i].addHint(typeHints[i]);
+            }
+            return cprocs;
+        }
+
+        public CellProcessor[] gen(int[] columnTypes) throws CommandException {
             int len = columnTypes.length;
             List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
             for (int i = 0; i < len; i++) {
@@ -82,16 +91,6 @@ public class CSVFileParser extends FileParser {
                 cprocs.add(cproc);
             }
             return cprocs.toArray(new CellProcessor[0]);
-        }
-
-        public CellProcessor[] genForSampleReader(String[] typeHints, int sampleRowSize)
-                throws CommandException {
-            TypeSuggestionProcessor[] cprocs = new TypeSuggestionProcessor[typeHints.length];
-            for (int i = 0; i < cprocs.length; i++) {
-                cprocs[i] = new TypeSuggestionProcessor(sampleRowSize);
-                cprocs[i].addHint(typeHints[i]);
-            }
-            return cprocs;
         }
     }
 
@@ -275,52 +274,47 @@ public class CSVFileParser extends FileParser {
 
         // create sample reader
         CsvListReader sampleReader = new CsvListReader(new InputStreamReader(in), pref);
-
-        // column name e.g. "time,name,price"
-        if (request.hasColumnHeader()) {
-            try {
+        try {
+            // column name e.g. "time,name,price"
+            if (request.hasColumnHeader()) {
                 List<String> columnList = sampleReader.read();
                 columnNames = columnList.toArray(new String[0]);
-            } catch (IOException e) {
-                throw new CommandException(e);
+            } else {
+                columnNames = request.getColumnNames();
             }
-        } else {
-            columnNames = request.getColumnNames();
-        }
 
-        String aliasTimeColumnName = request.getAliasTimeColumn();
-        if (aliasTimeColumnName != null) {
+            String aliasTimeColumnName = request.getAliasTimeColumn();
+            if (aliasTimeColumnName != null) {
+                for (int i = 0; i < columnNames.length; i++) {
+                    if (columnNames[i].equals(aliasTimeColumnName)) {
+                        aliasTimeIndex = i;
+                        break;
+                    }
+                }
+            }
             for (int i = 0; i < columnNames.length; i++) {
-                if (columnNames[i].equals(aliasTimeColumnName)) {
-                    aliasTimeIndex = i;
+                if (columnNames[i]
+                        .equals(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+                    timeIndex = i;
                     break;
                 }
             }
-        }
-        for (int i = 0; i < columnNames.length; i++) {
-            if (columnNames[i]
-                    .equals(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                timeIndex = i;
-                break;
+            if (timeIndex < 0) {
+                timeValue = request.getTimeValue();
+                if (aliasTimeIndex >= 0 || timeValue > 0) {
+                    timeIndex = columnNames.length;
+                } else {
+                    throw new CommandException(
+                            "Time column not found. --time-column or --time-value option is required");
+                }
             }
-        }
-        if (timeIndex < 0) {
-            timeValue = request.getTimeValue();
-            if (aliasTimeIndex >= 0 || timeValue > 0) {
-                timeIndex = columnNames.length;
-            } else {
-                throw new CommandException(
-                        "Time column not found. --time-column or --time-value option is required");
-            }
-        }
 
-        // "long,string,long"
-        columnTypeHints = request.getColumnTypeHints();
+            // "long,string,long"
+            columnTypeHints = request.getColumnTypeHints();
 
-        cprocessors = new CellProcessorGen().genForSampleReader(
-                columnTypeHints, preExecuteRowNumber);
+            cprocessors = new CellProcessorGen().genForSampleReader(
+                    columnTypeHints, preExecuteRowNumber);
 
-        try {
             List<Object> firstRow = null;
             boolean isFirstRow = false;
             for (int i = 0; i < preExecuteRowNumber; i++) {
