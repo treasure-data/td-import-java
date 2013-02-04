@@ -25,6 +25,7 @@ public class TestCSVFileParser {
 
     @Test
     public void testTypeSuggestion() throws Exception {
+        int hintScore = 3;
         {
             String[] values = new String[] {
                     "v0\n", "v1\n", "v2\n", "v3\n", "v4\n",
@@ -41,7 +42,8 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
+                    values.length, hintScore);
             TSP.addHint("string");
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
@@ -55,8 +57,8 @@ public class TestCSVFileParser {
             assertEquals(TSP.getScore(CSVFileParser.INT), 0);
             assertEquals(TSP.getScore(CSVFileParser.LONG), 0);
             assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
-            assertEquals(TSP.getScore(CSVFileParser.STRING),
-                    TypeSuggestionProcessor.HINT_SCORE + values.length);
+            assertEquals(TSP.getScore(CSVFileParser.STRING), hintScore
+                    + values.length);
 
             assertEquals(CSVFileParser.STRING, TSP.getSuggestedType());
         }
@@ -76,7 +78,8 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
+                    values.length, hintScore);
             TSP.addHint("int"); // int
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
@@ -87,8 +90,7 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT),
-                    TypeSuggestionProcessor.HINT_SCORE);
+            assertEquals(TSP.getScore(CSVFileParser.INT), hintScore);
             assertEquals(TSP.getScore(CSVFileParser.LONG), 0);
             assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
             assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
@@ -111,7 +113,8 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
+                    values.length, hintScore);
             TSP.addHint("long");
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
@@ -123,8 +126,7 @@ public class TestCSVFileParser {
             sampleReader.close();
 
             assertEquals(TSP.getScore(CSVFileParser.INT), 0);
-            assertEquals(TSP.getScore(CSVFileParser.LONG),
-                    TypeSuggestionProcessor.HINT_SCORE);
+            assertEquals(TSP.getScore(CSVFileParser.LONG), hintScore);
             assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
             assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
 
@@ -145,7 +147,8 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(6);
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
+                    values.length, hintScore);
             TSP.addHint("int"); // int
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
@@ -156,8 +159,8 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT),
-                    TypeSuggestionProcessor.HINT_SCORE + values.length);
+            assertEquals(TSP.getScore(CSVFileParser.INT), hintScore
+                    + values.length);
             assertEquals(TSP.getScore(CSVFileParser.LONG), values.length);
             assertEquals(TSP.getScore(CSVFileParser.DOUBLE), values.length);
             assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
@@ -179,7 +182,8 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
+                    values.length, hintScore);
             TSP.addHint("int"); // int
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
@@ -188,8 +192,8 @@ public class TestCSVFileParser {
             }
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT),
-                    TypeSuggestionProcessor.HINT_SCORE + values.length);
+            assertEquals(TSP.getScore(CSVFileParser.INT), hintScore
+                    + values.length);
             assertEquals(TSP.getScore(CSVFileParser.LONG), values.length);
             assertEquals(TSP.getScore(CSVFileParser.DOUBLE), values.length);
             assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
@@ -279,6 +283,47 @@ public class TestCSVFileParser {
                 "time", 12345L });
         w.setColSize(5);
         w.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1L, "v3", 1.1,
+                "time", 12345L });
+        w.setColSize(5);
+        w.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2L, "v3", 2.2,
+                "time", 12345L });
+
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertTrue(p.parseRow(w));
+        assertFalse(p.parseRow(w));
+
+        assertEquals(3, p.getRowNum());
+
+        p.close();
+        w.close();
+    }
+
+    @Test
+    public void parseSeveralTypesOfColumnsIncludeNull() throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,v2,v3,time");
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
+                "string,int,long,double,long");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        PreparePartsRequest request = new PreparePartsRequest(new String[0],
+                props);
+
+        String text = "c00,0,0,0.0,12345\n" + ",,,,12345\n"
+                + "c20,2,2,2.2,12345\n";
+        byte[] bytes = text.getBytes();
+        CSVFileParser p = new CSVFileParser(request);
+        p.doPreExecute(new ByteArrayInputStream(bytes));
+        p.initReader(new ByteArrayInputStream(bytes));
+
+        MockFileWriter w = new MockFileWriter(request);
+        w.setColSize(5);
+        w.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0L, "v3", 0.0,
+                "time", 12345L });
+        w.setColSize(5);
+        w.setRow(new Object[] { "v0", null, "v1", null, "v2", null, "v3", null,
                 "time", 12345L });
         w.setColSize(5);
         w.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2L, "v3", 2.2,

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import org.apache.catalina.util.Strftime;
 import org.json.simple.JSONValue;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
+import org.supercsv.cellprocessor.ConvertNullTo;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
@@ -57,10 +58,11 @@ public class CSVFileParser extends FileParser {
 
     static class CellProcessorGen {
         public CellProcessor[] genForSampleReader(String[] typeHints,
-                int sampleRowSize) throws CommandException {
+                int sampleRowSize, int sampleHintScore) throws CommandException {
             TypeSuggestionProcessor[] cprocs = new TypeSuggestionProcessor[typeHints.length];
             for (int i = 0; i < cprocs.length; i++) {
-                cprocs[i] = new TypeSuggestionProcessor(sampleRowSize);
+                cprocs[i] = new TypeSuggestionProcessor(sampleRowSize,
+                        sampleHintScore);
                 cprocs[i].addHint(typeHints[i]);
             }
             return cprocs;
@@ -74,13 +76,13 @@ public class CSVFileParser extends FileParser {
                 int t = columnTypes[i];
                 switch (t) { // override 'optional' ?
                 case INT:
-                    cproc = new ParseInt();
+                    cproc = new ConvertNullTo(null, new ParseInt());
                     break;
                 case LONG:
-                    cproc = new ParseLong();
+                    cproc = new ConvertNullTo(null, new ParseLong());
                     break;
                 case DOUBLE:
-                    cproc = new ParseDouble();
+                    cproc = new ConvertNullTo(null, new ParseDouble());
                     break;
                 case STRING:
                     cproc = new Optional();
@@ -95,24 +97,24 @@ public class CSVFileParser extends FileParser {
     }
 
     static class TypeSuggestionProcessor extends CellProcessorAdaptor {
-        static final int HINT_SCORE = 3;
-
         private int[] scores = new int[] { 0, 0, 0, 0 };
         private int rowSize;
+        private int hintScore;
 
-        TypeSuggestionProcessor(int rowSize) {
+        TypeSuggestionProcessor(int rowSize, int hintScore) {
             this.rowSize = rowSize;
+            this.hintScore = hintScore;
         }
 
         void addHint(String typeHint) throws CommandException {
             if (typeHint.equals("string")) {
-                scores[STRING] += HINT_SCORE;
+                scores[STRING] += hintScore;
             } else if (typeHint.equals("int")) {
-                scores[INT] += HINT_SCORE;
+                scores[INT] += hintScore;
             } else if (typeHint.equals("long")) {
-                scores[LONG] += HINT_SCORE;
+                scores[LONG] += hintScore;
             } else if (typeHint.equals("double")) {
-                scores[DOUBLE] += HINT_SCORE;
+                scores[DOUBLE] += hintScore;
             } else {
                 throw new CommandException("Unsupported type: " + typeHint);
             }
@@ -310,7 +312,8 @@ public class CSVFileParser extends FileParser {
             columnTypeHints = request.getColumnTypeHints();
 
             cprocessors = new CellProcessorGen().genForSampleReader(
-                    columnTypeHints, request.getSampleRowSize());
+                    columnTypeHints, request.getSampleRowSize(),
+                    request.getSampleHintScore());
 
             List<Object> firstRow = null;
             boolean isFirstRow = false;

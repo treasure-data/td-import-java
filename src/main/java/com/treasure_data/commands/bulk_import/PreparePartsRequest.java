@@ -43,6 +43,7 @@ public class PreparePartsRequest extends CommandRequest {
     protected String timeFormat;
     protected String errorRecordOutputDirName;
     protected boolean dryRun = false;
+    protected int sampleHintScore;
     protected int sampleRowSize;
     protected String outputDirName;
     protected int splitSize;
@@ -143,6 +144,12 @@ public class PreparePartsRequest extends CommandRequest {
                 Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
         if (srs != null) {
             sampleRowSize = Integer.parseInt(srs);
+        }
+
+        String hscore = props.getProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
+                Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
+        if (hscore != null) {
+            sampleHintScore = Integer.parseInt(hscore);
         }
 
         // split size
@@ -254,6 +261,11 @@ public class PreparePartsRequest extends CommandRequest {
     public boolean dryRun() {
         return dryRun;
     }
+
+    public int getSampleHintScore() {
+        return sampleHintScore;
+    }
+
     public int getSampleRowSize() {
         return sampleRowSize;
     }
