@@ -109,7 +109,7 @@ public class PreparePartsRequest extends CommandRequest {
 
         // encoding
         encoding = props.getProperty(Config.BI_PREPARE_PARTS_ENCODING,
-                Config.BI_PREPARE_PARTS_COMPRESS_DEFAULTVALUE);
+                Config.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
 
         // time column
         String tc = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN);
@@ -134,18 +134,23 @@ public class PreparePartsRequest extends CommandRequest {
                     + Config.BI_PREPARE_PARTS_OUTPUTDIR);
         }
 
-        errorRecordOutputDirName = props.getProperty(Config.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
+        // error record output DIR
+        errorRecordOutputDirName = props
+                .getProperty(Config.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
 
+        // dry-run mode
         String drun = props.getProperty(Config.BI_PREPARE_PARTS_DRYRUN,
                 Config.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
         dryRun = drun != null && drun.equals("true");
 
+        // row size with sample reader
         String srs = props.getProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
                 Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
         if (srs != null) {
             sampleRowSize = Integer.parseInt(srs);
         }
 
+        // hint score with sample reader
         String hscore = props.getProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
                 Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
         if (hscore != null) {
@@ -159,6 +164,7 @@ public class PreparePartsRequest extends CommandRequest {
         splitSize = Integer.parseInt(splitsize);
 
         if (format.equals("csv") || format.equals("tsv")) {
+
             ////////////////////////////////////////
             // CSV/TSV_OPTIONS                    //
             ////////////////////////////////////////

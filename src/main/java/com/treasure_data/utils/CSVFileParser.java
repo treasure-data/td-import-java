@@ -273,7 +273,7 @@ public class CSVFileParser extends FileParser {
         // encoding
         final CharsetDecoder decoder;
         String encodingName = request.getEncoding();
-        if (encodingName.equals("utf8")) {
+        if (encodingName.equals("utf-8")) {
             decoder = Charset.forName("UTF-8").newDecoder()
                     .onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT);
@@ -353,6 +353,10 @@ public class CSVFileParser extends FileParser {
 
             // print sample row
             if (firstRow != null) {
+                /**
+                 * TODO #MN
+                 * we should parse first row with suggested type converters
+                 */
                 String s = JSONValue.toJSONString(firstRow);
                 LOG.info("sample row: " + s);
             }
@@ -374,12 +378,12 @@ public class CSVFileParser extends FileParser {
         // encoding
         final CharsetDecoder decoder; // redundant code
         String encodingName = request.getEncoding();
-        if (encodingName.equals("utf8")) {
+        if (encodingName.equals("utf-8")) {
             decoder = Charset.forName("UTF-8").newDecoder()
                     .onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT);
         } else {
-            // TODO any more...
+            // TODO any more... 'sjis', 'euc',...
             throw new CommandException(new UnsupportedOperationException());
         }
 
@@ -438,6 +442,14 @@ public class CSVFileParser extends FileParser {
         } catch (Exception e) {
             // catch IOException and SuperCsvCellProcessorException
             e.printStackTrace();
+
+            if (errWriter != null) {
+                // TODO and parsent-encoded row?
+                String msg = String.format("reason: %s, line: %d",
+                        e.getMessage(), getRowNum());
+                errWriter.println(msg);
+            }
+
             LOG.warning("Skip row number: " + getRowNum());
             return true;
         }

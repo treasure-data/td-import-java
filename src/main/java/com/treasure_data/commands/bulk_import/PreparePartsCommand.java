@@ -17,11 +17,13 @@
 //
 package com.treasure_data.commands.bulk_import;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -156,6 +158,8 @@ public class PreparePartsCommand extends
                 }
 
                 p.initReader(createFileInputStream(compressType, infile));
+                p.setErrorRecordFileWriter(createErrorRecordFileOutputStream(
+                        request, infile.getName()));
                 w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
                     ;
@@ -167,6 +171,7 @@ public class PreparePartsCommand extends
                 if (w != null) {
                     w.closeSilently();
                 }
+                // TODO
             }
 
             result.setParsedRowNum(p.getRowNum());
@@ -174,6 +179,30 @@ public class PreparePartsCommand extends
 
             LOG.info("file: " + infile.getName() + ": "
                     + result.getParsedRowNum() + " entries by " + getName());
+        }
+    }
+
+    private static OutputStream createErrorRecordFileOutputStream(
+            PreparePartsRequest request, String infileName)
+            throws CommandException {
+        // outputDir
+        String outputDirName = request.getErrorRecordOutputDirName();
+        if (outputDirName == null) {
+            return null;
+        }
+
+        // outputFilePrefix
+        int lastSepIndex = infileName.lastIndexOf(File.pathSeparator);
+        String outputFilePrefix = infileName.substring(lastSepIndex + 1,
+                infileName.length()).replace('.', '_');
+        String outputFileName = outputFilePrefix + ".err.txt";
+
+        try {
+            File outputFile = new File(outputDirName, outputFileName);
+            LOG.info("Created output file: " + outputFileName);
+            return new BufferedOutputStream(new FileOutputStream(outputFile));
+        } catch (IOException e) {
+            throw new CommandException(e);
         }
     }
 

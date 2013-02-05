@@ -18,6 +18,8 @@
 package com.treasure_data.utils;
 
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.logging.Logger;
 
 import com.treasure_data.commands.CommandException;
@@ -28,12 +30,18 @@ public abstract class FileParser {
 
     private long rowNum = 0;
 
+    protected PrintWriter errWriter;
+
     public void incrRowNum() {
         rowNum++;
     }
 
     public long getRowNum() {
         return rowNum;
+    }
+
+    public void setErrorRecordFileWriter(OutputStream errStream) {
+        this.errWriter = new PrintWriter(errStream);
     }
 
     public abstract void initReader(InputStream in) throws CommandException;
