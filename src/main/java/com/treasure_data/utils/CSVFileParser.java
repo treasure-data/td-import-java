@@ -20,6 +20,9 @@ package com.treasure_data.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -267,12 +270,25 @@ public class CSVFileParser extends FileParser {
     public void doPreExecute(InputStream in) throws CommandException {
         // TODO more testing
 
+        // encoding
+        final CharsetDecoder decoder;
+        String encodingName = request.getEncoding();
+        if (encodingName.equals("utf8")) {
+            decoder = Charset.forName("UTF-8").newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT);
+        } else {
+            // TODO any more...
+            throw new CommandException(new UnsupportedOperationException());
+        }
+
         // CSV preference
         CsvPreference pref = new CsvPreference.Builder('"',
                 request.getDelimiterChar(), request.getNewline()).build();
 
         // create sample reader
-        CsvListReader sampleReader = new CsvListReader(new InputStreamReader(in), pref);
+        CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
+                in, decoder), pref);
         try {
             // column name e.g. "time,name,price"
             if (request.hasColumnHeader()) {
@@ -355,12 +371,24 @@ public class CSVFileParser extends FileParser {
 
     @Override
     public void initReader(InputStream in) throws CommandException {
+        // encoding
+        final CharsetDecoder decoder; // redundant code
+        String encodingName = request.getEncoding();
+        if (encodingName.equals("utf8")) {
+            decoder = Charset.forName("UTF-8").newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT);
+        } else {
+            // TODO any more...
+            throw new CommandException(new UnsupportedOperationException());
+        }
+
         // CSV preference
         CsvPreference pref = new CsvPreference.Builder('"',
                 request.getDelimiterChar(), request.getNewline()).build();
 
         // create reader
-        reader = new CsvListReader(new InputStreamReader(in), pref);
+        reader = new CsvListReader(new InputStreamReader(in, decoder), pref);
 
         // column name e.g. "time,name,price"
         if (request.hasColumnHeader()) {
