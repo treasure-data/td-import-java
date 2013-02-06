@@ -30,7 +30,7 @@ public abstract class FileParser {
 
     private long rowNum = 0;
 
-    protected PrintWriter errWriter;
+    private PrintWriter errWriter = null;
 
     public void incrRowNum() {
         rowNum++;
@@ -40,8 +40,22 @@ public abstract class FileParser {
         return rowNum;
     }
 
-    public void setErrorRecordFileWriter(OutputStream errStream) {
-        this.errWriter = new PrintWriter(errStream);
+    public void setErrorRecordWriter(OutputStream errStream) {
+        if (errStream != null) {
+            errWriter = new PrintWriter(errStream);
+        }
+    }
+
+    public void writeErrorRecord(String msg) {
+        if (errWriter != null) {
+            errWriter.println(msg);
+        }
+    }
+
+    public void closeErrorRecordWriter() {
+        if (errWriter != null) {
+            errWriter.close();
+        }
     }
 
     public abstract void initReader(InputStream in) throws CommandException;
@@ -56,6 +70,7 @@ public abstract class FileParser {
     public void closeSilently() {
         try {
             close();
+            closeErrorRecordWriter();
         } catch (CommandException e) {
             LOG.severe(e.getMessage());
         }

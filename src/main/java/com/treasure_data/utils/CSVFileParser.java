@@ -443,12 +443,10 @@ public class CSVFileParser extends FileParser {
             // catch IOException and SuperCsvCellProcessorException
             e.printStackTrace();
 
-            if (errWriter != null) {
-                // TODO and parsent-encoded row?
-                String msg = String.format("reason: %s, line: %d",
-                        e.getMessage(), getRowNum());
-                errWriter.println(msg);
-            }
+            // TODO and parsent-encoded row?
+            String msg = String.format("reason: %s, line: %d",
+                    e.getMessage(), getRowNum());
+            writeErrorRecord(msg);
 
             LOG.warning("Skip row number: " + getRowNum());
             return true;

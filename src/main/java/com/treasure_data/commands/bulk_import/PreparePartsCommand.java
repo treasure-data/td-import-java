@@ -158,8 +158,8 @@ public class PreparePartsCommand extends
                 }
 
                 p.initReader(createFileInputStream(compressType, infile));
-                p.setErrorRecordFileWriter(createErrorRecordFileOutputStream(
-                        request, infile.getName()));
+                p.setErrorRecordWriter(createErrorRecordOutputStream(request,
+                        infile.getName()));
                 w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
                     ;
@@ -182,7 +182,7 @@ public class PreparePartsCommand extends
         }
     }
 
-    private static OutputStream createErrorRecordFileOutputStream(
+    private static OutputStream createErrorRecordOutputStream(
             PreparePartsRequest request, String infileName)
             throws CommandException {
         // outputDir
