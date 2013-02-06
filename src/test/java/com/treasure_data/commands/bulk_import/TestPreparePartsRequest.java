@@ -66,52 +66,9 @@ public class TestPreparePartsRequest {
     }
 
     @Test
-    public void passInvalidFormat() throws Exception {
-        String invalidFormat = "muga";
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, invalidFormat);
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        PreparePartsRequest req = new PreparePartsRequest();
-        /**
-         * it works fine. but file parser is not created.
-         */
-        req.setOptions(props);
-        assertEquals(invalidFormat, req.getFormat());
-    }
-
-    @Test
-    public void passNotSpecifiedFormat() throws Exception {
-        Properties props = new Properties();
-        // props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        PreparePartsRequest req = new PreparePartsRequest();
-        /**
-         * it works fine. if format is not specified, default format 'csv' is
-         * inserted into system properties.
-         */
-        req.setOptions(props);
-        assertEquals(req.getFormat(),
-                Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
-    }
-
-    @Test
     public void passNotSpecifiedColumnHeader() throws Exception {
         Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
+        //props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
         // props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
@@ -120,11 +77,12 @@ public class TestPreparePartsRequest {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
 
-        PreparePartsRequest req = new PreparePartsRequest();
+        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
         /**
          * it works fine. if column header is not specified, 'columns' option is
          * used.
          */
+        req.setFormat("csv");
         req.setOptions(props);
         String[] columnNames = req.getColumnNames();
         assertEquals("v0", columnNames[0]);
@@ -144,8 +102,9 @@ public class TestPreparePartsRequest {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
 
-        PreparePartsRequest req = new PreparePartsRequest();
+        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
         try {
+            req.setFormat("csv");
             req.setOptions(props);
             fail();
         } catch (Throwable t) {
@@ -165,11 +124,12 @@ public class TestPreparePartsRequest {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
 
-        PreparePartsRequest req = new PreparePartsRequest();
+        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
         /**
          * it works fine. if columns is not specified, 'column-header' option is
          * used.
          */
+        req.setFormat("csv");
         req.setOptions(props);
         assertTrue(null == req.getColumnNames());
         assertTrue(req.hasColumnHeader());
@@ -189,6 +149,7 @@ public class TestPreparePartsRequest {
 
         PreparePartsRequest req = new PreparePartsRequest();
         try {
+            req.setFormat("csv");
             req.setOptions(props);
             fail();
         } catch (Throwable t) {

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import com.treasure_data.commands.bulk_import.PreparePartsCommand;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.commands.bulk_import.PreparePartsRequestFactory;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 
 public class BulkImportTool {
@@ -68,7 +69,8 @@ public class BulkImportTool {
             fileNames[i] = args[i + 1];
         }
 
-        PreparePartsRequest request = new PreparePartsRequest(fileNames, props);
+        PreparePartsRequest request = PreparePartsRequestFactory.newInstance(
+                fileNames, props);
         PreparePartsResult result = new PreparePartsResult();
 
         PreparePartsCommand command = new PreparePartsCommand();

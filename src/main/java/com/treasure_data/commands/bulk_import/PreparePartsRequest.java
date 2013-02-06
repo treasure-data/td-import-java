@@ -48,25 +48,20 @@ public class PreparePartsRequest extends CommandRequest {
     protected String outputDirName;
     protected int splitSize;
 
-    // csv/tsv options
-    protected char delimiterChar;
-    protected String newline;
-    protected String[] columnNames;
-    protected String[] columnTypeHints;
-    protected boolean hasColumnHeader = false;
-    protected String typeErrorMode;
-    protected String[] excludeColumns;
-    protected String[] onlyColumns;
-
     public PreparePartsRequest() throws CommandException {
         super(null);
     }
 
-    public PreparePartsRequest(String[] fileNames, Properties props)
+    public PreparePartsRequest(String format, String[] fileNames, Properties props)
             throws CommandException {
         super(props);
+        setFormat(format);
         setFiles(fileNames);
         setOptions(getProperties());
+    }
+
+    void setFormat(String format) {
+        this.format = format;
     }
 
     @Override
@@ -74,7 +69,7 @@ public class PreparePartsRequest extends CommandRequest {
         return COMMAND_NAME;
     }
 
-    void setFiles(String[] fileNames) throws CommandException {
+    protected void setFiles(String[] fileNames) throws CommandException {
         // validation for file names
         List<File> fileList = new ArrayList<File>(fileNames.length);
         for (int i = 0; i < fileNames.length; i++) {
@@ -93,16 +88,7 @@ public class PreparePartsRequest extends CommandRequest {
         return files;
     }
 
-    void setOptions(Properties props) throws CommandException {
-
-        ////////////////////////////////////////
-        // PREPARE_PARTS_OPTIONS              //
-        ////////////////////////////////////////
-
-        // format
-        format = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT,
-                Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
-
+    protected void setOptions(Properties props) throws CommandException {
         // compress
         compressType = props.getProperty(Config.BI_PREPARE_PARTS_COMPRESS,
                 Config.BI_PREPARE_PARTS_COMPRESS_DEFAULTVALUE);
@@ -162,79 +148,6 @@ public class PreparePartsRequest extends CommandRequest {
                 Config.BI_PREPARE_PARTS_SPLIT_SIZE,
                 Config.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
         splitSize = Integer.parseInt(splitsize);
-
-        if (format.equals("csv") || format.equals("tsv")) {
-
-            ////////////////////////////////////////
-            // CSV/TSV_OPTIONS                    //
-            ////////////////////////////////////////
-
-            // delimiter
-            if (format.equals("csv")) {
-                delimiterChar = props.getProperty(
-                        Config.BI_PREPARE_PARTS_DELIMITER,
-                        Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE)
-                        .charAt(0);
-            } else { // "tsv"
-                delimiterChar = props.getProperty(
-                        Config.BI_PREPARE_PARTS_DELIMITER,
-                        Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE)
-                        .charAt(0);
-            }
-
-            // newline
-            newline = props.getProperty(Config.BI_PREPARE_PARTS_NEWLINE,
-                    Config.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE);
-
-            boolean setColumns = false;
-
-            // columns
-            String cs = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNS);
-            if (cs != null) {
-                setColumns = true;
-                columnNames = cs.split(",");
-            }
-
-            // column header
-            String columnHeader = props
-                    .getProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER);
-            if (columnHeader == null || !columnHeader.equals("true")) {
-                if (!setColumns) {
-                    throw new CommandException("Column names not set");
-                }
-            } else {
-                hasColumnHeader = true;
-            }
-
-            // column types
-            String ctypes = props
-                    .getProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES);
-            if (ctypes == null || ctypes.isEmpty()) {
-                throw new CommandException("Column types is required: "
-                        + Config.BI_PREPARE_PARTS_COLUMNTYPES);
-            } else {
-                columnTypeHints = ctypes.split(",");
-            }
-
-            // type-conversion-error
-            typeErrorMode = props.getProperty(
-                    Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR,
-                    Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR_DEFAULTVALUE);
-
-            // exclude-columns
-            String ecs = props
-                    .getProperty(Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
-            if (ecs != null) {
-                excludeColumns = ecs.split(",");
-            }
-
-            // only-columns
-            String ocs = props
-                    .getProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
-            if (ocs != null) {
-                onlyColumns = ocs.split(",");
-            }
-        }
     }
 
     public String getFormat() {
@@ -282,37 +195,5 @@ public class PreparePartsRequest extends CommandRequest {
 
     public int getSplitSize() {
         return splitSize;
-    }
-
-    public char getDelimiterChar() {
-        return delimiterChar;
-    }
-
-    public String getNewline() {
-        return newline;
-    }
-
-    public String[] getColumnNames() {
-        return columnNames;
-    }
-
-    public String[] getColumnTypeHints() {
-        return columnTypeHints;
-    }
-
-    public boolean hasColumnHeader() {
-        return hasColumnHeader;
-    }
-
-    public String getTypeErrorMode() {
-        return typeErrorMode;
-    }
-
-    public String[] getExcludeColumns() {
-        return excludeColumns;
-    }
-
-    public String[] getOnlyColumns() {
-        return onlyColumns;
     }
 }

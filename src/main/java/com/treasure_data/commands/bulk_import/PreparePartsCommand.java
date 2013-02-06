@@ -34,9 +34,9 @@ import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
-import com.treasure_data.utils.FileParser;
-import com.treasure_data.utils.FileParserFactory;
-import com.treasure_data.utils.MsgpackGZIPFileWriter;
+import com.treasure_data.file.FileParser;
+import com.treasure_data.file.FileParserFactory;
+import com.treasure_data.file.MsgpackGZIPFileWriter;
 
 public class PreparePartsCommand extends
         Command<PreparePartsRequest, PreparePartsResult> {
