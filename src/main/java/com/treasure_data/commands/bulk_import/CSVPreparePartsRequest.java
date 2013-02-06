@@ -1,5 +1,8 @@
 package com.treasure_data.commands.bulk_import;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -7,11 +10,78 @@ import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 
 public class CSVPreparePartsRequest extends PreparePartsRequest {
+    public static enum NewLine {
+        CR("\r"), LF("\n"), CRLF("\r\n");
+
+        private String newline;
+
+        NewLine(String newline) {
+            this.newline = newline;
+        }
+
+        public String newline() {
+            return newline;
+        }
+    }
+
+    public static enum ColumnType {
+        INT("int", 0), LONG("long", 1), DOUBLE("double", 2), STRING("string", 3);
+
+        private String type;
+
+        private int index;
+
+        ColumnType(String type, int index) {
+            this.type = type;
+            this.index = index;
+        }
+
+        public static ColumnType fromString(String type) {
+            return StringToColumnType.get(type);
+        }
+
+        public static ColumnType fromInt(int index) {
+            return IntToColumnType.get(index);
+        }
+
+        private static class StringToColumnType {
+            private static final Map<String, ColumnType> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, ColumnType> map = new HashMap<String, ColumnType>();
+                for (ColumnType elem : ColumnType.values()) {
+                    map.put(elem.type, elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static ColumnType get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+
+        private static class IntToColumnType {
+            private static final Map<Integer, ColumnType> REVERSE_DICTIONARY;
+
+            static {
+                Map<Integer, ColumnType> map = new HashMap<Integer, ColumnType>();
+                for (ColumnType elem : ColumnType.values()) {
+                    map.put(elem.index, elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static ColumnType get(Integer index) {
+                return REVERSE_DICTIONARY.get(index);
+            }
+        }
+    }
+
     private static final Logger LOG = Logger
             .getLogger(CSVPreparePartsRequest.class.getName());
 
     protected char delimiterChar;
-    protected String newline;
+    protected NewLine newline;
     protected String[] columnNames;
     protected String[] columnTypeHints;
     protected boolean hasColumnHeader;
@@ -23,7 +93,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         super();
     }
 
-    public CSVPreparePartsRequest(String format, String[] fileNames,
+    public CSVPreparePartsRequest(Format format, String[] fileNames,
             Properties props) throws CommandException {
         super(format, fileNames, props);
     }
@@ -33,23 +103,30 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         super.setOptions(props);
 
         // delimiter
-        if (format.equals("csv")) {
+        if (format.equals(PreparePartsRequest.Format.CSV)) {
             delimiterChar = props.getProperty(
                     Config.BI_PREPARE_PARTS_DELIMITER,
-                    Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE)
-                    .charAt(0);
-        } else { // "tsv"
+                    Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE).charAt(
+                    0);
+        } else if (format.equals(PreparePartsRequest.Format.TSV)) {
             delimiterChar = props.getProperty(
                     Config.BI_PREPARE_PARTS_DELIMITER,
-                    Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE)
-                    .charAt(0);
+                    Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
+                    0);
+        } else {
+            // Here might be not executed
+            throw new CommandException("unsupported format: " + format);
         }
 
         // newline
-        newline = props.getProperty(Config.BI_PREPARE_PARTS_NEWLINE,
+        String nLine = props.getProperty(Config.BI_PREPARE_PARTS_NEWLINE,
                 Config.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE);
+        newline = NewLine.valueOf(nLine);
+        if (newline == null) {
+            throw new CommandException("unsupported newline char: " + nLine);
+        }
 
-        boolean setColumns = false;
+        boolean setColumns = false; // TODO
 
         // columns
         String cs = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNS);
@@ -104,7 +181,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return delimiterChar;
     }
 
-    public String getNewline() {
+    public NewLine getNewline() {
         return newline;
     }
 

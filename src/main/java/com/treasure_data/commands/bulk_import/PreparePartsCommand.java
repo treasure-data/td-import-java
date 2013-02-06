@@ -34,6 +34,7 @@ import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.bulk_import.PreparePartsRequest.CompressionType;
 import com.treasure_data.file.FileParser;
 import com.treasure_data.file.FileParserFactory;
 import com.treasure_data.file.MsgpackGZIPFileWriter;
@@ -52,8 +53,6 @@ public class PreparePartsCommand extends
     @Override
     public void execute(PreparePartsRequest request, PreparePartsResult result)
             throws CommandException {
-        LOG.info("Execute " + request.getName() + " command");
-
         Properties props = request.getProperties();
         File[] files = request.getFiles();
 
@@ -69,13 +68,13 @@ public class PreparePartsCommand extends
 
         // avaiable cpu processors
         int numOfProcs = Runtime.getRuntime().availableProcessors();
-        LOG.info("Recognized CPU Processors: " + numOfProcs);
+        LOG.info("recognized CPU processors: " + numOfProcs);
 
         // create worker threads
         workers = new ArrayList<Worker>(numOfProcs);
         for (int i = 0; i < numOfProcs; i++) {
             Worker w = new Worker(props, request, result);
-            LOG.fine("Created worker thread: " + w.getName());
+            LOG.fine("created worker thread: " + w.getName());
             workers.add(w);
         }
         // start workers
@@ -97,8 +96,6 @@ public class PreparePartsCommand extends
             }
             workers.remove(workers.size() - 1);
         }
-
-        LOG.info("Finish " + request.getName() + " command");
     }
 
     static class Worker extends Thread {
@@ -131,8 +128,8 @@ public class PreparePartsCommand extends
                     try {
                         execute(props, request, result, t.file);
                     } catch (CommandException e) {
-                        LOG.severe("Failed command by " + getName() + ": "
-                                + e.getMessage());
+                        LOG.severe(String.format("failed command by %s: %s",
+                                getName(), e.getMessage()));
                         e.printStackTrace();
                     }
                 }
@@ -142,14 +139,19 @@ public class PreparePartsCommand extends
         private void execute(Properties props, PreparePartsRequest request,
                 PreparePartsResult result, final File infile)
                 throws CommandException {
-            LOG.info("Read file: " + infile.getName() + " by " + getName());
+            LOG.info(String.format("started converting file: %s by %s",
+                    infile.getName(), getName()));
 
-            FileParser p = null;
+            // TODO #MN need type paramters
+            FileParser<?, ?> p = null;
             MsgpackGZIPFileWriter w = null;
-            String compressType = getCompressType(request, infile);
             try {
+                CompressionType compressionType = getCompressType(request, infile);
+
                 p = FileParserFactory.newInstance(request);
-                p.doPreExecute(createFileInputStream(compressType, infile));
+                p.setErrorRecordWriter(createErrorRecordOutputStream(request,
+                        infile.getName()));
+                p.doPreExecute(createFileInputStream(compressionType, infile));
 
                 if (request.dryRun()) {
                     // if this processing is dry-run mode, thread of control
@@ -157,9 +159,7 @@ public class PreparePartsCommand extends
                     return;
                 }
 
-                p.initReader(createFileInputStream(compressType, infile));
-                p.setErrorRecordWriter(createErrorRecordOutputStream(request,
-                        infile.getName()));
+                p.doParse(createFileInputStream(compressionType, infile));
                 w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
                     ;
@@ -171,14 +171,13 @@ public class PreparePartsCommand extends
                 if (w != null) {
                     w.closeSilently();
                 }
-                // TODO
             }
 
             result.setParsedRowNum(p.getRowNum());
             result.setWrittenRowNum(w.getRowNum());
 
-            LOG.info("file: " + infile.getName() + ": "
-                    + result.getParsedRowNum() + " entries by " + getName());
+            LOG.info(String.format("file: %s: %d entries by %s",
+                    infile.getName(), result.getParsedRowNum(), getName()));
         }
     }
 
@@ -206,49 +205,54 @@ public class PreparePartsCommand extends
         }
     }
 
-    private static InputStream createFileInputStream(String compressType,
-            final File infile) throws CommandException {
+    private static InputStream createFileInputStream(
+            CompressionType compressionType, final File infile)
+            throws CommandException {
         try {
-            if (compressType.equals("gzip")) {
+            if (compressionType.equals(CompressionType.GZIP)) {
                 return new GZIPInputStream(new FileInputStream(infile));
-            } else if (compressType.equals("none")) {
+            } else if (compressionType.equals(CompressionType.NONE)) {
                 return new FileInputStream(infile);
             } else {
                 throw new CommandException("unsupported compress type: "
-                        + compressType);
+                        + compressionType);
             }
         } catch (IOException e) {
             throw new CommandException(e);
         }
     }
 
-    private static String getCompressType(PreparePartsRequest request,
+    private static CompressionType getCompressType(PreparePartsRequest request,
             final File infile) throws CommandException {
         String fileName = infile.getName();
-        String userCompressType = request.getCompressType();
+        CompressionType userCompressType = request.getCompressionType();
         if (userCompressType == null) {
             throw new CommandException("fatal error");
         }
 
-        String[] candidateCompressTypes;
-        if (userCompressType.equals("gzip")) {
-            candidateCompressTypes = new String[] { "gzip" };
-        } else if (userCompressType.equals("none")) {
-            candidateCompressTypes = new String[] { "none" };
-        } else if (userCompressType.equals("auto")) {
-            candidateCompressTypes = new String[] { "gzip", "none" };
+        CompressionType[] candidateCompressTypes;
+        // TODO need to refactor here
+        // here should be moved to CompressionType enum
+        if (userCompressType.equals(CompressionType.GZIP)) {
+            candidateCompressTypes = new CompressionType[] { CompressionType.GZIP, };
+        } else if (userCompressType.equals(CompressionType.NONE)) {
+            candidateCompressTypes = new CompressionType[] { CompressionType.NONE, };
+        } else if (userCompressType.equals(CompressionType.AUTO)) {
+            candidateCompressTypes = new CompressionType[] {
+                    CompressionType.GZIP, CompressionType.NONE, };
         } else {
             throw new CommandException("unsupported compression type: "
                     + userCompressType);
         }
 
-        String compressType = null;
+        CompressionType compressionType = null;
         for (int i = 0; i < candidateCompressTypes.length; i++) {
             InputStream in = null;
             try {
-                if (candidateCompressTypes[i].equals("gzip")) {
+                if (candidateCompressTypes[i].equals(CompressionType.GZIP)) {
                     in = new GZIPInputStream(new FileInputStream(fileName));
-                } else if (candidateCompressTypes[i].equals("none")) {
+                } else if (candidateCompressTypes[i]
+                        .equals(CompressionType.NONE)) {
                     in = new FileInputStream(fileName);
                 } else {
                     throw new CommandException("fatal error");
@@ -256,7 +260,7 @@ public class PreparePartsCommand extends
                 byte[] b = new byte[2];
                 in.read(b);
 
-                compressType = candidateCompressTypes[i];
+                compressionType = candidateCompressTypes[i];
                 break;
             } catch (IOException e) {
                 LOG.info(String.format("file %s is %s", fileName,
@@ -272,12 +276,12 @@ public class PreparePartsCommand extends
             }
         }
 
-        if (compressType == null) {
+        if (compressionType == null) {
             throw new CommandException(new IOException(String.format(
                     "cannot read file %s with specified compress type: %s",
                     fileName, userCompressType)));
         }
 
-        return compressType;
+        return compressionType;
     }
 }

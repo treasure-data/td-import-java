@@ -18,30 +18,26 @@
 package com.treasure_data.file;
 
 import com.treasure_data.commands.CommandException;
-import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 
 public class FileParserFactory {
 
-    private static final String MSGPACK = "msgpack";
-    private static final String JSON = "json";
-    private static final String CSV = "csv";
-    private static final String TSV = "tsv";
-
-    public static FileParser newInstance(PreparePartsRequest request)
+    // TODO #MN should consider type parameters
+    public static FileParser<?, ?> newInstance(PreparePartsRequest request)
             throws CommandException {
-        String format = request.getFormat();
-        if (format.equals(CSV) || format.equals(TSV)) {
+        PreparePartsRequest.Format format = request.getFormat();
+        if (format.equals(PreparePartsRequest.Format.CSV)
+                || format.equals(PreparePartsRequest.Format.TSV)) {
             return new CSVFileParser((CSVPreparePartsRequest) request);
-        } else if (format.equals(JSON)) {
-            throw new CommandException("JSON format not supported");
-        } else if (format.equals(MSGPACK)) {
-            throw new CommandException("msgpack format not supported");
+        } else if (format.equals(PreparePartsRequest.Format.JSON)) {
+            throw new CommandException(new UnsupportedOperationException(
+                    "format: " + format));
+        } else if (format.equals(PreparePartsRequest.Format.MSGPACK)) {
+            throw new CommandException(new UnsupportedOperationException(
+                    "format: " + format));
         } else {
-            // TODO any more type...
-            throw new CommandException("Invalid format: "
-                    + Config.BI_PREPARE_PARTS_FORMAT);
+            throw new CommandException("Invalid format: " + format);
         }
     }
 }

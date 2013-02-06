@@ -13,12 +13,26 @@ public class PreparePartsRequestFactory {
     public static PreparePartsRequest newInstance(String[] fileNames,
             Properties props) throws CommandException {
         // format
-        String format = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT,
+        String f = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT,
                 Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
-        if (format.equals("csv") || format.equals("tsv")) {
+        PreparePartsRequest.Format format = PreparePartsRequest.Format
+                .fromString(f);
+        if (format == null) {
+            throw new CommandException("unsupported format: " + f);
+        }
+
+        if (format.equals(PreparePartsRequest.Format.CSV)
+                || format.equals(PreparePartsRequest.Format.TSV)) {
             return new CSVPreparePartsRequest(format, fileNames, props);
+        } else if (format.equals(PreparePartsRequest.Format.JSON)) {
+            throw new CommandException(new UnsupportedOperationException(
+                    format.format()));
+        } else if (format.equals(PreparePartsRequest.Format.MSGPACK)) {
+            throw new CommandException(new UnsupportedOperationException(
+                    format.format()));
         } else {
-            throw new CommandException("unsupported format: " + format);
+            throw new CommandException("fatal error: unsupported format: "
+                    + format);
         }
     }
 }

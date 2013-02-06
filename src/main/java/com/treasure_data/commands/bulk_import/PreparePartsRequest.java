@@ -19,7 +19,10 @@ package com.treasure_data.commands.bulk_import;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -28,6 +31,74 @@ import com.treasure_data.commands.CommandRequest;
 import com.treasure_data.commands.Config;
 
 public class PreparePartsRequest extends CommandRequest {
+    public static enum Format {
+        CSV("csv"), TSV("tsv"), JSON("json"), MSGPACK("msgpack");
+
+        private String format;
+
+        Format(String format) {
+            this.format = format;
+        }
+
+        public String format() {
+            return format;
+        }
+
+        public static Format fromString(String format) {
+            return StringToFormat.get(format);
+        }
+
+        private static class StringToFormat {
+            private static final Map<String, Format> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, Format> map = new HashMap<String, Format>();
+                for (Format elem : Format.values()) {
+                    map.put(elem.format(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static Format get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
+
+    public static enum CompressionType {
+        GZIP("gzip"), AUTO("auto"), NONE("none");
+
+        private String type;
+
+        CompressionType(String type) {
+            this.type = type;
+        }
+
+        public String type() {
+            return type;
+        }
+
+        public static CompressionType fromString(String type) {
+            return StringToCompressionType.get(type);
+        }
+
+        private static class StringToCompressionType {
+            private static final Map<String, CompressionType> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, CompressionType> map = new HashMap<String, CompressionType>();
+                for (CompressionType elem : CompressionType.values()) {
+                    map.put(elem.type(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static CompressionType get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
+
     private static final Logger LOG = Logger
             .getLogger(PreparePartsRequest.class.getName());
 
@@ -35,8 +106,8 @@ public class PreparePartsRequest extends CommandRequest {
 
     protected File[] files;
 
-    protected String format;
-    protected String compressType;
+    protected Format format;
+    protected CompressionType compressionType;
     protected String encoding;
     protected String aliasTimeColumn;
     protected long timeValue = -1;
@@ -52,7 +123,7 @@ public class PreparePartsRequest extends CommandRequest {
         super(null);
     }
 
-    public PreparePartsRequest(String format, String[] fileNames, Properties props)
+    public PreparePartsRequest(Format format, String[] fileNames, Properties props)
             throws CommandException {
         super(props);
         setFormat(format);
@@ -60,7 +131,7 @@ public class PreparePartsRequest extends CommandRequest {
         setOptions(getProperties());
     }
 
-    void setFormat(String format) {
+    void setFormat(Format format) {
         this.format = format;
     }
 
@@ -89,26 +160,37 @@ public class PreparePartsRequest extends CommandRequest {
     }
 
     protected void setOptions(Properties props) throws CommandException {
-        // compress
-        compressType = props.getProperty(Config.BI_PREPARE_PARTS_COMPRESS,
-                Config.BI_PREPARE_PARTS_COMPRESS_DEFAULTVALUE);
+        // compression type
+        String compType = props.getProperty(
+                Config.BI_PREPARE_PARTS_COMPRESSION,
+                Config.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE);
+        compressionType = CompressionType.fromString(compType);
+        if (compressionType == null) {
+            throw new CommandException("unsupported compression type: "
+                    + compressionType);
+        }
 
         // encoding
         encoding = props.getProperty(Config.BI_PREPARE_PARTS_ENCODING,
                 Config.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
 
         // time column
-        String tc = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN);
-        if (tc != null) {
-            aliasTimeColumn = tc;
-        }
+        aliasTimeColumn = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN);
 
         // time column value
-        String tv = props.getProperty(Config.BI_PREPARE_PARTS_TIMEVALUE);
-        if (tv != null) {
-            timeValue = Long.parseLong(tv);
+        String tValue = props.getProperty(Config.BI_PREPARE_PARTS_TIMEVALUE);
+        if (tValue != null) {
+            try {
+                timeValue = Long.parseLong(tValue);
+            } catch (NumberFormatException e) {
+                String msg = String.format(
+                        "time value is required as long type (unix timestamp) e.g. -D%s=1360141200",
+                        Config.BI_PREPARE_PARTS_TIMEVALUE);
+                throw new CommandException(msg, e);
+            }
         }
 
+        // TODO #MN should implement later
         // time format
         timeFormat = props.getProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT,
                 Config.BI_PREPARE_PARTS_TIMEFORMAT_DEFAULTVALUE);
@@ -116,8 +198,9 @@ public class PreparePartsRequest extends CommandRequest {
         // output DIR
         outputDirName = props.getProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR);
         if (outputDirName == null || outputDirName.isEmpty()) {
-            throw new CommandException("Output dir is required: "
-                    + Config.BI_PREPARE_PARTS_OUTPUTDIR);
+            String msg = String.format("output dir is required e.g. -D%s=./",
+                    Config.BI_PREPARE_PARTS_OUTPUTDIR);
+            throw new CommandException(msg);
         }
 
         // error record output DIR
@@ -130,32 +213,54 @@ public class PreparePartsRequest extends CommandRequest {
         dryRun = drun != null && drun.equals("true");
 
         // row size with sample reader
-        String srs = props.getProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
+        String sRowSize = props.getProperty(
+                Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
                 Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
-        if (srs != null) {
-            sampleRowSize = Integer.parseInt(srs);
+        try {
+            sampleRowSize = Integer.parseInt(sRowSize);
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "sample row size is required as int type e.g. -D%s=%s",
+                    Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
+                    Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
+            throw new CommandException(msg, e);
         }
 
         // hint score with sample reader
-        String hscore = props.getProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
+        String sHintScore = props.getProperty(
+                Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
                 Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
-        if (hscore != null) {
-            sampleHintScore = Integer.parseInt(hscore);
+        try {
+            sampleHintScore = Integer.parseInt(sHintScore);
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "sample hint score is required as int type e.g. -D%s=%s",
+                    Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
+                    Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
+            throw new CommandException(msg, e);
         }
 
         // split size
-        String splitsize = props.getProperty(
+        String sSize = props.getProperty(
                 Config.BI_PREPARE_PARTS_SPLIT_SIZE,
                 Config.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
-        splitSize = Integer.parseInt(splitsize);
+        try {
+            splitSize = Integer.parseInt(sSize);
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "split size is required as int type e.g. -D%s=%s",
+                    Config.BI_PREPARE_PARTS_SPLIT_SIZE,
+                    Config.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
+            throw new CommandException(msg, e);
+        }
     }
 
-    public String getFormat() {
+    public Format getFormat() {
         return format;
     }
 
-    public String getCompressType() {
-        return compressType;
+    public CompressionType getCompressionType() {
+        return compressionType;
     }
 
     public String getEncoding() {

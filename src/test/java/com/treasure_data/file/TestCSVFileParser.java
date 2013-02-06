@@ -278,7 +278,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(5);
@@ -319,7 +319,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(5);
@@ -358,7 +358,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -391,7 +391,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -429,7 +429,7 @@ public class TestCSVFileParser {
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -468,7 +468,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -509,7 +509,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -547,7 +547,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -587,7 +587,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -630,7 +630,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -671,7 +671,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
         p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.initReader(new ByteArrayInputStream(bytes));
+        p.doParse(new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);

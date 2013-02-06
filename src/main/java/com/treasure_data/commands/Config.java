@@ -28,8 +28,8 @@ public interface Config {
     String BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE = "csv"; // default 'csv'
 
     // compress [gzip,.., auto]; default=auto detect
-    String BI_PREPARE_PARTS_COMPRESS = "td.bulk_import.prepare_parts.compress";
-    String BI_PREPARE_PARTS_COMPRESS_DEFAULTVALUE = "auto";
+    String BI_PREPARE_PARTS_COMPRESSION = "td.bulk_import.prepare_parts.compression";
+    String BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE = "auto";
 
     // encoding [utf-8,...]
     String BI_PREPARE_PARTS_ENCODING = "td.bulk_import.prepare_parts.encoding";
@@ -78,7 +78,7 @@ public interface Config {
 
     // newline [CRLF, LF, CR]; default=CRLF (or auto detect?)
     String BI_PREPARE_PARTS_NEWLINE = "td.bulk_import.prepare_parts.newline";
-    String BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE = "\r\n"; // default CRLF
+    String BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE = "CRLF"; // default CRLF
 
     // column-header; default=true
     String BI_PREPARE_PARTS_COLUMNHEADER = "td.bulk_import.prepare_parts.column-header";

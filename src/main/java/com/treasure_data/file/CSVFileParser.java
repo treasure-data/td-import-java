@@ -49,7 +49,6 @@ import org.supercsv.util.CsvContext;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
-import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 
 public class CSVFileParser extends
@@ -286,7 +285,8 @@ public class CSVFileParser extends
 
         // CSV preference
         CsvPreference pref = new CsvPreference.Builder('"',
-                request.getDelimiterChar(), request.getNewline()).build();
+                request.getDelimiterChar(), request.getNewline().newline())
+                .build();
 
         // create sample reader
         CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
@@ -376,7 +376,7 @@ public class CSVFileParser extends
     }
 
     @Override
-    public void initReader(InputStream in) throws CommandException {
+    public void doParse(InputStream in) throws CommandException {
         // encoding
         final CharsetDecoder decoder; // redundant code
         String encodingName = request.getEncoding();
@@ -391,7 +391,8 @@ public class CSVFileParser extends
 
         // CSV preference
         CsvPreference pref = new CsvPreference.Builder('"',
-                request.getDelimiterChar(), request.getNewline()).build();
+                request.getDelimiterChar(), request.getNewline().newline())
+                .build();
 
         // create reader
         reader = new CsvListReader(new InputStreamReader(in, decoder), pref);

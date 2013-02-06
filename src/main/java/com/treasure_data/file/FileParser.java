@@ -66,7 +66,7 @@ public abstract class FileParser<REQ extends CommandRequest, RET extends Command
         }
     }
 
-    public abstract void initReader(InputStream in) throws CommandException;
+    public abstract void doParse(InputStream in) throws CommandException;
 
     public abstract void doPreExecute(InputStream in) throws CommandException;
 
