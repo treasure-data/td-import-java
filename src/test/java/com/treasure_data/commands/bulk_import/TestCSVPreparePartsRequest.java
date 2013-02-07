@@ -1,10 +1,10 @@
 package com.treasure_data.commands.bulk_import;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -13,163 +13,72 @@ import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 
 public class TestCSVPreparePartsRequest {
-
     @Test
-    public void dontPassFileNames() throws Exception {
-        String[] fileNames = new String[0];
-        PreparePartsRequest req = new PreparePartsRequest();
-        req.setFiles(fileNames);
-        assertEquals(fileNames.length, req.getFiles().length);
-    }
+    public void receiveNormalOptions() throws Exception {
+        {
+            Properties props = new Properties();
+            props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_DELIMITER, ".");
+            props.setProperty(Config.BI_PREPARE_PARTS_NEWLINE, "CR");
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "int,long");
+            props.setProperty(Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR, "none");
+            props.setProperty(Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, "v0");
+            props.setProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS, "v1");
 
-    @Test
-    public void passMultiFileNames() throws Exception {
-        File tmpFile0 = null, tmpFile1 = null;
-        try {
-            // create tmp files
-            tmpFile0 = File.createTempFile("tmp-", ".tmp");
-            tmpFile1 = File.createTempFile("tmp-", ".tmp");
-
-            String[] fileNames = new String[] { tmpFile0.getAbsolutePath(),
-                    "muga", tmpFile1.getAbsolutePath(), "nishizawa", };
-
-            PreparePartsRequest req = new PreparePartsRequest();
-            req.setFiles(fileNames);
-
-            assertEquals(2, req.getFiles().length);
-        } finally {
-            // delete tmp files
-            if (tmpFile0 != null) {
-                tmpFile0.delete();
-            }
-            if (tmpFile1 != null) {
-                tmpFile1.delete();
-            }
-        }
-    }
-
-    @Test
-    public void passNormalOptions() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        PreparePartsRequest req = new PreparePartsRequest();
-        req.setOptions(props);
-    }
-
-    @Test
-    public void passNotSpecifiedColumnHeader() throws Exception {
-        Properties props = new Properties();
-        //props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        // props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
-
-        /**
-         * it works fine. if column header is not specified, 'columns' option is
-         * used.
-         */
-        req.setFormat(PreparePartsRequest.Format.CSV);
-        req.setOptions(props);
-        String[] columnNames = req.getColumnNames();
-        assertEquals("v0", columnNames[0]);
-        assertEquals("v1", columnNames[1]);
-        assertTrue(!req.hasColumnHeader());
-    }
-
-    @Test
-    public void passNotSpecifiedColumnHeaderAndColumns() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        // props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        // props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
-        try {
+            CSVPreparePartsRequest req = new CSVPreparePartsRequest();
             req.setFormat(PreparePartsRequest.Format.CSV);
             req.setOptions(props);
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof CommandException);
+
+            assertEquals('.', req.getDelimiterChar());
+            assertEquals(CSVPreparePartsRequest.NewLine.CR, req.getNewline());
+            assertEquals(true, req.hasColumnHeader());
+            assertArrayEquals(null, req.getColumnNames());
+            assertArrayEquals(new String[] { "int", "long" }, req.getColumnTypeHints());
+            assertEquals("none", req.getTypeErrorMode());
+            assertArrayEquals(new String[] { "v0" }, req.getExcludeColumns());
+            assertArrayEquals(new String[] { "v1" }, req.getOnlyColumns());
         }
-    }
+        { // check default values
+            Properties props = new Properties();
+            props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true"); // required
 
-    @Test
-    public void passNotSpecifiedColumns() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        // props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
-        /**
-         * it works fine. if columns is not specified, 'column-header' option is
-         * used.
-         */
-        req.setFormat(PreparePartsRequest.Format.CSV);
-        req.setOptions(props);
-        assertTrue(null == req.getColumnNames());
-        assertTrue(req.hasColumnHeader());
-    }
-
-    @Test
-    public void passNotSpecifiedColumnTypes() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        // props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        PreparePartsRequest req = new PreparePartsRequest();
-        try {
+            CSVPreparePartsRequest req = new CSVPreparePartsRequest();
             req.setFormat(PreparePartsRequest.Format.CSV);
             req.setOptions(props);
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof CommandException);
+
+            assertEquals(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0), req.getDelimiterChar());
+            assertEquals(CSVPreparePartsRequest.NewLine.CRLF, req.getNewline());
+            assertEquals(true, req.hasColumnHeader());
+            assertArrayEquals(null, req.getColumnNames());
+            assertArrayEquals(new String[0], req.getColumnTypeHints());
+            assertEquals("skip", req.getTypeErrorMode());
+            assertArrayEquals(new String[0], req.getExcludeColumns());
+            assertArrayEquals(new String[0], req.getOnlyColumns());
+        }
+        { // check default values 2
+            Properties props = new Properties();
+            props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true"); // required
+            CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+            req.setFormat(PreparePartsRequest.Format.TSV);
+            req.setOptions(props);
+
+            assertEquals(Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE.charAt(0), req.getDelimiterChar());
         }
     }
 
     @Test
-    public void passNotSpecifiedOutputDir() throws Exception {
+    public void throwCmdErrorWhenReceiveInvalidNewLine() throws Exception {
         Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        // props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true"); // required
+        props.setProperty(Config.BI_PREPARE_PARTS_NEWLINE, "muga");
 
-        PreparePartsRequest req = new PreparePartsRequest();
+        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+        req.setFormat(PreparePartsRequest.Format.CSV);
         try {
             req.setOptions(props);
             fail();
@@ -179,104 +88,46 @@ public class TestCSVPreparePartsRequest {
     }
 
     @Test
-    public void passUserTimeColumn() throws Exception {
-        String tc = "user_time";
+    public void throwCmdErrorWhenReceiveInvalidColumnNames() throws Exception {
+        {
+            Properties props = new Properties();
+            props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "false"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
 
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, tc);
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+            CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+            req.setFormat(PreparePartsRequest.Format.CSV);
+            req.setOptions(props);
 
-        PreparePartsRequest req = new PreparePartsRequest();
-        req.setOptions(props);
-        assertEquals(tc, req.getAliasTimeColumn());
-    }
+            assertEquals(false, req.hasColumnHeader());
+            assertArrayEquals(new String[] { "v0", "v1" }, req.getColumnNames());
+        }
+        {
+            Properties props = new Properties();
+            props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "false");
 
-    @Test
-    public void passNotSpecifiedTimeColumn() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        // props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
+            CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+            req.setFormat(PreparePartsRequest.Format.CSV);
+            try {
+                req.setOptions(props);
+                fail();
+            } catch (Throwable t) {
+                assertTrue(t instanceof CommandException);
+            }
+        }
+        {
+            Properties props = new Properties();
+            props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
 
-        PreparePartsRequest req = new PreparePartsRequest();
-        req.setOptions(props);
-        /**
-         * it works fine.
-         */
-        assertTrue(null == req.getAliasTimeColumn());
-    }
+            CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+            req.setFormat(PreparePartsRequest.Format.CSV);
+            req.setOptions(props);
 
-    @Test
-    public void passNotSpecifiedTimeValue() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        // props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-
-        PreparePartsRequest req = new PreparePartsRequest();
-        req.setOptions(props);
-        /**
-         * it works fine.
-         */
-        assertEquals(-1, req.getTimeValue());
-    }
-
-    @Test
-    public void passUserDefinedSplitSize() throws Exception {
-        int splitSize = 5 * 1024;
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + splitSize);
-
-        PreparePartsRequest req = new PreparePartsRequest();
-        req.setOptions(props);
-        /**
-         * it works fine.
-         */
-        assertEquals(splitSize, req.getSplitSize());
-    }
-
-    @Test
-    public void passNotSpecifiedSplitSize() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,int");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "time");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        // props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 *
-        // 1024));
-
-        PreparePartsRequest req = new PreparePartsRequest();
-        req.setOptions(props);
-        /**
-         * it works fine.
-         */
-        assertEquals(Config.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE,
-                "" + req.getSplitSize());
+            assertEquals(true, req.hasColumnHeader());
+            assertArrayEquals(null, req.getColumnNames());
+        }
     }
 }

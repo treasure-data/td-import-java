@@ -98,7 +98,7 @@ public class TestPreparePartsRequest {
     }
 
     @Test
-    public void throwCmdErrorWhenPassInvalidCompressionType() throws Exception {
+    public void throwCmdErrorWhenReceiveInvalidCompressionType() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_COMPRESSION, "muga");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
@@ -113,7 +113,7 @@ public class TestPreparePartsRequest {
     }
 
     @Test
-    public void throwCmdErrorWhenPassInvalidTimeValue() throws Exception {
+    public void throwCmdErrorWhenReceiveInvalidTimeValue() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "muga");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
@@ -128,7 +128,7 @@ public class TestPreparePartsRequest {
     }
 
     @Test
-    public void throwCmdErrorWhenDontPassOutputDir() throws Exception {
+    public void throwCmdErrorWhenDontReceiveOutputDir() throws Exception {
         Properties props = new Properties();
         //props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
         PreparePartsRequest req = new PreparePartsRequest();
@@ -142,7 +142,7 @@ public class TestPreparePartsRequest {
     }
 
     @Test
-    public void throwCmdErrorWhenPassInvalidSampleRowSize() throws Exception {
+    public void throwCmdErrorWhenReceiveInvalidSampleRowSize() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "muga");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
@@ -157,7 +157,7 @@ public class TestPreparePartsRequest {
     }
 
     @Test
-    public void throwCmdErrorWhenPassInvalidSampleHintScore() throws Exception {
+    public void throwCmdErrorWhenReceiveInvalidSampleHintScore() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE, "muga");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
@@ -172,7 +172,7 @@ public class TestPreparePartsRequest {
     }
 
     @Test
-    public void throwCmdErrorWhenPassInvalidSplitSize() throws Exception {
+    public void throwCmdErrorWhenReceiveInvalidSplitSize() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "muga");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required

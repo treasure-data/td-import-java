@@ -122,7 +122,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
                     Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
                     0);
         } else {
-            // Here might be not executed
+            // fatal error. i mean here might be not executed
             throw new CommandException("unsupported format: " + format);
         }
 
@@ -156,6 +156,8 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
                 Config.BI_PREPARE_PARTS_COLUMNTYPES);
         if (cTypeHints != null && !cTypeHints.isEmpty()) {
             columnTypeHints = cTypeHints.split(",");
+        } else {
+            columnTypeHints = new String[0];
         }
 
         // type-conversion-error
