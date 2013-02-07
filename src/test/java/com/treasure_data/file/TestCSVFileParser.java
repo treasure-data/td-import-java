@@ -66,8 +66,7 @@ public class TestCSVFileParser {
             assertEquals(CSVPreparePartsRequest.ColumnType.STRING, TSP.getSuggestedType());
         }
         {
-            String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n",
-                    "v4\n", };
+            String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n", "v4\n", };
             StringBuilder sbuf = new StringBuilder();
             for (int i = 0; i < values.length; i++) {
                 sbuf.append(values[i]);
@@ -101,8 +100,7 @@ public class TestCSVFileParser {
             assertEquals(CSVPreparePartsRequest.ColumnType.STRING, TSP.getSuggestedType());
         }
         {
-            String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n",
-                    "v4\n", };
+            String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n", "v4\n", };
             StringBuilder sbuf = new StringBuilder();
             for (int i = 0; i < values.length; i++) {
                 sbuf.append(values[i]);

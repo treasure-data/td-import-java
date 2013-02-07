@@ -184,32 +184,64 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         }
     }
 
+    void setDelimiterChar(char c) {
+        this.delimiterChar = c;
+    }
+
     public char getDelimiterChar() {
         return delimiterChar;
+    }
+
+    void setNewLine(NewLine newline) {
+        this.newline = newline;
     }
 
     public NewLine getNewline() {
         return newline;
     }
 
+    void setColumnNames(String[] columnNames) {
+        this.columnNames = columnNames;
+    }
+
     public String[] getColumnNames() {
         return columnNames;
+    }
+
+    void setColumnTypeHints(String[] hints) {
+        this.columnTypeHints = hints;
     }
 
     public String[] getColumnTypeHints() {
         return columnTypeHints;
     }
 
+    void setHasColumnHeader(boolean flag) {
+        hasColumnHeader = flag;
+    }
+
     public boolean hasColumnHeader() {
         return hasColumnHeader;
+    }
+
+    void setTypeErrorMode(String mode) {
+        typeErrorMode = mode;
     }
 
     public String getTypeErrorMode() {
         return typeErrorMode;
     }
 
+    void setExcludeColumns(String[] columns) {
+        this.excludeColumns = columns;
+    }
+
     public String[] getExcludeColumns() {
         return excludeColumns;
+    }
+
+    void setOnlyColumns(String[] columns) {
+        this.onlyColumns = columns;
     }
 
     public String[] getOnlyColumns() {

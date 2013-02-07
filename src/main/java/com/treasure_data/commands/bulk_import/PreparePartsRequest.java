@@ -131,10 +131,6 @@ public class PreparePartsRequest extends CommandRequest {
         setOptions(getProperties());
     }
 
-    void setFormat(Format format) {
-        this.format = format;
-    }
-
     @Override
     public String getName() {
         return COMMAND_NAME;
@@ -255,47 +251,96 @@ public class PreparePartsRequest extends CommandRequest {
         }
     }
 
+    void setFormat(Format format) {
+        this.format = format;
+    }
+
     public Format getFormat() {
         return format;
+    }
+
+    void setCompressionType(CompressionType compressionType) {
+        this.compressionType = compressionType;
     }
 
     public CompressionType getCompressionType() {
         return compressionType;
     }
 
+    void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
     public String getEncoding() {
         return encoding;
+    }
+
+    void setAliasTimeColumn(String aliasColumn) {
+        this.aliasTimeColumn = aliasColumn;
     }
 
     public String getAliasTimeColumn() {
         return aliasTimeColumn;
     }
 
+    void setTimeValue(long timeValue) {
+        this.timeValue = timeValue;
+    }
+
     public long getTimeValue() {
         return timeValue;
     }
+
+    void setTimeFormat(String timeFormat) {
+        this.timeFormat = timeFormat;
+    }
+
     public String getTimeFormat() {
         return timeFormat;
+    }
+
+    void setErrorRecordOutputDirName(String dirName) {
+        this.errorRecordOutputDirName = dirName;
     }
 
     public String getErrorRecordOutputDirName() {
         return errorRecordOutputDirName;
     }
 
+    void setDryRun(boolean flag) {
+        this.dryRun = flag;
+    }
+
     public boolean dryRun() {
         return dryRun;
+    }
+
+    void setSampleHintScore(int score) {
+        this.sampleHintScore = score;
     }
 
     public int getSampleHintScore() {
         return sampleHintScore;
     }
 
+    void setSampleRowSize(int size) {
+        this.sampleRowSize = size;
+    }
+
     public int getSampleRowSize() {
         return sampleRowSize;
     }
 
+    void setOutputDirName(String dirName) {
+        this.outputDirName = dirName;
+    }
+
     public String getOutputDirName() {
         return outputDirName;
+    }
+
+    void setSplitSize(int size) {
+        this.splitSize = size;
     }
 
     public int getSplitSize() {
