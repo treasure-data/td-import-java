@@ -154,11 +154,12 @@ public class CSVFileParser extends
             }
         }
 
-        int getScore(int type) {
-            if (type < 0 || type >= 4) {
-                throw new ArrayIndexOutOfBoundsException(type);
+        int getScore(CSVPreparePartsRequest.ColumnType type) {
+            int i = type.index();
+            if (i < 0 || i >= 4) {
+                throw new ArrayIndexOutOfBoundsException(i);
             }
-            return scores[type];
+            return scores[i];
         }
 
         @Override

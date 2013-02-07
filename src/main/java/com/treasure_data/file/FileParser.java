@@ -20,7 +20,9 @@ package com.treasure_data.file;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.util.logging.Logger;
 
 import com.treasure_data.commands.CommandException;
@@ -30,6 +32,10 @@ import com.treasure_data.commands.CommandResult;
 public abstract class FileParser<REQ extends CommandRequest, RET extends CommandResult> {
     private static final Logger LOG = Logger.getLogger(FileParser.class
             .getName());
+
+    static final CharsetDecoder UTF8 = Charset.forName("UTF-8")
+            .newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT);
 
     protected REQ request;
 
