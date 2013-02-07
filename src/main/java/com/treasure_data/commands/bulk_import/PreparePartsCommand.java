@@ -24,6 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -147,11 +150,10 @@ public class PreparePartsCommand extends
             MsgpackGZIPFileWriter w = null;
             try {
                 CompressionType compressionType = getCompressType(request, infile);
+                CharsetDecoder decoder = getCharsetDecoder(request);
 
                 p = FileParserFactory.newInstance(request);
-                p.setErrorRecordWriter(createErrorRecordOutputStream(request,
-                        infile.getName()));
-                p.doPreExecute(createFileInputStream(compressionType, infile));
+                p.initParser(decoder, createFileInputStream(compressionType, infile));
 
                 if (request.dryRun()) {
                     // if this processing is dry-run mode, thread of control
@@ -159,7 +161,8 @@ public class PreparePartsCommand extends
                     return;
                 }
 
-                p.doParse(createFileInputStream(compressionType, infile));
+                p.setErrorRecordWriter(createErrorRecordOutputStream(request,
+                        infile.getName()));
                 w = new MsgpackGZIPFileWriter(request, infile.getName());
                 while (p.parseRow(w)) {
                     ;
@@ -231,8 +234,6 @@ public class PreparePartsCommand extends
         }
 
         CompressionType[] candidateCompressTypes;
-        // TODO need to refactor here
-        // here should be moved to CompressionType enum
         if (userCompressType.equals(CompressionType.GZIP)) {
             candidateCompressTypes = new CompressionType[] { CompressionType.GZIP, };
         } else if (userCompressType.equals(CompressionType.NONE)) {
@@ -283,5 +284,19 @@ public class PreparePartsCommand extends
         }
 
         return compressionType;
+    }
+
+    private static CharsetDecoder getCharsetDecoder(
+            PreparePartsRequest request) throws CommandException {
+        // encoding
+        String encodingName = request.getEncoding();
+        if (encodingName.equals("utf-8")) {
+            return Charset.forName("UTF-8").newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT);
+        } else {
+            // TODO any more...
+            throw new CommandException(new UnsupportedOperationException());
+        }
     }
 }

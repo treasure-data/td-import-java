@@ -168,6 +168,8 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
                 Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
         if (eColumns != null && !eColumns.isEmpty()) {
             excludeColumns = eColumns.split(",");
+        } else {
+            excludeColumns = new String[0];
         }
 
         // only-columns
@@ -175,6 +177,8 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
                 Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
         if (oColumns != null && !oColumns.isEmpty()) {
             onlyColumns = oColumns.split(",");
+        } else {
+            onlyColumns = new String[0];
         }
     }
 

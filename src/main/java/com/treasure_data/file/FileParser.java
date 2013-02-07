@@ -20,6 +20,7 @@ package com.treasure_data.file;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.CharsetDecoder;
 import java.util.logging.Logger;
 
 import com.treasure_data.commands.CommandException;
@@ -66,9 +67,8 @@ public abstract class FileParser<REQ extends CommandRequest, RET extends Command
         }
     }
 
-    public abstract void doParse(InputStream in) throws CommandException;
-
-    public abstract void doPreExecute(InputStream in) throws CommandException;
+    public abstract void initParser(CharsetDecoder decoder, InputStream in)
+            throws CommandException;
 
     public abstract boolean parseRow(MsgpackGZIPFileWriter w)
             throws CommandException;

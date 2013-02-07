@@ -20,9 +20,7 @@ package com.treasure_data.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,7 +66,9 @@ public class CSVFileParser extends
             return cprocs;
         }
 
-        public CellProcessor[] gen(CSVPreparePartsRequest.ColumnType[] columnTypes) throws CommandException {
+        public CellProcessor[] gen(
+                CSVPreparePartsRequest.ColumnType[] columnTypes)
+                throws CommandException {
             int len = columnTypes.length;
             List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
             for (int i = 0; i < len; i++) {
@@ -84,7 +84,7 @@ public class CSVFileParser extends
                     cproc = new ConvertNullTo(null, new ParseDouble());
                     break;
                 case STRING:
-                    cproc = new Optional();
+                    cproc = new Optional(); // TODO optimizable as new converter
                     break;
                 default:
                     String msg = String.format("unsupported type: %s",
@@ -108,16 +108,31 @@ public class CSVFileParser extends
         }
 
         void addHint(String typeHint) throws CommandException {
-            if (typeHint.equals("string")) {
-                scores[CSVPreparePartsRequest.ColumnType.STRING.index()] += hintScore;
-            } else if (typeHint.equals("int")) {
+            if (typeHint == null) {
+                throw new NullPointerException("type hint is null.");
+            }
+
+            CSVPreparePartsRequest.ColumnType type =
+                    CSVPreparePartsRequest.ColumnType.fromString(typeHint);
+            if (type == null) { // fatal error
+                throw new CommandException("unsupported type: " + typeHint);
+            }
+
+            switch (type) {
+            case INT:
                 scores[CSVPreparePartsRequest.ColumnType.INT.index()] += hintScore;
-            } else if (typeHint.equals("long")) {
+                break;
+            case LONG:
                 scores[CSVPreparePartsRequest.ColumnType.LONG.index()] += hintScore;
-            } else if (typeHint.equals("double")) {
+                break;
+            case DOUBLE:
                 scores[CSVPreparePartsRequest.ColumnType.DOUBLE.index()] += hintScore;
-            } else {
-                throw new CommandException("Unsupported type: " + typeHint);
+                break;
+            case STRING:
+                scores[CSVPreparePartsRequest.ColumnType.STRING.index()] += hintScore;
+                break;
+            default:
+                throw new CommandException("fatal error");
             }
         }
 
@@ -249,14 +264,15 @@ public class CSVFileParser extends
     }
 
     private ICsvListReader reader;
+    private CsvPreference csvPref;
+
     private int timeIndex = -1;
     private Long timeValue = new Long(-1);
     private int aliasTimeIndex = -1;
-    private String[] columnNames;
+    private String[] allColumnNames;
+    private List<Integer> extractedColumnIndexes;
 
-    private String[] columnTypeHints;
-    private CSVPreparePartsRequest.ColumnType[] columnTypes;
-
+    private CSVPreparePartsRequest.ColumnType[] allSuggestedColumnTypes;
     private CellProcessor[] cprocessors;
 
     public CSVFileParser(CSVPreparePartsRequest request) throws CommandException {
@@ -264,75 +280,114 @@ public class CSVFileParser extends
     }
 
     @Override
-    public void doPreExecute(InputStream in) throws CommandException {
-        // TODO more testing
-
-        // encoding
-        final CharsetDecoder decoder;
-        String encodingName = request.getEncoding();
-        if (encodingName.equals("utf-8")) {
-            decoder = Charset.forName("UTF-8").newDecoder()
-                    .onMalformedInput(CodingErrorAction.REPORT)
-                    .onUnmappableCharacter(CodingErrorAction.REPORT);
-        } else {
-            // TODO any more...
-            throw new CommandException(new UnsupportedOperationException());
-        }
-
+    public void initParser(final CharsetDecoder decoder, InputStream in)
+            throws CommandException {
         // CSV preference
-        CsvPreference pref = new CsvPreference.Builder('"',
-                request.getDelimiterChar(), request.getNewline().newline())
-                .build();
+        csvPref = new CsvPreference.Builder('"', request.getDelimiterChar(),
+                request.getNewline().newline()).build();
 
         // create sample reader
         CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
-                in, decoder), pref);
+                in, decoder), csvPref);
+
         try {
-            // column name e.g. "time,name,price"
+            // extract all column names
+            // e.g. new String[] { "time", "name", "price" }
+            // e.g. new String[] { "timestamp", "name", "price" }
             if (request.hasColumnHeader()) {
                 List<String> columnList = sampleReader.read();
-                columnNames = columnList.toArray(new String[0]);
+                allColumnNames = columnList.toArray(new String[0]);
             } else {
-                columnNames = request.getColumnNames();
+                allColumnNames = request.getColumnNames();
             }
 
+            // get index of specified alias time column
+            // new String[] { "timestamp", "name", "price" } as all columns and
+            // "timestamp" as alias time column are given, the index is zero.
             String aliasTimeColumnName = request.getAliasTimeColumn();
             if (aliasTimeColumnName != null) {
-                for (int i = 0; i < columnNames.length; i++) {
-                    if (columnNames[i].equals(aliasTimeColumnName)) {
+                for (int i = 0; i < allColumnNames.length; i++) {
+                    if (allColumnNames[i].equals(aliasTimeColumnName)) {
                         aliasTimeIndex = i;
                         break;
                     }
                 }
             }
-            for (int i = 0; i < columnNames.length; i++) {
-                if (columnNames[i]
-                        .equals(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+            // get index of 'time' column
+            // new String[] { "time", "name", "price" } as all columns is given,
+            // the index is zero.
+            for (int i = 0; i < allColumnNames.length; i++) {
+                if (allColumnNames[i].equals(
+                        Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
                     timeIndex = i;
                     break;
                 }
             }
             if (timeIndex < 0) {
+                // if 'time' column is not included in all columns, then...
                 timeValue = request.getTimeValue();
                 if (aliasTimeIndex >= 0 || timeValue > 0) {
-                    timeIndex = columnNames.length;
+                    // 'time' column is appended to all columns (last elem) 
+                    timeIndex = allColumnNames.length;
                 } else {
                     throw new CommandException(
                             "Time column not found. --time-column or --time-value option is required");
                 }
             }
 
-            // "long,string,long"
-            columnTypeHints = request.getColumnTypeHints();
+            extractedColumnIndexes = new ArrayList<Integer>();
+            String[] onlyColumns = request.getOnlyColumns();
+            String[] excludeColumns = request.getExcludeColumns();
+            for (int i = 0; i < allColumnNames.length; i++) {
+                String cname = allColumnNames[i];
 
-            cprocessors = new CellProcessorGen().genForSampleReader(
+                // column is included in exclude-columns?
+                if (excludeColumns.length != 0) {
+                    boolean isExcludeColumn = false;
+                    for (int j = 0; j < excludeColumns.length; j++) {
+                        if (cname.equals(excludeColumns[j])) {
+                            isExcludeColumn = true;
+                            break;
+                        }
+                    }
+                    if (isExcludeColumn) {
+                        continue;
+                    }
+                }
+
+                // column is included in only-columns?
+                if (onlyColumns.length == 0) {
+                    extractedColumnIndexes.add(i);
+                    continue;
+                } else {
+                    boolean isOnlyColumn = false;
+                    for (int j = 0; j < onlyColumns.length; j++) {
+                        if (cname.equals(onlyColumns[j])) {
+                            isOnlyColumn = true;
+                            break;
+                        }
+                    }
+                    if (isOnlyColumn) {
+                        extractedColumnIndexes.add(i);
+                    }
+                }
+            }
+
+            // new String[] { "long", "string", "long" }
+            String[] columnTypeHints = request.getColumnTypeHints();
+            if (columnTypeHints.length != allColumnNames.length) {
+                throw new CommandException(
+                        "mismatched between size of specified column types and size of columns");
+            }
+
+            CellProcessor[] cprocs = new CellProcessorGen().genForSampleReader(
                     columnTypeHints, request.getSampleRowSize(),
                     request.getSampleHintScore());
 
             List<Object> firstRow = null;
             boolean isFirstRow = false;
             for (int i = 0; i < request.getSampleRowSize(); i++) {
-                List<Object> row = sampleReader.read(cprocessors);
+                List<Object> row = sampleReader.read(cprocs);
                 if (!isFirstRow) {
                     firstRow = row;
                     isFirstRow = true;
@@ -343,17 +398,21 @@ public class CSVFileParser extends
                 }
             }
 
-            columnTypes = new CSVPreparePartsRequest.ColumnType[cprocessors.length];
-            for (int i = 0; i < cprocessors.length; i++) {
-                columnTypes[i] = ((TypeSuggestionProcessor) cprocessors[i])
+            allSuggestedColumnTypes = new CSVPreparePartsRequest.ColumnType[cprocs.length];
+            for (int i = 0; i < cprocs.length; i++) {
+                allSuggestedColumnTypes[i] = ((TypeSuggestionProcessor) cprocs[i])
                         .getSuggestedType();
             }
 
             // print sample row
             if (firstRow != null) {
                 /**
+                 * TODO
+                 * TODO
                  * TODO #MN
-                 * we should parse first row with suggested type converters
+                 * * we should parse first row with suggested type converters
+                 *
+                 * * needed JSONFileWriter impl.
                  */
                 String s = JSONValue.toJSONString(firstRow);
                 LOG.info("sample row: " + s);
@@ -369,69 +428,11 @@ public class CSVFileParser extends
                 }
             }
         }
-    }
-
-    @Override
-    public void doParse(InputStream in) throws CommandException {
-        // encoding
-        final CharsetDecoder decoder; // redundant code
-        String encodingName = request.getEncoding();
-        if (encodingName.equals("utf-8")) {
-            decoder = Charset.forName("UTF-8").newDecoder()
-                    .onMalformedInput(CodingErrorAction.REPORT)
-                    .onUnmappableCharacter(CodingErrorAction.REPORT);
-        } else {
-            // TODO any more... 'sjis', 'euc',...
-            throw new CommandException(new UnsupportedOperationException());
-        }
-
-        // CSV preference
-        CsvPreference pref = new CsvPreference.Builder('"',
-                request.getDelimiterChar(), request.getNewline().newline())
-                .build();
 
         // create reader
-        reader = new CsvListReader(new InputStreamReader(in, decoder), pref);
-
-        // column name e.g. "time,name,price"
-        if (request.hasColumnHeader()) {
-            try {
-                List<String> columnList = reader.read();
-                columnNames = columnList.toArray(new String[0]);
-            } catch (IOException e) {
-                throw new CommandException(e);
-            }
-        } else {
-            columnNames = request.getColumnNames();
-        }
-
-        String aliasTimeColumnName = request.getAliasTimeColumn();
-        if (aliasTimeColumnName != null) {
-            for (int i = 0; i < columnNames.length; i++) {
-                if (columnNames[i].equals(aliasTimeColumnName)) {
-                    aliasTimeIndex = i;
-                    break;
-                }
-            }
-        }
-        for (int i = 0; i < columnNames.length; i++) {
-            if (columnNames[i]
-                    .equals(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                timeIndex = i;
-                break;
-            }
-        }
-        if (timeIndex < 0) {
-            timeValue = request.getTimeValue();
-            if (aliasTimeIndex >= 0 || timeValue > 0) {
-                timeIndex = columnNames.length;
-            } else {
-                throw new CommandException(
-                        "Time column not found. --time-column or --time-value option is required");
-            }
-        }
-
-        cprocessors = new CellProcessorGen().gen(columnTypes);
+        reader = new CsvListReader(new InputStreamReader(in, decoder), csvPref);
+        // create cell processors
+        cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes);
     }
 
     public boolean parseRow(MsgpackGZIPFileWriter w) throws CommandException {
@@ -442,6 +443,8 @@ public class CSVFileParser extends
             // catch IOException and SuperCsvCellProcessorException
             e.printStackTrace();
 
+            // TODO
+            // TODO
             // TODO and parsent-encoded row?
             String msg = String.format("reason: %s, line: %d",
                     e.getMessage(), getRowNum());
@@ -458,6 +461,10 @@ public class CSVFileParser extends
         // increment row number
         incrRowNum();
 
+        return parseList(w, row);
+    }
+
+    private boolean parseList(MsgpackGZIPFileWriter w, List<Object> row) throws CommandException {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
                     reader.getLineNumber(), reader.getRowNumber(),
@@ -470,25 +477,37 @@ public class CSVFileParser extends
          */
 
         try {
-            int size = row.size();
+            int allSize = row.size();
 
-            if (size == timeIndex) {
-                w.writeBeginRow(size + 1);
+            if (allSize == timeIndex) {
+                w.writeBeginRow(extractedColumnIndexes.size() + 1);
             } else {
-                w.writeBeginRow(size);
+                w.writeBeginRow(extractedColumnIndexes.size());
             }
 
             long time = 0;
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < allSize; i++) {
                 if (i == aliasTimeIndex) {
                     time = (Long) row.get(i);
                 }
 
-                w.write(columnNames[i]);
-                w.write(row.get(i));
+                // i is included in extractedColumnIndexes?
+                boolean included = false;
+                for (Integer j : extractedColumnIndexes) {
+                    if (i == j) { // TODO optimize
+                        included = true;
+                        break;
+                    }
+                }
+
+                // write extracted data with writer
+                if (included) {
+                    w.write(allColumnNames[i]);
+                    w.write(row.get(i));
+                }
             }
 
-            if (size == timeIndex) {
+            if (allSize == timeIndex) {
                 w.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
                 if (aliasTimeIndex >= 0) {
                     w.write(time);
