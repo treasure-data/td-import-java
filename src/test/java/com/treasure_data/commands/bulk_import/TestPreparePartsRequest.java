@@ -17,7 +17,6 @@ public class TestPreparePartsRequest {
     @Test
     public void dontPassFileNames() throws Exception {
         String[] fileNames = new String[0];
-
         PreparePartsRequest req = new PreparePartsRequest();
         req.setFiles(fileNames);
         assertEquals(fileNames.length, req.getFiles().length);
@@ -78,11 +77,12 @@ public class TestPreparePartsRequest {
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
 
         CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+
         /**
          * it works fine. if column header is not specified, 'columns' option is
          * used.
          */
-        req.setFormat("csv");
+        req.setFormat(PreparePartsRequest.Format.CSV);
         req.setOptions(props);
         String[] columnNames = req.getColumnNames();
         assertEquals("v0", columnNames[0]);
@@ -104,7 +104,7 @@ public class TestPreparePartsRequest {
 
         CSVPreparePartsRequest req = new CSVPreparePartsRequest();
         try {
-            req.setFormat("csv");
+            req.setFormat(PreparePartsRequest.Format.CSV);
             req.setOptions(props);
             fail();
         } catch (Throwable t) {
@@ -129,7 +129,7 @@ public class TestPreparePartsRequest {
          * it works fine. if columns is not specified, 'column-header' option is
          * used.
          */
-        req.setFormat("csv");
+        req.setFormat(PreparePartsRequest.Format.CSV);
         req.setOptions(props);
         assertTrue(null == req.getColumnNames());
         assertTrue(req.hasColumnHeader());
@@ -149,7 +149,7 @@ public class TestPreparePartsRequest {
 
         PreparePartsRequest req = new PreparePartsRequest();
         try {
-            req.setFormat("csv");
+            req.setFormat(PreparePartsRequest.Format.CSV);
             req.setOptions(props);
             fail();
         } catch (Throwable t) {
