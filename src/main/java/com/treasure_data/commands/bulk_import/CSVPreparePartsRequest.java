@@ -36,6 +36,14 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
             this.index = index;
         }
 
+        public String type() {
+            return type;
+        }
+
+        public int index() {
+            return index;
+        }
+
         public static ColumnType fromString(String type) {
             return StringToColumnType.get(type);
         }
@@ -126,20 +134,16 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
             throw new CommandException("unsupported newline char: " + nLine);
         }
 
-        boolean setColumns = false; // TODO
-
-        // columns
-        String cs = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNS);
-        if (cs != null) {
-            setColumns = true;
-            columnNames = cs.split(",");
-        }
-
         // column header
-        String columnHeader = props
-                .getProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER);
+        String columnHeader = props.getProperty(
+                Config.BI_PREPARE_PARTS_COLUMNHEADER);
         if (columnHeader == null || !columnHeader.equals("true")) {
-            if (!setColumns) {
+            // columns
+            String columns = props.getProperty(
+                    Config.BI_PREPARE_PARTS_COLUMNS);
+            if (columns != null && !columns.isEmpty()) {
+                columnNames = columns.split(",");
+            } else {
                 throw new CommandException("Column names not set");
             }
             hasColumnHeader = false;
@@ -148,13 +152,10 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         }
 
         // column types
-        String ctypes = props
-                .getProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES);
-        if (ctypes == null || ctypes.isEmpty()) {
-            throw new CommandException("Column types is required: "
-                    + Config.BI_PREPARE_PARTS_COLUMNTYPES);
-        } else {
-            columnTypeHints = ctypes.split(",");
+        String cTypeHints = props.getProperty(
+                Config.BI_PREPARE_PARTS_COLUMNTYPES);
+        if (cTypeHints != null && !cTypeHints.isEmpty()) {
+            columnTypeHints = cTypeHints.split(",");
         }
 
         // type-conversion-error
@@ -163,17 +164,17 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
                 Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR_DEFAULTVALUE);
 
         // exclude-columns
-        String ecs = props
-                .getProperty(Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
-        if (ecs != null) {
-            excludeColumns = ecs.split(",");
+        String eColumns = props.getProperty(
+                Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
+        if (eColumns != null && !eColumns.isEmpty()) {
+            excludeColumns = eColumns.split(",");
         }
 
         // only-columns
-        String ocs = props
-                .getProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
-        if (ocs != null) {
-            onlyColumns = ocs.split(",");
+        String oColumns = props.getProperty(
+                Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
+        if (oColumns != null && !oColumns.isEmpty()) {
+            onlyColumns = oColumns.split(",");
         }
     }
 
