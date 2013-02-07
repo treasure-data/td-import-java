@@ -65,9 +65,9 @@ public class TestMsgpackGZIPFileWriter {
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
                 "string,int,long,double,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        PreparePartsRequest req = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "1024");
+        PreparePartsRequest req = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         MockMsgpackGZIPFileWriter w = new MockMsgpackGZIPFileWriter(req,
                 "foo/bar.csv");

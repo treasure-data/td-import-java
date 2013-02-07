@@ -57,13 +57,13 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT), 0);
-            assertEquals(TSP.getScore(CSVFileParser.LONG), 0);
-            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
-            assertEquals(TSP.getScore(CSVFileParser.STRING), hintScore
-                    + values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING),
+                    hintScore + values.length);
 
-            assertEquals(CSVFileParser.STRING, TSP.getSuggestedType());
+            assertEquals(CSVPreparePartsRequest.ColumnType.STRING, TSP.getSuggestedType());
         }
         {
             String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n",
@@ -93,12 +93,12 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT), hintScore);
-            assertEquals(TSP.getScore(CSVFileParser.LONG), 0);
-            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
-            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), hintScore);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
 
-            assertEquals(CSVFileParser.STRING, TSP.getSuggestedType());
+            assertEquals(CSVPreparePartsRequest.ColumnType.STRING, TSP.getSuggestedType());
         }
         {
             String[] values = new String[] { "v0\n", "v1\n", "v2\n", "v3\n",
@@ -128,12 +128,12 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT), 0);
-            assertEquals(TSP.getScore(CSVFileParser.LONG), hintScore);
-            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), 0);
-            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), hintScore);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
 
-            assertEquals(CSVFileParser.STRING, TSP.getSuggestedType());
+            assertEquals(CSVPreparePartsRequest.ColumnType.STRING, TSP.getSuggestedType());
         }
         {
             String[] values = new String[] { "0\n", "1\n", "2\n", "3\n", "4\n", };
@@ -162,13 +162,13 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT), hintScore
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), hintScore
                     + values.length);
-            assertEquals(TSP.getScore(CSVFileParser.LONG), values.length);
-            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), values.length);
-            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
 
-            assertEquals(CSVFileParser.INT, TSP.getSuggestedType());
+            assertEquals(CSVPreparePartsRequest.ColumnType.INT, TSP.getSuggestedType());
         }
         {
             String[] values = new String[] { "0\n", "1\n", "2\n", "3\n", "4\n", };
@@ -195,13 +195,13 @@ public class TestCSVFileParser {
             }
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVFileParser.INT), hintScore
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), hintScore
                     + values.length);
-            assertEquals(TSP.getScore(CSVFileParser.LONG), values.length);
-            assertEquals(TSP.getScore(CSVFileParser.DOUBLE), values.length);
-            assertEquals(TSP.getScore(CSVFileParser.STRING), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
 
-            assertEquals(CSVFileParser.INT, TSP.getSuggestedType());
+            assertEquals(CSVPreparePartsRequest.ColumnType.INT, TSP.getSuggestedType());
         }
     }
 
@@ -270,15 +270,14 @@ public class TestCSVFileParser {
                 "string,int,long,double,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "c00,0,0,0.0,12345\n" + "c10,1,1,1.1,12345\n"
                 + "c20,2,2,2.2,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(5);
@@ -311,15 +310,14 @@ public class TestCSVFileParser {
                 "string,int,long,double,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "c00,0,0,0.0,12345\n" + ",,,,12345\n"
                 + "c20,2,2,2.2,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(5);
@@ -351,14 +349,13 @@ public class TestCSVFileParser {
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "int,long,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "0,0,12345\n" + "c10,1,12345\n" + "2,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -384,14 +381,13 @@ public class TestCSVFileParser {
                 "string,string,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -421,15 +417,14 @@ public class TestCSVFileParser {
                 "string,string,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("tsv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "c00\tc01\t12345\n" + "c10\tc11\t12345\r\n" + "c20\tc21\t12345\r\n";
         byte[] bytes = text.getBytes();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -461,14 +456,13 @@ public class TestCSVFileParser {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -502,14 +496,13 @@ public class TestCSVFileParser {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -539,15 +532,14 @@ public class TestCSVFileParser {
                 "string,string,long");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "v0,v1,time\n" + "c00,c01,12345\n" + "c10,c11,12345\n"
                 + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
@@ -579,15 +571,14 @@ public class TestCSVFileParser {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "v0,v1,timestamp\n" + "c00,c01,12345\n"
                 + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -622,15 +613,14 @@ public class TestCSVFileParser {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "timestamp,v0,v1\n" + "12345,c00,c01\n"
                 + "12345,c10,c11\n" + "12345,c20,c21\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(4);
@@ -664,14 +654,13 @@ public class TestCSVFileParser {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest("csv",
-                new String[0], props);
+        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
+                PreparePartsRequest.Format.CSV, new String[0], props);
 
         String text = "v0,v1\n" + "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.doPreExecute(new ByteArrayInputStream(bytes));
-        p.doParse(new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
         MockFileWriter w = new MockFileWriter(request);
         w.setColSize(3);
