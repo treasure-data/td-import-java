@@ -31,8 +31,10 @@ import org.msgpack.packer.Packer;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.commands.bulk_import.PreparePartsResult;
 
-public class MsgpackGZIPFileWriter {
+public class MsgpackGZIPFileWriter
+        extends com.treasure_data.file.FileWriter<PreparePartsRequest, PreparePartsResult> {
     static class DataSizeChecker extends FilterOutputStream {
 
         private int size = 0;
@@ -73,12 +75,12 @@ public class MsgpackGZIPFileWriter {
     private String outputDirName;
     private String outputFilePrefix;
 
-    public MsgpackGZIPFileWriter(PreparePartsRequest request, String infileName)
+    public MsgpackGZIPFileWriter(PreparePartsRequest request)
             throws CommandException {
-        initWriter(request, infileName);
+        super(request);
     }
 
-    public void initWriter(PreparePartsRequest request, String infileName)
+    public void initWriter(String infileName)
             throws CommandException {
         msgpack = new MessagePack();
 
@@ -99,7 +101,11 @@ public class MsgpackGZIPFileWriter {
     protected void reopenOutputFile() throws CommandException {
         // close stream
         if (outputFileIndex != 0) {
-            close();
+            try {
+                close();
+            } catch (IOException e) {
+                throw new CommandException(e);
+            }
         }
 
         // create msgpack packer
@@ -153,13 +159,9 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
-    public void close() throws CommandException {
+    public void close() throws IOException {
         if (gzout != null) {
-            try {
-                gzout.close();
-            } catch (IOException e) {
-                throw new CommandException(e);
-            }
+            gzout.close();
             gzout = null;
             dout = null;
         }
@@ -169,7 +171,7 @@ public class MsgpackGZIPFileWriter {
     public void closeSilently() {
         try {
             close();
-        } catch (CommandException e) {
+        } catch (IOException e) {
             LOG.severe(e.getMessage());
         }
     }

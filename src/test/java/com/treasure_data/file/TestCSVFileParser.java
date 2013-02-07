@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,13 +211,13 @@ public class TestCSVFileParser {
 
         public MockFileWriter(PreparePartsRequest request)
                 throws CommandException {
-            super(request, null);
+            super(request);
             colSizeList = new ArrayList<Integer>();
             objectList = new ArrayList<Object>();
         }
 
         @Override
-        public void initWriter(PreparePartsRequest request, String infileName)
+        public void initWriter(String infileName)
                 throws CommandException {
             // do nothing
         }
@@ -249,7 +250,7 @@ public class TestCSVFileParser {
         }
 
         @Override
-        public void close() throws CommandException {
+        public void close() throws IOException {
             // do nothing
         }
 

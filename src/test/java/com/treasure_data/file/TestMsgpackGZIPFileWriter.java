@@ -27,9 +27,8 @@ public class TestMsgpackGZIPFileWriter {
 
         private ByteArrayOutputStream out;
 
-        public MockMsgpackGZIPFileWriter(PreparePartsRequest request,
-                String infileName) throws CommandException {
-            super(request, infileName);
+        public MockMsgpackGZIPFileWriter(PreparePartsRequest request) throws CommandException {
+            super(request);
         }
 
         @Override
@@ -40,13 +39,9 @@ public class TestMsgpackGZIPFileWriter {
         }
 
         @Override
-        public void close() throws CommandException {
+        public void close() throws IOException {
             if (dout != null) {
-                try {
-                    dout.close();
-                } catch (IOException e) {
-                    throw new CommandException(e);
-                }
+                dout.close();
                 dout = null;
             }
             packer = null;
@@ -69,8 +64,8 @@ public class TestMsgpackGZIPFileWriter {
         PreparePartsRequest req = new CSVPreparePartsRequest(
                 PreparePartsRequest.Format.CSV, new String[0], props);
 
-        MockMsgpackGZIPFileWriter w = new MockMsgpackGZIPFileWriter(req,
-                "foo/bar.csv");
+        MockMsgpackGZIPFileWriter w = new MockMsgpackGZIPFileWriter(req);
+        w.initWriter("foo/bar.csv");
         w.writeBeginRow(5); // 1st row
         w.write("v0");
         w.write("c00");
