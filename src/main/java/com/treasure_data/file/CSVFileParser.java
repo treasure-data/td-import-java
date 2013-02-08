@@ -485,8 +485,6 @@ public class CSVFileParser extends
             // catch IOException and SuperCsvCellProcessorException
             e.printStackTrace();
 
-            // TODO
-            // TODO
             // TODO and parsent-encoded row?
             String msg = String.format("reason: %s, line: %d",
                     e.getMessage(), getRowNum());

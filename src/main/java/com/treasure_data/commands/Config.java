@@ -68,7 +68,7 @@ public interface Config {
     String BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE ="16384";
 
     ////////////////////////////////////////
-    // CSV/TSV_OPTIONS                    //
+    // CSV/TSV PREPARE_PARTS_OPTIONS      //
     ////////////////////////////////////////
 
     // delimiter CHAR; default=',' at 'csv', '\t' at 'tsv'

@@ -43,7 +43,6 @@ public class TestCSVPreparePartsRequest {
         { // check default values
             Properties props = new Properties();
             props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
-            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true"); // required
 
             CSVPreparePartsRequest req = new CSVPreparePartsRequest();
             req.setFormat(PreparePartsRequest.Format.CSV);
@@ -61,7 +60,6 @@ public class TestCSVPreparePartsRequest {
         { // check default values 2
             Properties props = new Properties();
             props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
-            props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true"); // required
             CSVPreparePartsRequest req = new CSVPreparePartsRequest();
             req.setFormat(PreparePartsRequest.Format.TSV);
             req.setOptions(props);
@@ -74,7 +72,6 @@ public class TestCSVPreparePartsRequest {
     public void throwCmdErrorWhenReceiveInvalidNewLine() throws Exception {
         Properties props = new Properties();
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true"); // required
         props.setProperty(Config.BI_PREPARE_PARTS_NEWLINE, "muga");
 
         CSVPreparePartsRequest req = new CSVPreparePartsRequest();

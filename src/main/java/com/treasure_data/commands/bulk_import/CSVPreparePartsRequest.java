@@ -137,8 +137,9 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
 
         // column header
         String columnHeader = props.getProperty(
-                Config.BI_PREPARE_PARTS_COLUMNHEADER);
-        if (columnHeader == null || !columnHeader.equals("true")) {
+                Config.BI_PREPARE_PARTS_COLUMNHEADER,
+                Config.BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE);
+        if (!columnHeader.equals("true")) {
             // columns
             String columns = props.getProperty(
                     Config.BI_PREPARE_PARTS_COLUMNS);
