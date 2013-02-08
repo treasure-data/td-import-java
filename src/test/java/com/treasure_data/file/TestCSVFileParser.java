@@ -494,44 +494,6 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseColumns() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
-        // parser setting
-        String text =
-                "v0,v1,v2,v3,time\n" +
-                "c00,0,0,0.0,12345\n" +
-                "c10,1,1,1.1,12345\n" +
-                "c20,2,2,2.2,12345\n";
-        byte[] bytes = text.getBytes();
-        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
-        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
-
-        // writer
-        writer.setColSize(5);
-        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345 });
-        writer.setColSize(5);
-        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345 });
-        writer.setColSize(5);
-        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345 });
-
-        assertTrue(parser.parseRow(writer));
-        assertTrue(parser.parseRow(writer));
-        assertTrue(parser.parseRow(writer));
-        assertFalse(parser.parseRow(writer));
-
-        assertEquals(3, parser.getRowNum());
-    }
-
-    @Test
     public void parseColumnsThatIncludeNullValue() throws Exception {
         // request setting
         request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
