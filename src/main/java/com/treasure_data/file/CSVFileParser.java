@@ -385,6 +385,23 @@ public class CSVFileParser extends
                 }
             }
 
+            // check whether time column is included in extracted column
+            if (timeValue < 0) {
+                if (timeIndex != allColumnNames.length) {
+                    boolean hasTimeRepresentedColumn = false;
+                    for (Integer i : extractedColumnIndexes) {
+                        if (i == timeIndex) {
+                            hasTimeRepresentedColumn = true;
+                            break;
+                        }
+                    }
+                    if (!hasTimeRepresentedColumn) {
+                        throw new CommandException(
+                                "Time represented column is not included in specified columns");
+                    }
+                }
+            }
+
             // new String[] { "long", "string", "long" }
             String[] columnTypeHints = request.getColumnTypeHints();
             int columnTypeHintSize = columnTypeHints.length;
