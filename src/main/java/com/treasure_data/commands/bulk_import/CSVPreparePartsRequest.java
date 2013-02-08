@@ -129,9 +129,10 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         // newline
         String nLine = props.getProperty(Config.BI_PREPARE_PARTS_NEWLINE,
                 Config.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE);
-        newline = NewLine.valueOf(nLine);
-        if (newline == null) {
-            throw new CommandException("unsupported newline char: " + nLine);
+        try {
+            newline = NewLine.valueOf(nLine);
+        } catch (IllegalArgumentException e) {
+            throw new CommandException("unsupported newline char: " + nLine, e);
         }
 
         // column header
@@ -184,7 +185,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         }
     }
 
-    void setDelimiterChar(char c) {
+    public void setDelimiterChar(char c) {
         this.delimiterChar = c;
     }
 
@@ -192,7 +193,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return delimiterChar;
     }
 
-    void setNewLine(NewLine newline) {
+    public void setNewLine(NewLine newline) {
         this.newline = newline;
     }
 
@@ -200,7 +201,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return newline;
     }
 
-    void setColumnNames(String[] columnNames) {
+    public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
     }
 
@@ -208,7 +209,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return columnNames;
     }
 
-    void setColumnTypeHints(String[] hints) {
+    public void setColumnTypeHints(String[] hints) {
         this.columnTypeHints = hints;
     }
 
@@ -216,7 +217,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return columnTypeHints;
     }
 
-    void setHasColumnHeader(boolean flag) {
+    public void setHasColumnHeader(boolean flag) {
         hasColumnHeader = flag;
     }
 
@@ -224,7 +225,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return hasColumnHeader;
     }
 
-    void setTypeErrorMode(String mode) {
+    public void setTypeErrorMode(String mode) {
         typeErrorMode = mode;
     }
 
@@ -232,7 +233,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return typeErrorMode;
     }
 
-    void setExcludeColumns(String[] columns) {
+    public void setExcludeColumns(String[] columns) {
         this.excludeColumns = columns;
     }
 
@@ -240,7 +241,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return excludeColumns;
     }
 
-    void setOnlyColumns(String[] columns) {
+    public void setOnlyColumns(String[] columns) {
         this.onlyColumns = columns;
     }
 
