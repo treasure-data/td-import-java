@@ -354,7 +354,7 @@ public class CSVFileParser extends
                 String cname = allColumnNames[i];
 
                 // column is included in exclude-columns?
-                if (excludeColumns.length != 0) {
+                if (excludeColumns.length != 0 && !cname.equals("time")) {
                     boolean isExcludeColumn = false;
                     for (int j = 0; j < excludeColumns.length; j++) {
                         if (cname.equals(excludeColumns[j])) {
@@ -397,7 +397,7 @@ public class CSVFileParser extends
                     }
                     if (!hasTimeRepresentedColumn) {
                         throw new CommandException(
-                                "Time represented column is not included in specified columns");
+                                "'time' represented column is not included in specified columns");
                     }
                 }
             }
