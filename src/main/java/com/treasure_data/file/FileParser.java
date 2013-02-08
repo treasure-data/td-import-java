@@ -33,7 +33,7 @@ public abstract class FileParser<REQ extends CommandRequest, RET extends Command
     private static final Logger LOG = Logger.getLogger(FileParser.class
             .getName());
 
-    static final CharsetDecoder UTF8 = Charset.forName("UTF-8")
+    static final CharsetDecoder UTF_8 = Charset.forName("UTF-8")
             .newDecoder().onMalformedInput(CodingErrorAction.REPORT)
             .onUnmappableCharacter(CodingErrorAction.REPORT);
 

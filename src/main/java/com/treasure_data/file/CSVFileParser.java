@@ -419,7 +419,7 @@ public class CSVFileParser extends
 
             // print sample row
             if (firstRow != null) {
-                OneLineJSONRecordWriter w = new OneLineJSONRecordWriter(request);
+                JSONFileWriter w = new JSONFileWriter(request);
                 parseList(w, firstRow);
                 String ret = JSONValue.toJSONString(w.getRecord());
                 LOG.info("sample row: " + ret);

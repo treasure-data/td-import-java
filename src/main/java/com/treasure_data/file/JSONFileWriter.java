@@ -10,12 +10,12 @@ import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 
-public class OneLineJSONRecordWriter extends FileWriter<PreparePartsRequest, PreparePartsResult> {
+public class JSONFileWriter extends FileWriter<PreparePartsRequest, PreparePartsResult> {
 
     private Map<String, Object> record;
     private List<Object> recordElements;
 
-    protected OneLineJSONRecordWriter(PreparePartsRequest request)
+    protected JSONFileWriter(PreparePartsRequest request)
             throws CommandException {
         super(request);
     }

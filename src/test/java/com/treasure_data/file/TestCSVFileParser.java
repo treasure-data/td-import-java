@@ -8,6 +8,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -21,6 +23,30 @@ import com.treasure_data.file.CSVFileParser;
 import com.treasure_data.file.CSVFileParser.TypeSuggestionProcessor;
 
 public class TestCSVFileParser {
+
+    private CSVPreparePartsRequest request;
+    private CSVFileParser parser;
+    private FileWriterTestUtil writer;
+
+    @Before
+    public void createResources() throws Exception {
+        request = new CSVPreparePartsRequest();
+        request.setSampleRowSize(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE));
+        request.setSampleHintScore(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE));
+
+        parser = new CSVFileParser(request);
+
+        writer = new FileWriterTestUtil(request);
+    }
+
+    @After
+    public void deleteResources() throws Exception {
+        parser.close();
+        parser = null;
+
+        writer.close();
+        writer = null;
+    }
 
     @Test
     public void testTypeSuggestion() throws Exception {
@@ -200,159 +226,117 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void sample() throws Exception {
-        // request
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest();
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0));
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF);
+    public void parseSeveralTypesOfColumns() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
         request.setHasColumnHeader(true);
         request.setColumnNames(new String[0]);
         request.setAliasTimeColumn(null);
         request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[0]);
         request.setColumnTypeHints(new String[0]);
-        request.setSampleRowSize(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE));
-        request.setSampleHintScore(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE));
 
-        // parser
-        CSVFileParser p = new CSVFileParser(request);
+        // parser setting
         String text =
                 "v0,v1,v2,v3,time\n" +
                 "c00,0,0,0.0,12345\n" +
                 "c10,1,1,1.1,12345\n" +
                 "c20,2,2,2.2,12345\n";
         byte[] bytes = text.getBytes();
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
-        p.startParsing(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345 });
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345 });
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345 });
+        // writer
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345 });
 
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
 
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
+        assertEquals(3, parser.getRowNum());
     }
 
-    @Test @Ignore
-    public void parseSeveralTypesOfColumns() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,v2,v3,time");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,int,long,double,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
+    @Test
+    public void parseColumnsThatIncludeNullValue() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
 
-        String text = "c00,0,0,0.0,12345\n" + "c10,1,1,1.1,12345\n"
-                + "c20,2,2,2.2,12345\n";
+        // parser setting
+        String text =
+                "v0,v1,v2,v3,time\n" +
+                "c00,0,0,0.0,12345\n" +
+                ",,,,12345\n" +
+                "c20,2,2,2.2,12345\n";
         byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0L, "v3", 0.0,
-                "time", 12345L });
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1L, "v3", 1.1,
-                "time", 12345L });
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2L, "v3", 2.2,
-                "time", 12345L });
+        // writer
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", null, "v1", null, "v2", null, "v3", null, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345 });
 
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
 
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
+        assertEquals(3, parser.getRowNum());
     }
 
-    @Test @Ignore
-    public void parseSeveralTypesOfColumnsIncludeNull() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,v2,v3,time");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,int,long,double,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
+    @Test
+    public void parseColumnThatIncludedSeveralTypesValues() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
 
-        String text = "c00,0,0,0.0,12345\n" + ",,,,12345\n"
-                + "c20,2,2,2.2,12345\n";
+        // parser setting
+        String text =
+                "v0,v1,time\n" +
+                "0,0,12345\n" +
+                "c10,,12345\n" +
+                ",2,12345\n";
         byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0L, "v3", 0.0,
-                "time", 12345L });
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", null, "v1", null, "v2", null, "v3", null,
-                "time", 12345L });
-        w.setColSize(5);
-        w.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2L, "v3", 2.2,
-                "time", 12345L });
+        // writer
+        writer.setColSize(3);
+        writer.setRow(new Object[] { "v0", "0", "v1", 0, "time", 12345 });
+        writer.setColSize(3);
+        writer.setRow(new Object[] { "v0", "c10", "v1", null, "time", 12345 });
+        writer.setColSize(3);
+        writer.setRow(new Object[] { "v0", null, "v1", 2, "time", 12345 });
 
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
 
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
-    }
-
-    @Test @Ignore
-    public void parseInvalidTypesAndHandleErrors() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,time");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "int,long,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
-
-        String text = "0,0,12345\n" + "c10,1,12345\n" + "2,c21,12345\n";
-        byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
-
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", 0, "v1", 0L, "time", 12345L });
-
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
-
-        assertEquals(1, p.getRowNum());
-
-        p.close();
-        w.close();
+        assertEquals(3, parser.getRowNum());
     }
 
     @Test @Ignore
@@ -370,7 +354,7 @@ public class TestCSVFileParser {
         String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
@@ -407,7 +391,7 @@ public class TestCSVFileParser {
         byte[] bytes = text.getBytes();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
@@ -445,7 +429,7 @@ public class TestCSVFileParser {
         String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(4);
@@ -485,7 +469,7 @@ public class TestCSVFileParser {
         String text = "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
@@ -522,7 +506,7 @@ public class TestCSVFileParser {
                 + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
@@ -561,7 +545,7 @@ public class TestCSVFileParser {
                 + "c10,c11,12345\n" + "c20,c21,12345\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(4);
@@ -603,7 +587,7 @@ public class TestCSVFileParser {
                 + "12345,c10,c11\n" + "12345,c20,c21\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(4);
@@ -643,7 +627,7 @@ public class TestCSVFileParser {
         String text = "v0,v1\n" + "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
         byte[] bytes = text.getBytes();
         CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
+        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
