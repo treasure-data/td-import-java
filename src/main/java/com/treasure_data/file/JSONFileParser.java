@@ -146,7 +146,7 @@ public class JSONFileParser extends
                     w.write(timeValue);
                 } else {
                     throw new CommandException(
-                            "'time' represented column not found");
+                            "'time' represented column not specified. --time-column or --time-value option is required");
                 }
             }
 
