@@ -76,6 +76,9 @@ public abstract class FileParser<REQ extends CommandRequest, RET extends Command
     public abstract void initParser(CharsetDecoder decoder, InputStream in)
             throws CommandException;
 
+    public abstract void startParsing(final CharsetDecoder decoder, InputStream in)
+            throws CommandException;
+
     public abstract boolean parseRow(com.treasure_data.file.FileWriter w)
             throws CommandException;
 

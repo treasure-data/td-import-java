@@ -251,7 +251,7 @@ public class PreparePartsRequest extends CommandRequest {
         }
     }
 
-    void setFormat(Format format) {
+    public void setFormat(Format format) {
         this.format = format;
     }
 
@@ -259,7 +259,7 @@ public class PreparePartsRequest extends CommandRequest {
         return format;
     }
 
-    void setCompressionType(CompressionType compressionType) {
+    public void setCompressionType(CompressionType compressionType) {
         this.compressionType = compressionType;
     }
 
@@ -267,7 +267,7 @@ public class PreparePartsRequest extends CommandRequest {
         return compressionType;
     }
 
-    void setEncoding(String encoding) {
+    public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
 
@@ -275,7 +275,7 @@ public class PreparePartsRequest extends CommandRequest {
         return encoding;
     }
 
-    void setAliasTimeColumn(String aliasColumn) {
+    public void setAliasTimeColumn(String aliasColumn) {
         this.aliasTimeColumn = aliasColumn;
     }
 
@@ -283,7 +283,8 @@ public class PreparePartsRequest extends CommandRequest {
         return aliasTimeColumn;
     }
 
-    void setTimeValue(long timeValue) {
+    public void setTimeValue(long timeValue) {
+        // initial value of timeValue is '-1'
         this.timeValue = timeValue;
     }
 
@@ -291,7 +292,7 @@ public class PreparePartsRequest extends CommandRequest {
         return timeValue;
     }
 
-    void setTimeFormat(String timeFormat) {
+    public void setTimeFormat(String timeFormat) {
         this.timeFormat = timeFormat;
     }
 
@@ -299,7 +300,7 @@ public class PreparePartsRequest extends CommandRequest {
         return timeFormat;
     }
 
-    void setErrorRecordOutputDirName(String dirName) {
+    public void setErrorRecordOutputDirName(String dirName) {
         this.errorRecordOutputDirName = dirName;
     }
 
@@ -307,7 +308,7 @@ public class PreparePartsRequest extends CommandRequest {
         return errorRecordOutputDirName;
     }
 
-    void setDryRun(boolean flag) {
+    public void setDryRun(boolean flag) {
         this.dryRun = flag;
     }
 
@@ -315,7 +316,7 @@ public class PreparePartsRequest extends CommandRequest {
         return dryRun;
     }
 
-    void setSampleHintScore(int score) {
+    public void setSampleHintScore(int score) {
         this.sampleHintScore = score;
     }
 
@@ -323,7 +324,7 @@ public class PreparePartsRequest extends CommandRequest {
         return sampleHintScore;
     }
 
-    void setSampleRowSize(int size) {
+    public void setSampleRowSize(int size) {
         this.sampleRowSize = size;
     }
 
@@ -331,7 +332,7 @@ public class PreparePartsRequest extends CommandRequest {
         return sampleRowSize;
     }
 
-    void setOutputDirName(String dirName) {
+    public void setOutputDirName(String dirName) {
         this.outputDirName = dirName;
     }
 
@@ -339,7 +340,7 @@ public class PreparePartsRequest extends CommandRequest {
         return outputDirName;
     }
 
-    void setSplitSize(int size) {
+    public void setSplitSize(int size) {
         this.splitSize = size;
     }
 

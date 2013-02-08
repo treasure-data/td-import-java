@@ -17,6 +17,11 @@
 //
 package com.treasure_data.file;
 
+import static com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType.INT;
+import static com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType.LONG;
+import static com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType.DOUBLE;
+import static com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType.STRING;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,27 +52,27 @@ import org.supercsv.util.CsvContext;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
+import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 
 public class CSVFileParser extends
         FileParser<CSVPreparePartsRequest, PreparePartsResult> {
-    private static final Logger LOG = Logger.getLogger(CSVFileParser.class
-            .getName());
+    private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
 
     static class CellProcessorGen {
-        public CellProcessor[] genForSampleReader(String[] typeHints,
+        public CellProcessor[] genForSampleReader(String[] columnNames, String[] typeHints,
                 int sampleRowSize, int sampleHintScore) throws CommandException {
-            TypeSuggestionProcessor[] cprocs = new TypeSuggestionProcessor[typeHints.length];
+            TypeSuggestionProcessor[] cprocs = new TypeSuggestionProcessor[columnNames.length];
             for (int i = 0; i < cprocs.length; i++) {
-                cprocs[i] = new TypeSuggestionProcessor(sampleRowSize,
-                        sampleHintScore);
-                cprocs[i].addHint(typeHints[i]);
+                cprocs[i] = new TypeSuggestionProcessor(sampleRowSize, sampleHintScore);
+                if (typeHints.length != 0) {
+                    cprocs[i].addHint(typeHints[i]);
+                }
             }
             return cprocs;
         }
 
-        public CellProcessor[] gen(
-                CSVPreparePartsRequest.ColumnType[] columnTypes)
+        public CellProcessor[] gen(CSVPreparePartsRequest.ColumnType[] columnTypes)
                 throws CommandException {
             int len = columnTypes.length;
             List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
@@ -75,16 +80,20 @@ public class CSVFileParser extends
                 CellProcessor cproc;
                 switch (columnTypes[i]) { // override 'optional' ?
                 case INT:
+                    // TODO optimizable as new converter
                     cproc = new ConvertNullTo(null, new ParseInt());
                     break;
                 case LONG:
+                    // TODO optimizable as new converter
                     cproc = new ConvertNullTo(null, new ParseLong());
                     break;
                 case DOUBLE:
+                    // TODO optimizable as new converter
                     cproc = new ConvertNullTo(null, new ParseDouble());
                     break;
                 case STRING:
-                    cproc = new Optional(); // TODO optimizable as new converter
+                    // TODO optimizable as new converter
+                    cproc = new Optional();
                     break;
                 default:
                     String msg = String.format("unsupported type: %s",
@@ -112,31 +121,30 @@ public class CSVFileParser extends
                 throw new NullPointerException("type hint is null.");
             }
 
-            CSVPreparePartsRequest.ColumnType type =
-                    CSVPreparePartsRequest.ColumnType.fromString(typeHint);
+            CSVPreparePartsRequest.ColumnType type = ColumnType.fromString(typeHint);
             if (type == null) { // fatal error
                 throw new CommandException("unsupported type: " + typeHint);
             }
 
             switch (type) {
             case INT:
-                scores[CSVPreparePartsRequest.ColumnType.INT.index()] += hintScore;
+                scores[INT.index()] += hintScore;
                 break;
             case LONG:
-                scores[CSVPreparePartsRequest.ColumnType.LONG.index()] += hintScore;
+                scores[LONG.index()] += hintScore;
                 break;
             case DOUBLE:
-                scores[CSVPreparePartsRequest.ColumnType.DOUBLE.index()] += hintScore;
+                scores[DOUBLE.index()] += hintScore;
                 break;
             case STRING:
-                scores[CSVPreparePartsRequest.ColumnType.STRING.index()] += hintScore;
+                scores[STRING.index()] += hintScore;
                 break;
             default:
                 throw new CommandException("fatal error");
             }
         }
 
-        CSVPreparePartsRequest.ColumnType getSuggestedType() {
+        ColumnType getSuggestedType() {
             int max = -rowSize;
             int maxIndex = 0;
             for (int i = 0; i < scores.length; i++) {
@@ -145,7 +153,7 @@ public class CSVFileParser extends
                     maxIndex = i;
                 }
             }
-            return CSVPreparePartsRequest.ColumnType.fromInt(maxIndex);
+            return ColumnType.fromInt(maxIndex);
         }
 
         void printScores() {
@@ -154,7 +162,7 @@ public class CSVFileParser extends
             }
         }
 
-        int getScore(CSVPreparePartsRequest.ColumnType type) {
+        int getScore(ColumnType type) {
             int i = type.index();
             if (i < 0 || i >= 4) {
                 throw new ArrayIndexOutOfBoundsException(i);
@@ -172,16 +180,16 @@ public class CSVFileParser extends
             Object result = null;
 
             // value looks like String object?
-            scores[CSVPreparePartsRequest.ColumnType.STRING.index()] += 1;
+            scores[STRING.index()] += 1;
 
             // value looks like Double object?
             if (value instanceof Double) {
                 result = (Double) value;
-                scores[CSVPreparePartsRequest.ColumnType.DOUBLE.index()] += 1;
+                scores[DOUBLE.index()] += 1;
             } else {
                 try {
                     result = Double.parseDouble((String) value);
-                    scores[CSVPreparePartsRequest.ColumnType.DOUBLE.index()] += 1;
+                    scores[DOUBLE.index()] += 1;
                 } catch (NumberFormatException e) {
                     // ignore
                 }
@@ -190,11 +198,11 @@ public class CSVFileParser extends
 
             if (value instanceof Long) {
                 result = (Long) value;
-                scores[CSVPreparePartsRequest.ColumnType.LONG.index()] += 1;
+                scores[LONG.index()] += 1;
             } else if (value instanceof String) {
                 try {
                     result = Long.parseLong((String) value);
-                    scores[CSVPreparePartsRequest.ColumnType.LONG.index()] += 1;
+                    scores[LONG.index()] += 1;
                 } catch (NumberFormatException e) {
                     // ignore
                 }
@@ -203,11 +211,11 @@ public class CSVFileParser extends
             // value looks like Integer object?
             if (value instanceof Integer) {
                 result = (Integer) value;
-                scores[CSVPreparePartsRequest.ColumnType.INT.index()] += 1;
+                scores[INT.index()] += 1;
             } else if (value instanceof String) {
                 try {
                     result = Integer.parseInt((String) value);
-                    scores[CSVPreparePartsRequest.ColumnType.INT.index()] += 1;
+                    scores[INT.index()] += 1;
                 } catch (NumberFormatException e) {
                     // ignore
                 }
@@ -273,7 +281,7 @@ public class CSVFileParser extends
     private String[] allColumnNames;
     private List<Integer> extractedColumnIndexes;
 
-    private CSVPreparePartsRequest.ColumnType[] allSuggestedColumnTypes;
+    private ColumnType[] allSuggestedColumnTypes;
     private CellProcessor[] cprocessors;
 
     public CSVFileParser(CSVPreparePartsRequest request) throws CommandException {
@@ -376,13 +384,14 @@ public class CSVFileParser extends
 
             // new String[] { "long", "string", "long" }
             String[] columnTypeHints = request.getColumnTypeHints();
-            if (columnTypeHints.length != allColumnNames.length) {
+            int columnTypeHintSize = columnTypeHints.length;
+            if (columnTypeHintSize != 0 && columnTypeHintSize != allColumnNames.length) {
                 throw new CommandException(
                         "mismatched between size of specified column types and size of columns");
             }
 
             CellProcessor[] cprocs = new CellProcessorGen().genForSampleReader(
-                    columnTypeHints, request.getSampleRowSize(),
+                    allColumnNames, columnTypeHints, request.getSampleRowSize(),
                     request.getSampleHintScore());
 
             List<Object> firstRow = null;
@@ -399,7 +408,7 @@ public class CSVFileParser extends
                 }
             }
 
-            allSuggestedColumnTypes = new CSVPreparePartsRequest.ColumnType[cprocs.length];
+            allSuggestedColumnTypes = new ColumnType[cprocs.length];
             for (int i = 0; i < cprocs.length; i++) {
                 allSuggestedColumnTypes[i] = ((TypeSuggestionProcessor) cprocs[i])
                         .getSuggestedType();
@@ -429,14 +438,29 @@ public class CSVFileParser extends
                 }
             }
         }
+    }
 
+    @Override
+    public void startParsing(final CharsetDecoder decoder, InputStream in)
+            throws CommandException {
         // create reader
         reader = new CsvListReader(new InputStreamReader(in, decoder), csvPref);
+        if (request.hasColumnHeader()) {
+            // header line is skipped
+            try {
+                reader.read();
+            } catch (IOException e) {
+                throw new CommandException(e);
+            }
+        }
+
         // create cell processors
         cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes);
     }
 
-    public boolean parseRow(com.treasure_data.file.FileWriter w)
+    @Override
+    public boolean parseRow(
+            @SuppressWarnings("rawtypes") com.treasure_data.file.FileWriter w)
             throws CommandException {
         List<Object> row = null;
         try {
@@ -466,7 +490,8 @@ public class CSVFileParser extends
         return parseList(w, row);
     }
 
-    private boolean parseList(com.treasure_data.file.FileWriter w,
+    private boolean parseList(
+            @SuppressWarnings("rawtypes") com.treasure_data.file.FileWriter w,
             List<Object> row) throws CommandException {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",

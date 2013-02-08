@@ -163,6 +163,7 @@ public class PreparePartsCommand extends
 
                 p.setErrorRecordWriter(createErrorRecordOutputStream(request,
                         infile.getName()));
+                p.startParsing(decoder, createFileInputStream(compressionType, infile));
                 w = new MsgpackGZIPFileWriter(request);
                 w.initWriter(infile.getName());
                 while (p.parseRow(w)) {
