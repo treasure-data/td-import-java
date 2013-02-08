@@ -436,7 +436,8 @@ public class CSVFileParser extends
         cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes);
     }
 
-    public boolean parseRow(MsgpackGZIPFileWriter w) throws CommandException {
+    public boolean parseRow(com.treasure_data.file.FileWriter w)
+            throws CommandException {
         List<Object> row = null;
         try {
             row = reader.read(cprocessors);
@@ -465,7 +466,8 @@ public class CSVFileParser extends
         return parseList(w, row);
     }
 
-    private boolean parseList(MsgpackGZIPFileWriter w, List<Object> row) throws CommandException {
+    private boolean parseList(com.treasure_data.file.FileWriter w,
+            List<Object> row) throws CommandException {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
                     reader.getLineNumber(), reader.getRowNumber(),

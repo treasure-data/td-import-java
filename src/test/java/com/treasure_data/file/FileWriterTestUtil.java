@@ -5,14 +5,20 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.junit.Ignore;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.commands.bulk_import.PreparePartsResult;
 
 @Ignore
-public class FileWriterTestUtil extends MsgpackGZIPFileWriter {
+public class FileWriterTestUtil
+        extends com.treasure_data.file.FileWriter<PreparePartsRequest, PreparePartsResult> {
+    private static final Logger LOG = Logger.getLogger(FileWriterTestUtil.class
+            .getName());
+
     private List<Integer> colSizeList;
     private List<Object> objectList;
 
@@ -61,8 +67,4 @@ public class FileWriterTestUtil extends MsgpackGZIPFileWriter {
         // do nothing
     }
 
-    @Override
-    public void closeSilently() {
-        // do nothing
-    }
 }

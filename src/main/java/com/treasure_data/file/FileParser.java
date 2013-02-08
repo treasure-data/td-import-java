@@ -76,7 +76,7 @@ public abstract class FileParser<REQ extends CommandRequest, RET extends Command
     public abstract void initParser(CharsetDecoder decoder, InputStream in)
             throws CommandException;
 
-    public abstract boolean parseRow(MsgpackGZIPFileWriter w)
+    public abstract boolean parseRow(com.treasure_data.file.FileWriter w)
             throws CommandException;
 
     public abstract void close() throws CommandException;
