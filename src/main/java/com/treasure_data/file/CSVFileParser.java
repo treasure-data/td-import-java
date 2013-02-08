@@ -180,13 +180,16 @@ public class CSVFileParser extends
             Object result = null;
 
             // value looks like String object?
-            scores[STRING.index()] += 1;
+            if (value instanceof String) {
+                scores[STRING.index()] += 1;
+                result = (String) value;
+            }
 
             // value looks like Double object?
             if (value instanceof Double) {
                 result = (Double) value;
                 scores[DOUBLE.index()] += 1;
-            } else {
+            } else if (value instanceof String) {
                 try {
                     result = Double.parseDouble((String) value);
                     scores[DOUBLE.index()] += 1;
@@ -424,8 +427,11 @@ public class CSVFileParser extends
                  *
                  * * needed JSONFileWriter impl.
                  */
+                System.out.println(firstRow);
                 String s = JSONValue.toJSONString(firstRow);
                 LOG.info("sample row: " + s);
+            } else {
+                LOG.info("sample row is null");
             }
         } catch (IOException e) {
             throw new CommandException(e);
