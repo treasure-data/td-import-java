@@ -49,7 +49,7 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void testTypeSuggestion() throws Exception {
+    public void checkTypeSuggestion() throws Exception {
         int hintScore = 3;
         {
             String[] values = new String[] {
@@ -226,7 +226,235 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseSeveralTypesOfColumns() throws Exception {
+    public void parseIntColumn() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,time\n" +
+                "0,12345\n" +
+                "1,12345\n" +
+                "2,12345\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 0, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 1, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 2, "time", 12345 });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseIntColumnThatNullValueIncluded() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,time\n" +
+                ",12345\n" +
+                "1,12345\n" +
+                ",12345\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", null, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 1, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", null, "time", 12345 });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseDoubleColumn() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,time\n" +
+                "0.0,12345\n" +
+                "1.1,12345\n" +
+                "2.2,12345\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 0.0, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 1.1, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 2.2, "time", 12345 });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseDoubleColumnThatNullValueIncluded() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,time\n" +
+                ",12345\n" +
+                "1.1,12345\n" +
+                ",12345\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", null, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", 1.1, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", null, "time", 12345 });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseStringColumn() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,time\n" +
+                "c00,12345\n" +
+                "c01,12345\n" +
+                "c02,12345\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", "c00", "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", "c01", "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", "c02", "time", 12345 });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseStringColumnThatNullValueIncluded() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,time\n" +
+                ",12345\n" +
+                "c01,12345\n" +
+                ",12345\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", null, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", "c01", "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", null, "time", 12345 });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseIntDoubleStringColumns() throws Exception {
         // request setting
         request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
         request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
@@ -302,7 +530,7 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseColumnThatIncludedSeveralTypesValues() throws Exception {
+    public void parseSeveralTypeColumn() throws Exception {
         // request setting
         request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
         request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
@@ -315,21 +543,21 @@ public class TestCSVFileParser {
 
         // parser setting
         String text =
-                "v0,v1,time\n" +
-                "0,0,12345\n" +
-                "c10,,12345\n" +
-                ",2,12345\n";
+                "v0,time\n" +
+                "0,12345\n" +
+                "c10,12345\n" +
+                ",12345\n";
         byte[] bytes = text.getBytes();
         parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
         parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         // writer
-        writer.setColSize(3);
-        writer.setRow(new Object[] { "v0", "0", "v1", 0, "time", 12345 });
-        writer.setColSize(3);
-        writer.setRow(new Object[] { "v0", "c10", "v1", null, "time", 12345 });
-        writer.setColSize(3);
-        writer.setRow(new Object[] { "v0", null, "v1", 2, "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", "0", "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", "c10", "time", 12345 });
+        writer.setColSize(2);
+        writer.setRow(new Object[] { "v0", null, "time", 12345 });
 
         assertTrue(parser.parseRow(writer));
         assertTrue(parser.parseRow(writer));
@@ -339,312 +567,270 @@ public class TestCSVFileParser {
         assertEquals(3, parser.getRowNum());
     }
 
-    @Test @Ignore
+    @Test
+    public void parseNoTimeColumnAndAliasColumnName01() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn("timestamp");
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,v1,v2,v3,timestamp\n" +
+                "c00,0,0,0.0,12345\n" +
+                "c10,1,1,1.1,12345\n" +
+                "c20,2,2,2.2,12345\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "timestamp", 12345, "time", 12345L });
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "timestamp", 12345, "time", 12345L });
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "timestamp", 12345, "time", 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseNoTimeColumnAndAliasColumnName02() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn("timestamp");
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "timestamp,v0,v1,v2,v3\n" +
+                "12345,c00,0,0,0.0\n" +
+                "12345,c10,1,1,1.1\n" +
+                "12345,c20,2,2,2.2\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "timestamp", 12345, "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345L });
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "timestamp", 12345, "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345L });
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "timestamp", 12345, "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseNoTimeColumnAndTimeValue()
+            throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setTimeValue(12345L);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
+
+        // parser setting
+        String text =
+                "v0,v1,v2,v3\n" +
+                "c00,0,0,0.0\n" +
+                "c10,1,1,1.1\n" +
+                "c20,2,2,2.2\n";
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345L });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345L });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
     public void parseHeaderlessCSVText() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,time");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,string,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(false);
+        request.setColumnNames(new String[] { "v0", "v1", "v2", "v3", "time" });
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
 
-        String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
+        // parser setting
+        String text =
+                "c00,0,0,0.0,12345\n" +
+                "c10,1,1,1.1,12345\n" +
+                "c20,2,2,2.2,12345\n";
         byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+        // writer
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345 });
 
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
 
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
+        assertEquals(3, parser.getRowNum());
     }
 
-    @Test @Ignore
+    @Test
     public void parseHeaderlessTSVText() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "tsv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,time");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,string,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
+        // request setting
+        request.setFormat(PreparePartsRequest.Format.TSV);
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(false);
+        request.setColumnNames(new String[] { "v0", "v1", "v2", "v3", "time" });
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
 
-        String text = "c00\tc01\t12345\n" + "c10\tc11\t12345\r\n" + "c20\tc21\t12345\r\n";
+        // parser setting
+        String text =
+                "c00\t0\t0\t0.0\t12345\n" +
+                "c10\t1\t1\t1.1\t12345\n" +
+                "c20\t2\t2\t2.2\t12345\n";
         byte[] bytes = text.getBytes();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+        // writer
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345 });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345 });
 
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
 
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
+        assertEquals(3, parser.getRowNum());
     }
 
-    @Test @Ignore
-    public void parseNotSpecifiedTimeColumnHeaderlessCSVTextWithAliasColumnName()
-            throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1,timestamp");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,string,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
+    @Test
+    public void parseHeaderlessNoTimeColumnAndAliasColumn() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(false);
+        request.setColumnNames(new String[] { "v0", "v1", "v2", "v3", "timestamp" });
+        request.setAliasTimeColumn("timestamp");
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
 
-        String text = "c00,c01,12345\n" + "c10,c11,12345\n" + "c20,c21,12345\n";
+        // parser setting
+        String text =
+                "c00,0,0,0.0,12345\n" +
+                "c10,1,1,1.1,12345\n" +
+                "c20,2,2,2.2,12345\n";
         byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "timestamp", 12345L,
-                "time", 12345L });
-        w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "timestamp", 12345L,
-                "time", 12345L });
-        w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "timestamp", 12345L,
-                "time", 12345L });
+        // writer
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "timestamp", 12345, "time", 12345L });
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "timestamp", 12345, "time", 12345L });
+        writer.setColSize(6);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "timestamp", 12345, "time", 12345L });
 
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
 
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
+        assertEquals(3, parser.getRowNum());
     }
 
-    @Test @Ignore
-    public void parseNotSpecifiedTimeColumnHeaderlessCSVTextWithTimeValue()
-            throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "v0,v1");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
+    @Test
+    public void parseHeaderlessNoTimeColumnAndTimeValue() throws Exception {
+        // request setting
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(false);
+        request.setColumnNames(new String[] { "v0", "v1", "v2", "v3" });
+        request.setAliasTimeColumn(null);
+        request.setTimeValue(12345L);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
 
-        String text = "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
+        // parser setting
+        String text =
+                "c00,0,0,0.0\n" +
+                "c10,1,1,1.1\n" +
+                "c20,2,2,2.2\n";
         byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
+        // writer
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0, "v3", 0.0, "time", 12345L });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c10", "v1", 1, "v2", 1, "v3", 1.1, "time", 12345L });
+        writer.setColSize(5);
+        writer.setRow(new Object[] { "v0", "c20", "v1", 2, "v2", 2, "v3", 2.2, "time", 12345L });
 
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
 
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
+        assertEquals(3, parser.getRowNum());
     }
 
-    @Test @Ignore
-    public void parseHeaderedCSVText() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,string,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
-
-        String text = "v0,v1,time\n" + "c00,c01,12345\n" + "c10,c11,12345\n"
-                + "c20,c21,12345\n";
-        byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
-
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
-
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
-
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
-    }
-
-    @Test @Ignore
-    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithAliasColumnName01()
-            throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "string,string,long");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
-
-        String text = "v0,v1,timestamp\n" + "c00,c01,12345\n"
-                + "c10,c11,12345\n" + "c20,c21,12345\n";
-        byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
-
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "timestamp", 12345L,
-                "time", 12345L });
-        w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "timestamp", 12345L,
-                "time", 12345L });
-        w.setColSize(4);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "timestamp", 12345L,
-                "time", 12345L });
-
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
-
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
-    }
-
-    @Test @Ignore
-    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithAliasColumnName02()
-            throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES,
-                "long,string,string");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
-
-        String text = "timestamp,v0,v1\n" + "12345,c00,c01\n"
-                + "12345,c10,c11\n" + "12345,c20,c21\n";
-        byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
-
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(4);
-        w.setRow(new Object[] { "timestamp", 12345L, "v0", "c00", "v1", "c01",
-                "time", 12345L });
-        w.setColSize(4);
-        w.setRow(new Object[] { "timestamp", 12345L, "v0", "c10", "v1", "c11",
-                "time", 12345L });
-        w.setColSize(4);
-        w.setRow(new Object[] { "timestamp", 12345L, "v0", "c20", "v1", "c21",
-                "time", 12345L });
-
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
-
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
-    }
-
-    @Test @Ignore
-    public void parseNotSpecifiedTimeColumnHeaderedCSVTextWithTimeValue()
-            throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "string,string");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
-        props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "" + (16 * 1024));
-        CSVPreparePartsRequest request = new CSVPreparePartsRequest(
-                PreparePartsRequest.Format.CSV, new String[0], props);
-
-        String text = "v0,v1\n" + "c00,c01\n" + "c10,c11\n" + "c20,c21\n";
-        byte[] bytes = text.getBytes();
-        CSVFileParser p = new CSVFileParser(request);
-        p.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
-
-        FileWriterTestUtil w = new FileWriterTestUtil(request);
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c10", "v1", "c11", "time", 12345L });
-        w.setColSize(3);
-        w.setRow(new Object[] { "v0", "c20", "v1", "c21", "time", 12345L });
-
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertTrue(p.parseRow(w));
-        assertFalse(p.parseRow(w));
-
-        assertEquals(3, p.getRowNum());
-
-        p.close();
-        w.close();
-    }
 }
