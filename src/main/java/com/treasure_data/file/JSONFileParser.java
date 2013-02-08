@@ -76,6 +76,9 @@ public class JSONFileParser extends
         Map<String, Object> row = null;
         try {
             String jsonText = reader.readLine();
+            if (jsonText == null) {
+                return false;
+            }
             row = (Map<String, Object>) JSONValue.parse(jsonText);
         } catch (IOException e) {
             e.printStackTrace();
@@ -92,6 +95,7 @@ public class JSONFileParser extends
         }
 
         // increment row number
+        incrRowNum();
 
         return parseMap(w, row);
     }
