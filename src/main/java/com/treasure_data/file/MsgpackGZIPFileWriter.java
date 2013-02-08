@@ -78,6 +78,7 @@ public class MsgpackGZIPFileWriter
         super(request);
     }
 
+    @Override
     public void initWriter(String infileName)
             throws CommandException {
         msgpack = new MessagePack();

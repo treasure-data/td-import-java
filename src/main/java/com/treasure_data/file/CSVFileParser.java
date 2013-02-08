@@ -419,17 +419,10 @@ public class CSVFileParser extends
 
             // print sample row
             if (firstRow != null) {
-                /**
-                 * TODO
-                 * TODO
-                 * TODO #MN
-                 * * we should parse first row with suggested type converters
-                 *
-                 * * needed JSONFileWriter impl.
-                 */
-                System.out.println(firstRow);
-                String s = JSONValue.toJSONString(firstRow);
-                LOG.info("sample row: " + s);
+                OneLineJSONRecordWriter w = new OneLineJSONRecordWriter(request);
+                parseList(w, firstRow);
+                String ret = JSONValue.toJSONString(w.getRecord());
+                LOG.info("sample row: " + ret);
             } else {
                 LOG.info("sample row is null");
             }
