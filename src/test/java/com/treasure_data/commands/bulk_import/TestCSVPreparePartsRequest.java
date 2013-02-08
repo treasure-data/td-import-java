@@ -26,6 +26,8 @@ public class TestCSVPreparePartsRequest {
             props.setProperty(Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR, "none");
             props.setProperty(Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, "v0");
             props.setProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS, "v1");
+            props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "50");
+            props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE, "10");
 
             CSVPreparePartsRequest req = new CSVPreparePartsRequest();
             req.setFormat(PreparePartsRequest.Format.CSV);
@@ -39,6 +41,8 @@ public class TestCSVPreparePartsRequest {
             assertEquals("none", req.getTypeErrorMode());
             assertArrayEquals(new String[] { "v0" }, req.getExcludeColumns());
             assertArrayEquals(new String[] { "v1" }, req.getOnlyColumns());
+            assertEquals(50, req.getSampleRowSize());
+            assertEquals(10, req.getSampleHintScore());
         }
         { // check default values
             Properties props = new Properties();
@@ -56,6 +60,8 @@ public class TestCSVPreparePartsRequest {
             assertEquals("skip", req.getTypeErrorMode());
             assertArrayEquals(new String[0], req.getExcludeColumns());
             assertArrayEquals(new String[0], req.getOnlyColumns());
+            assertEquals(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE), req.getSampleRowSize());
+            assertEquals(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE), req.getSampleHintScore());
         }
         { // check default values 2
             Properties props = new Properties();
@@ -125,6 +131,38 @@ public class TestCSVPreparePartsRequest {
 
             assertEquals(true, req.hasColumnHeader());
             assertArrayEquals(null, req.getColumnNames());
+        }
+    }
+
+    @Test
+    public void throwCmdErrorWhenReceiveInvalidSampleRowSize() throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "muga");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+
+        try {
+            req.setFormat(PreparePartsRequest.Format.CSV);
+            req.setOptions(props);
+            fail();
+        } catch (Throwable t) {
+            assertTrue(t instanceof CommandException);
+        }
+    }
+
+    @Test
+    public void throwCmdErrorWhenReceiveInvalidSampleHintScore() throws Exception {
+        Properties props = new Properties();
+        props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE, "muga");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
+        CSVPreparePartsRequest req = new CSVPreparePartsRequest();
+
+        try {
+            req.setFormat(PreparePartsRequest.Format.CSV);
+            req.setOptions(props);
+            fail();
+        } catch (Throwable t) {
+            assertTrue(t instanceof CommandException);
         }
     }
 }

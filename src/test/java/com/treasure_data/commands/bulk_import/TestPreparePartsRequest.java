@@ -60,8 +60,6 @@ public class TestPreparePartsRequest {
             props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
             props.setProperty(Config.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT, "err");
             props.setProperty(Config.BI_PREPARE_PARTS_DRYRUN, "true");
-            props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "50");
-            props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE, "10");
             props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "1024");
             PreparePartsRequest req = new PreparePartsRequest();
             req.setOptions(props);
@@ -73,8 +71,6 @@ public class TestPreparePartsRequest {
             assertEquals("out", req.getOutputDirName());
             assertEquals("err", req.getErrorRecordOutputDirName());
             assertEquals(true, req.dryRun());
-            assertEquals(50, req.getSampleRowSize());
-            assertEquals(10, req.getSampleHintScore());
             assertEquals(1024, req.getSplitSize());
         }
         { // check default values
@@ -91,8 +87,6 @@ public class TestPreparePartsRequest {
             assertEquals("out", req.getOutputDirName());
             assertEquals(null, req.getErrorRecordOutputDirName());
             assertEquals(Boolean.parseBoolean(Config.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE), req.dryRun());
-            assertEquals(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE), req.getSampleRowSize());
-            assertEquals(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE), req.getSampleHintScore());
             assertEquals(Integer.parseInt(Config.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE), req.getSplitSize());
         }
     }
@@ -131,36 +125,6 @@ public class TestPreparePartsRequest {
     public void throwCmdErrorWhenDontReceiveOutputDir() throws Exception {
         Properties props = new Properties();
         //props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
-        PreparePartsRequest req = new PreparePartsRequest();
-
-        try {
-            req.setOptions(props);
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof CommandException);
-        }
-    }
-
-    @Test
-    public void throwCmdErrorWhenReceiveInvalidSampleRowSize() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "muga");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
-        PreparePartsRequest req = new PreparePartsRequest();
-
-        try {
-            req.setOptions(props);
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof CommandException);
-        }
-    }
-
-    @Test
-    public void throwCmdErrorWhenReceiveInvalidSampleHintScore() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE, "muga");
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out"); // required
         PreparePartsRequest req = new PreparePartsRequest();
 
         try {

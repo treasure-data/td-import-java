@@ -114,8 +114,6 @@ public class PreparePartsRequest extends CommandRequest {
     protected String timeFormat;
     protected String errorRecordOutputDirName;
     protected boolean dryRun = false;
-    protected int sampleHintScore;
-    protected int sampleRowSize;
     protected String outputDirName;
     protected int splitSize;
 
@@ -208,34 +206,6 @@ public class PreparePartsRequest extends CommandRequest {
                 Config.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
         dryRun = drun != null && drun.equals("true");
 
-        // row size with sample reader
-        String sRowSize = props.getProperty(
-                Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
-        try {
-            sampleRowSize = Integer.parseInt(sRowSize);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "sample row size is required as int type e.g. -D%s=%s",
-                    Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                    Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
-            throw new CommandException(msg, e);
-        }
-
-        // hint score with sample reader
-        String sHintScore = props.getProperty(
-                Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
-                Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
-        try {
-            sampleHintScore = Integer.parseInt(sHintScore);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "sample hint score is required as int type e.g. -D%s=%s",
-                    Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
-                    Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
-            throw new CommandException(msg, e);
-        }
-
         // split size
         String sSize = props.getProperty(
                 Config.BI_PREPARE_PARTS_SPLIT_SIZE,
@@ -314,22 +284,6 @@ public class PreparePartsRequest extends CommandRequest {
 
     public boolean dryRun() {
         return dryRun;
-    }
-
-    public void setSampleHintScore(int score) {
-        this.sampleHintScore = score;
-    }
-
-    public int getSampleHintScore() {
-        return sampleHintScore;
-    }
-
-    public void setSampleRowSize(int size) {
-        this.sampleRowSize = size;
-    }
-
-    public int getSampleRowSize() {
-        return sampleRowSize;
     }
 
     public void setOutputDirName(String dirName) {

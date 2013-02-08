@@ -58,12 +58,6 @@ public interface Config {
     String BI_PREPARE_PARTS_DRYRUN = "td.bulk_import.prepare_parts.dry-run";
     String BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE = "false";
 
-    String BI_PREPARE_PARTS_SAMPLE_HINT_SCORE = "td.bulk_import.prepare_parts.sample.hint.score";
-    String BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE = "3";
-
-    String BI_PREPARE_PARTS_SAMPLE_ROWSIZE = "td.bulk_import.prepare_parts.sample.rowsize";
-    String BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE = "30";
-
     String BI_PREPARE_PARTS_SPLIT_SIZE = "td.bulk_import.prepare_parts.split-size";
     String BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE ="16384";
 
@@ -98,6 +92,12 @@ public interface Config {
     String BI_PREPARE_PARTS_EXCLUDE_COLUMNS = "td.bulk_import.prepare_parts.exclude-columns";
     // only-columns NAME,NAME,NAME
     String BI_PREPARE_PARTS_ONLY_COLUMNS = "td.bulk_import.prepare_parts.only-columns";
+
+    String BI_PREPARE_PARTS_SAMPLE_HINT_SCORE = "td.bulk_import.prepare_parts.sample.hint.score";
+    String BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE = "3";
+
+    String BI_PREPARE_PARTS_SAMPLE_ROWSIZE = "td.bulk_import.prepare_parts.sample.rowsize";
+    String BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE = "30";
 
     ////////////////////////////////////////
     // UPLOAD_PARTS_OPTIONS               //
