@@ -99,4 +99,21 @@ public interface Config {
     // only-columns NAME,NAME,NAME
     String BI_PREPARE_PARTS_ONLY_COLUMNS = "td.bulk_import.prepare_parts.only-columns";
 
+    ////////////////////////////////////////
+    // UPLOAD_PARTS_OPTIONS               //
+    ////////////////////////////////////////
+
+    // auto-perform
+    String BI_UPLOAD_PARTS_AUTO_PERFORM = "td.bulk_import.upload_parts.auto-perform";
+    String BI_UPLOAD_PARTS_AUTO_PERFORM_DEFAULTVALUE = "true";
+
+    // auto-commit
+    String BI_UPLOAD_PARTS_AUTO_COMMIT = "td.bulk_import.upload_parts.auto-commit";
+    String BI_UPLOAD_PARTS_AUTO_COMMIT_DEFAULTVALUE = "false";
+
+    // parallel NUM
+    String BI_UPLOAD_PARTS_UPLOAD_PARALLEL = "td.bulk_import.upload_parts.upload-parallel";
+    String BI_UPLOAD_PARTS_UPLOAD_PARALLEL_DEFAULTVALUE = "1"; // TODO #MN should change 2
+    String BI_UPLOAD_PARTS_UPLOAD_PARALLEL_MAX_VALUE = "8"; // TODO #MN should change 2
+
 }
