@@ -515,7 +515,7 @@ public class CSVFileParser extends
             long time = 0;
             for (int i = 0; i < allSize; i++) {
                 if (i == aliasTimeIndex) {
-                    time = (Long) row.get(i);
+                    time = ((Number) row.get(i)).longValue();
                 }
 
                 // i is included in extractedColumnIndexes?
