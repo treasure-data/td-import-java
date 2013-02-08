@@ -1,10 +1,13 @@
 package com.treasure_data.file;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.junit.Ignore;
@@ -19,14 +22,32 @@ public class FileWriterTestUtil
     private static final Logger LOG = Logger.getLogger(FileWriterTestUtil.class
             .getName());
 
-    private List<Integer> colSizeList;
-    private List<Object> objectList;
+    private List<Integer> expectedSizeList;
+    private boolean isMap;
+
+    private List<List<Object>> expectedList;
+    private List<Object> gotList;
+    private List<Map<Object, Object>> expectedMapList;
+    private Map<Object, Object> gotMap;
+    private Object rowKey;
 
     public FileWriterTestUtil(PreparePartsRequest request)
             throws CommandException {
+        this(request, false);
+    }
+
+    public FileWriterTestUtil(PreparePartsRequest request, boolean isMap)
+            throws CommandException {
         super(request);
-        colSizeList = new ArrayList<Integer>();
-        objectList = new ArrayList<Object>();
+        this.isMap = isMap;
+        expectedSizeList = new ArrayList<Integer>();
+        if (!isMap) { // list
+            expectedList = new ArrayList<List<Object>>();
+            gotList = new ArrayList<Object>();
+        } else { // map
+            expectedMapList = new ArrayList<Map<Object, Object>>();
+            gotMap = new HashMap<Object, Object>();
+        }
     }
 
     @Override
@@ -36,30 +57,74 @@ public class FileWriterTestUtil
     }
 
     public void setColSize(int colSize) {
-        colSizeList.add(colSize);
+        expectedSizeList.add(colSize);
     }
 
     @Override
     public void writeBeginRow(int got) throws CommandException {
-        int expected = colSizeList.remove(0);
+        int expected = expectedSizeList.remove(0);
         assertEquals(expected, got);
     }
 
     public void setRow(Object[] row) {
-        for (Object c : row) {
-            objectList.add(c);
+        if (isMap) { // map
+            throw new UnsupportedOperationException();
         }
+
+        List<Object> list = new ArrayList<Object>();
+        for (Object r : row) {
+            list.add(r);
+        }
+        expectedList.add(list);
+    }
+
+    public void setRow(Object[] rowKeys, Object[] rowValues) {
+        if (!isMap) { // list
+            throw new UnsupportedOperationException();
+        }
+
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        int s = rowKeys.length;
+        for (int i = 0; i < s; i++) {
+            map.put(rowKeys[i], rowValues[i]);
+        }
+        expectedMapList.add(map);
     }
 
     @Override
     public void write(Object got) throws CommandException {
-        Object expected = objectList.remove(0);
-        assertEquals(expected, got);
+        if (!isMap) { // list
+            gotList.add(got);
+        } else { // map
+            if (rowKey != null) {
+                gotMap.put(rowKey, got);
+                rowKey = null;
+            } else {
+                rowKey = got;
+            }
+        }
     }
 
     @Override
     public void writeEndRow() throws CommandException {
-        // do nothing
+        if (!isMap) { // list
+            List<Object> expected = expectedList.remove(0);
+            assertArrayEquals(
+                    expected.toArray(new Object[0]),
+                    gotList.toArray(new Object[0]));
+        } else { // map
+            Map<Object, Object> expected = expectedMapList.remove(0);
+            for (Map.Entry<Object, Object> e : gotMap.entrySet()) {
+                Object gotKey = e.getKey();
+                assertEquals(expected.get(gotKey), e.getValue());
+            }
+        }
+
+        if (!isMap) { // list
+            gotList.clear();
+        } else { // map
+            gotMap.clear();
+        }
     }
 
     @Override
