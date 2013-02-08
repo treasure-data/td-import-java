@@ -204,62 +204,6 @@ public class TestCSVFileParser {
         }
     }
 
-    @Ignore
-    static class MockFileWriter extends MsgpackGZIPFileWriter {
-        private List<Integer> colSizeList;
-        private List<Object> objectList;
-
-        public MockFileWriter(PreparePartsRequest request)
-                throws CommandException {
-            super(request);
-            colSizeList = new ArrayList<Integer>();
-            objectList = new ArrayList<Object>();
-        }
-
-        @Override
-        public void initWriter(String infileName)
-                throws CommandException {
-            // do nothing
-        }
-
-        public void setColSize(int colSize) {
-            colSizeList.add(colSize);
-        }
-
-        @Override
-        public void writeBeginRow(int got) throws CommandException {
-            int expected = colSizeList.remove(0);
-            assertEquals(expected, got);
-        }
-
-        public void setRow(Object[] row) {
-            for (Object c : row) {
-                objectList.add(c);
-            }
-        }
-
-        @Override
-        public void write(Object got) throws CommandException {
-            Object expected = objectList.remove(0);
-            assertEquals(expected, got);
-        }
-
-        @Override
-        public void writeEndRow() throws CommandException {
-            // do nothing
-        }
-
-        @Override
-        public void close() throws IOException {
-            // do nothing
-        }
-
-        @Override
-        public void closeSilently() {
-            // do nothing
-        }
-    }
-
     @Test
     public void parseSeveralTypesOfColumns() throws Exception {
         Properties props = new Properties();
@@ -278,7 +222,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(5);
         w.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0L, "v3", 0.0,
                 "time", 12345L });
@@ -318,7 +262,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(5);
         w.setRow(new Object[] { "v0", "c00", "v1", 0, "v2", 0L, "v3", 0.0,
                 "time", 12345L });
@@ -356,7 +300,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
         w.setRow(new Object[] { "v0", 0, "v1", 0L, "time", 12345L });
 
@@ -388,7 +332,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
         w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
         w.setColSize(3);
@@ -425,7 +369,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
         w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
         w.setColSize(3);
@@ -463,7 +407,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(4);
         w.setRow(new Object[] { "v0", "c00", "v1", "c01", "timestamp", 12345L,
                 "time", 12345L });
@@ -503,7 +447,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
         w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
         w.setColSize(3);
@@ -540,7 +484,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
         w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
         w.setColSize(3);
@@ -579,7 +523,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(4);
         w.setRow(new Object[] { "v0", "c00", "v1", "c01", "timestamp", 12345L,
                 "time", 12345L });
@@ -621,7 +565,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(4);
         w.setRow(new Object[] { "timestamp", 12345L, "v0", "c00", "v1", "c01",
                 "time", 12345L });
@@ -661,7 +605,7 @@ public class TestCSVFileParser {
         CSVFileParser p = new CSVFileParser(request);
         p.initParser(FileParser.UTF8, new ByteArrayInputStream(bytes));
 
-        MockFileWriter w = new MockFileWriter(request);
+        FileWriterTestUtil w = new FileWriterTestUtil(request);
         w.setColSize(3);
         w.setRow(new Object[] { "v0", "c00", "v1", "c01", "time", 12345L });
         w.setColSize(3);
