@@ -29,9 +29,10 @@ public class UploadPartsRequest extends CommandRequest {
         super(null);
     }
 
-    public UploadPartsRequest(Properties props) throws CommandException {
+    public UploadPartsRequest(String[] fileNames, Properties props) throws CommandException {
         super(props);
-        // TODO
+        setFiles(fileNames);
+        setOptions(props);
     }
 
     @Override
@@ -39,4 +40,11 @@ public class UploadPartsRequest extends CommandRequest {
         return COMMAND_NAME;
     }
 
+    protected void setFiles(String[] fileNames) throws CommandException {
+        // TODO override?
+    }
+
+    protected void setOptions(Properties props) throws CommandException {
+        // TODO override?
+    }
 }

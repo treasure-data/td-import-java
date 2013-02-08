@@ -24,6 +24,9 @@ import com.treasure_data.commands.bulk_import.PreparePartsCommand;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsRequestFactory;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
+import com.treasure_data.commands.bulk_import.UploadPartsCommand;
+import com.treasure_data.commands.bulk_import.UploadPartsRequest;
+import com.treasure_data.commands.bulk_import.UploadPartsResult;
 
 public class BulkImportTool {
     private static final Logger LOG = Logger.getLogger(BulkImportTool.class
@@ -79,6 +82,42 @@ public class BulkImportTool {
         LOG.info("Finish prepare_parts command");
     }
 
+    /**
+     * > td bulk_import:upoad_parts2
+     * usage:
+     *   $ td bulk_import:upload_parts <name> <files...>
+     * example:
+     *   $ td bulk_import:upload_parts parts/* --parallel 4
+     * description:
+     *   Upload or re-upload files into a bulk import session
+     * options:
+     *   -P, --prefix NAME       add prefix to parts name
+     *   -s, --use-suffix COUNT  use COUNT number of . (dots) in the source file name to the parts name
+     *       --auto-perform      perform bulk import job automatically
+     *       --parallel NUM      perform uploading in parallel (default: 2; max 8)
+     */
+    public static void uploadParts(final String[] args, Properties props)
+            throws Exception {
+        if (args.length < 2) {
+            throw new IllegalArgumentException("File names not specified");
+        }
+
+        LOG.info("Start upload_parts command");
+
+        String[] fileNames = new String[args.length - 1];
+        for (int i = 0; i < args.length - 1; i++) {
+            fileNames[i] = args[i + 1];
+        }
+
+        UploadPartsRequest request = new UploadPartsRequest(fileNames, props);
+        UploadPartsResult result = new UploadPartsResult();
+
+        UploadPartsCommand command = new UploadPartsCommand();
+        command.execute(request, result);
+
+        LOG.info("Finish upload_parts command");
+    }
+
     public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
             throw new IllegalArgumentException("Command not specified");
@@ -88,6 +127,8 @@ public class BulkImportTool {
         Properties props = System.getProperties();
         if (commandName.equals("prepare_parts")) {
             prepareParts(args, props);
+        } else if (commandName.equals("upload_parts")) {
+            uploadParts(args, props);
         } else {
             throw new IllegalArgumentException(
                     "Not support command: " + commandName);
