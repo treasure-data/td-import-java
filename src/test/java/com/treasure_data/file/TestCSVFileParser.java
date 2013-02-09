@@ -35,6 +35,14 @@ public class TestCSVFileParser {
         request = new CSVPreparePartsRequest();
         request.setSampleRowSize(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE));
         request.setSampleHintScore(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE));
+        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
+        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
+        request.setHasColumnHeader(true);
+        request.setColumnNames(new String[0]);
+        request.setAliasTimeColumn(null);
+        request.setOnlyColumns(new String[0]);
+        request.setExcludeColumns(new String[0]);
+        request.setColumnTypeHints(new String[0]);
 
         parser = new CSVFileParser(request);
 
@@ -229,16 +237,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseIntColumn() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,time\n" +
@@ -267,16 +265,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseIntColumnThatNullValueIncluded() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,time\n" +
@@ -305,16 +293,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseDoubleColumn() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,time\n" +
@@ -343,16 +321,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseDoubleColumnThatNullValueIncluded() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,time\n" +
@@ -381,16 +349,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseStringColumn() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,time\n" +
@@ -419,16 +377,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseStringColumnThatNullValueIncluded() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,time\n" +
@@ -457,16 +405,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseIntDoubleStringColumns() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,v1,v2,v3,time\n" +
@@ -495,16 +433,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseColumnsThatIncludeNullValue() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,v1,v2,v3,time\n" +
@@ -533,16 +461,6 @@ public class TestCSVFileParser {
 
     @Test
     public void parseSeveralTypeColumn() throws Exception {
-        // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
-
         // parser setting
         String text =
                 "v0,time\n" +
@@ -572,14 +490,7 @@ public class TestCSVFileParser {
     @Test
     public void parseNoTimeColumnAndAliasColumnName01() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
         request.setAliasTimeColumn("timestamp");
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -610,14 +521,7 @@ public class TestCSVFileParser {
     @Test
     public void parseNoTimeColumnAndAliasColumnName02() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
         request.setAliasTimeColumn("timestamp");
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -646,18 +550,9 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseNoTimeColumnAndTimeValue()
-            throws Exception {
+    public void parseNoTimeColumnAndTimeValue() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
         request.setTimeValue(12345L);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -688,14 +583,7 @@ public class TestCSVFileParser {
     @Test
     public void parseOnlyColumns() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
         request.setOnlyColumns(new String[] { "v1", "v3", "time" });
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -727,14 +615,8 @@ public class TestCSVFileParser {
     public void parseNoTimeColumnAndAliasTimeColumnAsOnlyColumns01()
             throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
         request.setAliasTimeColumn("timestamp");
         request.setOnlyColumns(new String[] { "v1", "v3", "time" });
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -766,14 +648,8 @@ public class TestCSVFileParser {
     public void parseNoTimeColumnAndAliasTimeColumnAsOnlyColumns02()
             throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
         request.setAliasTimeColumn("timestamp");
         request.setOnlyColumns(new String[] { "v1", "v3" });
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -802,18 +678,10 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseNoTimeColumnAndTimeValueAsOnlyColumns01()
-            throws Exception {
+    public void parseNoTimeColumnAndTimeValueAsOnlyColumns01() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
         request.setTimeValue(12345L);
         request.setOnlyColumns(new String[] { "v1", "v3", "time" });
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -842,18 +710,10 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void parseNoTimeColumnAndTimeValueAsOnlyColumns02()
-            throws Exception {
+    public void parseNoTimeColumnAndTimeValueAsOnlyColumns02() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
         request.setTimeValue(12345L);
         request.setOnlyColumns(new String[] { "v1", "v3" });
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -885,14 +745,7 @@ public class TestCSVFileParser {
     public void throwCmdErrorWhenParseNoTimeColumnSpecifiedAsOnlyColumns()
             throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
         request.setOnlyColumns(new String[] { "v1", "v3" });
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -912,14 +765,7 @@ public class TestCSVFileParser {
     @Test
     public void parseExcludeColumns() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[] { "v0", "v2" });
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -950,14 +796,7 @@ public class TestCSVFileParser {
     @Test
     public void parseTimeColumnSpecifiedAsExcludeColumns() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[] { "v0", "v2", "time" });
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -989,14 +828,8 @@ public class TestCSVFileParser {
     public void parseNoTimeColumnAndAliasTimeColumnAsExcludeColumns01()
             throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
         request.setAliasTimeColumn("timestamp");
-        request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[] { "v0", "v2", "timestamp" });
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -1027,16 +860,10 @@ public class TestCSVFileParser {
     public void parseNoTimeColumnAndAliasTimeColumnAsExcludeColumns02()
             throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
         request.setAliasTimeColumn("timestamp");
-        request.setOnlyColumns(new String[0]);
         // even though 'time' is specified as exclude-columns,
         // 'time' is added to the result
         request.setExcludeColumns(new String[] { "v0", "v2", "timestamp", "time" });
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -1068,15 +895,8 @@ public class TestCSVFileParser {
     public void parseNoTimeColumnAndAliasTimeValueAsExcludeColumns01()
             throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
         request.setTimeValue(12345L);
-        request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[] { "v0", "v2" });
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -1108,15 +928,8 @@ public class TestCSVFileParser {
     public void parseNoTimeColumnAndAliasTimeValueAsExcludeColumns02()
             throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
-        request.setHasColumnHeader(true);
-        request.setColumnNames(new String[0]);
-        request.setAliasTimeColumn(null);
         request.setTimeValue(12345L);
-        request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[] { "v0", "v2", "time" });
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -1147,14 +960,8 @@ public class TestCSVFileParser {
     @Test
     public void parseHeaderlessCSVText() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
         request.setHasColumnHeader(false);
         request.setColumnNames(new String[] { "v0", "v1", "v2", "v3", "time" });
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -1186,13 +993,8 @@ public class TestCSVFileParser {
         // request setting
         request.setFormat(PreparePartsRequest.Format.TSV);
         request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
         request.setHasColumnHeader(false);
         request.setColumnNames(new String[] { "v0", "v1", "v2", "v3", "time" });
-        request.setAliasTimeColumn(null);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -1222,14 +1024,9 @@ public class TestCSVFileParser {
     @Test
     public void parseHeaderlessNoTimeColumnAndAliasColumn() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
         request.setHasColumnHeader(false);
         request.setColumnNames(new String[] { "v0", "v1", "v2", "v3", "timestamp" });
         request.setAliasTimeColumn("timestamp");
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
@@ -1259,15 +1056,9 @@ public class TestCSVFileParser {
     @Test
     public void parseHeaderlessNoTimeColumnAndTimeValue() throws Exception {
         // request setting
-        request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
-        request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
         request.setHasColumnHeader(false);
         request.setColumnNames(new String[] { "v0", "v1", "v2", "v3" });
-        request.setAliasTimeColumn(null);
         request.setTimeValue(12345L);
-        request.setOnlyColumns(new String[0]);
-        request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
 
         // parser setting
         String text =
