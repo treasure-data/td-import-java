@@ -41,55 +41,56 @@ public class TestJSONFileParser {
         writer = null;
     }
 
+    private static String toJSONMapString(String[] keys, Object[] values) {
+        return JSONValue.toJSONString(createMapObject(keys, values));
+    }
+
+    private static Map<String, Object> createMapObject(String[] keys,
+            Object[] values) {
+        if (keys.length != values.length) {
+            throw new IllegalArgumentException();
+        }
+
+        int size = keys.length;
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (int i = 0; i < size; i++) {
+            map.put(keys[i], values[i]);
+        }
+        return map;
+    }
+
     @Test
-    public void parseIntDoubleStringColumns() throws Exception {
+    public void parseIntColumn() throws Exception {
         // parser setting
         StringBuilder sb = new StringBuilder();
-        {
-            Map<String, Object> row = new HashMap<String, Object>();
-            row.put("v0", "c00");
-            row.put("v1", 0);
-            row.put("v2", 0);
-            row.put("v3", 0.0);
-            row.put("time", 12345);
-            sb.append(JSONValue.toJSONString(row)).append("\n");
-        }
-        {
-            Map<String, Object> row = new HashMap<String, Object>();
-            row.put("v0", "c10");
-            row.put("v1", 1);
-            row.put("v2", 1);
-            row.put("v3", 1.1);
-            row.put("time", 12345);
-            sb.append(JSONValue.toJSONString(row)).append("\n");
-        }
-        {
-            Map<String, Object> row = new HashMap<String, Object>();
-            row.put("v0", "c20");
-            row.put("v1", 2);
-            row.put("v2", 2);
-            row.put("v3", 2.2);
-            row.put("time", 12345);
-            sb.append(JSONValue.toJSONString(row)).append("\n");
-        }
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 0, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 2, 12345L })).append("\n");
+
         String text = sb.toString();
         byte[] bytes = text.getBytes();
         parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
         parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
 
         // writer
-        writer.setColSize(5);
+        writer.setColSize(2);
         writer.setRow(
-                new Object[] { "v0", "v1", "v2", "v3", "time" },
-                new Object[] { "c00", 0L, 0L, 0.0, 12345L }); // TODO
-        writer.setColSize(5);
+                new Object[] { "v0", "time" },
+                new Object[] { 0L, 12345L });
+        writer.setColSize(2);
         writer.setRow(
-                new Object[] { "v0", "v1", "v2", "v3", "time" },
-                new Object[] { "c10", 1L, 1L, 1.1, 12345L }); // TODO
-        writer.setColSize(5);
+                new Object[] { "v0", "time" },
+                new Object[] { 1L, 12345L });
+        writer.setColSize(2);
         writer.setRow(
-                new Object[] { "v0", "v1", "v2", "v3", "time" },
-                new Object[] { "c20", 2L, 2L, 2.2, 12345L }); // TODO
+                new Object[] { "v0", "time" },
+                new Object[] { 2L, 12345L });
 
         assertTrue(parser.parseRow(writer));
         assertTrue(parser.parseRow(writer));
@@ -99,4 +100,331 @@ public class TestJSONFileParser {
         assertEquals(3, parser.getRowNum());
     }
 
+    @Test
+    public void parseIntColumnThatNullValueIncluded() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { null, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { null, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { null, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { 1L, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { null, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseDoubleColumn() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 0.0, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 1.1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 2.2, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { 0.0, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { 1.1, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { 2.2, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseDoubleColumnThatNullValueIncluded() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { null, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 1.1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { null, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { null, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { 1.1, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { null, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseStringColumn() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { "c00", 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { "c10", 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { "c20", 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { "c00", 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { "c10", 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { "c20", 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseStringColumnThatNullValueIncluded() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { null, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { "c10", 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { null, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { null, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { "c10", 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { null, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseIntDoubleStringColumns() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c00", 0, 0L, 0.0, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c10", 1, 1L, 1.1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c20", 2, 2L, 2.2, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(5);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c00", 0L, 0L, 0.0, 12345L });
+        writer.setColSize(5);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c10", 1L, 1L, 1.1, 12345L });
+        writer.setColSize(5);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c20", 2L, 2L, 2.2, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseColumnsThatIncludeNullValue() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c00", 0, 0L, 0.0, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { null, null, null, null, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c20", 2, 2L, 2.2, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(5);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c00", 0L, 0L, 0.0, 12345L });
+        writer.setColSize(5);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { null, null, null, null, 12345L });
+        writer.setColSize(5);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "time" },
+                new Object[] { "c20", 2L, 2L, 2.2, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseSeveralTypeColumn() throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { "c00", 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { null, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "time" },
+                new Object[] { 1, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { "c00", 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { null, 12345L });
+        writer.setColSize(2);
+        writer.setRow(
+                new Object[] { "v0", "time" },
+                new Object[] { 1L, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
 }
