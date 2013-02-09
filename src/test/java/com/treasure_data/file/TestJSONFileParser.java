@@ -3,6 +3,7 @@ package com.treasure_data.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 import com.treasure_data.file.JSONFileParser;
 
@@ -426,5 +428,119 @@ public class TestJSONFileParser {
         assertFalse(parser.parseRow(writer));
 
         assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseNoTimeColumnAndAliasColumnName() throws Exception {
+        // request setting
+        request.setAliasTimeColumn("timestamp");
+
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c00", 0, 0L, 0.0, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c10", 1, 1L, 1.1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c20", 2, 2L, 2.2, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(6);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "timestamp", "time" },
+                new Object[] { "c00", 0L, 0L, 0.0, 12345L, 12345L });
+        writer.setColSize(6);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "timestamp", "time" },
+                new Object[] { "c10", 1L, 1L, 1.1, 12345L, 12345L });
+        writer.setColSize(6);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "timestamp", "time" },
+                new Object[] { "c20", 2L, 2L, 2.2, 12345L, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void parseNoTimeColumnAndTimeValue() throws Exception {
+        // request setting
+        request.setAliasTimeColumn(null);
+        request.setTimeValue(12345L);
+
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c00", 0, 0L, 0.0, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c10", 1, 1L, 1.1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c20", 2, 2L, 2.2, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+        parser.startParsing(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+
+        // writer
+        writer.setColSize(6);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "timestamp", "time" },
+                new Object[] { "c00", 0L, 0L, 0.0, 12345L, 12345L });
+        writer.setColSize(6);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "timestamp", "time" },
+                new Object[] { "c10", 1L, 1L, 1.1, 12345L, 12345L });
+        writer.setColSize(6);
+        writer.setRow(
+                new Object[] { "v0", "v1", "v2", "v3", "timestamp", "time" },
+                new Object[] { "c20", 2L, 2L, 2.2, 12345L, 12345L });
+
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertTrue(parser.parseRow(writer));
+        assertFalse(parser.parseRow(writer));
+
+        assertEquals(3, parser.getRowNum());
+    }
+
+    @Test
+    public void throwCmdErrorWhenParseNoTimeColumnSpecifiedColumns()
+            throws Exception {
+        // parser setting
+        StringBuilder sb = new StringBuilder();
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c00", 0, 0L, 0.0, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c10", 1, 1L, 1.1, 12345L })).append("\n");
+        sb.append(toJSONMapString(
+                new String[] { "v0", "v1", "v2", "v3", "timestamp" },
+                new Object[] { "c20", 2, 2L, 2.2, 12345L })).append("\n");
+
+        String text = sb.toString();
+        byte[] bytes = text.getBytes();
+        try {
+            parser.initParser(FileParser.UTF_8, new ByteArrayInputStream(bytes));
+            fail();
+        } catch (Throwable t) {
+            assertTrue(t instanceof CommandException);
+        }
     }
 }
