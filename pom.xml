@@ -46,6 +46,23 @@
       </snapshotRepository>
   </distributionManagement>
 
+  <properties>
+    <!--  version properties for dependencies -->
+    <msgpack.version>0.6.7</msgpack.version>
+    <super-csv.version>2.0.1</super-csv.version>
+    <td-client.version>0.2.0</td-client.version>
+    <junit.version>4.8.2</junit.version>
+    <mockito.version>1.9.5</mockito.version>
+
+    <!-- version properties for plugins -->
+    <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+    <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
+    <maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
+    <maven-eclipse-plugin.version>2.5.1</maven-eclipse-plugin.version>
+    <maven-surefire-plugin.version>2.13</maven-surefire-plugin.version>
+    <maven-shade-plugin.version>1.5</maven-shade-plugin.version>
+  </properties>
+
   <repositories>
     <repository>
       <id>fluentd.org</id>
@@ -64,23 +81,28 @@
     <dependency>
       <groupId>org.msgpack</groupId>
       <artifactId>msgpack</artifactId>
-      <version>0.6.6</version>
+      <version>${msgpack.version}</version>
     </dependency>
     <dependency>
       <groupId>net.sf.supercsv</groupId>
       <artifactId>super-csv</artifactId>
-      <version>2.0.1</version>
+      <version>${super-csv.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.treasure_data</groupId>
+      <artifactId>td-client</artifactId>
+      <version>${td-client.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.2</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <version>1.9.5</version>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -100,7 +122,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -111,7 +133,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.1.2</version>
+        <version>${maven-source-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -124,7 +146,7 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
+        <version>${maven-assembly-plugin.version}</version>
         <executions>
           <execution>
             <id>make-assembly</id>
@@ -140,14 +162,14 @@
       </plugin>
 
       <plugin>
-      	<artifactId>maven-eclipse-plugin</artifactId>
-      	<version>2.5.1</version>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>${maven-eclipse-plugin.version}</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.1.2</version>
+        <version>${maven-source-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -158,11 +180,29 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+        <configuration>
+          <useSystemClassLoader>false</useSystemClassLoader>
+          <parallel>methods</parallel>
+          <threadCount>1</threadCount>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit47</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
       <!-- include jars for msgpack -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.5</version>
+        <version>${maven-shade-plugin.version}</version>
         <executions>
           <execution>
             <phase>package</phase>
