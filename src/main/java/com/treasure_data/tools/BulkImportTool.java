@@ -98,18 +98,20 @@ public class BulkImportTool {
      */
     public static void uploadParts(final String[] args, Properties props)
             throws Exception {
-        if (args.length < 2) {
+        if (args.length < 3) {
             throw new IllegalArgumentException("File names not specified");
         }
 
         LOG.info("Start upload_parts command");
 
-        String[] fileNames = new String[args.length - 1];
-        for (int i = 0; i < args.length - 1; i++) {
-            fileNames[i] = args[i + 1];
+        String sessionName = args[1];
+        String[] fileNames = new String[args.length - 2];
+        for (int i = 0; i < args.length - 2; i++) {
+            fileNames[i] = args[i + 2];
         }
 
-        UploadPartsRequest request = new UploadPartsRequest(fileNames, props);
+        UploadPartsRequest request = new UploadPartsRequest(
+                sessionName, fileNames, props);
         UploadPartsResult result = new UploadPartsResult();
 
         UploadPartsCommand command = new UploadPartsCommand();
