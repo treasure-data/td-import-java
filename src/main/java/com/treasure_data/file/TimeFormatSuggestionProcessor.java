@@ -82,6 +82,15 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
         }
     }
 
+    static final SimpleDateFormat RFC_822_1123_FORMAT = new SimpleDateFormat(
+            "EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+    static final SimpleDateFormat RFC_850_1036_FORMAT = new SimpleDateFormat(
+            "EEEE, dd-MMM-yy HH:mm:ss z", Locale.ENGLISH);
+    static final SimpleDateFormat APACHE_CLF_FORMAT = new SimpleDateFormat(
+            "dd/MMM/yyyy HH:mm:ss Z", Locale.ENGLISH);
+    static final SimpleDateFormat ANSI_C_ASCTIME_FORMAT = new SimpleDateFormat(
+            "EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH);
+
     private int[] scores = new int[] { 0, 0, 0, 0, 0, 0, 0 };
     private TimeFormatMatcher[] matchers;
     private int rowSize;
@@ -333,9 +342,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     public static class RFC_822_1123_FormatMatcher extends
             SimpleDateFormatMatcher {
-        private final SimpleDateFormat RFC_822_1123_FORMAT = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return RFC_822_1123_FORMAT;
@@ -344,9 +350,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     public static class RFC_822_1123_FormatProcessor extends
             SimpleDateFormatProcessor {
-        private final SimpleDateFormat RFC_822_1123_FORMAT = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return RFC_822_1123_FORMAT;
@@ -355,9 +358,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     public static class RFC_850_1036_FormatMatcher extends
             SimpleDateFormatMatcher {
-        private final SimpleDateFormat RFC_850_1036_FORMAT = new SimpleDateFormat(
-                "EEEE, dd-MMM-yy HH:mm:ss z", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return RFC_850_1036_FORMAT;
@@ -366,9 +366,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     public static class RFC_850_1036_FormatProcessor extends
             SimpleDateFormatProcessor {
-        private final SimpleDateFormat RFC_850_1036_FORMAT = new SimpleDateFormat(
-                "EEEE, dd-MMM-yy HH:mm:ss z", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return RFC_850_1036_FORMAT;
@@ -376,9 +373,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
     }
 
     public static class ApacheCLFFormatMatcher extends SimpleDateFormatMatcher {
-        private final SimpleDateFormat APACHE_CLF_FORMAT = new SimpleDateFormat(
-                "dd/MMM/yyyy HH:mm:ss Z", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return APACHE_CLF_FORMAT;
@@ -387,9 +381,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     public static class ApacheCLFFormatProcessor extends
             SimpleDateFormatProcessor {
-        private final SimpleDateFormat APACHE_CLF_FORMAT = new SimpleDateFormat(
-                "dd/MMM/yyyy HH:mm:ss Z", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return APACHE_CLF_FORMAT;
@@ -398,9 +389,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     public static class ANSICAscTimeFormatMatcher extends
             SimpleDateFormatMatcher {
-        private final SimpleDateFormat ANSI_C_ASCTIME_FORMAT = new SimpleDateFormat(
-                "EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return ANSI_C_ASCTIME_FORMAT;
@@ -409,9 +397,6 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     public static class ANSICAscTimeFormatProcessor extends
             SimpleDateFormatProcessor {
-        private final SimpleDateFormat ANSI_C_ASCTIME_FORMAT = new SimpleDateFormat(
-                "EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH);
-
         @Override
         public SimpleDateFormat getFormat() {
             return ANSI_C_ASCTIME_FORMAT;
