@@ -76,6 +76,13 @@
       </snapshots>
     </repository>
     <repository>
+      <id>maven.treasure-data.com</id>
+      <url>http://maven.treasure-data.com/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>local-repo</id>
       <url>file://${basedir}/mvn-local</url>
     </repository>
