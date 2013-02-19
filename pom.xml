@@ -61,6 +61,10 @@
     <maven-eclipse-plugin.version>2.5.1</maven-eclipse-plugin.version>
     <maven-surefire-plugin.version>2.13</maven-surefire-plugin.version>
     <maven-shade-plugin.version>1.5</maven-shade-plugin.version>
+    <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
+    <wagon-webdav-jackrabbit.version>1.0-beta-7</wagon-webdav-jackrabbit.version>
+    <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
+    <maven-surefire-report-plugin.version>2.11</maven-surefire-report-plugin.version>
   </properties>
 
   <repositories>
@@ -228,7 +232,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-7</version>
+        <version>${wagon-webdav-jackrabbit.version}</version>
       </extension>
     </extensions>
   </build>
@@ -239,25 +243,24 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.8.1</version>
+        <version>${maven-javadoc-plugin.version}</version>
         <configuration>
           <doctitle>${project.name} ${project.version} API</doctitle>
           <aggregate>true</aggregate>
           <locale>en_US</locale>
-	  <encoding>UTF-8</encoding>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.2</version>
+        <version>${maven-jxr-plugin.version}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.11</version>
+        <version>${maven-surefire-report-plugin.version}</version>
       </plugin>
     </plugins>
   </reporting>
-
 </project>
