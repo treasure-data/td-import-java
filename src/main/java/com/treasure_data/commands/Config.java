@@ -20,6 +20,26 @@ package com.treasure_data.commands;
 public interface Config {
 
     ////////////////////////////////////////
+    // UPLOAD_PARTS_OPTIONS               //
+    ////////////////////////////////////////
+
+    // auto-perform
+    String BI_UPLOAD_PARTS_AUTOPERFORM = "td.bulk_import.upload_parts.auto-perform";
+    String BI_UPLOAD_PARTS_AUTOPERFORM_DEFAULTVALUE = "true";
+
+    // auto-commit
+    String BI_UPLOAD_PARTS_AUTOCOMMIT = "td.bulk_import.upload_parts.auto-commit";
+    String BI_UPLOAD_PARTS_AUTOCOMMIT_DEFAULTVALUE = "false";
+
+    // retryCount
+    String BI_UPLOAD_PARTS_RETRYCOUNT = "td.bulk_import.upload_parts.retrycount";
+    String BI_UPLOAD_PARTS_RETRYCOUNT_DEFAULTVALUE = "10";
+
+    // waitSec
+    String BI_UPLOAD_PARTS_WAITSEC = "td.bulk_import.upload_parts.waitsec";
+    String BI_UPLOAD_PARTS_WAITSEC_DEFAULTVALUE = "1";
+
+    ////////////////////////////////////////
     // PREPARE_PARTS_OPTIONS              //
     ////////////////////////////////////////
 
