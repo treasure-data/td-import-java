@@ -53,7 +53,7 @@ public class UploadPartsCommand extends Command<UploadPartsRequest, UploadPartsR
     private void execute(final UploadPartsRequest request,
             final UploadPartsResult result, final File file)
             throws CommandException {
-        LOG.info(String.format("started uploading file: %s", file.getName()));
+        LOG.fine(String.format("started uploading file: %s", file.getName()));
 
         final TreasureDataClient client = new TreasureDataClient(request.getProperties());
         final BulkImportClient biClient = new BulkImportClient(client);

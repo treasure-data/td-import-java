@@ -71,7 +71,7 @@ public class PreparePartsCommand extends
 
         // avaiable cpu processors
         int numOfProcs = Runtime.getRuntime().availableProcessors();
-        LOG.info("recognized CPU processors: " + numOfProcs);
+        LOG.fine("recognized CPU processors: " + numOfProcs);
 
         // create worker threads
         workers = new ArrayList<Worker>(numOfProcs);
@@ -142,7 +142,7 @@ public class PreparePartsCommand extends
         private void execute(Properties props, PreparePartsRequest request,
                 PreparePartsResult result, final File infile)
                 throws CommandException {
-            LOG.info(String.format("started converting file: %s by %s",
+            LOG.fine(String.format("started converting file: %s by %s",
                     infile.getName(), getName()));
 
             // TODO #MN need type paramters
@@ -203,7 +203,7 @@ public class PreparePartsCommand extends
 
         try {
             File outputFile = new File(outputDirName, outputFileName);
-            LOG.info("Created output file: " + outputFileName);
+            LOG.fine("Created output file: " + outputFileName);
             return new BufferedOutputStream(new FileOutputStream(outputFile));
         } catch (IOException e) {
             throw new CommandException(e);
@@ -266,7 +266,7 @@ public class PreparePartsCommand extends
                 compressionType = candidateCompressTypes[i];
                 break;
             } catch (IOException e) {
-                LOG.info(String.format("file %s is %s", fileName,
+                LOG.fine(String.format("file %s is %s", fileName,
                         e.getMessage()));
             } finally {
                 if (in != null) {

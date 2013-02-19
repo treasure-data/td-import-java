@@ -117,7 +117,7 @@ public class MsgpackGZIPFileWriter
             gzout = new GZIPOutputStream(dout);
             packer = msgpack.createPacker(new BufferedOutputStream(gzout));
 
-            LOG.info("Created output file: " + outputFileName);
+            LOG.fine("Created output file: " + outputFileName);
         } catch (IOException e) {
             throw new CommandException(e);
         }

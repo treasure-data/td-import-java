@@ -65,7 +65,7 @@ public class BulkImportTool {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        LOG.info("Start prepare_parts command");
+        LOG.fine("Start prepare_parts command");
 
         String[] fileNames = new String[args.length - 1];
         for (int i = 0; i < args.length - 1; i++) {
@@ -79,7 +79,7 @@ public class BulkImportTool {
         PreparePartsCommand command = new PreparePartsCommand();
         command.execute(request, result);
 
-        LOG.info("Finish prepare_parts command");
+        LOG.fine("Finish prepare_parts command");
     }
 
     /**
@@ -102,7 +102,7 @@ public class BulkImportTool {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        LOG.info("Start upload_parts command");
+        LOG.fine("Start upload_parts command");
 
         String sessionName = args[1];
         String[] fileNames = new String[args.length - 2];
@@ -117,7 +117,7 @@ public class BulkImportTool {
         UploadPartsCommand command = new UploadPartsCommand();
         command.execute(request, result);
 
-        LOG.info("Finish upload_parts command");
+        LOG.fine("Finish upload_parts command");
     }
 
     public static void main(final String[] args) throws Exception {
