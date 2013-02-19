@@ -319,7 +319,13 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
             String text = (String) value;
             ParsePosition pp = new ParsePosition(0);
             Date d = getFormat().parse(text, pp);
-            return d.getTime() / 1000;
+            if (d != null && pp.getErrorIndex() == -1) {
+                throw new SuperCsvCellProcessorException(String.format(
+                        "the input value cannot be parsed by the format %s",
+                        getFormat()), context, this);
+            } else {
+                return d.getTime() / 1000;
+            }
         }
 
         protected abstract SimpleDateFormat getFormat();
