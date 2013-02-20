@@ -57,7 +57,7 @@ public class PreparePartsCommand extends
             CompressionType compressionType = getCompressType(request, file);
             CharsetDecoder decoder = getCharsetDecoder(request);
 
-            p = FileParserFactory.newInstance(request);
+            p = FileParserFactory.newInstance(request, result);
             p.initParser(decoder, createFileInputStream(compressionType, file));
 
             if (request.dryRun()) {
@@ -70,7 +70,7 @@ public class PreparePartsCommand extends
                     file.getName()));
             p.startParsing(decoder,
                     createFileInputStream(compressionType, file));
-            w = new MsgpackGZIPFileWriter(request);
+            w = new MsgpackGZIPFileWriter(request, result);
             w.initWriter(file.getName());
             while (p.parseRow(w)) {
                 ;

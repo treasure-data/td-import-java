@@ -7,11 +7,9 @@ import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
-import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -21,12 +19,14 @@ import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.commands.bulk_import.PreparePartsResult;
 import com.treasure_data.file.CSVFileParser;
 import com.treasure_data.file.CSVFileParser.TypeSuggestionProcessor;
 
 public class TestCSVFileParser {
 
     private CSVPreparePartsRequest request;
+    private PreparePartsResult result;
     private CSVFileParser parser;
     private FileWriterTestUtil writer;
 
@@ -43,10 +43,11 @@ public class TestCSVFileParser {
         request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[0]);
         request.setColumnTypeHints(new String[0]);
+        result = new PreparePartsResult();
 
-        parser = new CSVFileParser(request);
+        parser = new CSVFileParser(request, result);
 
-        writer = new FileWriterTestUtil(request);
+        writer = new FileWriterTestUtil(request, result);
     }
 
     @After

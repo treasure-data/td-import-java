@@ -26,8 +26,8 @@ public class JSONFileParser extends
     private String aliasTimeColumn;
     private Long timeValue = new Long(-1);
 
-    public JSONFileParser(PreparePartsRequest request) {
-        super(request);
+    public JSONFileParser(PreparePartsRequest request, PreparePartsResult result) {
+        super(request, result);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class JSONFileParser extends
 
             // print sample row
             if (firstRow != null) {
-                JSONFileWriter w = new JSONFileWriter(request);
+                JSONFileWriter w = new JSONFileWriter(request, result);
                 parseMap(w, firstRow);
                 String ret = JSONValue.toJSONString(w.getRecord());
                 LOG.info("sample row: " + ret);

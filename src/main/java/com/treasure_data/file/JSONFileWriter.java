@@ -15,9 +15,9 @@ public class JSONFileWriter extends FileWriter<PreparePartsRequest, PrepareParts
     private Map<String, Object> record;
     private List<Object> recordElements;
 
-    protected JSONFileWriter(PreparePartsRequest request)
-            throws CommandException {
-        super(request);
+    protected JSONFileWriter(PreparePartsRequest request,
+            PreparePartsResult result) throws CommandException {
+        super(request, result);
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.commands.bulk_import.PreparePartsResult;
 import com.treasure_data.file.MsgpackGZIPFileWriter;
 
 public class TestMsgpackGZIPFileWriter {
@@ -27,8 +28,9 @@ public class TestMsgpackGZIPFileWriter {
 
         private ByteArrayOutputStream out;
 
-        public MockMsgpackGZIPFileWriter(PreparePartsRequest request) throws CommandException {
-            super(request);
+        public MockMsgpackGZIPFileWriter(PreparePartsRequest request,
+                PreparePartsResult result) throws CommandException {
+            super(request, result);
         }
 
         @Override
@@ -63,8 +65,9 @@ public class TestMsgpackGZIPFileWriter {
         props.setProperty(Config.BI_PREPARE_PARTS_SPLIT_SIZE, "1024");
         PreparePartsRequest req = new CSVPreparePartsRequest(
                 PreparePartsRequest.Format.CSV, new String[0], props);
+        PreparePartsResult ret = new PreparePartsResult();
 
-        MockMsgpackGZIPFileWriter w = new MockMsgpackGZIPFileWriter(req);
+        MockMsgpackGZIPFileWriter w = new MockMsgpackGZIPFileWriter(req, ret);
         w.initWriter("foo/bar.csv");
         w.writeBeginRow(5); // 1st row
         w.write("v0");

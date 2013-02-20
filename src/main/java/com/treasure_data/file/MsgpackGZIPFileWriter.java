@@ -73,9 +73,9 @@ public class MsgpackGZIPFileWriter
     private String outputDirName;
     private String outputFilePrefix;
 
-    public MsgpackGZIPFileWriter(PreparePartsRequest request)
-            throws CommandException {
-        super(request);
+    public MsgpackGZIPFileWriter(PreparePartsRequest request,
+            PreparePartsResult result) throws CommandException {
+        super(request, result);
     }
 
     @Override

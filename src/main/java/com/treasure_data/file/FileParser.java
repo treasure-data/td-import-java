@@ -38,13 +38,15 @@ public abstract class FileParser<REQ extends CommandRequest, RET extends Command
             .onUnmappableCharacter(CodingErrorAction.REPORT);
 
     protected REQ request;
+    protected RET result;
 
     private long rowNum = 0;
 
     private PrintWriter errWriter = null;
 
-    protected FileParser(REQ request) {
+    protected FileParser(REQ request, RET result) {
         this.request = request;
+        this.result = result;
     }
 
     public void incrRowNum() {

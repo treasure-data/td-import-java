@@ -14,10 +14,6 @@ public class PrepareUploadPartsCommand extends
     public PrepareUploadPartsCommand() {
     }
 
-    public static void main(String[] arga) throws Exception {
-        
-    }
-
     @Override
     public void execute(final PrepareUploadPartsRequest request,
             final PrepareUploadPartsResult result, final File file)

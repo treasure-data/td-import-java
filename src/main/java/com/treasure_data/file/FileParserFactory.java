@@ -20,16 +20,17 @@ package com.treasure_data.file;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.commands.bulk_import.PreparePartsResult;
 
 public class FileParserFactory {
 
     // TODO #MN should consider type parameters
-    public static FileParser<?, ?> newInstance(PreparePartsRequest request)
-            throws CommandException {
+    public static FileParser<?, ?> newInstance(PreparePartsRequest request,
+            PreparePartsResult result) throws CommandException {
         PreparePartsRequest.Format format = request.getFormat();
         if (format.equals(PreparePartsRequest.Format.CSV)
                 || format.equals(PreparePartsRequest.Format.TSV)) {
-            return new CSVFileParser((CSVPreparePartsRequest) request);
+            return new CSVFileParser((CSVPreparePartsRequest) request, result);
         } else if (format.equals(PreparePartsRequest.Format.JSON)) {
             throw new CommandException(new UnsupportedOperationException(
                     "format: " + format));

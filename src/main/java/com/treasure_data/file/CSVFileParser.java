@@ -287,8 +287,9 @@ public class CSVFileParser extends
     private ColumnType[] allSuggestedColumnTypes;
     private CellProcessor[] cprocessors;
 
-    public CSVFileParser(CSVPreparePartsRequest request) throws CommandException {
-        super(request);
+    public CSVFileParser(CSVPreparePartsRequest request,
+            PreparePartsResult result) throws CommandException {
+        super(request, result);
     }
 
     @Override
@@ -436,7 +437,7 @@ public class CSVFileParser extends
 
             // print sample row
             if (firstRow != null) {
-                JSONFileWriter w = new JSONFileWriter(request);
+                JSONFileWriter w = new JSONFileWriter(request, result);
                 parseList(w, firstRow);
                 String ret = JSONValue.toJSONString(w.getRecord());
                 LOG.info("sample row: " + ret);

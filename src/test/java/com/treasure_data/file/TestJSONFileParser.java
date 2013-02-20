@@ -17,21 +17,24 @@ import org.junit.Test;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
+import com.treasure_data.commands.bulk_import.PreparePartsResult;
 import com.treasure_data.file.JSONFileParser;
 
 public class TestJSONFileParser {
 
     private PreparePartsRequest request;
+    private PreparePartsResult result;
     private JSONFileParser parser;
     private FileWriterTestUtil writer;
 
     @Before
     public void createResources() throws Exception {
         request = new PreparePartsRequest();
+        result = new PreparePartsResult();
 
-        parser = new JSONFileParser(request);
+        parser = new JSONFileParser(request, result);
 
-        writer = new FileWriterTestUtil(request, true);
+        writer = new FileWriterTestUtil(request, result, true);
     }
 
     @After

@@ -14,10 +14,12 @@ public abstract class FileWriter<REQ extends CommandRequest, RET extends Command
             .getLogger(FileWriter.class.getName());
 
     protected REQ request;
+    protected RET result;
     protected long rowNum = 0;
 
-    protected FileWriter(REQ request) throws CommandException {
+    protected FileWriter(REQ request, RET result) throws CommandException {
         this.request = request;
+        this.result = result;
     }
 
     protected abstract void initWriter(String infileName)

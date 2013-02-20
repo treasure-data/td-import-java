@@ -31,14 +31,14 @@ public class FileWriterTestUtil
     private Map<Object, Object> gotMap;
     private Object rowKey;
 
-    public FileWriterTestUtil(PreparePartsRequest request)
-            throws CommandException {
-        this(request, false);
+    public FileWriterTestUtil(PreparePartsRequest request,
+            PreparePartsResult result) throws CommandException {
+        this(request, result, false);
     }
 
-    public FileWriterTestUtil(PreparePartsRequest request, boolean isMap)
-            throws CommandException {
-        super(request);
+    public FileWriterTestUtil(PreparePartsRequest request,
+            PreparePartsResult result, boolean isMap) throws CommandException {
+        super(request, result);
         this.isMap = isMap;
         expectedSizeList = new ArrayList<Integer>();
         if (!isMap) { // list
