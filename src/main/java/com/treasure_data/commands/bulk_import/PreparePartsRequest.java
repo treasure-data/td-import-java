@@ -17,11 +17,8 @@
 //
 package com.treasure_data.commands.bulk_import;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -104,8 +101,6 @@ public class PreparePartsRequest extends CommandRequest {
 
     private static final String COMMAND_NAME = "prepare_parts";
 
-    protected File[] files;
-
     protected Format format;
     protected CompressionType compressionType;
     protected String encoding;
@@ -132,25 +127,6 @@ public class PreparePartsRequest extends CommandRequest {
     @Override
     public String getName() {
         return COMMAND_NAME;
-    }
-
-    protected void setFiles(String[] fileNames) throws CommandException {
-        // validation for file names
-        List<File> fileList = new ArrayList<File>(fileNames.length);
-        for (int i = 0; i < fileNames.length; i++) {
-            String fname = fileNames[i];
-            File f = new File(fname);
-            if (!f.isFile()) {
-                LOG.severe("No such file: " + fname);
-            } else {
-                fileList.add(f);
-            }
-        }
-        files = fileList.toArray(new File[0]);
-    }
-
-    public File[] getFiles() {
-        return files;
     }
 
     protected void setOptions(Properties props) throws CommandException {

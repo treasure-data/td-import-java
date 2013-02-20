@@ -46,12 +46,6 @@ public class PreparePartsCommand extends
     }
 
     @Override
-    public void execute(PreparePartsRequest request, PreparePartsResult result)
-            throws CommandException {
-        throw new UnsupportedOperationException(); // TODO
-    }
-
-    @Override
     public void execute(PreparePartsRequest request, PreparePartsResult result,
             final File file) throws CommandException {
         LOG.fine(String.format("started converting file: %s", file.getName()));

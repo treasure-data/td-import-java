@@ -17,9 +17,6 @@
 //
 package com.treasure_data.commands.bulk_import;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -34,7 +31,6 @@ public class UploadPartsRequest extends CommandRequest {
     private static final String COMMAND_NAME = "upload_parts";
 
     protected String sessionName;
-    protected File[] files;
     protected boolean autoPerform;
     protected boolean autoCommit;
     protected int retryCount;
@@ -63,26 +59,6 @@ public class UploadPartsRequest extends CommandRequest {
 
     protected String getSessionName() {
         return sessionName;
-    }
-
-    protected void setFiles(String[] fileNames) throws CommandException {
-        // validation for file names
-        List<File> fileList = new ArrayList<File>(fileNames.length);
-        for (int i = 0; i < fileNames.length; i++) {
-            String fname = fileNames[i];
-            File f = new File(fname);
-            if (!f.isFile()) {
-                LOG.severe("No such file: " + fname);
-            } else {
-                fileList.add(f);
-            }
-        }
-        files = fileList.toArray(new File[0]);
-    }
-
-    @Override
-    public File[] getFiles() {
-        return files;
     }
 
     protected void setOptions(Properties props) throws CommandException {

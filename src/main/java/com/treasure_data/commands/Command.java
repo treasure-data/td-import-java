@@ -21,8 +21,12 @@ import java.io.File;
 
 public abstract class Command<REQ extends CommandRequest, RET extends CommandResult> {
 
-    public abstract void execute(REQ request, RET result)
-            throws CommandException;
+    public void execute(REQ request, RET result) throws CommandException {
+        File[] files = request.getFiles();
+        for(File f : files) {
+            execute(request, result, f);
+        }
+    }
 
     public abstract void execute(REQ request, RET result, File file)
             throws CommandException;
