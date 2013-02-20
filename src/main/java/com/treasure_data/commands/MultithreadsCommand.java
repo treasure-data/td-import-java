@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.commands.bulk_import;
+package com.treasure_data.commands;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,10 +24,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
-import com.treasure_data.commands.Command;
-import com.treasure_data.commands.CommandException;
-import com.treasure_data.commands.CommandRequest;
-import com.treasure_data.commands.CommandResult;
 
 public class MultithreadsCommand<REQ extends CommandRequest, RET extends CommandResult>
         extends Command<REQ, RET> {
