@@ -17,6 +17,7 @@
 //
 package com.treasure_data.commands;
 
+import java.io.File;
 import java.util.Properties;
 
 public abstract class CommandRequest {
@@ -28,6 +29,7 @@ public abstract class CommandRequest {
     }
 
     protected abstract String getName();
+    public abstract File[] getFiles(); // TODO visibility is 'public'
 
     public Properties getProperties() {
         return props;

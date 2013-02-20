@@ -80,7 +80,8 @@ public class UploadPartsRequest extends CommandRequest {
         files = fileList.toArray(new File[0]);
     }
 
-    protected File[] getFiles() {
+    @Override
+    public File[] getFiles() {
         return files;
     }
 

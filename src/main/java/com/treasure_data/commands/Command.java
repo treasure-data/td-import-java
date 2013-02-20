@@ -17,8 +17,13 @@
 //
 package com.treasure_data.commands;
 
+import java.io.File;
+
 public abstract class Command<REQ extends CommandRequest, RET extends CommandResult> {
 
-    protected abstract void execute(REQ request, RET result)
+    public abstract void execute(REQ request, RET result)
+            throws CommandException;
+
+    public abstract void execute(REQ request, RET result, File file)
             throws CommandException;
 }

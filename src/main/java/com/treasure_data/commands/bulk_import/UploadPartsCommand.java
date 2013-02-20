@@ -44,13 +44,15 @@ public class UploadPartsCommand extends Command<UploadPartsRequest, UploadPartsR
     @Override
     public void execute(UploadPartsRequest request, UploadPartsResult result)
             throws CommandException {
+        // TODO #MN this method should be defined by Command class
         File[] files = request.getFiles();
         for(File f : files) {
             execute(request, result, f);
         }
     }
 
-    private void execute(final UploadPartsRequest request,
+    @Override
+    public void execute(final UploadPartsRequest request,
             final UploadPartsResult result, final File file)
             throws CommandException {
         LOG.fine(String.format("started uploading file: %s", file.getName()));

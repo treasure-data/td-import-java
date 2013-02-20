@@ -27,11 +27,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
@@ -47,143 +42,59 @@ public class PreparePartsCommand extends
     private static final Logger LOG = Logger
             .getLogger(PreparePartsCommand.class.getName());
 
-    private static BlockingQueue<Worker.Task> taskQueue;
-    private List<Worker> workers;
-
     public PreparePartsCommand() {
     }
 
     @Override
     public void execute(PreparePartsRequest request, PreparePartsResult result)
             throws CommandException {
-        Properties props = request.getProperties();
-        File[] files = request.getFiles();
-
-        // create queue and put all tasks to it
-        taskQueue = new LinkedBlockingQueue<Worker.Task>(files.length);
-        for (int i = 0; i < files.length; i++) {
-            try {
-                taskQueue.put(new Worker.Task(files[i]));
-            } catch (InterruptedException e) {
-                throw new CommandException(e);
-            }
-        }
-
-        // avaiable cpu processors
-        int numOfProcs = Runtime.getRuntime().availableProcessors();
-        LOG.fine("recognized CPU processors: " + numOfProcs);
-
-        // create worker threads
-        workers = new ArrayList<Worker>(numOfProcs);
-        for (int i = 0; i < numOfProcs; i++) {
-            Worker w = new Worker(props, request, result);
-            LOG.fine("created worker thread: " + w.getName());
-            workers.add(w);
-        }
-        // start workers
-        for (Worker w : workers) {
-            w.start();
-        }
-
-        // join
-        while (!workers.isEmpty()) {
-            Worker lastWorker = workers.get(workers.size() - 1);
-            try {
-                lastWorker.join();
-            } catch (InterruptedException e) {
-                lastWorker.interrupt();
-                try {
-                    lastWorker.join();
-                } catch (InterruptedException e2) {
-                }
-            }
-            workers.remove(workers.size() - 1);
-        }
+        throw new UnsupportedOperationException(); // TODO
     }
 
-    static class Worker extends Thread {
-        static class Task {
-            File file;
+    @Override
+    public void execute(PreparePartsRequest request, PreparePartsResult result,
+            final File file) throws CommandException {
+        LOG.fine(String.format("started converting file: %s", file.getName()));
 
-            Task(File file) {
-                this.file = file;
+        // TODO #MN need type paramters
+        FileParser<?, ?> p = null;
+        MsgpackGZIPFileWriter w = null;
+        try {
+            CompressionType compressionType = getCompressType(request, file);
+            CharsetDecoder decoder = getCharsetDecoder(request);
+
+            p = FileParserFactory.newInstance(request);
+            p.initParser(decoder, createFileInputStream(compressionType, file));
+
+            if (request.dryRun()) {
+                // if this processing is dry-run mode, thread of control
+                // returns back
+                return;
+            }
+
+            p.setErrorRecordWriter(createErrorRecordOutputStream(request,
+                    file.getName()));
+            p.startParsing(decoder,
+                    createFileInputStream(compressionType, file));
+            w = new MsgpackGZIPFileWriter(request);
+            w.initWriter(file.getName());
+            while (p.parseRow(w)) {
+                ;
+            }
+        } finally {
+            if (p != null) {
+                p.closeSilently();
+            }
+            if (w != null) {
+                w.closeSilently();
             }
         }
 
-        Properties props;
-        PreparePartsRequest request;
-        PreparePartsResult result;
+        result.setParsedRowNum(p.getRowNum());
+        result.setWrittenRowNum(w.getRowNum());
 
-        public Worker(Properties props, PreparePartsRequest request,
-                PreparePartsResult result) {
-            this.props = props;
-            this.request = request;
-            this.result = result;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                Task t = taskQueue.poll();
-                if (t == null) {
-                    break;
-                } else {
-                    try {
-                        execute(props, request, result, t.file);
-                    } catch (CommandException e) {
-                        LOG.severe(String.format("failed command by %s: %s",
-                                getName(), e.getMessage()));
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        private void execute(Properties props, PreparePartsRequest request,
-                PreparePartsResult result, final File infile)
-                throws CommandException {
-            LOG.fine(String.format("started converting file: %s by %s",
-                    infile.getName(), getName()));
-
-            // TODO #MN need type paramters
-            FileParser<?, ?> p = null;
-            MsgpackGZIPFileWriter w = null;
-            try {
-                CompressionType compressionType = getCompressType(request, infile);
-                CharsetDecoder decoder = getCharsetDecoder(request);
-
-                p = FileParserFactory.newInstance(request);
-                p.initParser(decoder, createFileInputStream(compressionType, infile));
-
-                if (request.dryRun()) {
-                    // if this processing is dry-run mode, thread of control
-                    // returns back
-                    return;
-                }
-
-                p.setErrorRecordWriter(createErrorRecordOutputStream(request,
-                        infile.getName()));
-                p.startParsing(decoder, createFileInputStream(compressionType, infile));
-                w = new MsgpackGZIPFileWriter(request);
-                w.initWriter(infile.getName());
-                while (p.parseRow(w)) {
-                    ;
-                }
-            } finally {
-                if (p != null) {
-                    p.closeSilently();
-                }
-                if (w != null) {
-                    w.closeSilently();
-                }
-            }
-
-            result.setParsedRowNum(p.getRowNum());
-            result.setWrittenRowNum(w.getRowNum());
-
-            LOG.info(String.format("file: %s: %d entries by %s",
-                    infile.getName(), result.getParsedRowNum(), getName()));
-        }
+        LOG.info(String.format("file: %s: %d entries", file.getName(),
+                result.getParsedRowNum()));
     }
 
     private static OutputStream createErrorRecordOutputStream(
