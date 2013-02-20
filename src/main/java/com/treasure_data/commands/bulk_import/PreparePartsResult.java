@@ -17,14 +17,19 @@
 //
 package com.treasure_data.commands.bulk_import;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.treasure_data.commands.CommandResult;
 
 public class PreparePartsResult extends CommandResult {
 
     private long parsedRowNum = 0;
     private long writtenRowNum = 0;
+    private List<String> outputFilePaths;
 
     public PreparePartsResult() {
+        outputFilePaths = new ArrayList<String>();
     }
 
     public void setParsedRowNum(long parsedRowNum) {
@@ -41,5 +46,13 @@ public class PreparePartsResult extends CommandResult {
 
     public long getWrittenRowNum() {
         return writtenRowNum;
+    }
+
+    public synchronized void addOutputFilePath(String filePath) {
+        outputFilePaths.add(filePath);
+    }
+
+    public List<String> getOutputFiles() {
+        return outputFilePaths;
     }
 }

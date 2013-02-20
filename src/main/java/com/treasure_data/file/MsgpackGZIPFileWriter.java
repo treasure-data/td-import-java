@@ -112,8 +112,10 @@ public class MsgpackGZIPFileWriter
             String outputFileName = outputFilePrefix + "_" + outputFileIndex
                     + ".msgpack.gz";
             outputFileIndex++;
+            File f = new File(outputDirName, outputFileName);
+            result.addOutputFilePath(f.getAbsolutePath());
             dout = new DataSizeChecker(new BufferedOutputStream(
-                    new FileOutputStream(new File(outputDirName, outputFileName))));
+                    new FileOutputStream(f)));
             gzout = new GZIPOutputStream(dout);
             packer = msgpack.createPacker(new BufferedOutputStream(gzout));
 

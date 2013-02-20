@@ -1,10 +1,12 @@
 package com.treasure_data.commands.bulk_import;
 
 import java.io.File;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.MultithreadsCommand;
 
 public class PrepareUploadPartsCommand extends
         Command<PrepareUploadPartsRequest, PrepareUploadPartsResult> {
@@ -23,11 +25,15 @@ public class PrepareUploadPartsCommand extends
         PreparePartsResult prepareResult = result.getPreparePartsResult();
         PreparePartsCommand prepareCommand = new PreparePartsCommand();
         prepareCommand.execute(prepareRequest, prepareResult);
+        List<String> filePaths = prepareResult.getOutputFiles();
 
         LOG.fine(String.format("started uploading file: %s", file.getName()));
         UploadPartsRequest uploadRequest = request.getUploadPartsRequest();
+        uploadRequest.setFiles(filePaths.toArray(new String[0]));
         UploadPartsResult uploadResult = result.getUploadPartsResult();
         UploadPartsCommand uploadCommand = new UploadPartsCommand();
-        uploadCommand.execute(uploadRequest, uploadResult);
+        MultithreadsCommand<UploadPartsRequest, UploadPartsResult> multithreading =
+                new MultithreadsCommand<UploadPartsRequest, UploadPartsResult>(uploadCommand);
+        multithreading.execute(uploadRequest, uploadResult);
     }
 }
