@@ -18,6 +18,11 @@
 package com.treasure_data.commands;
 
 public interface Config {
+    ////////////////////////////////////////
+    // Multi Threading OPTIONS            //
+    ////////////////////////////////////////
+    String BI_COMMAND_MULTITHREAD_NUM = "td.command.multithread.num";
+    String BI_COMMAND_MULTITHREAD_NUM_DEFAULTVALUE = "5";
 
     ////////////////////////////////////////
     // UPLOAD_PARTS_OPTIONS               //
