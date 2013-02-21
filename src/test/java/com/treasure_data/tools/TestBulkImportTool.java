@@ -10,6 +10,19 @@ import com.treasure_data.commands.Config;
 public class TestBulkImportTool {
 
     @Test @Ignore
+    public void testUploadPartsSample() throws Exception {
+        // bulk_import:create mugasess mugadb sesstest
+        Properties props = System.getProperties();
+        // TODO
+        final String[] args = new String[] {
+                "upload_parts",
+                "mugasess",
+                "./out/from_SQLServer_to_csv_10_csv_0.msgpack.gz",
+        };
+        BulkImportTool.uploadParts(args, props);
+    }
+
+    @Test @Ignore
     public void testSample() throws Exception {
         Properties props = System.getProperties();
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNS, "time,name,price");
