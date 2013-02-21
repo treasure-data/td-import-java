@@ -4,21 +4,23 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.commands.CommandException;
-import com.treasure_data.commands.CommandRequest;
 
-public class PrepareUploadPartsRequest extends CommandRequest {
+public class PrepareUploadPartsRequest extends UploadPartsRequest {
     private static final Logger LOG = Logger
             .getLogger(PrepareUploadPartsRequest.class.getName());
 
     private static final String COMMAND_NAME = "prepare_upload_parts";
 
     private PreparePartsRequest prepareRequest;
-    private UploadPartsRequest uploadRequest;
 
-    public PrepareUploadPartsRequest(Properties props)
-            throws CommandException {
-        super(props);
-        // TODO
+    public PrepareUploadPartsRequest() throws CommandException {
+        super();
+    }
+
+    public PrepareUploadPartsRequest(String sessionName, String[] fileNames,
+            Properties props) throws CommandException {
+        super(sessionName, fileNames, props);
+        prepareRequest = PreparePartsRequestFactory.newInstance(fileNames, props);
     }
 
     @Override
@@ -26,19 +28,11 @@ public class PrepareUploadPartsRequest extends CommandRequest {
         return COMMAND_NAME;
     }
 
-    public void createPreparePartsRequest() {
-        // TODO
-    }
-
     public PreparePartsRequest getPreparePartsRequest() {
         return prepareRequest;
     }
 
-    public void createUploadPartsRequest() {
-        // TODO
-    }
-
     public UploadPartsRequest getUploadPartsRequest() {
-        return uploadRequest;
+        return this;
     }
 }

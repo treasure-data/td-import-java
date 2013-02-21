@@ -26,6 +26,7 @@ import com.treasure_data.commands.bulk_import.PreparePartsRequestFactory;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 import com.treasure_data.commands.bulk_import.UploadPartsCommand;
 import com.treasure_data.commands.bulk_import.UploadPartsRequest;
+import com.treasure_data.commands.bulk_import.UploadPartsFactory;
 import com.treasure_data.commands.bulk_import.UploadPartsResult;
 
 public class BulkImportTool {
@@ -110,11 +111,11 @@ public class BulkImportTool {
             fileNames[i] = args[i + 2];
         }
 
-        UploadPartsRequest request = new UploadPartsRequest(
+        UploadPartsRequest request = UploadPartsFactory.newRequestInstance(
                 sessionName, fileNames, props);
-        UploadPartsResult result = new UploadPartsResult();
+        UploadPartsResult result = UploadPartsFactory.newResultInstance(request);
 
-        UploadPartsCommand command = new UploadPartsCommand();
+        UploadPartsCommand command = UploadPartsFactory.newCommandInstance(request);
         command.execute(request, result);
 
         LOG.fine("Finish upload_parts command");

@@ -4,12 +4,11 @@ import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.MultithreadsCommand;
 
 public class PrepareUploadPartsCommand extends
-        Command<PrepareUploadPartsRequest, PrepareUploadPartsResult> {
+        UploadPartsCommand<PrepareUploadPartsRequest, PrepareUploadPartsResult> {
     private static final Logger LOG = Logger
             .getLogger(PrepareUploadPartsCommand.class.getName());
 
@@ -35,5 +34,6 @@ public class PrepareUploadPartsCommand extends
         MultithreadsCommand<UploadPartsRequest, UploadPartsResult> multithreading =
                 new MultithreadsCommand<UploadPartsRequest, UploadPartsResult>(uploadCommand);
         multithreading.execute(uploadRequest, uploadResult);
+
     }
 }

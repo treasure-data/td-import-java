@@ -34,20 +34,22 @@ import com.treasure_data.commands.CommandException;
 import com.treasure_data.model.bulkimport.Session;
 import com.treasure_data.model.bulkimport.UploadPartRequest;
 
-public class UploadPartsCommand extends Command<UploadPartsRequest, UploadPartsResult> {
-    private static final Logger LOG = Logger
-            .getLogger(UploadPartsCommand.class.getName());
+public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends UploadPartsResult>
+        extends Command<REQ, RET> {
+
+    private static final Logger LOG = Logger.getLogger(UploadPartsCommand.class
+            .getName());
 
     public UploadPartsCommand() {
     }
 
     @Override
-    public void execute(final UploadPartsRequest request,
-            final UploadPartsResult result, final File file)
+    public void execute(final REQ request, final RET result, final File file)
             throws CommandException {
         LOG.fine(String.format("started uploading file: %s", file.getName()));
 
-        final TreasureDataClient client = new TreasureDataClient(request.getProperties());
+        final TreasureDataClient client = new TreasureDataClient(
+                request.getProperties());
         final BulkImportClient biClient = new BulkImportClient(client);
         try {
             new RetryClient().retry(new Retryable() {
