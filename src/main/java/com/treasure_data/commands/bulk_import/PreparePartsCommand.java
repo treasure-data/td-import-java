@@ -134,7 +134,6 @@ public class PreparePartsCommand extends
 
     private static CompressionType getCompressType(PreparePartsRequest request,
             final File infile) throws CommandException {
-        String fileName = infile.getName();
         CompressionType userCompressType = request.getCompressionType();
         if (userCompressType == null) {
             throw new CommandException("fatal error");
@@ -158,10 +157,9 @@ public class PreparePartsCommand extends
             InputStream in = null;
             try {
                 if (candidateCompressTypes[i].equals(CompressionType.GZIP)) {
-                    in = new GZIPInputStream(new FileInputStream(fileName));
-                } else if (candidateCompressTypes[i]
-                        .equals(CompressionType.NONE)) {
-                    in = new FileInputStream(fileName);
+                    in = new GZIPInputStream(new FileInputStream(infile));
+                } else if (candidateCompressTypes[i].equals(CompressionType.NONE)) {
+                    in = new FileInputStream(infile);
                 } else {
                     throw new CommandException("fatal error");
                 }
@@ -171,7 +169,7 @@ public class PreparePartsCommand extends
                 compressionType = candidateCompressTypes[i];
                 break;
             } catch (IOException e) {
-                LOG.fine(String.format("file %s is %s", fileName,
+                LOG.fine(String.format("file %s is %s", infile.getName(),
                         e.getMessage()));
             } finally {
                 if (in != null) {
@@ -187,7 +185,7 @@ public class PreparePartsCommand extends
         if (compressionType == null) {
             throw new CommandException(new IOException(String.format(
                     "cannot read file %s with specified compress type: %s",
-                    fileName, userCompressType)));
+                    infile.getName(), userCompressType)));
         }
 
         return compressionType;

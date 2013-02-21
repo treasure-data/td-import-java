@@ -8,7 +8,6 @@ import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.MultithreadsCommand;
 
 public class UploadPartsFactory {
-
     private static final Logger LOG = Logger
             .getLogger(UploadPartsFactory.class.getName());
 
