@@ -20,7 +20,7 @@ public class PrepareUploadPartsRequest extends UploadPartsRequest {
     public PrepareUploadPartsRequest(String sessionName, String[] fileNames,
             Properties props) throws CommandException {
         super(sessionName, fileNames, props);
-        prepareRequest = PreparePartsRequestFactory.newInstance(fileNames, props);
+        prepareRequest = PreparePartsFactory.newInstance(fileNames, props);
     }
 
     @Override

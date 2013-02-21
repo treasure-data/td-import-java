@@ -6,9 +6,9 @@ import java.util.logging.Logger;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;
 
-public class PreparePartsRequestFactory {
+public class PreparePartsFactory {
     private static final Logger LOG = Logger
-            .getLogger(PreparePartsRequestFactory.class.getName());
+            .getLogger(PreparePartsFactory.class.getName());
 
     public static PreparePartsRequest newInstance(String[] fileNames,
             Properties props) throws CommandException {
