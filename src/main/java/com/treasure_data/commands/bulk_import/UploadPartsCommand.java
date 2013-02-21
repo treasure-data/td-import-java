@@ -57,7 +57,7 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
                 public void doTry() throws ClientException {
                     try {
                         Session sess = new Session(request.getSessionName(), null, null);
-                        String partID = file.getName();
+                        String partID = file.getName().replace('.', '_');
                         InputStream in = new BufferedInputStream(
                                 new FileInputStream(file));
                         long size = file.length();
