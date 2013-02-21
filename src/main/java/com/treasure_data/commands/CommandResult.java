@@ -17,6 +17,6 @@
 //
 package com.treasure_data.commands;
 
-public abstract class CommandResult {
+public abstract class CommandResult implements Cloneable {
 
 }

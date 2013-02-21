@@ -55,4 +55,8 @@ public class PreparePartsResult extends CommandResult {
     public List<String> getOutputFiles() {
         return outputFilePaths;
     }
+
+    public Object clone() {
+        return new PreparePartsResult();
+    }
 }

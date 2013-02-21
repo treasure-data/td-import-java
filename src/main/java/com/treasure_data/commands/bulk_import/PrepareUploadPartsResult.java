@@ -11,4 +11,8 @@ public class PrepareUploadPartsResult extends UploadPartsResult {
     public UploadPartsResult getUploadPartsResult() {
         return this;
     }
+
+    public Object clone() {
+        return new PrepareUploadPartsResult();
+    }
 }

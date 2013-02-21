@@ -23,4 +23,8 @@ public class UploadPartsResult extends CommandResult {
 
     public UploadPartsResult() {
     }
+
+    public Object clone() {
+        return new UploadPartsResult();
+    }
 }
