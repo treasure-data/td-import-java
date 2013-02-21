@@ -16,15 +16,29 @@ public class PrepareUploadPartsCommand extends
     }
 
     @Override
-    public void execute(final PrepareUploadPartsRequest request,
-            final PrepareUploadPartsResult result, final File file)
-            throws CommandException {
+    public void execute(PrepareUploadPartsRequest request,
+            PrepareUploadPartsResult result) throws CommandException {
+        File[] files = request.getFiles();
+        for (File f : files) {
+            PrepareUploadPartsResult clonedResult =
+                    (PrepareUploadPartsResult) result.clone();
+            execute(request, clonedResult, f);
+        }
+    }
+
+    @Override
+    public void execute(PrepareUploadPartsRequest request,
+            PrepareUploadPartsResult result, File file) throws CommandException {
         LOG.fine(String.format("started preparing file: %s", file.getName()));
         PreparePartsRequest prepareRequest = request.getPreparePartsRequest();
         PreparePartsResult prepareResult = result.getPreparePartsResult();
         PreparePartsCommand prepareCommand = new PreparePartsCommand();
-        prepareCommand.execute(prepareRequest, prepareResult);
+        prepareCommand.execute(prepareRequest, prepareResult, file);
         List<String> filePaths = prepareResult.getOutputFiles();
+
+        // TODO
+        // TODO #MN can optimize the method with multi-threading
+        // TODO
 
         LOG.fine(String.format("started uploading file: %s", file.getName()));
         UploadPartsRequest uploadRequest = request.getUploadPartsRequest();
