@@ -3,7 +3,9 @@ package com.treasure_data.commands.bulk_import;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.commands.Command;
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.MultithreadsCommand;
 
 public class UploadPartsFactory {
 
@@ -15,8 +17,9 @@ public class UploadPartsFactory {
 
         boolean autoPrepare = false;
         for (Object key : props.keySet()) {
-            String val = props.getProperty((String) key);
-            if (val != null && val.startsWith("td.bulk_import.prepare_parts")) {
+            String k = (String) key;
+            String val = props.getProperty(k);
+            if (val != null && k.startsWith("td.bulk_import.prepare_parts")) {
                 autoPrepare = true;
                 break;
             }
@@ -42,12 +45,14 @@ public class UploadPartsFactory {
         }
     }
 
-    public static UploadPartsCommand newCommandInstance(
+    public static Command newCommandInstance(
             UploadPartsRequest request) throws CommandException {
         if (request instanceof PrepareUploadPartsRequest) {
             return new PrepareUploadPartsCommand();
         } else if (request instanceof UploadPartsRequest) {
-            return new UploadPartsCommand<UploadPartsRequest, UploadPartsResult>();
+            UploadPartsCommand<UploadPartsRequest, UploadPartsResult> command =
+                    new UploadPartsCommand<UploadPartsRequest, UploadPartsResult>();
+            return new MultithreadsCommand<UploadPartsRequest, UploadPartsResult>(command);
         } else {
             String cname = request.getName();
             throw new CommandException("the type of this request is invalid: "

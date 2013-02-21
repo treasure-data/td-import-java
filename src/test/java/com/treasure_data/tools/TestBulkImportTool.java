@@ -8,16 +8,35 @@ import org.junit.Test;
 import com.treasure_data.commands.Config;
 
 public class TestBulkImportTool {
+    @Test
+    public void testPrepareUploadPartsSample() throws Exception {
+        // bulk_import:create mugasess mugadb sesstest
+        Properties props = System.getProperties();
+        props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
+        final String[] args = new String[] {
+                "upload_parts",
+                "mugasess",
+                "./in/from_SQLServer_to_csv_10_v01.csv",
+                "./in/from_SQLServer_to_csv_10_v02.csv",
+                "./in/from_SQLServer_to_csv_10_v03.csv",
+        };
+
+        BulkImportTool.uploadParts(args, props);
+    }
 
     @Test @Ignore
     public void testUploadPartsSample() throws Exception {
         // bulk_import:create mugasess mugadb sesstest
         Properties props = System.getProperties();
-        // TODO
+        props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
         final String[] args = new String[] {
                 "upload_parts",
                 "mugasess",
                 "./out/from_SQLServer_to_csv_10_csv_0.msgpack.gz",
+                "./out/from_SQLServer_to_csv_10_csv_1.msgpack.gz",
         };
         BulkImportTool.uploadParts(args, props);
     }
