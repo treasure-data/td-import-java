@@ -115,7 +115,6 @@ public class BulkImportTool {
                 sessionName, fileNames, props);
         UploadPartsResult result = UploadPartsFactory.newResultInstance(request);
 
-        System.out.println("request: " + request.getClass().getName());
         UploadPartsFactory.newCommandInstance(request).execute(request, result);
 
         LOG.fine("Finish upload_parts command");
