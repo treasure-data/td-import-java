@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.treasure_data.commands.Config;
 
 public class TestBulkImportTool {
-    @Test
+    @Test @Ignore
     public void testPrepareUploadPartsSample() throws Exception {
         // bulk_import:create mugasess mugadb sesstest
         Properties props = System.getProperties();
