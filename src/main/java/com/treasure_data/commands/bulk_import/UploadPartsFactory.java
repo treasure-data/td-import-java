@@ -11,6 +11,8 @@ public class UploadPartsFactory {
     private static final Logger LOG = Logger
             .getLogger(UploadPartsFactory.class.getName());
 
+    private static final String PREPARE_PARTS_OPTION = "td.bulk_import.prepare_parts";
+
     public static UploadPartsRequest newRequestInstance(String sessionName,
             String[] fileNames, Properties props) throws CommandException {
 
@@ -18,7 +20,7 @@ public class UploadPartsFactory {
         for (Object key : props.keySet()) {
             String k = (String) key;
             String val = props.getProperty(k);
-            if (val != null && k.startsWith("td.bulk_import.prepare_parts")) {
+            if (val != null && k.startsWith(PREPARE_PARTS_OPTION)) {
                 autoPrepare = true;
                 break;
             }
@@ -47,7 +49,10 @@ public class UploadPartsFactory {
     public static Command newCommandInstance(
             UploadPartsRequest request) throws CommandException {
         if (request instanceof PrepareUploadPartsRequest) {
-            return new PrepareUploadPartsCommand();
+            // FIXME #MN should use MultithreadsCommand
+            PrepareUploadPartsCommand command =
+                    new PrepareUploadPartsCommand();
+            return new MultithreadsCommand<PrepareUploadPartsRequest, PrepareUploadPartsResult>(command);
         } else if (request instanceof UploadPartsRequest) {
             UploadPartsCommand<UploadPartsRequest, UploadPartsResult> command =
                     new UploadPartsCommand<UploadPartsRequest, UploadPartsResult>();
