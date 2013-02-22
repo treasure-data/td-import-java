@@ -49,9 +49,7 @@ public class UploadPartsFactory {
     public static Command newCommandInstance(
             UploadPartsRequest request) throws CommandException {
         if (request instanceof PrepareUploadPartsRequest) {
-            // FIXME #MN should use MultithreadsCommand
-            PrepareUploadPartsCommand command =
-                    new PrepareUploadPartsCommand();
+            PrepareUploadPartsCommand command = new PrepareUploadPartsCommand();
             return new MultithreadsCommand<PrepareUploadPartsRequest, PrepareUploadPartsResult>(command);
         } else if (request instanceof UploadPartsRequest) {
             UploadPartsCommand<UploadPartsRequest, UploadPartsResult> command =
