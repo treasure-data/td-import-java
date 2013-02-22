@@ -16,8 +16,11 @@ public class TestBulkImportTool {
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
+        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "true");
+        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
         final String[] args = new String[] {
                 "upload_parts",
+                //"prepare_parts",
                 "mugasess",
                 "./in/from_SQLServer_to_csv_10_v01.csv",
                 "./in/from_SQLServer_to_csv_10_v02.csv",
@@ -25,6 +28,7 @@ public class TestBulkImportTool {
         };
 
         BulkImportTool.uploadParts(args, props);
+        //BulkImportTool.prepareParts(args, props);
     }
 
     @Test @Ignore
