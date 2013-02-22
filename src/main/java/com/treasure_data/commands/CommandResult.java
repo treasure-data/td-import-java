@@ -19,4 +19,5 @@ package com.treasure_data.commands;
 
 public abstract class CommandResult implements Cloneable {
 
+    public abstract Object clone();
 }
