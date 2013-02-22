@@ -97,6 +97,14 @@ public class UploadPartsRequest extends CommandRequest {
         }
     }
 
+    public boolean autoPerform() {
+        return autoPerform;
+    }
+
+    public boolean autoCommit() {
+        return autoCommit;
+    }
+
     public int getRetryCount() {
         return retryCount;
     }
