@@ -42,7 +42,15 @@ public class MultithreadsCommand<REQ extends CommandRequest, RET extends Command
     @Override
     public void execute(REQ request, RET result, File file)
             throws CommandException {
-        throw new UnsupportedOperationException(); // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void preExecute(REQ request, RET result) throws CommandException {
+    }
+
+    @Override
+    public void postExecute(REQ request, RET result) throws CommandException {
     }
 
     @Override
@@ -89,6 +97,9 @@ public class MultithreadsCommand<REQ extends CommandRequest, RET extends Command
             }
             workers.remove(workers.size() - 1);
         }
+
+        // TODO #MN should consider the design of {pre,post}Execute()
+        command.postExecute(request, result);
     }
 
     static class Worker<REQ extends CommandRequest, RET extends CommandResult>
@@ -119,7 +130,8 @@ public class MultithreadsCommand<REQ extends CommandRequest, RET extends Command
                     break;
                 } else {
                     try {
-                        command.execute(request, result, t.file);
+                        RET cloned = (RET) result.clone();
+                        command.execute(request, cloned, t.file);
                     } catch (CommandException e) {
                         LOG.severe(String.format("failed command by %s: %s",
                                 getName(), e.getMessage()));

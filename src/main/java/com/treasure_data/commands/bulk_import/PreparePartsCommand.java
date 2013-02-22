@@ -204,4 +204,12 @@ public class PreparePartsCommand extends
             throw new CommandException(new UnsupportedOperationException());
         }
     }
+
+    @Override
+    public void preExecute(PreparePartsRequest request, PreparePartsResult result) throws CommandException {
+    }
+
+    @Override
+    public void postExecute(PreparePartsRequest request, PreparePartsResult result) throws CommandException {
+    }
 }

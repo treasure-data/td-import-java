@@ -51,17 +51,23 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
         final TreasureDataClient client = new TreasureDataClient(
                 request.getProperties());
         final BulkImportClient biClient = new BulkImportClient(client);
+
+        final Session sess = new Session(request.getSessionName(), null, null);
+        final String partID = file.getName().replace('.', '_');
+
+        // upload records
         try {
             new RetryClient().retry(new Retryable() {
                 @Override
                 public void doTry() throws ClientException {
                     try {
-                        Session sess = new Session(request.getSessionName(), null, null);
-                        String partID = file.getName().replace('.', '_');
                         InputStream in = new BufferedInputStream(
                                 new FileInputStream(file));
                         long size = file.length();
 
+                        LOG.fine(String.format(
+                                "uploading file = %s on session %s",
+                                file.getName(), sess.getName()));
                         UploadPartRequest req = new UploadPartRequest(sess,
                                 partID, in, (int) size);
                         // TODO #MN change client's API: int to long
@@ -75,5 +81,13 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
             LOG.severe(e.getMessage());
             throw new CommandException(e);
         }
+    }
+
+    @Override
+    public void preExecute(REQ request, RET result) throws CommandException {
+    }
+
+    @Override
+    public void postExecute(REQ request, RET result) throws CommandException {
     }
 }
