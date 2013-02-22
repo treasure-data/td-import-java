@@ -30,4 +30,12 @@ public abstract class Command<REQ extends CommandRequest, RET extends CommandRes
 
     public abstract void execute(REQ request, RET result, File file)
             throws CommandException;
+
+    // TODO #MN should consider the design and API
+    public void preExecute(REQ request, RET result) throws CommandException {
+    }
+
+    // TODO #MN should consider the design and API
+    public void postExecute(REQ request, RET result) throws CommandException {
+    }
 }
