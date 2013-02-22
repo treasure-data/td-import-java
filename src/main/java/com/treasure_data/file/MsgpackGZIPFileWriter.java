@@ -153,11 +153,15 @@ public class MsgpackGZIPFileWriter
     }
 
     public void close() throws IOException {
+        if (packer != null) {
+            packer.flush();
+            packer.close();
+            packer = null;
+        }
         if (gzout != null) {
             gzout.close();
             gzout = null;
             dout = null;
         }
-        packer = null;
     }
 }
