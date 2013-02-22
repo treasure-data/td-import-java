@@ -20,6 +20,7 @@ package com.treasure_data.tools;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.commands.MultithreadsCommand;
 import com.treasure_data.commands.bulk_import.PreparePartsCommand;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsFactory;
@@ -78,7 +79,8 @@ public class BulkImportTool {
         PreparePartsResult result = new PreparePartsResult();
 
         PreparePartsCommand command = new PreparePartsCommand();
-        command.execute(request, result);
+        new MultithreadsCommand<PreparePartsRequest, PreparePartsResult>(
+                command).execute(request, result);
 
         LOG.fine("Finish prepare_parts command");
     }
