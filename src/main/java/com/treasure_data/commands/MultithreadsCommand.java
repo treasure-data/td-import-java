@@ -32,7 +32,7 @@ public class MultithreadsCommand<REQ extends CommandRequest, RET extends Command
 
     protected Command<REQ, RET> command;
 
-    private static BlockingQueue<Worker.Task> taskQueue;
+    private BlockingQueue<Worker.Task> taskQueue;
     private List<Worker<REQ, RET>> workers;
 
     public MultithreadsCommand(Command<REQ, RET> command) {
@@ -74,7 +74,8 @@ public class MultithreadsCommand<REQ extends CommandRequest, RET extends Command
         // create worker threads
         workers = new ArrayList<Worker<REQ, RET>>(numOfProcs);
         for (int i = 0; i < numOfProcs; i++) {
-            Worker<REQ, RET> w = new Worker<REQ, RET>(command, request, result);
+            Worker<REQ, RET> w = new Worker<REQ, RET>(
+                    this, command, request, result);
             LOG.fine("created worker thread: " + w.getName());
             workers.add(w);
         }
@@ -106,17 +107,19 @@ public class MultithreadsCommand<REQ extends CommandRequest, RET extends Command
             extends Thread {
         static class Task {
             File file;
-
             Task(File file) {
                 this.file = file;
             }
         }
 
+        MultithreadsCommand<REQ, RET> parent;
         Command<REQ, RET> command;
         REQ request;
         RET result;
 
-        public Worker(Command<REQ, RET> command, REQ request, RET result) {
+        public Worker(MultithreadsCommand<REQ, RET> parent,
+                Command<REQ, RET> command, REQ request, RET result) {
+            this.parent = parent;
             this.command = command;
             this.request = request;
             this.result = result;
@@ -125,13 +128,14 @@ public class MultithreadsCommand<REQ extends CommandRequest, RET extends Command
         @Override
         public void run() {
             while (true) {
-                Task t = taskQueue.poll();
+                Task t = parent.taskQueue.poll();
                 if (t == null) {
                     break;
                 } else {
                     try {
                         RET cloned = (RET) result.clone();
                         command.execute(request, cloned, t.file);
+                        //command.execute(request, result, t.file);
                     } catch (CommandException e) {
                         LOG.severe(String.format("failed command by %s: %s",
                                 getName(), e.getMessage()));
