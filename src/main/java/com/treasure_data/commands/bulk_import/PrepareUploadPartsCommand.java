@@ -55,10 +55,11 @@ public class PrepareUploadPartsCommand extends
         UploadPartsRequest uploadRequest = request.getUploadPartsRequest();
         uploadRequest.setFiles(filePaths.toArray(new String[0]));
         UploadPartsResult uploadResult = result.getUploadPartsResult();
-        UploadPartsCommand uploadCommand = new UploadPartsCommand();
-        MultithreadsCommand<UploadPartsRequest, UploadPartsResult> multithreading =
+        UploadPartsCommand<UploadPartsRequest, UploadPartsResult> uploadCommand =
+                new UploadPartsCommand<UploadPartsRequest, UploadPartsResult>();
+        MultithreadsCommand<UploadPartsRequest, UploadPartsResult> multithreads =
                 new MultithreadsCommand<UploadPartsRequest, UploadPartsResult>(uploadCommand);
-        multithreading.execute(uploadRequest, uploadResult);
+        multithreads.execute(uploadRequest, uploadResult);
     }
 
     private SessionSummary summary;
@@ -66,43 +67,44 @@ public class PrepareUploadPartsCommand extends
     @Override
     public void postExecute(PrepareUploadPartsRequest request,
             PrepareUploadPartsResult result) throws CommandException {
+        if (!request.autoPerform()) {
+            return;
+        }
+
         final TreasureDataClient client = new TreasureDataClient(
                 request.getProperties());
         final BulkImportClient biClient = new BulkImportClient(client);
 
         final Session sess = new Session(request.getSessionName(), null, null);
 
-        if (request.autoPerform()) {
-            // freeze
-            try {
-                new RetryClient().retry(new Retryable() {
-                    @Override
-                    public void doTry() throws ClientException {
-                        LOG.fine(String.format("freezing session %s",
-                                sess.getName()));
-                        biClient.freezeSession(sess);
-                    }
-                }, request.getRetryCount(), request.getWaitSec());
-            } catch (IOException e) {
-                LOG.severe(e.getMessage());
-                throw new CommandException(e);
-            }
+        // freeze
+        try {
+            new RetryClient().retry(new Retryable() {
+                @Override
+                public void doTry() throws ClientException {
+                    LOG.fine(String.format("freezing session %s",
+                            sess.getName()));
+                    biClient.freezeSession(sess);
+                }
+            }, request.getRetryCount(), request.getWaitSec());
+        } catch (IOException e) {
+            LOG.severe(e.getMessage());
+            throw new CommandException(e);
+        }
 
-            // perform
-            try {
-                new RetryClient().retry(new Retryable() {
-                    @Override
-                    public void doTry() throws ClientException {
-                        LOG.fine(String.format(
-                                "performing all data on session %s",
-                                sess.getName()));
-                        biClient.performSession(sess);
-                    }
-                }, request.getRetryCount(), request.getWaitSec());
-            } catch (IOException e) {
-                LOG.severe(e.getMessage());
-                throw new CommandException(e);
-            }
+        // perform
+        try {
+            new RetryClient().retry(new Retryable() {
+                @Override
+                public void doTry() throws ClientException {
+                    LOG.fine(String.format("performing all data on session %s",
+                            sess.getName()));
+                    biClient.performSession(sess);
+                }
+            }, request.getRetryCount(), request.getWaitSec());
+        } catch (IOException e) {
+            LOG.severe(e.getMessage());
+            throw new CommandException(e);
         }
 
         if (request.autoCommit() && request.autoPerform()) {
