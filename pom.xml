@@ -50,7 +50,7 @@
     <!--  version properties for dependencies -->
     <msgpack.version>0.6.7</msgpack.version>
     <super-csv.version>2.0.1</super-csv.version>
-    <td-client.version>0.2.0</td-client.version>
+    <td-client.version>0.2.0-SNAPSHOT</td-client.version>
     <junit.version>4.8.2</junit.version>
     <mockito.version>1.9.5</mockito.version>
 
