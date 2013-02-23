@@ -81,6 +81,8 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
             LOG.severe(e.getMessage());
             throw new CommandException(e);
         }
+
+        LOG.fine(String.format("uploaded file: %s", file.getName()));
     }
 
     @Override

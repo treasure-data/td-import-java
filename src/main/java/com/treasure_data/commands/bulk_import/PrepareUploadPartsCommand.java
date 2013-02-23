@@ -2,11 +2,12 @@ package com.treasure_data.commands.bulk_import;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
-
-import org.msgpack.unpacker.Unpacker;
-import org.msgpack.unpacker.UnpackerIterator;
 
 import com.treasure_data.client.ClientException;
 import com.treasure_data.client.RetryClient;
@@ -14,7 +15,6 @@ import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.RetryClient.Retryable;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.commands.CommandException;
-import com.treasure_data.commands.MultithreadsCommand;
 import com.treasure_data.model.bulkimport.Session;
 import com.treasure_data.model.bulkimport.SessionSummary;
 
@@ -23,7 +23,10 @@ public class PrepareUploadPartsCommand extends
     private static final Logger LOG = Logger
             .getLogger(PrepareUploadPartsCommand.class.getName());
 
+    BlockingQueue<Worker.Task> taskQueue;
+
     public PrepareUploadPartsCommand() {
+        taskQueue = new LinkedBlockingQueue<Worker.Task>();
     }
 
     @Override
@@ -40,28 +43,117 @@ public class PrepareUploadPartsCommand extends
     @Override
     public void execute(PrepareUploadPartsRequest request,
             PrepareUploadPartsResult result, File file) throws CommandException {
+        int numOfUploadThreads = request.getNumOfUploadThreads();
+
         LOG.fine(String.format("started preparing file: %s", file.getName()));
         PreparePartsRequest prepareRequest = request.getPreparePartsRequest();
-        PreparePartsResult prepareResult = result.getPreparePartsResult();
+        MultiThreadsPreparePartsResult prepareResult =
+                (MultiThreadsPreparePartsResult) result.getPreparePartsResult();
+        prepareResult.setPrepareUploadPartsCommand(this);
         PreparePartsCommand prepareCommand = new PreparePartsCommand();
         prepareCommand.execute(prepareRequest, prepareResult, file);
-        List<String> filePaths = prepareResult.getOutputFiles();
+        prepareResult.addFinishTask(numOfUploadThreads);
 
-        // TODO
-        // TODO #MN can optimize the method with multi-threading
-        // TODO
-
-        LOG.fine(String.format("started uploading file: %s", file.getName()));
+        UploadPartsCommand uploadCommand = new UploadPartsCommand();
         UploadPartsRequest uploadRequest = request.getUploadPartsRequest();
-        uploadRequest.setFiles(filePaths.toArray(new String[0]));
         UploadPartsResult uploadResult = result.getUploadPartsResult();
-        UploadPartsCommand<UploadPartsRequest, UploadPartsResult> uploadCommand =
-                new UploadPartsCommand<UploadPartsRequest, UploadPartsResult>();
-        MultithreadsCommand<UploadPartsRequest, UploadPartsResult> multithreads =
-                new MultithreadsCommand<UploadPartsRequest, UploadPartsResult>(uploadCommand);
-        multithreads.execute(uploadRequest, uploadResult);
+        List<Worker> workers = new ArrayList<Worker>(numOfUploadThreads);
+
+        //create workers
+        for (int i = 0; i < numOfUploadThreads; i++) {
+            Worker worker = new Worker(this, uploadCommand, uploadRequest, uploadResult);
+            workers.add(worker);
+        }
+
+        // start workers
+        for (int i = 0; i < workers.size(); i++) {
+            workers.get(i).start();
+        }
+
+        // join
+        while (!workers.isEmpty()) {
+            Worker lastWorker = workers.get(workers.size() - 1);
+            System.out.println("last worker done: " + lastWorker.isFinished.get());
+            if (lastWorker.isFinished.get()) {
+                workers.remove(workers.size() - 1);
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO
+            }
+        }
+        System.out.println("### 2");
     }
 
+    static class Worker extends Thread {
+        static final Task FINISH_TASK = new Task("__FINISH__");
+        AtomicBoolean isFinished = new AtomicBoolean(false);
+
+        static class Task {
+            String fileName;
+
+            Task(String fileName) {
+                this.fileName = fileName;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (!(obj instanceof Task)) {
+                    return false;
+                }
+
+                Task t = (Task) obj;
+                return t.fileName.equals(fileName);
+            }
+
+            static boolean endTask(Task t) {
+                return t.equals(FINISH_TASK);
+            }
+        }
+
+        PrepareUploadPartsCommand parent;
+        UploadPartsCommand command;
+        UploadPartsRequest request;
+        UploadPartsResult result;
+
+        Worker(PrepareUploadPartsCommand parent, UploadPartsCommand command,
+                UploadPartsRequest request, UploadPartsResult result) {
+            this.parent = parent;
+            this.command = command;
+            this.request = request;
+            this.result = result;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                Worker.Task t = parent.taskQueue.poll();
+                System.out.println("task: " + t.fileName);
+                if (t == null) {
+                    continue;
+                } else if (Task.endTask(t)) {
+                    break;
+                } else {
+                    try {
+                        run0(t);
+                    } catch (CommandException e) {
+                        LOG.severe(String.format("failed command by %s: %s",
+                                getName(), e.getMessage()));
+                        e.printStackTrace();
+                    }
+                }
+            }
+            isFinished.set(true);
+        }
+
+        private void run0(Worker.Task t) throws CommandException {
+            command.execute(request, result, new File(t.fileName));
+        }
+    }
+
+    // TODO summary object works on multi-threading?
     private SessionSummary summary;
 
     @Override

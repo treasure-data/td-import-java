@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.treasure_data.commands.Config;
 
 public class TestBulkImportTool {
-    @Test @Ignore
+    @Test
     public void testPrepareUploadPartsSample() throws Exception {
         // bulk_import:create mugasess mugadb sesstest
         Properties props = System.getProperties();
@@ -16,7 +16,8 @@ public class TestBulkImportTool {
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
-        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "true");
+        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "4");
+        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "false");
         props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
         final String[] args = new String[] {
                 "upload_parts",

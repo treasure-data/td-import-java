@@ -33,6 +33,7 @@ public class UploadPartsRequest extends CommandRequest {
     protected String sessionName;
     protected boolean autoPerform;
     protected boolean autoCommit;
+    protected int numOfUploadThreads;
     protected int retryCount;
     protected long waitSec;
 
@@ -72,6 +73,25 @@ public class UploadPartsRequest extends CommandRequest {
                 Config.BI_UPLOAD_PARTS_AUTO_COMMIT_DEFAULTVALUE);
         autoCommit = aperform != null && acommit.equals("true");
 
+        // parallel
+        String uthreadNum = props.getProperty(Config.BI_UPLOAD_PARTS_PARALLEL,
+                Config.BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE);
+        try {
+            int n = Integer.parseInt(uthreadNum);
+            if (n < 0) {
+                numOfUploadThreads = 2;
+            } else if (n > 9){
+                numOfUploadThreads = 8;
+            } else {
+                numOfUploadThreads = n;
+            }
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "parallel is required as int type e.g. -D%s=5",
+                    Config.BI_UPLOAD_PARTS_PARALLEL);
+            throw new CommandException(msg, e);
+        }
+
         // retryCount
         String rcount = props.getProperty(Config.BI_UPLOAD_PARTS_RETRYCOUNT,
                 Config.BI_UPLOAD_PARTS_RETRYCOUNT_DEFAULTVALUE);
@@ -103,6 +123,10 @@ public class UploadPartsRequest extends CommandRequest {
 
     public boolean autoCommit() {
         return autoCommit;
+    }
+
+    public int getNumOfUploadThreads() {
+        return numOfUploadThreads;
     }
 
     public int getRetryCount() {
