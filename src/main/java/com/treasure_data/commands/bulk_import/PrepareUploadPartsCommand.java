@@ -9,6 +9,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
+import org.msgpack.unpacker.Unpacker;
+import org.msgpack.unpacker.UnpackerIterator;
+
 import com.treasure_data.client.ClientException;
 import com.treasure_data.client.RetryClient;
 import com.treasure_data.client.TreasureDataClient;
@@ -45,15 +48,7 @@ public class PrepareUploadPartsCommand extends
             PrepareUploadPartsResult result, File file) throws CommandException {
         int numOfUploadThreads = request.getNumOfUploadThreads();
 
-        LOG.fine(String.format("started preparing file: %s", file.getName()));
-        PreparePartsRequest prepareRequest = request.getPreparePartsRequest();
-        MultiThreadsPreparePartsResult prepareResult =
-                (MultiThreadsPreparePartsResult) result.getPreparePartsResult();
-        prepareResult.setPrepareUploadPartsCommand(this);
-        PreparePartsCommand prepareCommand = new PreparePartsCommand();
-        prepareCommand.execute(prepareRequest, prepareResult, file);
-        prepareResult.addFinishTask(numOfUploadThreads);
-
+        LOG.fine(String.format("started uploading threads"));
         UploadPartsCommand uploadCommand = new UploadPartsCommand();
         UploadPartsRequest uploadRequest = request.getUploadPartsRequest();
         UploadPartsResult uploadResult = result.getUploadPartsResult();
@@ -70,10 +65,18 @@ public class PrepareUploadPartsCommand extends
             workers.get(i).start();
         }
 
+        LOG.fine(String.format("started preparing file: %s", file.getName()));
+        PreparePartsRequest prepareRequest = request.getPreparePartsRequest();
+        MultiThreadsPreparePartsResult prepareResult =
+                (MultiThreadsPreparePartsResult) result.getPreparePartsResult();
+        prepareResult.setPrepareUploadPartsCommand(this);
+        PreparePartsCommand prepareCommand = new PreparePartsCommand();
+        prepareCommand.execute(prepareRequest, prepareResult, file);
+        prepareResult.addFinishTask(numOfUploadThreads);
+
         // join
         while (!workers.isEmpty()) {
             Worker lastWorker = workers.get(workers.size() - 1);
-            System.out.println("last worker done: " + lastWorker.isFinished.get());
             if (lastWorker.isFinished.get()) {
                 workers.remove(workers.size() - 1);
             }
@@ -81,10 +84,9 @@ public class PrepareUploadPartsCommand extends
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                // TODO
+                // ignore
             }
         }
-        System.out.println("### 2");
     }
 
     static class Worker extends Thread {
@@ -130,7 +132,6 @@ public class PrepareUploadPartsCommand extends
         public void run() {
             while (true) {
                 Worker.Task t = parent.taskQueue.poll();
-                System.out.println("task: " + t.fileName);
                 if (t == null) {
                     continue;
                 } else if (Task.endTask(t)) {
@@ -231,29 +232,28 @@ public class PrepareUploadPartsCommand extends
                 throw new CommandException(e);
             }
 
-            // check error records FIXME
-//            try {
-//                new RetryClient().retry(new Retryable() {
-//                    @Override
-//                    public void doTry() throws ClientException {
-//                        LOG.fine(String.format(
-//                                "checking error records in session %s",
-//                                sess.getName()));
-//                        // TODO
-//                        Unpacker unpacker = biClient.getErrorRecords(sess);
-//                        if (unpacker != null) {
-//                            UnpackerIterator iter = unpacker.iterator();
-//                            while (iter.hasNext()) {
-//                                // TODO
-//                                System.out.println(iter.next());
-//                            }
-//                        }
-//                    }
-//                }, request.getRetryCount(), request.getWaitSec());
-//            } catch (IOException e) {
-//                LOG.severe(e.getMessage());
-//                throw new CommandException(e);
-//            }
+            // check error records
+            try {
+                new RetryClient().retry(new Retryable() {
+                    @Override
+                    public void doTry() throws ClientException {
+                        LOG.fine(String.format(
+                                "checking error records in session %s",
+                                sess.getName()));
+                        Unpacker unpacker = biClient.getErrorRecords(sess);
+                        if (unpacker != null && unpacker.iterator().hasNext()) {
+                            // if it has error records, it finished processing.
+                            // it doesn't do commit processing.
+                            throw new ClientException(new IOException(String.format(
+                                    "detected error records on session %s",
+                                    sess.getName())));
+                        }
+                    }
+                }, request.getRetryCount(), request.getWaitSec());
+            } catch (IOException e) {
+                LOG.severe(e.getMessage());
+                throw new CommandException(e);
+            }
 
             // commit
             try {
