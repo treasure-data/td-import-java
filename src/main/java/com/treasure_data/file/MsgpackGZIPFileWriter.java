@@ -72,6 +72,7 @@ public class MsgpackGZIPFileWriter
     private int outputFileIndex = 0;
     private String outputDirName;
     private String outputFilePrefix;
+    private File outputFile;
 
     public MsgpackGZIPFileWriter(PreparePartsRequest request,
             PreparePartsResult result) throws CommandException {
@@ -112,10 +113,9 @@ public class MsgpackGZIPFileWriter
             String outputFileName = outputFilePrefix + "_" + outputFileIndex
                     + ".msgpack.gz";
             outputFileIndex++;
-            File f = new File(outputDirName, outputFileName);
-            result.addOutputFilePath(f.getAbsolutePath());
+            outputFile = new File(outputDirName, outputFileName);
             dout = new DataSizeChecker(new BufferedOutputStream(
-                    new FileOutputStream(f)));
+                    new FileOutputStream(outputFile)));
             gzout = new GZIPOutputStream(dout);
             packer = msgpack.createPacker(new BufferedOutputStream(gzout));
 
@@ -163,5 +163,6 @@ public class MsgpackGZIPFileWriter
             gzout = null;
             dout = null;
         }
+        result.addOutputFilePath(outputFile.getAbsolutePath());
     }
 }
