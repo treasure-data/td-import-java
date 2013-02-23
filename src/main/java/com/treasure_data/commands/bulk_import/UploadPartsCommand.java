@@ -45,36 +45,6 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
     public UploadPartsCommand() {
     }
 
-    private static class ExtRetryClient extends RetryClient {
-        public void retry(Retryable r, int retryCount, long waitSec) throws IOException {
-            int count = 0;
-            boolean notRetry = false;
-            while (true) {
-                try {
-                    r.doTry();
-                    break;
-                } catch (ClientException e) {
-                    LOG.warning(e.getMessage());
-                    if (e instanceof HttpClientException
-                            && ((HttpClientException) e).getResponseCode() < 400) {
-                        count++;
-                        waitRetry(waitSec);
-                    } else if (e.getCause() instanceof FileNotFoundException) {
-                        count++;
-                        waitRetry(waitSec);
-                    } else {
-                        LOG.info("turned notRetry flag: " + notRetry);
-                        notRetry = true;
-                    }
-                } finally {
-                    if (count >= retryCount || notRetry) {
-                        throw new IOException("Retry out error");
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public void execute(final REQ request, final RET result, final File file)
             throws CommandException {
@@ -89,7 +59,7 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
 
         // upload records
         try {
-            new ExtRetryClient().retry(new Retryable() {
+            new RetryClient().retry(new Retryable() {
                 @Override
                 public void doTry() throws ClientException {
                     try {
@@ -104,6 +74,9 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
                                 partID, in, (int) size);
                         // TODO #MN change client's API: int to long
                         biClient.uploadPart(req);
+                        LOG.info(String.format(
+                                "uploaded file = %s on sesssion %s",
+                                file.getName(), sess.getName()));
                     } catch (IOException e) {
                         throw new ClientException(e);
                     }
@@ -113,8 +86,6 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
             LOG.severe(e.getMessage());
             throw new CommandException(e);
         }
-
-        LOG.fine(String.format("uploaded file: %s", file.getName()));
     }
 
     @Override
