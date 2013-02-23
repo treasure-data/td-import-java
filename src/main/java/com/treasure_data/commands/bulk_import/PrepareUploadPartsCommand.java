@@ -154,7 +154,7 @@ public class PrepareUploadPartsCommand extends
         }
     }
 
-    // TODO summary object works on multi-threading?
+    // TODO summary object works on multi-threading? => maybe ok by #MN
     private SessionSummary summary;
 
     @Override
