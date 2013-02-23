@@ -8,8 +8,8 @@ import org.junit.Test;
 import com.treasure_data.commands.Config;
 
 public class TestBulkImportTool {
-    @Test
-    public void testPrepareUploadPartsSample() throws Exception {
+    @Test @Ignore
+    public void testPrepareUploadPartsSample02() throws Exception {
         // bulk_import:create mugasess mugadb sesstest
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
@@ -17,6 +17,29 @@ public class TestBulkImportTool {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
         props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "4");
+        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "false");
+        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
+        final String[] args = new String[] {
+                "upload_parts",
+                //"prepare_parts",
+                "mugasess",
+                "./in/from_SQLServer_to_csv_10000000_v01.csv",
+                "./in/from_SQLServer_to_csv_10000000_v02.csv",
+        };
+
+        BulkImportTool.uploadParts(args, props);
+        //BulkImportTool.prepareParts(args, props);
+    }
+
+    @Test @Ignore
+    public void testPrepareUploadPartsSample() throws Exception {
+        // bulk_import:create mugasess mugadb sesstest
+        Properties props = System.getProperties();
+        props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
+        props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
+        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
+        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "1");
         props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "false");
         props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
         final String[] args = new String[] {
