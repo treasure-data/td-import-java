@@ -19,12 +19,14 @@ package com.treasure_data.commands.bulk_import;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
 import com.treasure_data.client.ClientException;
+import com.treasure_data.client.HttpClientException;
 import com.treasure_data.client.RetryClient;
 import com.treasure_data.client.RetryClient.Retryable;
 import com.treasure_data.client.TreasureDataClient;
@@ -43,6 +45,36 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
     public UploadPartsCommand() {
     }
 
+    private static class ExtRetryClient extends RetryClient {
+        public void retry(Retryable r, int retryCount, long waitSec) throws IOException {
+            int count = 0;
+            boolean notRetry = false;
+            while (true) {
+                try {
+                    r.doTry();
+                    break;
+                } catch (ClientException e) {
+                    LOG.warning(e.getMessage());
+                    if (e instanceof HttpClientException
+                            && ((HttpClientException) e).getResponseCode() < 400) {
+                        count++;
+                        waitRetry(waitSec);
+                    } else if (e.getCause() instanceof FileNotFoundException) {
+                        count++;
+                        waitRetry(waitSec);
+                    } else {
+                        LOG.info("turned notRetry flag: " + notRetry);
+                        notRetry = true;
+                    }
+                } finally {
+                    if (count >= retryCount || notRetry) {
+                        throw new IOException("Retry out error");
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void execute(final REQ request, final RET result, final File file)
             throws CommandException {
@@ -57,7 +89,7 @@ public class UploadPartsCommand<REQ extends UploadPartsRequest, RET extends Uplo
 
         // upload records
         try {
-            new RetryClient().retry(new Retryable() {
+            new ExtRetryClient().retry(new Retryable() {
                 @Override
                 public void doTry() throws ClientException {
                     try {
