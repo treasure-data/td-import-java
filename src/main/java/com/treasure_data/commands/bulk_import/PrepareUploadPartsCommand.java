@@ -57,8 +57,9 @@ public class PrepareUploadPartsCommand extends
 
         //LOG.fine(String.format("started preparing file: %s", file.getName()));
         PreparePartsRequest prepareRequest = request.getPreparePartsRequest();
-        MultiThreadsPreparePartsResult prepareResult =
-                (MultiThreadsPreparePartsResult) result.getPreparePartsResult();
+        PrepareUploadPartsResult.MultiThreadsPreparePartsResult prepareResult =
+                (PrepareUploadPartsResult.MultiThreadsPreparePartsResult)
+                result.getPreparePartsResult();
         PreparePartsCommand prepareCommand = new PreparePartsCommand();
         MultithreadsCommand multithreads = new MultithreadsCommand(prepareCommand);
         multithreads.execute(prepareRequest, prepareResult);
