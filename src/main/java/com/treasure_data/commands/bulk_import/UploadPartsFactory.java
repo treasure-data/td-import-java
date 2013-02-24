@@ -49,8 +49,7 @@ public class UploadPartsFactory {
     public static Command newCommandInstance(
             UploadPartsRequest request) throws CommandException {
         if (request instanceof PrepareUploadPartsRequest) {
-            PrepareUploadPartsCommand command = new PrepareUploadPartsCommand();
-            return new MultithreadsCommand<PrepareUploadPartsRequest, PrepareUploadPartsResult>(command);
+            return new PrepareUploadPartsCommand();
         } else if (request instanceof UploadPartsRequest) {
             UploadPartsCommand<UploadPartsRequest, UploadPartsResult> command =
                     new UploadPartsCommand<UploadPartsRequest, UploadPartsResult>();

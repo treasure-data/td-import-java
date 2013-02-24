@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.msgpack.unpacker.Unpacker;
-import org.msgpack.unpacker.UnpackerIterator;
 
 import com.treasure_data.client.ClientException;
 import com.treasure_data.client.RetryClient;
@@ -18,6 +17,7 @@ import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.RetryClient.Retryable;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.MultithreadsCommand;
 import com.treasure_data.model.bulkimport.Session;
 import com.treasure_data.model.bulkimport.SessionSummary;
 
@@ -26,70 +26,56 @@ public class PrepareUploadPartsCommand extends
     private static final Logger LOG = Logger
             .getLogger(PrepareUploadPartsCommand.class.getName());
 
-    BlockingQueue<Worker.Task> taskQueue;
+    static BlockingQueue<UploadWorker.Task> uploadTaskQueue =
+            new LinkedBlockingQueue<UploadWorker.Task>();
+    static List<UploadWorker> uploadWorkers = new ArrayList<UploadWorker>();
 
     public PrepareUploadPartsCommand() {
-        taskQueue = new LinkedBlockingQueue<Worker.Task>();
     }
 
     @Override
     public void execute(PrepareUploadPartsRequest request,
             PrepareUploadPartsResult result) throws CommandException {
-        File[] files = request.getFiles();
-        for (File f : files) {
-            PrepareUploadPartsResult clonedResult =
-                    (PrepareUploadPartsResult) result.clone();
-            execute(request, clonedResult, f);
-        }
-    }
-
-    @Override
-    public void execute(PrepareUploadPartsRequest request,
-            PrepareUploadPartsResult result, File file) throws CommandException {
         int numOfUploadThreads = request.getNumOfUploadThreads();
 
         LOG.fine(String.format("started uploading threads"));
         UploadPartsCommand uploadCommand = new UploadPartsCommand();
         UploadPartsRequest uploadRequest = request.getUploadPartsRequest();
         UploadPartsResult uploadResult = result.getUploadPartsResult();
-        List<Worker> workers = new ArrayList<Worker>(numOfUploadThreads);
 
-        //create workers
+        // create workers
         for (int i = 0; i < numOfUploadThreads; i++) {
-            Worker worker = new Worker(this, uploadCommand, uploadRequest, uploadResult);
-            workers.add(worker);
+            UploadWorker worker = new UploadWorker(this, uploadCommand,
+                    uploadRequest, uploadResult);
+            uploadWorkers.add(worker);
         }
 
         // start workers
-        for (int i = 0; i < workers.size(); i++) {
-            workers.get(i).start();
+        for (int i = 0; i < uploadWorkers.size(); i++) {
+            uploadWorkers.get(i).start();
         }
 
-        LOG.fine(String.format("started preparing file: %s", file.getName()));
+        //LOG.fine(String.format("started preparing file: %s", file.getName()));
         PreparePartsRequest prepareRequest = request.getPreparePartsRequest();
         MultiThreadsPreparePartsResult prepareResult =
                 (MultiThreadsPreparePartsResult) result.getPreparePartsResult();
-        prepareResult.setPrepareUploadPartsCommand(this);
         PreparePartsCommand prepareCommand = new PreparePartsCommand();
-        prepareCommand.execute(prepareRequest, prepareResult, file);
+        MultithreadsCommand multithreads = new MultithreadsCommand(prepareCommand);
+        multithreads.execute(prepareRequest, prepareResult);
+        //prepareCommand.execute(prepareRequest, prepareResult, file);
+        
         prepareResult.addFinishTask(numOfUploadThreads);
 
-        // join
-        while (!workers.isEmpty()) {
-            Worker lastWorker = workers.get(workers.size() - 1);
-            if (lastWorker.isFinished.get()) {
-                workers.remove(workers.size() - 1);
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-        }
+        postExecute(request, result);
     }
 
-    static class Worker extends Thread {
+    @Override
+    public void execute(PrepareUploadPartsRequest request,
+            PrepareUploadPartsResult result, File file) throws CommandException {
+        throw new UnsupportedOperationException();
+    }
+
+    static class UploadWorker extends Thread {
         static final Task FINISH_TASK = new Task("__FINISH__");
         AtomicBoolean isFinished = new AtomicBoolean(false);
 
@@ -120,7 +106,7 @@ public class PrepareUploadPartsCommand extends
         UploadPartsRequest request;
         UploadPartsResult result;
 
-        Worker(PrepareUploadPartsCommand parent, UploadPartsCommand command,
+        UploadWorker(PrepareUploadPartsCommand parent, UploadPartsCommand command,
                 UploadPartsRequest request, UploadPartsResult result) {
             this.parent = parent;
             this.command = command;
@@ -131,7 +117,7 @@ public class PrepareUploadPartsCommand extends
         @Override
         public void run() {
             while (true) {
-                Worker.Task t = parent.taskQueue.poll();
+                UploadWorker.Task t = PrepareUploadPartsCommand.uploadTaskQueue.poll();
                 if (t == null) {
                     continue;
                 } else if (Task.endTask(t)) {
@@ -149,7 +135,7 @@ public class PrepareUploadPartsCommand extends
             isFinished.set(true);
         }
 
-        private void run0(Worker.Task t) throws CommandException {
+        private void run0(UploadWorker.Task t) throws CommandException {
             command.execute(request, result, new File(t.fileName));
         }
     }
@@ -160,6 +146,20 @@ public class PrepareUploadPartsCommand extends
     @Override
     public void postExecute(PrepareUploadPartsRequest request,
             PrepareUploadPartsResult result) throws CommandException {
+        // join
+        while (!uploadWorkers.isEmpty()) {
+            UploadWorker lastWorker = uploadWorkers.get(uploadWorkers.size() - 1);
+            if (lastWorker.isFinished.get()) {
+                uploadWorkers.remove(uploadWorkers.size() - 1);
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
+
         if (!request.autoPerform()) {
             return;
         }
@@ -199,6 +199,21 @@ public class PrepareUploadPartsCommand extends
             LOG.severe(e.getMessage());
             throw new CommandException(e);
         }
+        try { // show job_id after starting perform processing
+            new RetryClient().retry(new Retryable() {
+                @Override
+                public void doTry() throws ClientException {
+                    summary = biClient.showSession(sess.getName());
+                }
+            }, request.getRetryCount(), request.getWaitSec());
+        } catch (IOException e) {
+            LOG.severe(e.getMessage());
+            throw new CommandException(e);
+        }
+        LOG.info(String.format(
+                "Job %s is queued", summary.getJobID()));
+        LOG.info(String.format(
+                "Use 'td job:show [-w] %s' to show the status", summary.getJobID()));
 
         if (request.autoCommit() && request.autoPerform()) {
             // check 'perform' processing is finished

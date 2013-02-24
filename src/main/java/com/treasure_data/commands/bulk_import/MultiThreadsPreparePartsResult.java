@@ -17,14 +17,7 @@
 //
 package com.treasure_data.commands.bulk_import;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.treasure_data.commands.CommandResult;
-
 public class MultiThreadsPreparePartsResult extends PreparePartsResult {
-
-    PrepareUploadPartsCommand command;
 
     public MultiThreadsPreparePartsResult() {
         super();
@@ -32,14 +25,8 @@ public class MultiThreadsPreparePartsResult extends PreparePartsResult {
 
     public synchronized void addOutputFilePath(String filePath) {
         super.addOutputFilePath(filePath);
-        if (command != null) {
-            command.taskQueue.add(
-                    new PrepareUploadPartsCommand.Worker.Task(filePath));
-        }
-    }
-
-    public void setPrepareUploadPartsCommand(PrepareUploadPartsCommand command) {
-        this.command = command;
+        PrepareUploadPartsCommand.uploadTaskQueue.add(
+                new PrepareUploadPartsCommand.UploadWorker.Task(filePath));
     }
 
     public Object clone() {
@@ -47,11 +34,9 @@ public class MultiThreadsPreparePartsResult extends PreparePartsResult {
     }
 
     public synchronized void addFinishTask(int numOfThreads) {
-        if (command != null) {
-            for (int i = 0; i < numOfThreads; i++) {
-                command.taskQueue
-                        .add(PrepareUploadPartsCommand.Worker.FINISH_TASK);
-            }
+        for (int i = 0; i < numOfThreads; i++) {
+            PrepareUploadPartsCommand.uploadTaskQueue
+            .add(PrepareUploadPartsCommand.UploadWorker.FINISH_TASK);
         }
     }
 }
