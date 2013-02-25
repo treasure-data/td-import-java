@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.treasure_data</groupId>
@@ -65,6 +68,14 @@
     <wagon-webdav-jackrabbit.version>1.0-beta-7</wagon-webdav-jackrabbit.version>
     <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
     <maven-surefire-report-plugin.version>2.11</maven-surefire-report-plugin.version>
+
+    <!-- other properties -->
+    <javac.encoding>UTF-8</javac.encoding>
+    <javac.source>1.6</javac.source>
+    <javac.target>1.6</javac.target>
+    <javadoc.encoding>UTF-8</javadoc.encoding>
+    <javadoc.locale>en_US</javadoc.locale>
+    <surefire.threadCount>1</surefire.threadCount>
   </properties>
 
   <repositories>
@@ -135,9 +146,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <encoding>UTF-8</encoding>
+          <source>${javac.source}</source>
+          <target>${javac.target}</target>
+          <encoding>${javac.encoding}</encoding>
         </configuration>
       </plugin>
 
@@ -198,7 +209,7 @@
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
           <parallel>methods</parallel>
-          <threadCount>1</threadCount>
+          <threadCount>${surefire.threadCount}</threadCount>
         </configuration>
         <dependencies>
           <dependency>
@@ -254,8 +265,8 @@
         <configuration>
           <doctitle>${project.name} ${project.version} API</doctitle>
           <aggregate>true</aggregate>
-          <locale>en_US</locale>
-          <encoding>UTF-8</encoding>
+          <locale>${javadoc.locale}</locale>
+          <encoding>${javadoc.encoding}</encoding>
         </configuration>
       </plugin>
       <plugin>
