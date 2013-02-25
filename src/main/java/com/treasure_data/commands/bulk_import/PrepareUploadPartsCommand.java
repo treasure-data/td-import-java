@@ -63,10 +63,8 @@ public class PrepareUploadPartsCommand extends
         PreparePartsCommand prepareCommand = new PreparePartsCommand();
         MultithreadsCommand multithreads = new MultithreadsCommand(prepareCommand);
         multithreads.execute(prepareRequest, prepareResult);
-        //prepareCommand.execute(prepareRequest, prepareResult, file);
         
         prepareResult.addFinishTask(numOfUploadThreads);
-
         postExecute(request, result);
     }
 

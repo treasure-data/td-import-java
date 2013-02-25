@@ -6,11 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.CharsetDecoder;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.Config;

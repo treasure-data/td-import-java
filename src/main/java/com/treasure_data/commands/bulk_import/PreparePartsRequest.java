@@ -160,8 +160,6 @@ public class PreparePartsRequest extends CommandRequest {
             }
         }
 
-        // TODO #MN should implement later
-        // time format
         timeFormat = props.getProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT,
                 Config.BI_PREPARE_PARTS_TIMEFORMAT_DEFAULTVALUE);
 

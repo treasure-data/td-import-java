@@ -25,7 +25,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
     }
 
     public static enum ColumnType {
-        INT("int", 0), LONG("long", 1), DOUBLE("double", 2), STRING("string", 3);
+        INT("int", 0), LONG("long", 1), DOUBLE("double", 2), STRING("string", 3), TIME("time", 4);
 
         private String type;
 
@@ -182,6 +182,11 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         String oColumns = props.getProperty(
                 Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
         if (oColumns != null && !oColumns.isEmpty()) {
+            if (eColumns != null && !eColumns.isEmpty()) {
+                throw new CommandException(String.format("%s and %s must not be used",
+                        Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS,
+                        Config.BI_PREPARE_PARTS_ONLY_COLUMNS));
+            }
             onlyColumns = oColumns.split(",");
         } else {
             onlyColumns = new String[0];

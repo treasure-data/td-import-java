@@ -13,8 +13,9 @@ import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 import com.treasure_data.commands.CommandException;
+import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 
-public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
+public class TimeFormatSuggestionProcessor extends TypeSuggestionProcessor {
 
     public static enum TimeFormat {
         INT("int", 0),
@@ -93,10 +94,9 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
     private int[] scores = new int[] { 0, 0, 0, 0, 0, 0, 0 };
     private TimeFormatMatcher[] matchers;
-    private int rowSize;
 
-    TimeFormatSuggestionProcessor(int rowSize) {
-        this.rowSize = rowSize;
+    TimeFormatSuggestionProcessor(int rowSize, int hintScore) {
+        super(rowSize, hintScore);
         this.matchers = new TimeFormatMatcher[7];
         matchers[0] = new IntegerTimeFormatMatcher();
         matchers[1] = new LongTimeFormatMatcher();
@@ -107,8 +107,18 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
         matchers[6] = new ANSICAscTimeFormatMatcher();
     }
 
-    void addHint() throws CommandException { // TODO e.g. strf time
-        throw new UnsupportedOperationException();
+    void addHint(String typeHint) throws CommandException {
+        // TODO e.g. strf time
+    }
+
+    @Override
+    ColumnType getSuggestedType() {
+        return ColumnType.TIME;
+    }
+
+    TimeFormatProcessor getSuggestedTimeFormatProcessor()
+            throws CommandException {
+        return createTimeFormatProcessor(getSuggestedTimeFormat());
     }
 
     TimeFormat getSuggestedTimeFormat() {
@@ -132,7 +142,7 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
             return new LongTimeFormatProcessor();
         case FLOAT:
             return new FloatTimeFormatProcessor();
-        case  RFC_822_1123_FORMAT:
+        case RFC_822_1123_FORMAT:
             return new RFC_822_1123_FormatProcessor();
         case RFC_850_1036_FORMAT:
             return new RFC_850_1036_FormatProcessor();
@@ -302,7 +312,12 @@ public class TimeFormatSuggestionProcessor extends CellProcessorAdaptor {
 
             String text = (String) v;
             ParsePosition pp = new ParsePosition(0);
-            Date d = getFormat().parse(text, pp);
+            Date d = null;
+            try {
+                d = getFormat().parse(text, pp);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
             return d != null && pp.getErrorIndex() == -1;
         }
 
