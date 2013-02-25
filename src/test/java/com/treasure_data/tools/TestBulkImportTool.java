@@ -16,7 +16,7 @@ public class TestBulkImportTool {
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
-        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "4");
+        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "8");
         props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "false");
         props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
         final String[] args = new String[] {
@@ -39,7 +39,7 @@ public class TestBulkImportTool {
         props.setProperty(Config.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
-        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "1");
+        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "4");
         props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "false");
         props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
         final String[] args = new String[] {
@@ -49,6 +49,12 @@ public class TestBulkImportTool {
                 "./in/from_SQLServer_to_csv_10_v01.csv",
                 "./in/from_SQLServer_to_csv_10_v02.csv",
                 "./in/from_SQLServer_to_csv_10_v03.csv",
+                "./in/from_SQLServer_to_csv_10_v04.csv",
+                "./in/from_SQLServer_to_csv_10_v05.csv",
+                "./in/from_SQLServer_to_csv_10_v06.csv",
+                "./in/from_SQLServer_to_csv_10_v07.csv",
+                "./in/from_SQLServer_to_csv_10_v08.csv",
+                "./in/from_SQLServer_to_csv_10_v09.csv",
         };
 
         BulkImportTool.uploadParts(args, props);
