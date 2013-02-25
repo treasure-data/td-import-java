@@ -21,7 +21,6 @@ import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 import com.treasure_data.file.CSVFileParser;
-import com.treasure_data.file.CSVFileParser.TypeSuggestionProcessor;
 
 public class TestCSVFileParser {
 

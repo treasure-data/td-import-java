@@ -25,7 +25,6 @@ public class TestCSVPreparePartsRequest {
             props.setProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES, "int,long");
             props.setProperty(Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR, "none");
             props.setProperty(Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, "v0");
-            props.setProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS, "v1");
             props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "50");
             props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE, "10");
 
@@ -40,7 +39,7 @@ public class TestCSVPreparePartsRequest {
             assertArrayEquals(new String[] { "int", "long" }, req.getColumnTypeHints());
             assertEquals("none", req.getTypeErrorMode());
             assertArrayEquals(new String[] { "v0" }, req.getExcludeColumns());
-            assertArrayEquals(new String[] { "v1" }, req.getOnlyColumns());
+            assertArrayEquals(new String[] {}, req.getOnlyColumns());
             assertEquals(50, req.getSampleRowSize());
             assertEquals(10, req.getSampleHintScore());
         }
