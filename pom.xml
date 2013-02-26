@@ -6,8 +6,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.treasure_data</groupId>
   <artifactId>td-bulk-import</artifactId>
-  <name>Java Extension to CUI for Treasure Data</name>
-  <description>Java Extension to CUI for Treasure Data.</description>
+  <name>BulkImport Tool for Treasure Data</name>
+  <description>BulkImport Tool for Treasure Data.</description>
   <version>0.1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <url>https://github.com/treasure-data/td-bulk-import-java</url>
@@ -23,7 +23,7 @@
   <scm>
     <connection>scm:git:git://github.com/treasure-data/td-bulk-import-java.git</connection>
     <developerConnection>scm:git:git@github.com:treasure-data/td-bulk-import-java.git</developerConnection>
-    <url>https://github.com/treasure-data/td-java</url>
+    <url>https://github.com/treasure-data/td-bulk-import-java</url>
   </scm>
 
   <developers>
