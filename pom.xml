@@ -236,6 +236,7 @@
                 <includes>
                   <include>net.sf.supercsv</include>
                   <include>com.googlecode.json-simple:json-simple</include>
+                  <include>com.treasure_data:td-client</include>
                   <include>org.msgpack</include>
                   <include>org.javassist:javassist</include>
                 </includes>
