@@ -56,7 +56,7 @@ public class TestPreparePartsRequest {
             props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "sjis");
             props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
             props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "12345");
-            // TODO #MN implement time format
+            props.setProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT, "%Y-%m-%d %H:%M:%S");
             props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "out");
             props.setProperty(Config.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT, "err");
             props.setProperty(Config.BI_PREPARE_PARTS_DRYRUN, "true");
@@ -68,6 +68,7 @@ public class TestPreparePartsRequest {
             assertEquals("sjis", req.getEncoding());
             assertEquals("timestamp", req.getAliasTimeColumn());
             assertEquals(12345L, req.getTimeValue());
+            assertEquals("%Y-%m-%d %H:%M:%S", req.getTimeFormat());
             assertEquals("out", req.getOutputDirName());
             assertEquals("err", req.getErrorRecordOutputDirName());
             assertEquals(true, req.dryRun());
@@ -83,7 +84,7 @@ public class TestPreparePartsRequest {
             assertEquals(Config.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE, req.getEncoding());
             assertEquals(null, req.getAliasTimeColumn());
             assertEquals(-1L, req.getTimeValue());
-            // TODO #MN implement time format
+            assertEquals(null, req.getTimeFormat());
             assertEquals("out", req.getOutputDirName());
             assertEquals(null, req.getErrorRecordOutputDirName());
             assertEquals(Boolean.parseBoolean(Config.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE), req.dryRun());
