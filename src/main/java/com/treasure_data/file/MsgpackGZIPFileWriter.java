@@ -91,6 +91,10 @@ public class MsgpackGZIPFileWriter
 
         // outputDir
         outputDirName = request.getOutputDirName();
+        File outputDir = new File(outputDirName);
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
 
         // splitSize
         splitSize = request.getSplitSize() * 1024;
