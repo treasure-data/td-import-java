@@ -127,6 +127,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
             // fatal error. i mean here might be not executed
             throw new CommandException("unsupported format: " + format);
         }
+        LOG.config(String.format("use '%s' as delimiterChar", delimiterChar));
 
         // newline
         String nLine = props.getProperty(Config.BI_PREPARE_PARTS_NEWLINE,
@@ -136,6 +137,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         } catch (IllegalArgumentException e) {
             throw new CommandException("unsupported newline char: " + nLine, e);
         }
+        LOG.config(String.format("use '%s' as newline", newline));
 
         // column header
         String columnHeader = props.getProperty(
