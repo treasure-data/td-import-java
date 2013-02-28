@@ -32,6 +32,7 @@ public class FileParserFactory {
                 || format.equals(PreparePartsRequest.Format.TSV)) {
             return new CSVFileParser((CSVPreparePartsRequest) request, result);
         } else if (format.equals(PreparePartsRequest.Format.JSON)) {
+            //return new JSONFileParser(request, result);
             throw new CommandException(new UnsupportedOperationException(
                     "format: " + format));
         } else if (format.equals(PreparePartsRequest.Format.MSGPACK)) {

@@ -160,8 +160,8 @@ public class PreparePartsRequest extends CommandRequest {
             }
         }
 
-        timeFormat = props.getProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT,
-                Config.BI_PREPARE_PARTS_TIMEFORMAT_DEFAULTVALUE);
+        // time format
+        timeFormat = props.getProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT);
 
         // output DIR
         outputDirName = props.getProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR);
