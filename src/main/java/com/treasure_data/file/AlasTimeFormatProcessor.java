@@ -7,11 +7,11 @@ import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 import com.treasure_data.file.TimeFormatSuggestionProcessor.TimeFormat;
 import com.treasure_data.file.TimeFormatSuggestionProcessor.TimeFormatProcessor;
 
-public class AlasTimeFormatSuggestionProcessor extends TypeSuggestionProcessor {
+public class AlasTimeFormatProcessor extends TypeSuggestionProcessor {
 
     private TimeFormatSuggestionProcessor timeFormatProcessor;
 
-    AlasTimeFormatSuggestionProcessor(int rowSize, int hintScore) {
+    AlasTimeFormatProcessor(int rowSize, int hintScore) {
         super(rowSize, hintScore);
         timeFormatProcessor = new TimeFormatSuggestionProcessor(rowSize, hintScore);
     }
