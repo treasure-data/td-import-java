@@ -35,7 +35,7 @@ public class TestCSVPreparePartsRequest {
             assertEquals(CSVPreparePartsRequest.NewLine.CR, req.getNewline());
             assertEquals(true, req.hasColumnHeader());
             assertArrayEquals(null, req.getColumnNames());
-            assertArrayEquals(new String[] { "int", "long" }, req.getColumnTypeHints());
+            assertArrayEquals(new String[] { "int", "long" }, req.getColumnTypes());
             assertEquals("none", req.getTypeErrorMode());
             assertArrayEquals(new String[] { "v0" }, req.getExcludeColumns());
             assertArrayEquals(new String[] {}, req.getOnlyColumns());
@@ -53,7 +53,7 @@ public class TestCSVPreparePartsRequest {
             assertEquals(CSVPreparePartsRequest.NewLine.CRLF, req.getNewline());
             assertEquals(true, req.hasColumnHeader());
             assertArrayEquals(null, req.getColumnNames());
-            assertArrayEquals(new String[0], req.getColumnTypeHints());
+            assertArrayEquals(new String[0], req.getColumnTypes());
             assertEquals("skip", req.getTypeErrorMode());
             assertArrayEquals(new String[0], req.getExcludeColumns());
             assertArrayEquals(new String[0], req.getOnlyColumns());

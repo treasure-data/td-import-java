@@ -40,7 +40,7 @@ public class TestCSVFileParser {
         request.setAliasTimeColumn(null);
         request.setOnlyColumns(new String[0]);
         request.setExcludeColumns(new String[0]);
-        request.setColumnTypeHints(new String[0]);
+        request.setColumnTypes(new String[0]);
         result = new PreparePartsResult();
 
         parser = new CSVFileParser(request, result);

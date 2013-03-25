@@ -244,8 +244,8 @@ public class CSVFileParser extends
             }
 
             // new String[] { "long", "string", "long" }
-            String[] columnTypeHints = request.getColumnTypeHints();
-            int columnTypeHintSize = columnTypeHints.length;
+            String[] columnTypes = request.getColumnTypes();
+            int columnTypeHintSize = columnTypes.length;
             if (columnTypeHintSize != 0 && columnTypeHintSize != allColumnNames.length) {
                 throw new CommandException(String.format(
                         "mismatched between size of specified column types (%d) and size of columns (%d)",
@@ -256,21 +256,21 @@ public class CSVFileParser extends
             if (timeIndex < 0) {
                 if (aliasTimeIndex >= 0) {
                     cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypeHints, request.getSampleRowSize(),
+                            allColumnNames, columnTypes, request.getSampleRowSize(),
                             -1, aliasTimeIndex);
                 } else {
                     cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypeHints, request.getSampleRowSize(),
+                            allColumnNames, columnTypes, request.getSampleRowSize(),
                             -1, -1);
                 }
             } else {
                 if (aliasTimeIndex >= 0) {
                     cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypeHints, request.getSampleRowSize(),
+                            allColumnNames, columnTypes, request.getSampleRowSize(),
                             timeIndex, aliasTimeIndex);
                 } else {
                     cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypeHints, request.getSampleRowSize(),
+                            allColumnNames, columnTypes, request.getSampleRowSize(),
                             timeIndex, -1);
                 }
             }

@@ -91,7 +91,7 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
     protected char delimiterChar;
     protected NewLine newline;
     protected String[] columnNames;
-    protected String[] columnTypeHints;
+    protected String[] columnTypes;
     protected boolean hasColumnHeader;
     protected String typeErrorMode;
     protected String[] excludeColumns;
@@ -157,12 +157,11 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         }
 
         // column types
-        String cTypeHints = props.getProperty(
-                Config.BI_PREPARE_PARTS_COLUMNTYPES);
-        if (cTypeHints != null && !cTypeHints.isEmpty()) {
-            columnTypeHints = cTypeHints.split(",");
+        String cTypes = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES);
+        if (cTypes != null && !cTypes.isEmpty()) {
+            columnTypes = cTypes.split(",");
         } else {
-            columnTypeHints = new String[0];
+            columnTypes = new String[0];
         }
 
         // type-conversion-error
@@ -232,12 +231,12 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
         return columnNames;
     }
 
-    public void setColumnTypeHints(String[] hints) {
-        this.columnTypeHints = hints;
+    public void setColumnTypes(String[] types) {
+        this.columnTypes = types;
     }
 
-    public String[] getColumnTypeHints() {
-        return columnTypeHints;
+    public String[] getColumnTypes() {
+        return columnTypes;
     }
 
     public void setHasColumnHeader(boolean flag) {
