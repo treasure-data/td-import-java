@@ -88,8 +88,7 @@ public class TestCSVFileParser {
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING),
-                    values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
 
             assertEquals(CSVPreparePartsRequest.ColumnType.STRING, TSP.getSuggestedType());
         }

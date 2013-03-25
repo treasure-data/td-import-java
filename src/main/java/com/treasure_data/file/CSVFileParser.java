@@ -245,39 +245,23 @@ public class CSVFileParser extends
 
             // new String[] { "long", "string", "long" }
             String[] columnTypes = request.getColumnTypes();
-            int columnTypeHintSize = columnTypes.length;
-            if (columnTypeHintSize != 0 && columnTypeHintSize != allColumnNames.length) {
+            int columnTypeSize = columnTypes.length;
+            if (columnTypeSize != 0 && columnTypeSize != allColumnNames.length) {
                 throw new CommandException(String.format(
                         "mismatched between size of specified column types (%d) and size of columns (%d)",
-                        columnTypeHintSize, allColumnNames.length));
+                        columnTypeSize, allColumnNames.length));
             }
 
-            CellProcessor[] cprocs;
-            if (timeIndex < 0) {
-                if (aliasTimeIndex >= 0) {
-                    cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypes, request.getSampleRowSize(),
-                            -1, aliasTimeIndex);
-                } else {
-                    cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypes, request.getSampleRowSize(),
-                            -1, -1);
-                }
-            } else {
-                if (aliasTimeIndex >= 0) {
-                    cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypes, request.getSampleRowSize(),
-                            timeIndex, aliasTimeIndex);
-                } else {
-                    cprocs = new CellProcessorGen().genForSampleReader(
-                            allColumnNames, columnTypes, request.getSampleRowSize(),
-                            timeIndex, -1);
-                }
-            }
+            final int sampleRowSize = request.getSampleRowSize();
+
+            CellProcessor[] cprocs = new CellProcessorGen().genForSampleReader(
+                    allColumnNames, columnTypes, sampleRowSize,
+                    timeIndex < 0 ? -1 : timeIndex,
+                    aliasTimeIndex >= 0 ? aliasTimeIndex : -1);
 
             List<Object> firstRow = null;
             boolean isFirstRow = false;
-            for (int i = 0; i < request.getSampleRowSize(); i++) {
+            for (int i = 0; i < sampleRowSize; i++) {
                 List<Object> row = sampleReader.read(cprocs);
                 if (!isFirstRow) {
                     firstRow = row;
