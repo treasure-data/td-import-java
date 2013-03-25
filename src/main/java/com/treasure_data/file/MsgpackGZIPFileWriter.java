@@ -137,9 +137,46 @@ public class MsgpackGZIPFileWriter
         }
     }
 
+    @Override
     public void write(Object o) throws CommandException {
         try {
             packer.write(o);
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    @Override
+    public void writeString(String v) throws CommandException {
+        try {
+            packer.write(v);
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    @Override
+    public void writeInt(int v) throws CommandException {
+        try {
+            packer.write(v);
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    @Override
+    public void writeLong(long v) throws CommandException {
+        try {
+            packer.write(v);
+        } catch (IOException e) {
+            throw new CommandException(e);
+        }
+    }
+
+    @Override
+    public void writeNil() throws CommandException {
+        try {
+            packer.writeNil();
         } catch (IOException e) {
             throw new CommandException(e);
         }

@@ -106,6 +106,26 @@ public class FileWriterTestUtil
     }
 
     @Override
+    public void writeString(String got) throws CommandException {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    @Override
+    public void writeInt(int got) throws CommandException {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    @Override
+    public void writeLong(long got) throws CommandException {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    @Override
+    public void writeNil() throws CommandException {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    @Override
     public void writeEndRow() throws CommandException {
         if (!isMap) { // list
             List<Object> expected = expectedList.remove(0);

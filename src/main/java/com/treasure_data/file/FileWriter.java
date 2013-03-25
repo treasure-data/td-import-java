@@ -27,7 +27,11 @@ public abstract class FileWriter<REQ extends CommandRequest, RET extends Command
 
     protected abstract void writeBeginRow(int size) throws CommandException;
 
-    protected abstract void write(Object o) throws CommandException;
+    protected abstract void write(Object v) throws CommandException;
+    public abstract void writeString(String v) throws CommandException;
+    public abstract void writeInt(int v) throws CommandException;
+    public abstract void writeLong(long v) throws CommandException;
+    public abstract void writeNil() throws CommandException;
 
     protected abstract void writeEndRow() throws CommandException;
 

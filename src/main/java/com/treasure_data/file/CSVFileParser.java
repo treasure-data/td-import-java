@@ -43,6 +43,7 @@ import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 import com.treasure_data.file.TimeFormatSuggestionProcessor.TimeFormatProcessor;
+import com.treasure_data.file.proc.ColumnProcessorGen;
 
 public class CSVFileParser extends
         FileParser<CSVPreparePartsRequest, PreparePartsResult> {
@@ -57,7 +58,7 @@ public class CSVFileParser extends
                 if (timeIndex == i) {
                     cprocs[i] = new TimeFormatSuggestionProcessor(sampleRowSize, sampleHintScore);
                 } else if (aliasTimeIndex == i) {
-                    cprocs[i] = new AlasTimeFormatSuggestionProcessor(sampleRowSize, sampleHintScore);
+                    cprocs[i] = new AlasTimeFormatProcessor(sampleRowSize, sampleHintScore);
                 } else {
                     cprocs[i] = new TypeSuggestionProcessor(sampleRowSize, sampleHintScore);
                 }
@@ -117,6 +118,7 @@ public class CSVFileParser extends
 
     private ColumnType[] allSuggestedColumnTypes;
     private CellProcessor[] cprocessors;
+    //private CellProcessor[] cprocessors2;
 
     private TimeFormatProcessor timeColumnProc = null;
     private TimeFormatProcessor aliasTimeColumnProc = null;
@@ -151,10 +153,9 @@ public class CSVFileParser extends
             // get index of specified alias time column
             // new String[] { "timestamp", "name", "price" } as all columns and
             // "timestamp" as alias time column are given, the index is zero.
-            String aliasTimeColumnName = request.getAliasTimeColumn();
-            if (aliasTimeColumnName != null) {
+            if (request.getAliasTimeColumn() != null) {
                 for (int i = 0; i < allColumnNames.length; i++) {
-                    if (allColumnNames[i].equals(aliasTimeColumnName)) {
+                    if (allColumnNames[i].equals(request.getAliasTimeColumn())) {
                         aliasTimeIndex = i;
                         break;
                     }
@@ -288,7 +289,7 @@ public class CSVFileParser extends
                     timeColumnProc = ((TimeFormatSuggestionProcessor) cprocs[i])
                             .getSuggestedTimeFormatProcessor();
                 } else if (i == aliasTimeIndex) {
-                    aliasTimeColumnProc = ((AlasTimeFormatSuggestionProcessor) cprocs[i])
+                    aliasTimeColumnProc = ((AlasTimeFormatProcessor) cprocs[i])
                             .getSuggestedTimeFormatProcessor();
                 }
                 allSuggestedColumnTypes[i] = ((TypeSuggestionProcessor) cprocs[i])
@@ -333,6 +334,7 @@ public class CSVFileParser extends
 
         // create cell processors
         cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes, timeColumnProc);
+        //cprocessors2 = new ColumnProcessorGen().gen(allSuggestedColumnTypes, timeColumnProc);
     }
 
     @Override

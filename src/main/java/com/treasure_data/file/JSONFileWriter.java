@@ -39,6 +39,26 @@ public class JSONFileWriter extends FileWriter<PreparePartsRequest, PrepareParts
     }
 
     @Override
+    public void writeString(String v) throws CommandException {
+        recordElements.add(v);
+    }
+
+    @Override
+    public void writeInt(int v) throws CommandException {
+        recordElements.add(v);
+    }
+
+    @Override
+    public void writeLong(long v) throws CommandException {
+        recordElements.add(v);
+    }
+
+    @Override
+    public void writeNil() throws CommandException {
+        recordElements.add(null);
+    }
+
+    @Override
     protected void writeEndRow() throws CommandException {
         int size = recordElements.size() / 2;
         for (int i = 0; i < size; i++) {
