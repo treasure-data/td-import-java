@@ -105,9 +105,6 @@ public interface Constants extends com.treasure_data.client.Constants {
     // only-columns NAME,NAME,NAME
     String BI_PREPARE_PARTS_ONLY_COLUMNS = "td.bulk_import.prepare_parts.only-columns";
 
-    String BI_PREPARE_PARTS_SAMPLE_HINT_SCORE = "td.bulk_import.prepare_parts.sample.hint.score";
-    String BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE = "3";
-
     String BI_PREPARE_PARTS_SAMPLE_ROWSIZE = "td.bulk_import.prepare_parts.sample.rowsize";
     String BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE = "30";
 

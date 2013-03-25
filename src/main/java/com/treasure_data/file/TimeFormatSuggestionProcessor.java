@@ -95,8 +95,8 @@ public class TimeFormatSuggestionProcessor extends TypeSuggestionProcessor {
     private int[] scores = new int[] { 0, 0, 0, 0, 0, 0, 0 };
     private TimeFormatMatcher[] matchers;
 
-    TimeFormatSuggestionProcessor(int rowSize, int hintScore) {
-        super(rowSize, hintScore);
+    TimeFormatSuggestionProcessor(int rowSize) {
+        super(rowSize);
         this.matchers = new TimeFormatMatcher[7];
         matchers[0] = new IntegerTimeFormatMatcher();
         matchers[1] = new LongTimeFormatMatcher();

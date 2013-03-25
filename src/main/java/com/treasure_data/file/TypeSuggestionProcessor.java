@@ -13,44 +13,36 @@ import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 
 public class TypeSuggestionProcessor extends CellProcessorAdaptor {
+    private boolean fixedColumnType = false;
+    private CSVPreparePartsRequest.ColumnType columnType;
+
     private int[] scores = new int[] { 0, 0, 0, 0 };
     protected int rowSize;
-    protected int hintScore;
 
-    TypeSuggestionProcessor(int rowSize, int hintScore) {
+    TypeSuggestionProcessor(int rowSize) {
         this.rowSize = rowSize;
-        this.hintScore = hintScore;
     }
 
-    void addHint(String typeHint) throws CommandException {
-        if (typeHint == null) {
-            throw new NullPointerException("type hint is null.");
+    void setType(String columnType) throws CommandException {
+        if (columnType == null) {
+            throw new NullPointerException("column type is null.");
         }
 
-        CSVPreparePartsRequest.ColumnType type = ColumnType.fromString(typeHint);
-        if (type == null) { // fatal error
-            throw new CommandException("unsupported type: " + typeHint);
+        //CSVPreparePartsRequest.ColumnType type = ColumnType.fromString(columnType);
+        this.columnType = ColumnType.fromString(columnType);
+        if (this.columnType == null) { // fatal error
+            throw new CommandException(String.format(
+                    "specified column type is not supported: %s",
+                    columnType));
         }
-
-        switch (type) {
-        case INT:
-            scores[INT.index()] += hintScore;
-            break;
-        case LONG:
-            scores[LONG.index()] += hintScore;
-            break;
-        case DOUBLE:
-            scores[DOUBLE.index()] += hintScore;
-            break;
-        case STRING:
-            scores[STRING.index()] += hintScore;
-            break;
-        default:
-            throw new CommandException("fatal error");
-        }
+        fixedColumnType = true;
     }
 
     ColumnType getSuggestedType() {
+        if (fixedColumnType) {
+            return this.columnType;
+        }
+
         int max = -rowSize;
         int maxIndex = 0;
         for (int i = 0; i < scores.length; i++) {
@@ -60,12 +52,6 @@ public class TypeSuggestionProcessor extends CellProcessorAdaptor {
             }
         }
         return ColumnType.fromInt(maxIndex);
-    }
-
-    void printScores() {
-        for (int i = 0; i < scores.length; i++) {
-            System.out.println(scores[i]);
-        }
     }
 
     int getScore(ColumnType type) {
@@ -78,6 +64,10 @@ public class TypeSuggestionProcessor extends CellProcessorAdaptor {
 
     @Override
     public Object execute(Object value, CsvContext context) {
+        if (fixedColumnType) {
+            return next.execute(value, context);
+        }
+
         if (value == null) {
             // any score are not changed
             return null;

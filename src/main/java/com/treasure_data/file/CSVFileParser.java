@@ -51,19 +51,19 @@ public class CSVFileParser extends
 
     static class CellProcessorGen {
         public CellProcessor[] genForSampleReader(String[] columnNames, String[] typeHints,
-                int sampleRowSize, int sampleHintScore, int timeIndex, int aliasTimeIndex)
+                int sampleRowSize, int timeIndex, int aliasTimeIndex)
                         throws CommandException {
             TypeSuggestionProcessor[] cprocs = new TypeSuggestionProcessor[columnNames.length];
             for (int i = 0; i < cprocs.length; i++) {
                 if (timeIndex == i) {
-                    cprocs[i] = new TimeFormatSuggestionProcessor(sampleRowSize, sampleHintScore);
+                    cprocs[i] = new TimeFormatSuggestionProcessor(sampleRowSize);
                 } else if (aliasTimeIndex == i) {
-                    cprocs[i] = new AlasTimeFormatProcessor(sampleRowSize, sampleHintScore);
+                    cprocs[i] = new AlasTimeFormatProcessor(sampleRowSize);
                 } else {
-                    cprocs[i] = new TypeSuggestionProcessor(sampleRowSize, sampleHintScore);
-                }
-                if (typeHints.length != 0) {
-                    cprocs[i].addHint(typeHints[i]);
+                    cprocs[i] = new TypeSuggestionProcessor(sampleRowSize);
+                    if (typeHints.length != 0) {
+                        cprocs[i].setType(typeHints[i]);
+                    }
                 }
             }
             return cprocs;
@@ -141,8 +141,10 @@ public class CSVFileParser extends
 
         try {
             // extract all column names
-            // e.g. new String[] { "time", "name", "price" }
-            // e.g. new String[] { "timestamp", "name", "price" }
+            // e.g. 
+            // 1) [ "time", "name", "price" ]
+            // 2) [ "timestamp", "name", "price" ]
+            // 3) [ "name", "price" ]
             if (request.hasColumnHeader()) {
                 List<String> columnList = sampleReader.read();
                 allColumnNames = columnList.toArray(new String[0]);
@@ -151,7 +153,7 @@ public class CSVFileParser extends
             }
 
             // get index of specified alias time column
-            // new String[] { "timestamp", "name", "price" } as all columns and
+            // [ "timestamp", "name", "price" ] as all columns and
             // "timestamp" as alias time column are given, the index is zero.
             if (request.getAliasTimeColumn() != null) {
                 for (int i = 0; i < allColumnNames.length; i++) {
@@ -161,8 +163,9 @@ public class CSVFileParser extends
                     }
                 }
             }
+
             // get index of 'time' column
-            // new String[] { "time", "name", "price" } as all columns is given,
+            // [ "time", "name", "price" ] as all columns is given,
             // the index is zero.
             for (int i = 0; i < allColumnNames.length; i++) {
                 if (allColumnNames[i].equals(
@@ -171,8 +174,10 @@ public class CSVFileParser extends
                     break;
                 }
             }
+
             if (timeIndex < 0) {
-                // if 'time' column is not included in all columns, then...
+                // if 'time' column is not included in all columns
+                // e.g. [ "name", "price" ]
                 timeValue = request.getTimeValue();
                 if (aliasTimeIndex >= 0 || timeValue > 0) {
                     // 'time' column is appended to all columns (last elem) 
@@ -242,8 +247,9 @@ public class CSVFileParser extends
             String[] columnTypeHints = request.getColumnTypeHints();
             int columnTypeHintSize = columnTypeHints.length;
             if (columnTypeHintSize != 0 && columnTypeHintSize != allColumnNames.length) {
-                throw new CommandException(
-                        "mismatched between size of specified column types and size of columns");
+                throw new CommandException(String.format(
+                        "mismatched between size of specified column types (%d) and size of columns (%d)",
+                        columnTypeHintSize, allColumnNames.length));
             }
 
             CellProcessor[] cprocs;
@@ -251,21 +257,21 @@ public class CSVFileParser extends
                 if (aliasTimeIndex >= 0) {
                     cprocs = new CellProcessorGen().genForSampleReader(
                             allColumnNames, columnTypeHints, request.getSampleRowSize(),
-                            request.getSampleHintScore(), -1, aliasTimeIndex);
+                            -1, aliasTimeIndex);
                 } else {
                     cprocs = new CellProcessorGen().genForSampleReader(
                             allColumnNames, columnTypeHints, request.getSampleRowSize(),
-                            request.getSampleHintScore(), -1, -1);
+                            -1, -1);
                 }
             } else {
                 if (aliasTimeIndex >= 0) {
                     cprocs = new CellProcessorGen().genForSampleReader(
                             allColumnNames, columnTypeHints, request.getSampleRowSize(),
-                            request.getSampleHintScore(), timeIndex, aliasTimeIndex);
+                            timeIndex, aliasTimeIndex);
                 } else {
                     cprocs = new CellProcessorGen().genForSampleReader(
                             allColumnNames, columnTypeHints, request.getSampleRowSize(),
-                            request.getSampleHintScore(), timeIndex, -1);
+                            timeIndex, -1);
                 }
             }
 

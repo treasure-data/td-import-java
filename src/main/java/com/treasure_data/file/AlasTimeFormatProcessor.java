@@ -11,14 +11,9 @@ public class AlasTimeFormatProcessor extends TypeSuggestionProcessor {
 
     private TimeFormatSuggestionProcessor timeFormatProcessor;
 
-    AlasTimeFormatProcessor(int rowSize, int hintScore) {
-        super(rowSize, hintScore);
-        timeFormatProcessor = new TimeFormatSuggestionProcessor(rowSize, hintScore);
-    }
-
-    @Override
-    void addHint(String typeHint) throws CommandException {
-        addHint(typeHint);
+    AlasTimeFormatProcessor(int rowSize) {
+        super(rowSize);
+        timeFormatProcessor = new TimeFormatSuggestionProcessor(rowSize);
     }
 
     @Override

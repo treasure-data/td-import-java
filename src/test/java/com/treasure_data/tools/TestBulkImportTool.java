@@ -40,8 +40,8 @@ public class TestBulkImportTool {
         props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
         props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "4");
-        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "false");
-        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
+        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "true");
+        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "true");
         final String[] args = new String[] {
                 "upload_parts",
                 //"prepare_parts",

@@ -96,7 +96,6 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
     protected String typeErrorMode;
     protected String[] excludeColumns;
     protected String[] onlyColumns;
-    protected int sampleHintScore;
     protected int sampleRowSize;
 
     public CSVPreparePartsRequest() throws CommandException {
@@ -207,20 +206,6 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
                     Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
             throw new CommandException(msg, e);
         }
-
-        // hint score with sample reader
-        String sHintScore = props.getProperty(
-                Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
-                Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
-        try {
-            sampleHintScore = Integer.parseInt(sHintScore);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "sample hint score is required as int type e.g. -D%s=%s",
-                    Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE,
-                    Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE);
-            throw new CommandException(msg, e);
-        }
     }
 
     public void setDelimiterChar(char c) {
@@ -285,14 +270,6 @@ public class CSVPreparePartsRequest extends PreparePartsRequest {
 
     public String[] getOnlyColumns() {
         return onlyColumns;
-    }
-
-    public void setSampleHintScore(int score) {
-        this.sampleHintScore = score;
-    }
-
-    public int getSampleHintScore() {
-        return sampleHintScore;
     }
 
     public void setSampleRowSize(int size) {

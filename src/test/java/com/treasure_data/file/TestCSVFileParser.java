@@ -33,7 +33,6 @@ public class TestCSVFileParser {
     public void createResources() throws Exception {
         request = new CSVPreparePartsRequest();
         request.setSampleRowSize(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE));
-        request.setSampleHintScore(Integer.parseInt(Config.BI_PREPARE_PARTS_SAMPLE_HINT_SCORE_DEFAULTVALUE));
         request.setDelimiterChar(Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE.charAt(0)); // ','
         request.setNewLine(CSVPreparePartsRequest.NewLine.LF); // '\n'
         request.setHasColumnHeader(true);
@@ -60,7 +59,6 @@ public class TestCSVFileParser {
 
     @Test
     public void checkTypeSuggestion() throws Exception {
-        int hintScore = 3;
         {
             String[] values = new String[] {
                     "v0\n", "v1\n", "v2\n", "v3\n", "v4\n",
@@ -77,9 +75,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
-                    values.length, hintScore);
-            TSP.addHint("string");
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -93,7 +89,7 @@ public class TestCSVFileParser {
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING),
-                    hintScore + values.length);
+                    values.length);
 
             assertEquals(CSVPreparePartsRequest.ColumnType.STRING, TSP.getSuggestedType());
         }
@@ -112,9 +108,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
-                    values.length, hintScore);
-            TSP.addHint("int"); // int
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -124,7 +118,7 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), hintScore);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
@@ -146,9 +140,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
-                    values.length, hintScore);
-            TSP.addHint("long");
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -159,7 +151,7 @@ public class TestCSVFileParser {
             sampleReader.close();
 
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), hintScore);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
 
@@ -180,9 +172,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
-                    values.length, hintScore);
-            TSP.addHint("int"); // int
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -192,8 +182,7 @@ public class TestCSVFileParser {
             sampleReader.read(procs);
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), hintScore
-                    + values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), values.length);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), values.length);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), values.length);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
@@ -215,9 +204,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(
-                    values.length, hintScore);
-            TSP.addHint("int"); // int
+            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             for (int i = 0; i < values.length; i++) {
@@ -225,8 +212,7 @@ public class TestCSVFileParser {
             }
             sampleReader.close();
 
-            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), hintScore
-                    + values.length);
+            assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.INT), values.length);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.LONG), values.length);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), values.length);
             assertEquals(TSP.getScore(CSVPreparePartsRequest.ColumnType.STRING), values.length);
