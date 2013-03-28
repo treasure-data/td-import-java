@@ -9,7 +9,7 @@ import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
-public class StrftimeDataProcessor extends CellProcessorAdaptor implements
+public class StrftimeDataProc extends CellProcessorAdaptor implements
         StringCellProcessor {
     private static class ExtStrftime extends Strftime {
         public ExtStrftime(String origFormat) {
@@ -23,7 +23,7 @@ public class StrftimeDataProcessor extends CellProcessorAdaptor implements
 
     private static SimpleDateFormat simpleFormat;
 
-    public StrftimeDataProcessor(String dateFormat) {
+    public StrftimeDataProc(String dateFormat) {
         super();
         if (dateFormat == null) {
             throw new NullPointerException("dateFormat should not be null");
