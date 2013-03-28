@@ -21,6 +21,7 @@ import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsRequest;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
 import com.treasure_data.file.CSVFileParser;
+import com.treasure_data.file.proc.TypeSuggestProc;
 
 public class TestCSVFileParser {
 
@@ -58,7 +59,7 @@ public class TestCSVFileParser {
     }
 
     @Test
-    public void checkTypeSuggestion() throws Exception {
+    public void checkTypeSuggest() throws Exception {
         {
             String[] values = new String[] {
                     "v0\n", "v1\n", "v2\n", "v3\n", "v4\n",
@@ -75,7 +76,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
+            TypeSuggestProc TSP = new TypeSuggestProc(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -107,7 +108,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
+            TypeSuggestProc TSP = new TypeSuggestProc(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -139,7 +140,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
+            TypeSuggestProc TSP = new TypeSuggestProc(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -171,7 +172,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
+            TypeSuggestProc TSP = new TypeSuggestProc(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             sampleReader.read(procs);
@@ -203,7 +204,7 @@ public class TestCSVFileParser {
             CsvListReader sampleReader = new CsvListReader(
                     new InputStreamReader(in), pref);
 
-            TypeSuggestionProcessor TSP = new TypeSuggestionProcessor(values.length);
+            TypeSuggestProc TSP = new TypeSuggestProc(values.length);
             CellProcessor[] procs = new CellProcessor[] { TSP };
 
             for (int i = 0; i < values.length; i++) {
