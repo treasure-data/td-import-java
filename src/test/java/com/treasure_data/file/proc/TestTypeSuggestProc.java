@@ -32,10 +32,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.STRING, proc.getSuggestedType());
         }
     }
@@ -61,10 +57,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.STRING, proc.getSuggestedType());
         }
     }
@@ -90,10 +82,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.STRING, proc.getSuggestedType());
         }
     }
@@ -119,10 +107,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.INT, proc.getSuggestedType());
         }
     }
@@ -148,10 +132,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.INT, proc.getSuggestedType());
         }
     }
@@ -165,10 +145,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.LONG, proc.getSuggestedType());
         }
     }
@@ -182,10 +158,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.LONG, proc.getSuggestedType());
         }
     }
@@ -211,10 +183,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.DOUBLE, proc.getSuggestedType());
         }
     }
@@ -240,10 +208,6 @@ public class TestTypeSuggestProc {
             for (Object value : values) {
                 proc.execute(value, null);
             }
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.INT), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.LONG), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.DOUBLE), 0);
-            assertEquals(proc.getScore(CSVPreparePartsRequest.ColumnType.STRING), 0);
             assertEquals(CSVPreparePartsRequest.ColumnType.DOUBLE, proc.getSuggestedType());
         }
     }

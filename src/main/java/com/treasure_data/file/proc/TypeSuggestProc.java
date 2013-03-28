@@ -12,7 +12,7 @@ import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 
 public class TypeSuggestProc extends CellProcessorAdaptor {
-    private boolean fixedColumnType = false;
+    private boolean specifiedByUser = false;
     private CSVPreparePartsRequest.ColumnType columnType;
 
     private int[] scores = new int[] { 0, 0, 0, 0 };
@@ -24,12 +24,12 @@ public class TypeSuggestProc extends CellProcessorAdaptor {
 
     public void setType(CSVPreparePartsRequest.ColumnType type) {
         columnType = type;
-        fixedColumnType = true;
+        specifiedByUser = true;
     }
 
     public ColumnType getSuggestedType() {
-        if (fixedColumnType) {
-            return this.columnType;
+        if (specifiedByUser) {
+            return columnType;
         }
 
         int max = -rowNumber;
@@ -52,9 +52,21 @@ public class TypeSuggestProc extends CellProcessorAdaptor {
         return scores[i];
     }
 
+    public static void main(String[] args) throws Exception {
+        Object o = 1.1;
+        System.out.println("number?: " + (o instanceof Number));
+        System.out.println("integer?: " + (o instanceof Integer));
+        System.out.println("long?: " + (o instanceof Long));
+        System.out.println("double?: " + (o instanceof Double));
+        Number n = (Number) o;
+        String ns = n.toString();
+
+        System.out.println(Long.parseLong(ns));
+    }
+
     @Override
     public Object execute(Object value, CsvContext context) {
-        if (fixedColumnType) {
+        if (specifiedByUser) {
             return next.execute(value, context);
         }
 
