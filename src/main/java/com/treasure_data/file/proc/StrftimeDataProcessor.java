@@ -1,4 +1,4 @@
-package com.treasure_data.file;
+package com.treasure_data.file.proc;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

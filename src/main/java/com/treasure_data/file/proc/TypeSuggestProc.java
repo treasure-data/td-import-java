@@ -1,4 +1,4 @@
-package com.treasure_data.file;
+package com.treasure_data.file.proc;
 
 import static com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType.DOUBLE;
 import static com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType.INT;
@@ -8,42 +8,31 @@ import static com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.Colu
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.util.CsvContext;
 
-import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 
-public class TypeSuggestionProcessor extends CellProcessorAdaptor {
+public class TypeSuggestProc extends CellProcessorAdaptor {
     private boolean fixedColumnType = false;
     private CSVPreparePartsRequest.ColumnType columnType;
 
     private int[] scores = new int[] { 0, 0, 0, 0 };
-    protected int rowSize;
+    protected int rowNumber;
 
-    TypeSuggestionProcessor(int rowSize) {
-        this.rowSize = rowSize;
+    public TypeSuggestProc(int rowNumber) {
+        this.rowNumber = rowNumber;
     }
 
-    void setType(String columnType) throws CommandException {
-        if (columnType == null) {
-            throw new NullPointerException("column type is null.");
-        }
-
-        //CSVPreparePartsRequest.ColumnType type = ColumnType.fromString(columnType);
-        this.columnType = ColumnType.fromString(columnType);
-        if (this.columnType == null) { // fatal error
-            throw new CommandException(String.format(
-                    "specified column type is not supported: %s",
-                    columnType));
-        }
+    public void setType(CSVPreparePartsRequest.ColumnType type) {
+        columnType = type;
         fixedColumnType = true;
     }
 
-    ColumnType getSuggestedType() {
+    public ColumnType getSuggestedType() {
         if (fixedColumnType) {
             return this.columnType;
         }
 
-        int max = -rowSize;
+        int max = -rowNumber;
         int maxIndex = 0;
         for (int i = 0; i < scores.length; i++) {
             if (max < scores[i]) {
@@ -54,7 +43,8 @@ public class TypeSuggestionProcessor extends CellProcessorAdaptor {
         return ColumnType.fromInt(maxIndex);
     }
 
-    int getScore(ColumnType type) {
+    // TODO #MN should change 'protected'
+    public int getScore(ColumnType type) {
         int i = type.index();
         if (i < 0 || i >= 4) {
             throw new ArrayIndexOutOfBoundsException(i);
@@ -79,6 +69,9 @@ public class TypeSuggestionProcessor extends CellProcessorAdaptor {
         if (value instanceof String) {
             scores[STRING.index()] += 1;
             result = (String) value;
+        } else if (value instanceof Number) {
+            scores[STRING.index()] += 1;
+            result = ((Number) value).toString();
         }
 
         // value looks like Double object?

@@ -1,27 +1,27 @@
-package com.treasure_data.file;
+package com.treasure_data.file.proc;
 
 import org.supercsv.util.CsvContext;
 
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
-import com.treasure_data.file.TimeFormatSuggestionProcessor.TimeFormat;
-import com.treasure_data.file.TimeFormatSuggestionProcessor.TimeFormatProcessor;
+import com.treasure_data.file.proc.TimeFormatSuggestProc.TimeFormat;
+import com.treasure_data.file.proc.TimeFormatSuggestProc.TimeFormatProcessor;
 
-public class AlasTimeFormatProcessor extends TypeSuggestionProcessor {
+public class AlasTimeFormatProc extends TypeSuggestProc {
 
-    private TimeFormatSuggestionProcessor timeFormatProcessor;
+    private TimeFormatSuggestProc timeFormatProcessor;
 
-    AlasTimeFormatProcessor(int rowSize) {
+    public AlasTimeFormatProc(int rowSize) {
         super(rowSize);
-        timeFormatProcessor = new TimeFormatSuggestionProcessor(rowSize);
+        timeFormatProcessor = new TimeFormatSuggestProc(rowSize);
     }
 
     @Override
-    ColumnType getSuggestedType() {
+    public ColumnType getSuggestedType() {
         return super.getSuggestedType();
     }
 
-    TimeFormatProcessor getSuggestedTimeFormatProcessor()
+    public TimeFormatProcessor getSuggestedTimeFormatProcessor()
             throws CommandException {
         return timeFormatProcessor
                 .createTimeFormatProcessor(timeFormatProcessor

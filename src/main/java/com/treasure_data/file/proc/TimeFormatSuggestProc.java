@@ -1,4 +1,4 @@
-package com.treasure_data.file;
+package com.treasure_data.file.proc;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -15,7 +15,7 @@ import org.supercsv.util.CsvContext;
 import com.treasure_data.commands.CommandException;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 
-public class TimeFormatSuggestionProcessor extends TypeSuggestionProcessor {
+public class TimeFormatSuggestProc extends TypeSuggestProc {
 
     public static enum TimeFormat {
         INT("int", 0),
@@ -95,7 +95,7 @@ public class TimeFormatSuggestionProcessor extends TypeSuggestionProcessor {
     private int[] scores = new int[] { 0, 0, 0, 0, 0, 0, 0 };
     private TimeFormatMatcher[] matchers;
 
-    TimeFormatSuggestionProcessor(int rowSize) {
+    public TimeFormatSuggestProc(int rowSize) {
         super(rowSize);
         this.matchers = new TimeFormatMatcher[7];
         matchers[0] = new IntegerTimeFormatMatcher();
@@ -112,17 +112,17 @@ public class TimeFormatSuggestionProcessor extends TypeSuggestionProcessor {
     }
 
     @Override
-    ColumnType getSuggestedType() {
+    public ColumnType getSuggestedType() {
         return ColumnType.TIME;
     }
 
-    TimeFormatProcessor getSuggestedTimeFormatProcessor()
+    public TimeFormatProcessor getSuggestedTimeFormatProcessor()
             throws CommandException {
         return createTimeFormatProcessor(getSuggestedTimeFormat());
     }
 
     TimeFormat getSuggestedTimeFormat() {
-        int max = -rowSize;
+        int max = -rowNumber;
         int maxIndex = 0;
         for (int i = 0; i < scores.length; i++) {
             if (max < scores[i]) {

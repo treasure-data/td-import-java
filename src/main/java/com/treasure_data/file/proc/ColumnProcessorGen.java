@@ -3,7 +3,7 @@ package com.treasure_data.file.proc;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
-import com.treasure_data.file.TimeFormatSuggestionProcessor.TimeFormatProcessor;
+import com.treasure_data.file.proc.TimeFormatSuggestProc.TimeFormatProcessor;
 
 public class ColumnProcessorGen {
 

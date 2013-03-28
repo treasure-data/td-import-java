@@ -42,27 +42,38 @@ import com.treasure_data.commands.Config;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest;
 import com.treasure_data.commands.bulk_import.CSVPreparePartsRequest.ColumnType;
 import com.treasure_data.commands.bulk_import.PreparePartsResult;
-import com.treasure_data.file.TimeFormatSuggestionProcessor.TimeFormatProcessor;
-import com.treasure_data.file.proc.ColumnProcessorGen;
+import com.treasure_data.file.proc.AlasTimeFormatProc;
+import com.treasure_data.file.proc.TimeFormatSuggestProc;
+import com.treasure_data.file.proc.TypeSuggestProc;
+import com.treasure_data.file.proc.TimeFormatSuggestProc.TimeFormatProcessor;
 
 public class CSVFileParser extends
         FileParser<CSVPreparePartsRequest, PreparePartsResult> {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
 
     static class CellProcessorGen {
-        public CellProcessor[] genForSampleReader(String[] columnNames, String[] typeHints,
-                int sampleRowSize, int timeIndex, int aliasTimeIndex)
+        public CellProcessor[] genForSampleReader(String[] columnNames,
+                String[] columnTypes, int sampleRowSize, int timeIndex,
+                int aliasTimeIndex)
                         throws CommandException {
-            TypeSuggestionProcessor[] cprocs = new TypeSuggestionProcessor[columnNames.length];
+            TypeSuggestProc[] cprocs = new TypeSuggestProc[columnNames.length];
             for (int i = 0; i < cprocs.length; i++) {
                 if (timeIndex == i) {
-                    cprocs[i] = new TimeFormatSuggestionProcessor(sampleRowSize);
+                    cprocs[i] = new TimeFormatSuggestProc(sampleRowSize);
                 } else if (aliasTimeIndex == i) {
-                    cprocs[i] = new AlasTimeFormatProcessor(sampleRowSize);
+                    cprocs[i] = new AlasTimeFormatProc(sampleRowSize);
                 } else {
-                    cprocs[i] = new TypeSuggestionProcessor(sampleRowSize);
-                    if (typeHints.length != 0) {
-                        cprocs[i].setType(typeHints[i]);
+                    cprocs[i] = new TypeSuggestProc(sampleRowSize);
+                    if (columnTypes != null && columnTypes.length != 0) {
+                        CSVPreparePartsRequest.ColumnType columnType =
+                                ColumnType.fromString(columnTypes[i]);
+                        if (columnType == null) {
+                            LOG.warning(String.format(
+                                    "specified column type is not supported: %s",
+                                    columnTypes[i]));
+                            continue;
+                        }
+                        cprocs[i].setType(columnType);
                     }
                 }
             }
@@ -276,13 +287,13 @@ public class CSVFileParser extends
             allSuggestedColumnTypes = new ColumnType[cprocs.length];
             for (int i = 0; i < cprocs.length; i++) {
                 if (i == timeIndex) {
-                    timeColumnProc = ((TimeFormatSuggestionProcessor) cprocs[i])
+                    timeColumnProc = ((TimeFormatSuggestProc) cprocs[i])
                             .getSuggestedTimeFormatProcessor();
                 } else if (i == aliasTimeIndex) {
-                    aliasTimeColumnProc = ((AlasTimeFormatProcessor) cprocs[i])
+                    aliasTimeColumnProc = ((AlasTimeFormatProc) cprocs[i])
                             .getSuggestedTimeFormatProcessor();
                 }
-                allSuggestedColumnTypes[i] = ((TypeSuggestionProcessor) cprocs[i])
+                allSuggestedColumnTypes[i] = ((TypeSuggestProc) cprocs[i])
                         .getSuggestedType();
             }
 
