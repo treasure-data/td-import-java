@@ -6,8 +6,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.treasure_data</groupId>
   <artifactId>td-bulk-import</artifactId>
-  <name>BulkImport Tool for Treasure Data</name>
-  <description>BulkImport Tool for Treasure Data.</description>
+  <name>Treasure Data Bulk-Import Tool in Java</name>
+  <description>Treasure Data Bulk-Import Tool in Java.</description>
   <version>0.1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <url>https://github.com/treasure-data/td-bulk-import-java</url>
