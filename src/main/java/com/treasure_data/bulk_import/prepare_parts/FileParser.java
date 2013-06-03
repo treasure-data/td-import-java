@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 public abstract class FileParser {
     // TODO #MN should consider type parameters
-    public static FileParser newInstance(PrepareConfig conf)
+    public static FileParser newFileParser(PrepareConfig conf)
             throws PreparePartsException {
         PrepareConfig.Format format = conf.getFormat();
         if (format.equals(PrepareConfig.Format.CSV)

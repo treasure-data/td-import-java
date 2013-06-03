@@ -41,37 +41,51 @@ import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;;
 
 public class CSVFileParser extends FileParser {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
 
     static class CellProcessorGen {
-        public CellProcessor[] genForSampleReader(String[] columnNames,
-                String[] columnTypes, int sampleRowSize, int timeIndex,
-                int aliasTimeIndex)
-                        throws CommandException {
-            TypeSuggestProc[] cprocs = new TypeSuggestProc[columnNames.length];
-            for (int i = 0; i < cprocs.length; i++) {
-                if (timeIndex == i) {
-                    cprocs[i] = new TimeFormatSuggestProc(sampleRowSize);
-                } else if (aliasTimeIndex == i) {
-                    cprocs[i] = new AlasTimeFormatProc(sampleRowSize);
-                } else {
-                    cprocs[i] = new TypeSuggestProc(sampleRowSize);
-                    if (columnTypes != null && columnTypes.length != 0) {
-                        CSVPreparePartsRequest.ColumnType columnType =
-                                ColumnType.fromString(columnTypes[i]);
-                        if (columnType == null) {
-                            LOG.warning(String.format(
-                                    "specified column type is not supported: %s",
-                                    columnTypes[i]));
-                            continue;
-                        }
-                        cprocs[i].setType(columnType);
-                    }
+        public CellProcessor[] gen(PrepareConfig.ColumnType[] columnTypes)
+                throws PreparePartsException {
+            int len = columnTypes.length;
+            List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
+            for (int i = 0; i < len; i++) {
+                CellProcessor cproc;
+                switch (columnTypes[i]) { // override 'optional' ?
+                case INT:
+                    // TODO optimizable as new converter
+                    cproc = new Optional();
+                    //cproc = new ConvertNullTo(null, new ParseInt());
+                    break;
+                case LONG:
+                    // TODO optimizable as new converter
+                    cproc = new Optional();
+                    //cproc = new ConvertNullTo(null, new ParseLong());
+                    break;
+                case DOUBLE:
+                    // TODO optimizable as new converter
+                    cproc = new Optional();
+                    //cproc = new ConvertNullTo(null, new ParseDouble());
+                    break;
+                case STRING:
+                    // TODO optimizable as new converter
+                    cproc = new Optional();
+                    break;
+                case TIME:
+                    cproc = new ParseDouble();
+                    //cproc = timeFormatProc;
+                    break;
+                default:
+                    String msg = String.format("unsupported type: %s",
+                            columnTypes[i]);
+                    throw new PreparePartsException(msg);
                 }
+                cprocs.add(cproc);
             }
-            return cprocs;
+            return cprocs.toArray(new CellProcessor[0]);
         }
     }
 
@@ -86,10 +100,6 @@ public class CSVFileParser extends FileParser {
 
     private ColumnType[] allSuggestedColumnTypes;
     private CellProcessor[] cprocessors;
-    //private CellProcessor[] cprocessors2;
-
-    private TimeFormatProcessor timeColumnProc = null;
-    private TimeFormatProcessor aliasTimeColumnProc = null;
 
     public CSVFileParser(PrepareConfig conf) throws PreparePartsException {
         super(conf);
@@ -219,59 +229,22 @@ public class CSVFileParser extends FileParser {
                         columnTypeSize, allColumnNames.length));
             }
 
-            final int sampleRowSize = conf.getSampleRowSize();
+        // TODO
 
-            CellProcessor[] cprocs = new CellProcessorGen().genForSampleReader(
-                    allColumnNames, columnTypes, sampleRowSize,
-                    timeIndex < 0 ? -1 : timeIndex,
-                    aliasTimeIndex >= 0 ? aliasTimeIndex : -1);
-
-            List<Object> firstRow = null;
-            boolean isFirstRow = false;
-            for (int i = 0; i < sampleRowSize; i++) {
-                List<Object> row = sampleReader.read(cprocs);
-                if (!isFirstRow) {
-                    firstRow = row;
-                    isFirstRow = true;
-                }
-
-                if (row == null || row.isEmpty()) {
-                    break;
-                }
-            }
-
-            allSuggestedColumnTypes = new ColumnType[cprocs.length];
-            for (int i = 0; i < cprocs.length; i++) {
+            allSuggestedColumnTypes = new ColumnType[allColumnNames.length];
+            for (int i = 0; i < allColumnNames.length; i++) {
                 if (i == timeIndex) {
-                    timeColumnProc = ((TimeFormatSuggestProc) cprocs[i])
-                            .getSuggestedTimeFormatProcessor();
+                    allSuggestedColumnTypes[i] = PrepareConfig.ColumnType.LONG;
                 } else if (i == aliasTimeIndex) {
-                    aliasTimeColumnProc = ((AlasTimeFormatProc) cprocs[i])
-                            .getSuggestedTimeFormatProcessor();
+                    allSuggestedColumnTypes[i] = PrepareConfig.ColumnType.LONG;
+                } else {
+                    allSuggestedColumnTypes[i] = PrepareConfig.ColumnType.STRING;
                 }
-                allSuggestedColumnTypes[i] = ((TypeSuggestProc) cprocs[i])
-                        .getSuggestedType();
-            }
-
-            // print sample row
-            if (firstRow != null) {
-                JSONFileWriter w = new JSONFileWriter(request, result);
-                parseList(w, firstRow);
-                String ret = JSONValue.toJSONString(w.getRecord());
-                LOG.info("sample row: " + ret);
-            } else {
-                LOG.info("sample row is null");
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);
         } finally {
-            if (sampleReader != null) {
-                try {
-                    sampleReader.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
+
         }
     }
 
@@ -290,8 +263,7 @@ public class CSVFileParser extends FileParser {
         }
 
         // create cell processors
-        cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes, timeColumnProc);
-        //cprocessors2 = new ColumnProcessorGen().gen(allSuggestedColumnTypes, timeColumnProc);
+        cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes);
     }
 
     @Override
@@ -323,20 +295,6 @@ public class CSVFileParser extends FileParser {
         return parseList(w, row);
     }
 
-    // TODO patch
-    static final SimpleDateFormat WINGARC_FORMAT = new SimpleDateFormat(
-            "yyyyMMdd", Locale.ENGLISH);
-
-    // TODO patch
-    private static long parseWingArcTimeColumn(long t) {
-        String date = "" + t;
-        try {
-            return WINGARC_FORMAT.parse(date).getTime() / 1000;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private boolean parseList(
             com.treasure_data.bulk_import.prepare_parts.FileWriter w,
             List<Object> row) throws PreparePartsException {
@@ -363,8 +321,7 @@ public class CSVFileParser extends FileParser {
             long time = 0;
             for (int i = 0; i < allSize; i++) {
                 if (i == aliasTimeIndex) {
-                    time = ((Number) aliasTimeColumnProc.execute(row.get(i), null)).longValue();
-                    time = parseWingArcTimeColumn(time); // patch
+                    time = ((Number) row.get(i)).longValue();
                 }
 
                 // i is included in extractedColumnIndexes?

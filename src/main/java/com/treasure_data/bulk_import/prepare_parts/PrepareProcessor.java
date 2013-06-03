@@ -67,17 +67,16 @@ public class PrepareProcessor {
             CompressionType compressionType = conf.getCompressType(task.fileName);
             CharsetDecoder decoder = conf.getCharsetDecoder();
 
-            p = FileParser.newInstance(conf);
+            p = FileParser.newFileParser(conf);
             p.initParser(decoder, conf.createFileInputStream(compressionType, task.fileName));
 
-            if (conf.dryRun()) {
-                // if this processing is dry-run mode, thread of control
-                // returns back
-                return new ErrorInfo(task, null, 0, 0);
-            }
+//            if (conf.dryRun()) {
+//                // if this processing is dry-run mode, thread of control
+//                // returns back
+//                return new ErrorInfo(task, null, 0, 0);
+//            }
 
-            p.startParsing(decoder,
-                    conf.createFileInputStream(compressionType, task.fileName));
+            p.startParsing(decoder, conf.createFileInputStream(compressionType, task.fileName));
             w = new MsgpackGZIPFileWriter(conf);
             w.initWriter(task.fileName);
             while (p.parseRow(w)) {
