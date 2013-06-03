@@ -19,22 +19,22 @@ package com.treasure_data.bulk_import.upload_parts;
 
 import java.util.Properties;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 
-public class UploadConfig extends Config {
-    private Properties props;
+public class UploadConfig extends PrepareConfig {
 
-    private boolean autoPerform;
-    private boolean autoCommit;
-    private int numOfUploadThreads;
-    private int retryCount;
-    private long waitSec;
+    protected boolean autoPerform;
+    protected boolean autoCommit;
+    protected int numOfUploadThreads;
+    protected int retryCount;
+    protected long waitSec;
 
     public UploadConfig() {
+        super();
     }
 
     public void configure(Properties props) {
-        this.props = props;
+        super.configure(props);
 
         // auto-perform
         String aperform = props.getProperty(BI_UPLOAD_PARTS_AUTO_PERFORM,
