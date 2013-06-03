@@ -85,18 +85,25 @@ public class UploadProcessor {
     }
 
     public ErrorInfo execute(final Task task) {
-        LOG.info(String.format(
-                "Upload file '%s' (size %d) to session '%s' as part '%s'",
-                task.fileName, task.size, task.sessName, task.partName));
-
         try {
+            LOG.info(String.format(
+                    "Upload file '%s' (size %d) to session '%s' as part '%s'",
+                    task.fileName, task.size, task.sessName, task.partName));
+
+            long time = System.currentTimeMillis();
             new RetryClient2().retry(new RetryClient2.Retryable2() {
                 @Override
                 public void doTry() throws ClientException, IOException {
                     execute0(task);
                 }
             }, task.sessName, task.partName, conf.getRetryCount(),
-            conf.getWaitSec() * 1000);
+                    conf.getWaitSec() * 1000);
+            time = System.currentTimeMillis() - time;
+
+            LOG.info(String
+                    .format("Uploaded file '%s' (size %d) to session '%s' as part '%s' (time: %d sec.)",
+                            task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
+
             return null;
         } catch (IOException e) {
             LOG.severe(e.getMessage());
@@ -105,16 +112,20 @@ public class UploadProcessor {
     }
 
     protected void execute0(final Task task) throws ClientException, IOException {
-        LOG.fine(String.format(
-                "Upload file '%s' (size %d) to session '%s' as part '%s' by thread '%s'",
-                task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
+        LOG.fine(String
+                .format("Upload file '%s' (size %d) to session '%s' as part '%s' by thread '%s'",
+                        task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
 
+        long time = System.currentTimeMillis();
         Session session = new Session(task.sessName, null, null);
-        client.uploadPart(session, task.partName, task.createInputStream(), (int) task.size);
+        client.uploadPart(session, task.partName, task.createInputStream(),
+                (int) task.size);
+        time = System.currentTimeMillis() - time;
 
-        LOG.fine(String.format(
-                "Uploaded file '%s' (size %d) to session '%s' as part '%s' by thread '%s'",
-                task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
+        LOG.fine(String
+                .format("Uploaded file '%s' (size %d) to session '%s' as part '%s' by thread '%s' (time: %d sec.)",
+                        task.fileName, task.size, task.sessName, task.partName,
+                        Thread.currentThread().getName(), (time / 1000)));
     }
 
     static class RetryClient2 {
