@@ -62,13 +62,13 @@ public class PrepareProcessor {
         // TODO #MN need type paramters
         ErrorInfo err = null;
         FileParser p = null;
-        MsgpackGZIPFileWriter w = null;
+        MsgpackGZIPFileWriter writer = null;
         try {
             CompressionType compressionType = conf.getCompressType(task.fileName);
-            CharsetDecoder decoder = conf.getCharsetDecoder();
 
             p = FileParser.newFileParser(conf);
-            p.initParser(decoder, conf.createFileInputStream(compressionType, task.fileName));
+            p.setDecorder(conf.getCharsetDecoder());
+            p.initParser(conf.createFileInputStream(compressionType, task.fileName));
 
 //            if (conf.dryRun()) {
 //                // if this processing is dry-run mode, thread of control
@@ -76,12 +76,11 @@ public class PrepareProcessor {
 //                return new ErrorInfo(task, null, 0, 0);
 //            }
 
-            p.startParsing(decoder, conf.createFileInputStream(compressionType, task.fileName));
-            w = new MsgpackGZIPFileWriter(conf);
-            w.initWriter(task.fileName);
-            while (p.parseRow(w)) {
-                ;
-            }
+            writer = new MsgpackGZIPFileWriter(conf);
+            writer.initWriter(task.fileName);
+
+            p.setFileWriter(writer);
+            p.parse(conf.createFileInputStream(compressionType, task.fileName));
         } catch (PreparePartsException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -89,13 +88,13 @@ public class PrepareProcessor {
             if (p != null) {
                 p.closeSilently();
             }
-            if (w != null) {
-                w.closeSilently();
+            if (writer != null) {
+                writer.closeSilently();
             }
         }
 
         err.redRows = p.getRowNum();
-        err.writtenRows = w.getRowNum();
+        err.writtenRows = writer.getRowNum();
 
         LOG.info(String.format("Converted file '%s', %d entries",
                 task.fileName, err.writtenRows));

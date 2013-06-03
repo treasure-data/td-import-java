@@ -54,6 +54,8 @@ public abstract class FileParser {
 
     protected PrepareConfig conf;
     protected long rowNum = 0;
+    protected CharsetDecoder decoder;
+    protected com.treasure_data.bulk_import.prepare_parts.FileWriter writer;
 
     private PrintWriter errWriter = null;
 
@@ -67,6 +69,18 @@ public abstract class FileParser {
 
     public long getRowNum() {
         return rowNum;
+    }
+
+    public void setDecorder(CharsetDecoder decorder) {
+        this.decoder = decorder;
+    }
+
+    public CharsetDecoder getDecorder() {
+        return decoder;
+    }
+
+    public void setFileWriter(com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
+        this.writer = writer;
     }
 
     public void setErrorRecordWriter(OutputStream errStream) {
@@ -87,14 +101,9 @@ public abstract class FileParser {
         }
     }
 
-    public abstract void initParser(CharsetDecoder decoder, InputStream in)
-            throws PreparePartsException;
+    public abstract void initParser(InputStream in) throws PreparePartsException;
 
-    public abstract void startParsing(final CharsetDecoder decoder, InputStream in)
-            throws PreparePartsException;
-
-    public abstract boolean parseRow(com.treasure_data.bulk_import.prepare_parts.FileWriter w)
-            throws PreparePartsException;
+    public abstract void parse(InputStream in) throws PreparePartsException;
 
     public abstract void close() throws PreparePartsException;
 

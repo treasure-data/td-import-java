@@ -20,21 +20,13 @@ package com.treasure_data.bulk_import.prepare_parts;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.CharsetDecoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.simple.JSONValue;
-import org.supercsv.cellprocessor.ConvertNullTo;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
-import org.supercsv.cellprocessor.ParseInt;
-import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
@@ -106,8 +98,7 @@ public class CSVFileParser extends FileParser {
     }
 
     @Override
-    public void initParser(final CharsetDecoder decoder, InputStream in)
-            throws PreparePartsException {
+    public void initParser(InputStream in) throws PreparePartsException {
         // CSV preference
         csvPref = new CsvPreference.Builder('"', conf.getDelimiterChar(),
                 conf.getNewline().newline()).build();
@@ -249,8 +240,7 @@ public class CSVFileParser extends FileParser {
     }
 
     @Override
-    public void startParsing(final CharsetDecoder decoder, InputStream in)
-            throws PreparePartsException {
+    public void parse(InputStream in) throws PreparePartsException {
         // create reader
         reader = new CsvListReader(new InputStreamReader(in, decoder), csvPref);
         if (conf.hasColumnHeader()) {
@@ -264,11 +254,13 @@ public class CSVFileParser extends FileParser {
 
         // create cell processors
         cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes);
+
+        while (parseRow()) {
+            ;
+        }
     }
 
-    @Override
-    public boolean parseRow(com.treasure_data.bulk_import.prepare_parts.FileWriter w)
-            throws PreparePartsException {
+    private boolean parseRow() throws PreparePartsException {
         List<Object> row = null;
         try {
             row = reader.read(cprocessors);
@@ -292,12 +284,10 @@ public class CSVFileParser extends FileParser {
         // increment row number
         incrRowNum();
 
-        return parseList(w, row);
+        return parseList(row);
     }
 
-    private boolean parseList(
-            com.treasure_data.bulk_import.prepare_parts.FileWriter w,
-            List<Object> row) throws PreparePartsException {
+    private boolean parseList(List<Object> row) throws PreparePartsException {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
                     reader.getLineNumber(), reader.getRowNumber(),
@@ -313,9 +303,9 @@ public class CSVFileParser extends FileParser {
             int allSize = row.size();
 
             if (allSize == timeIndex) {
-                w.writeBeginRow(extractedColumnIndexes.size() + 1);
+                writer.writeBeginRow(extractedColumnIndexes.size() + 1);
             } else {
-                w.writeBeginRow(extractedColumnIndexes.size());
+                writer.writeBeginRow(extractedColumnIndexes.size());
             }
 
             long time = 0;
@@ -335,23 +325,23 @@ public class CSVFileParser extends FileParser {
 
                 // write extracted data with writer
                 if (included) {
-                    w.write(allColumnNames[i]);
-                    w.write(row.get(i));
+                    writer.write(allColumnNames[i]);
+                    writer.write(row.get(i));
                 }
             }
 
             if (allSize == timeIndex) {
-                w.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+                writer.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
                 if (aliasTimeIndex >= 0) {
-                    w.write(time);
+                    writer.write(time);
                 } else {
-                    w.write(timeValue);
+                    writer.write(timeValue);
                 }
             }
 
-            w.writeEndRow();
+            writer.writeEndRow();
 
-            w.incrRowNum();
+            writer.incrRowNum();
             return true;
         } catch (Exception e) {
             throw new PreparePartsException(e);
