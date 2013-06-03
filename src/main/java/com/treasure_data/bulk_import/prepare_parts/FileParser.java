@@ -27,13 +27,14 @@ import java.util.logging.Logger;
 
 public abstract class FileParser {
     // TODO #MN should consider type parameters
-    public static FileParser newInstance(PrepareConfig conf) throws PreparePartsException {
+    public static FileParser newInstance(PrepareConfig conf)
+            throws PreparePartsException {
         PrepareConfig.Format format = conf.getFormat();
         if (format.equals(PrepareConfig.Format.CSV)
                 || format.equals(PrepareConfig.Format.TSV)) {
             return new CSVFileParser(conf);
         } else if (format.equals(PrepareConfig.Format.JSON)) {
-            //return new JSONFileParser(request, result);
+            // return new JSONFileParser(request, result);
             throw new PreparePartsException(new UnsupportedOperationException(
                     "format: " + format));
         } else if (format.equals(PrepareConfig.Format.MSGPACK)) {
@@ -47,15 +48,17 @@ public abstract class FileParser {
     private static final Logger LOG = Logger.getLogger(FileParser.class
             .getName());
 
-    private static final CharsetDecoder UTF_8 = Charset.forName("UTF-8")
+    static final CharsetDecoder UTF_8 = Charset.forName("UTF-8")
             .newDecoder().onMalformedInput(CodingErrorAction.REPORT)
             .onUnmappableCharacter(CodingErrorAction.REPORT);
 
     protected PrepareConfig conf;
     protected long rowNum = 0;
-    protected PrintWriter errWriter = null;
+
+    private PrintWriter errWriter = null;
 
     protected FileParser(PrepareConfig conf) {
+        this.conf = conf;
     }
 
     public void incrRowNum() {
@@ -90,8 +93,7 @@ public abstract class FileParser {
     public abstract void startParsing(final CharsetDecoder decoder, InputStream in)
             throws PreparePartsException;
 
-    public abstract boolean parseRow(
-            com.treasure_data.bulk_import.prepare_parts.MsgpackGZIPFileWriter w)
+    public abstract boolean parseRow(com.treasure_data.bulk_import.prepare_parts.FileWriter w)
             throws PreparePartsException;
 
     public abstract void close() throws PreparePartsException;

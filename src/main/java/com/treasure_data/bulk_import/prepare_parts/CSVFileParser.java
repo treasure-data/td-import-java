@@ -40,6 +40,8 @@ import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
 
+import com.treasure_data.bulk_import.Config;
+
 public class CSVFileParser extends FileParser {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
 
@@ -71,43 +73,6 @@ public class CSVFileParser extends FileParser {
             }
             return cprocs;
         }
-
-        public CellProcessor[] gen(CSVPreparePartsRequest.ColumnType[] columnTypes,
-                TimeFormatProcessor timeFormatProc)
-                throws CommandException {
-            int len = columnTypes.length;
-            List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
-            for (int i = 0; i < len; i++) {
-                CellProcessor cproc;
-                switch (columnTypes[i]) { // override 'optional' ?
-                case INT:
-                    // TODO optimizable as new converter
-                    cproc = new ConvertNullTo(null, new ParseInt());
-                    break;
-                case LONG:
-                    // TODO optimizable as new converter
-                    cproc = new ConvertNullTo(null, new ParseLong());
-                    break;
-                case DOUBLE:
-                    // TODO optimizable as new converter
-                    cproc = new ConvertNullTo(null, new ParseDouble());
-                    break;
-                case STRING:
-                    // TODO optimizable as new converter
-                    cproc = new Optional();
-                    break;
-                case TIME:
-                    cproc = timeFormatProc;
-                    break;
-                default:
-                    String msg = String.format("unsupported type: %s",
-                            columnTypes[i]);
-                    throw new CommandException(msg);
-                }
-                cprocs.add(cproc);
-            }
-            return cprocs.toArray(new CellProcessor[0]);
-        }
     }
 
     private ICsvListReader reader;
@@ -134,8 +99,8 @@ public class CSVFileParser extends FileParser {
     public void initParser(final CharsetDecoder decoder, InputStream in)
             throws PreparePartsException {
         // CSV preference
-        csvPref = new CsvPreference.Builder('"', request.getDelimiterChar(),
-                request.getNewline().newline()).build();
+        csvPref = new CsvPreference.Builder('"', conf.getDelimiterChar(),
+                conf.getNewline().newline()).build();
 
         // create sample reader
         CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
@@ -147,19 +112,19 @@ public class CSVFileParser extends FileParser {
             // 1) [ "time", "name", "price" ]
             // 2) [ "timestamp", "name", "price" ]
             // 3) [ "name", "price" ]
-            if (request.hasColumnHeader()) {
+            if (conf.hasColumnHeader()) {
                 List<String> columnList = sampleReader.read();
                 allColumnNames = columnList.toArray(new String[0]);
             } else {
-                allColumnNames = request.getColumnNames();
+                allColumnNames = conf.getColumnNames();
             }
 
             // get index of specified alias time column
             // [ "timestamp", "name", "price" ] as all columns and
             // "timestamp" as alias time column are given, the index is zero.
-            if (request.getAliasTimeColumn() != null) {
+            if (conf.getAliasTimeColumn() != null) {
                 for (int i = 0; i < allColumnNames.length; i++) {
-                    if (allColumnNames[i].equals(request.getAliasTimeColumn())) {
+                    if (allColumnNames[i].equals(conf.getAliasTimeColumn())) {
                         aliasTimeIndex = i;
                         break;
                     }
@@ -180,7 +145,7 @@ public class CSVFileParser extends FileParser {
             if (timeIndex < 0) {
                 // if 'time' column is not included in all columns
                 // e.g. [ "name", "price" ]
-                timeValue = request.getTimeValue();
+                timeValue = conf.getTimeValue();
                 if (aliasTimeIndex >= 0 || timeValue > 0) {
                     // 'time' column is appended to all columns (last elem) 
                     timeIndex = allColumnNames.length;
@@ -191,8 +156,8 @@ public class CSVFileParser extends FileParser {
             }
 
             extractedColumnIndexes = new ArrayList<Integer>();
-            String[] onlyColumns = request.getOnlyColumns();
-            String[] excludeColumns = request.getExcludeColumns();
+            String[] onlyColumns = conf.getOnlyColumns();
+            String[] excludeColumns = conf.getExcludeColumns();
             for (int i = 0; i < allColumnNames.length; i++) {
                 String cname = allColumnNames[i];
 
@@ -246,7 +211,7 @@ public class CSVFileParser extends FileParser {
             }
 
             // new String[] { "long", "string", "long" }
-            String[] columnTypes = request.getColumnTypes();
+            String[] columnTypes = conf.getColumnTypes();
             int columnTypeSize = columnTypes.length;
             if (columnTypeSize != 0 && columnTypeSize != allColumnNames.length) {
                 throw new PreparePartsException(String.format(
@@ -254,7 +219,7 @@ public class CSVFileParser extends FileParser {
                         columnTypeSize, allColumnNames.length));
             }
 
-            final int sampleRowSize = request.getSampleRowSize();
+            final int sampleRowSize = conf.getSampleRowSize();
 
             CellProcessor[] cprocs = new CellProcessorGen().genForSampleReader(
                     allColumnNames, columnTypes, sampleRowSize,
@@ -315,12 +280,12 @@ public class CSVFileParser extends FileParser {
             throws PreparePartsException {
         // create reader
         reader = new CsvListReader(new InputStreamReader(in, decoder), csvPref);
-        if (request.hasColumnHeader()) {
+        if (conf.hasColumnHeader()) {
             // header line is skipped
             try {
                 reader.read();
             } catch (IOException e) {
-                throw new CommandException(e);
+                throw new PreparePartsException(e);
             }
         }
 
@@ -330,8 +295,7 @@ public class CSVFileParser extends FileParser {
     }
 
     @Override
-    public boolean parseRow(
-            @SuppressWarnings("rawtypes") com.treasure_data.file.FileWriter w)
+    public boolean parseRow(com.treasure_data.bulk_import.prepare_parts.FileWriter w)
             throws PreparePartsException {
         List<Object> row = null;
         try {
@@ -374,7 +338,7 @@ public class CSVFileParser extends FileParser {
     }
 
     private boolean parseList(
-            @SuppressWarnings("rawtypes") com.treasure_data.file.FileWriter w,
+            com.treasure_data.bulk_import.prepare_parts.FileWriter w,
             List<Object> row) throws PreparePartsException {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",

@@ -29,7 +29,7 @@ import java.util.zip.GZIPOutputStream;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
-public class MsgpackGZIPFileWriter {
+public class MsgpackGZIPFileWriter extends FileWriter {
     static class DataSizeChecker extends FilterOutputStream {
 
         private int size = 0;
@@ -58,24 +58,22 @@ public class MsgpackGZIPFileWriter {
     private static final Logger LOG = Logger
             .getLogger(MsgpackGZIPFileWriter.class.getName());
 
-    protected PrepareConfig conf;
-
     protected MessagePack msgpack;
     protected Packer packer;
     protected GZIPOutputStream gzout;
 
     private int splitSize;
     protected DataSizeChecker dout;
-    protected long rowNum = 0;
     private int outputFileIndex = 0;
     private String outputDirName;
     private String outputFilePrefix;
     private File outputFile;
 
     public MsgpackGZIPFileWriter(PrepareConfig conf) {
-        this.conf = conf;
+        super(conf);
     }
 
+    @Override
     public void initWriter(String infileName) throws PreparePartsException {
         msgpack = new MessagePack();
 
@@ -124,14 +122,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
-    public void incrRowNum() {
-        rowNum++;
-    }
-
-    public long getRowNum() {
-        return rowNum;
-    }
-
+    @Override
     public void writeBeginRow(int size) throws PreparePartsException {
         try {
             packer.writeMapBegin(size);
@@ -140,6 +131,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
+    @Override
     public void write(Object o) throws PreparePartsException {
         try {
             packer.write(o);
@@ -148,6 +140,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
+    @Override
     public void writeString(String v) throws PreparePartsException {
         try {
             packer.write(v);
@@ -156,6 +149,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
+    @Override
     public void writeInt(int v) throws PreparePartsException {
         try {
             packer.write(v);
@@ -164,6 +158,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
+    @Override
     public void writeLong(long v) throws PreparePartsException {
         try {
             packer.write(v);
@@ -172,6 +167,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
+    @Override
     public void writeNil() throws PreparePartsException {
         try {
             packer.writeNil();
@@ -180,6 +176,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
+    @Override
     public void writeEndRow() throws PreparePartsException {
         try {
             packer.writeMapEnd();
@@ -191,6 +188,7 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
+    @Override
     public void close() throws IOException {
         if (packer != null) {
             packer.flush();
@@ -204,11 +202,4 @@ public class MsgpackGZIPFileWriter {
         }
     }
 
-    public void closeSilently() {
-        try {
-            close();
-        } catch (IOException e) {
-            LOG.severe(e.getMessage());
-        }
-    }
 }
