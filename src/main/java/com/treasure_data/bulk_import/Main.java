@@ -17,9 +17,14 @@
 //
 package com.treasure_data.bulk_import;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
+import com.treasure_data.bulk_import.upload_parts.UploadConfig;
+import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 import com.treasure_data.commands.MultithreadsCommand;
 import com.treasure_data.commands.bulk_import.PreparePartsCommand;
 import com.treasure_data.commands.bulk_import.PreparePartsFactory;
@@ -102,17 +107,45 @@ public class Main {
 
         LOG.info(String.format("Start %s command", Config.CMD_UPLOAD_PARTS));
 
-        String sessionName = args[1];
-        String[] fileNames = new String[args.length - 2];
+        final String sessionName = args[1];
+        final String[] fileNames = new String[args.length - 2];
         for (int i = 0; i < args.length - 2; i++) {
             fileNames[i] = args[i + 2];
         }
 
-        UploadPartsRequest request = UploadPartsFactory.newRequestInstance(
-                sessionName, fileNames, props);
-        UploadPartsResult result = UploadPartsFactory.newResultInstance(request);
+        final UploadConfig conf = new UploadConfig();
+        conf.configure(props);
 
-        UploadPartsFactory.newCommandInstance(request).execute(request, result);
+        MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
+        proc.registerWorkers();
+        proc.startWorkers();
+
+        // scan files that are uploaded
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < fileNames.length; i++) {
+                    try {
+                        long size = new File(fileNames[i]).length();
+                        UploadProcessor.Task task = new UploadProcessor.Task(
+                                sessionName, fileNames[i], size);
+                        MultiThreadUploadProcessor.addTask(task);
+                    } catch (Throwable t) {
+                        LOG.severe("Error occurred During 'addTask' method call");
+                        LOG.throwing("Main", "addTask", t);
+                    }
+                }
+
+                // end of file list
+                try {
+                    MultiThreadUploadProcessor.addFinishTask(conf);
+                } catch (Throwable t) {
+                    LOG.severe("Error occurred During 'addFinishTask' method call");
+                    LOG.throwing("Main", "addFinishTask", t);
+                }
+            }
+        }).start();
+
+        proc.joinWorkers();
     }
 
     public static void main(final String[] args) throws Exception {

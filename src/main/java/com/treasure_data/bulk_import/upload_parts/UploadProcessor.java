@@ -29,7 +29,7 @@ import com.treasure_data.model.bulkimport.Session;
 
 public class UploadProcessor {
 
-    static class Task {
+    public static class Task {
         private static final String TAG = "__FINISH__";
         static final Task FINISH_TASK = new Task(TAG, TAG, 0);
 
@@ -106,15 +106,15 @@ public class UploadProcessor {
 
     protected void execute0(final Task task) throws ClientException, IOException {
         LOG.fine(String.format(
-                "Upload file '%s' (size %d) to session '%s' as part '%s'",
-                task.fileName, task.size, task.sessName, task.partName));
+                "Upload file '%s' (size %d) to session '%s' as part '%s' by thread '%s'",
+                task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
 
         Session session = new Session(task.sessName, null, null);
         client.uploadPart(session, task.partName, task.createInputStream(), (int) task.size);
 
         LOG.fine(String.format(
-                "Uploaded file '%s' (size %d) to session '%s' as part '%s'",
-                task.fileName, task.size, task.sessName, task.partName));
+                "Uploaded file '%s' (size %d) to session '%s' as part '%s' by thread '%s'",
+                task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
     }
 
     static class RetryClient2 {
