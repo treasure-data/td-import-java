@@ -22,17 +22,11 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadConfig;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
-import com.treasure_data.commands.MultithreadsCommand;
-import com.treasure_data.commands.bulk_import.PreparePartsCommand;
-import com.treasure_data.commands.bulk_import.PreparePartsFactory;
-import com.treasure_data.commands.bulk_import.PreparePartsRequest;
-import com.treasure_data.commands.bulk_import.PreparePartsResult;
-import com.treasure_data.commands.bulk_import.UploadPartsFactory;
-import com.treasure_data.commands.bulk_import.UploadPartsRequest;
-import com.treasure_data.commands.bulk_import.UploadPartsResult;
 
 public class Main {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
@@ -71,18 +65,40 @@ public class Main {
 
         LOG.info(String.format("Start %s command", Config.CMD_PREPARE_PARTS));
 
-        String[] fileNames = new String[args.length - 1];
+        final String[] fileNames = new String[args.length - 1];
         for (int i = 0; i < args.length - 1; i++) {
             fileNames[i] = args[i + 1];
         }
 
-        PreparePartsRequest request = PreparePartsFactory.newInstance(
-                fileNames, props);
-        PreparePartsResult result = new PreparePartsResult();
+        PrepareConfig conf = new PrepareConfig();
+        conf.configure(props);
 
-        PreparePartsCommand command = new PreparePartsCommand();
-        new MultithreadsCommand<PreparePartsRequest, PreparePartsResult>(
-                command).execute(request, result);
+        PrepareProcessor proc = new PrepareProcessor(conf);
+
+        // scan files that are prepared
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < fileNames.length; i++) {
+                    try {
+//                        long size = new File(fileNames[i]).length();
+//                        PrepareProcessor.Task task = new PrepareProcessor.Task(
+//                                sessionName, fileNames[i], size);
+//                        MultiThreadPrepareProcessor.addTask(task);
+                    } catch (Throwable t) {
+                        LOG.severe("Error occurred During 'addTask' method call");
+                        LOG.throwing("Main", "addTask", t);
+                    }
+                }
+
+                // end of file list
+                try {
+//                    MultiThreadPrepareProcessor.addFinishTask(conf);
+                } catch (Throwable t) {
+                    LOG.severe("Error occurred During 'addFinishTask' method call");
+                    LOG.throwing("Main", "addFinishTask", t);
+                }
+            }
+        }).start();
     }
 
     /**

@@ -17,17 +17,90 @@
 //
 package com.treasure_data.bulk_import.prepare_parts;
 
-import java.util.Properties;
+import java.nio.charset.CharsetDecoder;
+import java.util.logging.Logger;
+
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.CompressionType;
 
 public class PrepareProcessor {
 
-    public PrepareProcessor(Properties props, String[] fileNames) {
-        
+    public static class Task {
+        String fileName;
+
+        public Task(String fileName) {
+            this.fileName = fileName;
+        }
     }
 
-    public void execute() {
-        
+    public static class ErrorInfo {
+        Task task;
+        Throwable error;
+
+        long redRows;
+        long writtenRows;
+
+        public ErrorInfo(Task task, Throwable error, long redRows, long writtenRows) {
+            this.task = task;
+            this.error = error;
+            this.redRows = redRows;
+            this.writtenRows = writtenRows;
+        }
     }
 
+    private static final Logger LOG = Logger.getLogger(
+            PrepareProcessor.class.getName());
+
+    protected PrepareConfig conf;
+
+    public PrepareProcessor(PrepareConfig conf) {
+        this.conf = conf;
+    }
+
+    public ErrorInfo execute(final Task task) {
+        LOG.info(String.format("Convert file '%s'", task.fileName));
+
+        // TODO #MN need type paramters
+        ErrorInfo err = null;
+        FileParser p = null;
+        MsgpackGZIPFileWriter w = null;
+        try {
+            CompressionType compressionType = conf.getCompressType(task.fileName);
+            CharsetDecoder decoder = conf.getCharsetDecoder();
+
+            p = FileParser.newInstance(conf);
+            p.initParser(decoder, conf.createFileInputStream(compressionType, task.fileName));
+
+            if (conf.dryRun()) {
+                // if this processing is dry-run mode, thread of control
+                // returns back
+                return new ErrorInfo(task, null, 0, 0);
+            }
+
+            p.startParsing(decoder,
+                    conf.createFileInputStream(compressionType, task.fileName));
+            w = new MsgpackGZIPFileWriter(conf);
+            w.initWriter(task.fileName);
+            while (p.parseRow(w)) {
+                ;
+            }
+        } catch (PreparePartsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (p != null) {
+                p.closeSilently();
+            }
+            if (w != null) {
+                w.closeSilently();
+            }
+        }
+
+        err.redRows = p.getRowNum();
+        err.writtenRows = w.getRowNum();
+
+        LOG.info(String.format("Converted file '%s', %d entries",
+                task.fileName, err.writtenRows));
+        return err;
+    }
 
 }
