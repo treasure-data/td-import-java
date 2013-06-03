@@ -122,7 +122,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // parallel NUM
     String BI_UPLOAD_PARTS_UPLOAD_PARALLEL = "td.bulk_import.upload_parts.upload-parallel";
-    String BI_UPLOAD_PARTS_UPLOAD_PARALLEL_DEFAULTVALUE = "1"; // TODO #MN should change 2
-    String BI_UPLOAD_PARTS_UPLOAD_PARALLEL_MAX_VALUE = "8"; // TODO #MN should change 2
+    String BI_UPLOAD_PARTS_UPLOAD_PARALLEL_DEFAULTVALUE = "2";
+    String BI_UPLOAD_PARTS_UPLOAD_PARALLEL_MAX_VALUE = "8";
 
 }
