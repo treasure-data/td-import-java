@@ -382,12 +382,11 @@ public class PrepareConfig extends Config {
         this.compressionType = compressionType;
     }
 
-    public CompressionType getCompressionType() {
+    public CompressionType getUserCompressionType() {
         return compressionType;
     }
 
-    public InputStream createFileInputStream(
-            CompressionType compressionType, String fileName)
+    public InputStream createFileInputStream(String fileName)
             throws PreparePartsException {
         try {
             if (compressionType.equals(CompressionType.GZIP)) {
@@ -403,8 +402,8 @@ public class PrepareConfig extends Config {
         }
     }
 
-    public CompressionType getCompressType(String fileName) throws PreparePartsException {
-        CompressionType userCompressType = getCompressionType();
+    public CompressionType getCompressionType(String fileName) throws PreparePartsException {
+        CompressionType userCompressType = getUserCompressionType();
         if (userCompressType == null) {
             throw new PreparePartsException("fatal error");
         }

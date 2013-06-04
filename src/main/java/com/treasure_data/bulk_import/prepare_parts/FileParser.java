@@ -55,12 +55,18 @@ public abstract class FileParser {
     protected PrepareConfig conf;
     protected long rowNum = 0;
     protected CharsetDecoder decoder;
+    protected PrepareConfig.CompressionType compressionType;
     protected com.treasure_data.bulk_import.prepare_parts.FileWriter writer;
 
     private PrintWriter errWriter = null;
 
     protected FileParser(PrepareConfig conf) {
         this.conf = conf;
+    }
+
+    public void configure(String fileName) throws PreparePartsException {
+        decoder = conf.getCharsetDecoder();
+        compressionType = conf.getCompressionType(fileName);
     }
 
     public void incrRowNum() {
@@ -101,7 +107,7 @@ public abstract class FileParser {
         }
     }
 
-    public abstract void initParser(InputStream in) throws PreparePartsException;
+    public abstract void sample(InputStream in) throws PreparePartsException;
 
     public abstract void parse(InputStream in) throws PreparePartsException;
 

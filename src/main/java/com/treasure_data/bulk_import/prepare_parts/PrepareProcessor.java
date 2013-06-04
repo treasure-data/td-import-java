@@ -17,10 +17,7 @@
 //
 package com.treasure_data.bulk_import.prepare_parts;
 
-import java.nio.charset.CharsetDecoder;
 import java.util.logging.Logger;
-
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.CompressionType;
 
 public class PrepareProcessor {
 
@@ -64,11 +61,9 @@ public class PrepareProcessor {
         FileParser p = null;
         MsgpackGZIPFileWriter writer = null;
         try {
-            CompressionType compressionType = conf.getCompressType(task.fileName);
-
             p = FileParser.newFileParser(conf);
-            p.setDecorder(conf.getCharsetDecoder());
-            p.initParser(conf.createFileInputStream(compressionType, task.fileName));
+            p.configure(task.fileName);
+            p.sample(conf.createFileInputStream(task.fileName));
 
 //            if (conf.dryRun()) {
 //                // if this processing is dry-run mode, thread of control
@@ -80,7 +75,7 @@ public class PrepareProcessor {
             writer.initWriter(task.fileName);
 
             p.setFileWriter(writer);
-            p.parse(conf.createFileInputStream(compressionType, task.fileName));
+            p.parse(conf.createFileInputStream(task.fileName));
         } catch (PreparePartsException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

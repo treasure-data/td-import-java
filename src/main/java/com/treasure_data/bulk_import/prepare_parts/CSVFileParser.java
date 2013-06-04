@@ -83,6 +83,7 @@ public class CSVFileParser extends FileParser {
 
     private ICsvListReader reader;
     private CsvPreference csvPref;
+    private CellProcessor[] cprocessors;
 
     private int timeIndex = -1;
     private Long timeValue = new Long(-1);
@@ -91,18 +92,22 @@ public class CSVFileParser extends FileParser {
     private List<Integer> extractedColumnIndexes;
 
     private ColumnType[] allSuggestedColumnTypes;
-    private CellProcessor[] cprocessors;
 
     public CSVFileParser(PrepareConfig conf) throws PreparePartsException {
         super(conf);
     }
 
     @Override
-    public void initParser(InputStream in) throws PreparePartsException {
+    public void configure(String fileName) throws PreparePartsException {
+        super.configure(fileName);
+
         // CSV preference
         csvPref = new CsvPreference.Builder('"', conf.getDelimiterChar(),
                 conf.getNewline().newline()).build();
+    }
 
+    @Override
+    public void sample(InputStream in) throws PreparePartsException {
         // create sample reader
         CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
                 in, decoder), csvPref);
