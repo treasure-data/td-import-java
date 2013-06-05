@@ -32,7 +32,7 @@ public abstract class FileWriter implements Closeable {
         this.conf = conf;
     }
 
-    protected abstract void initWriter(String infileName)
+    protected abstract void configure(String infileName)
             throws PreparePartsException;
 
     protected abstract void writeBeginRow(int size) throws PreparePartsException;

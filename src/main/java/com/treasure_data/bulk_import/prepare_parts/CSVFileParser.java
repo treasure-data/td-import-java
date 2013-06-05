@@ -28,69 +28,32 @@ import java.util.logging.Logger;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.exception.SuperCsvException;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
+import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
+import org.supercsv.util.CsvContext;
+import org.supercsv.util.Util;
 
 import com.treasure_data.bulk_import.Config;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;
+import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcessor;
+import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcessorGenerator;
 
 public class CSVFileParser extends FileParser {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
 
-    static class CellProcessorGen {
-        public CellProcessor[] gen(PrepareConfig.ColumnType[] columnTypes)
-                throws PreparePartsException {
-            int len = columnTypes.length;
-            List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
-            for (int i = 0; i < len; i++) {
-                CellProcessor cproc;
-                switch (columnTypes[i]) { // override 'optional' ?
-                case INT:
-                    // TODO optimizable as new converter
-                    cproc = new Optional();
-                    //cproc = new ConvertNullTo(null, new ParseInt());
-                    break;
-                case LONG:
-                    // TODO optimizable as new converter
-                    cproc = new Optional();
-                    //cproc = new ConvertNullTo(null, new ParseLong());
-                    break;
-                case DOUBLE:
-                    // TODO optimizable as new converter
-                    cproc = new Optional();
-                    //cproc = new ConvertNullTo(null, new ParseDouble());
-                    break;
-                case STRING:
-                    // TODO optimizable as new converter
-                    cproc = new Optional();
-                    break;
-                case TIME:
-                    cproc = new ParseDouble();
-                    //cproc = timeFormatProc;
-                    break;
-                default:
-                    String msg = String.format("unsupported type: %s",
-                            columnTypes[i]);
-                    throw new PreparePartsException(msg);
-                }
-                cprocs.add(cproc);
-            }
-            return cprocs.toArray(new CellProcessor[0]);
-        }
-    }
-
-    private ICsvListReader reader;
+    private Tokenizer reader;
     private CsvPreference csvPref;
-    private CellProcessor[] cprocessors;
+    private CellProcessor[] cprocs;
 
     private int timeIndex = -1;
     private Long timeValue = new Long(-1);
     private int aliasTimeIndex = -1;
     private String[] allColumnNames;
     private List<Integer> extractedColumnIndexes;
-
     private ColumnType[] allSuggestedColumnTypes;
 
     public CSVFileParser(PrepareConfig conf) throws PreparePartsException {
@@ -247,29 +210,38 @@ public class CSVFileParser extends FileParser {
     @Override
     public void parse(InputStream in) throws PreparePartsException {
         // create reader
-        reader = new CsvListReader(new InputStreamReader(in, decoder), csvPref);
+        reader = new Tokenizer(new InputStreamReader(in, decoder), csvPref);
         if (conf.hasColumnHeader()) {
             // header line is skipped
             try {
-                reader.read();
+                reader.readColumns(new ArrayList<String>());
+                incrLineNum();
             } catch (IOException e) {
                 throw new PreparePartsException(e);
             }
         }
 
         // create cell processors
-        cprocessors = new CellProcessorGen().gen(allSuggestedColumnTypes);
+        ColumnProcessor[] cprocs = new ColumnProcessorGenerator().generate(
+                allColumnNames, allSuggestedColumnTypes, writer);
+        this.cprocs = new CellProcessor[cprocs.length];
+        for (int i = 0; i < cprocs.length; i++) {
+            this.cprocs[i] = (CellProcessor) cprocs[i];
+        }
 
-        while (parseRow()) {
-            ;
+        List<String> row = new ArrayList<String>();
+        while (parseRow(row)) {
+            incrLineNum();
         }
     }
 
-    private boolean parseRow() throws PreparePartsException {
-        List<Object> row = null;
+    private boolean parseRow(List<String> row) throws PreparePartsException {
+        boolean ret = false;
         try {
-            row = reader.read(cprocessors);
-        } catch (Exception e) {
+            ret = reader.readColumns(row);
+        } catch (IOException e) {
+            // TODO FIXME more detail
+
             // catch IOException and SuperCsvCellProcessorException
             e.printStackTrace();
 
@@ -282,76 +254,84 @@ public class CSVFileParser extends FileParser {
             return true;
         }
 
-        if (row == null || row.isEmpty()) {
+        if (!ret) {
             return false;
         }
 
         // increment row number
         incrRowNum();
 
-        return parseList(row);
-    }
+        int allSize = cprocs.length;
 
-    private boolean parseList(List<Object> row) throws PreparePartsException {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-                    reader.getLineNumber(), reader.getRowNumber(),
-                    row));
+        if (allSize == timeIndex) {
+            writer.writeBeginRow(extractedColumnIndexes.size() + 1);
+        } else {
+            writer.writeBeginRow(extractedColumnIndexes.size());
         }
 
-        /** DEBUG
-        System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s",
-                reader.getLineNumber(), reader.getRowNumber(), row));
-         */
-
-        try {
-            int allSize = row.size();
-
-            if (allSize == timeIndex) {
-                writer.writeBeginRow(extractedColumnIndexes.size() + 1);
-            } else {
-                writer.writeBeginRow(extractedColumnIndexes.size());
+        {
+            final CsvContext context = new CsvContext(0, 0, 1); // TODO
+            if (row.size() != cprocs.length) {
+                throw new SuperCsvException(String.format(
+                        "The number of columns to be processed (%d) must match the number of CellProcessors (%d): check that the number"
+                                + " of CellProcessors you have defined matches the expected number of columns being read/written",
+                                row.size(), cprocs.length), context);
             }
 
-            long time = 0;
-            for (int i = 0; i < allSize; i++) {
-                if (i == aliasTimeIndex) {
-                    time = ((Number) row.get(i)).longValue();
-                }
-
-                // i is included in extractedColumnIndexes?
-                boolean included = false;
-                for (Integer j : extractedColumnIndexes) {
-                    if (i == j) { // TODO optimize
-                        included = true;
-                        break;
-                    }
-                }
-
-                // write extracted data with writer
-                if (included) {
-                    writer.write(allColumnNames[i]);
-                    writer.write(row.get(i));
-                }
+            for (int i = 0; i < row.size(); i++) {
+                cprocs[i].execute(row.get(i), context);
             }
-
-            if (allSize == timeIndex) {
-                writer.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-                if (aliasTimeIndex >= 0) {
-                    writer.write(time);
-                } else {
-                    writer.write(timeValue);
-                }
-            }
-
-            writer.writeEndRow();
-
-            writer.incrRowNum();
-            return true;
-        } catch (Exception e) {
-            throw new PreparePartsException(e);
         }
+        //parseList(); // TODO
+
+        writer.writeEndRow();
+        writer.incrRowNum();
+
+        return true;
     }
+
+//    private boolean parseList() throws PreparePartsException {
+//        try {
+//
+//            long time = 0;
+//            for (int i = 0; i < allSize; i++) {
+//                if (i == aliasTimeIndex) {
+//                    time = ((Number) row.get(i)).longValue();
+//                }
+//
+//                // i is included in extractedColumnIndexes?
+//                boolean included = false;
+//                for (Integer j : extractedColumnIndexes) {
+//                    if (i == j) { // TODO optimize
+//                        included = true;
+//                        break;
+//                    }
+//                }
+//
+//                // write extracted data with writer
+//                if (included) {
+//                    writer.write(allColumnNames[i]);
+//                    writer.write(row.get(i));
+//                }
+//            }
+//
+//            if (allSize == timeIndex) {
+//                writer.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+//                if (aliasTimeIndex >= 0) {
+//                    writer.write(time);
+//                } else {
+//                    writer.write(timeValue);
+//                }
+//            }
+//
+//            writer.writeEndRow();
+//
+//            writer.incrRowNum();
+//            return true;
+//        } catch (Exception e) {
+//            throw new PreparePartsException(e);
+//        }
+//    }
 
     public void close() throws PreparePartsException {
         if (reader != null) {

@@ -78,6 +78,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // output DIR
     String BI_PREPARE_PARTS_OUTPUTDIR = "td.bulk_import.prepare_parts.output-dir";
+    String BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE = "./out";
 
     // error-record-output DIR; format=reason + line(percent-encoded?); default=NULL output stream
     // reason: type conversion error (->int, ->boolean, ->double, etc)

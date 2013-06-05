@@ -74,7 +74,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void initWriter(String infileName) throws PreparePartsException {
+    public void configure(String infileName) throws PreparePartsException {
         msgpack = new MessagePack();
 
         // outputFilePrefix

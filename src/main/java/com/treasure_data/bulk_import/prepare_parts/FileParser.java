@@ -53,6 +53,7 @@ public abstract class FileParser {
             .onUnmappableCharacter(CodingErrorAction.REPORT);
 
     protected PrepareConfig conf;
+    protected long lineNum = 0;
     protected long rowNum = 0;
     protected CharsetDecoder decoder;
     protected PrepareConfig.CompressionType compressionType;
@@ -66,7 +67,15 @@ public abstract class FileParser {
 
     public void configure(String fileName) throws PreparePartsException {
         decoder = conf.getCharsetDecoder();
-        compressionType = conf.getCompressionType(fileName);
+        compressionType = conf.checkCompressionType(fileName);
+    }
+
+    public void incrLineNum() {
+        lineNum++;
+    }
+
+    public long getLineNum() {
+        return lineNum;
     }
 
     public void incrRowNum() {

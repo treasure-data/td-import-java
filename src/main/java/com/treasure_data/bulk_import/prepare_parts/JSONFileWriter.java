@@ -33,7 +33,7 @@ public class JSONFileWriter extends FileWriter {
     }
 
     @Override
-    public void initWriter(String infileName) throws PreparePartsException {
+    public void configure(String infileName) throws PreparePartsException {
     }
 
     @Override

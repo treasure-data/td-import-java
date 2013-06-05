@@ -17,6 +17,7 @@
 //
 package com.treasure_data.bulk_import.prepare_parts;
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +70,22 @@ public class PrepareConfig extends Config {
     }
 
     public static enum CompressionType {
-        GZIP("gzip"), AUTO("auto"), NONE("none");
+        GZIP("gzip") {
+            @Override
+            public InputStream createInputStream(InputStream in) throws IOException {
+                return new BufferedInputStream(new GZIPInputStream(in));
+            }
+        }, AUTO("auto") {
+            @Override
+            public InputStream createInputStream(InputStream in) throws IOException {
+                throw new IOException("unsupported compress type");
+            }
+        }, NONE("none") {
+            @Override
+            public InputStream createInputStream(InputStream in) throws IOException {
+                return new BufferedInputStream(in);
+            }
+        };
 
         private String type;
 
@@ -80,6 +96,8 @@ public class PrepareConfig extends Config {
         public String type() {
             return type;
         }
+
+        public abstract InputStream createInputStream(InputStream in) throws IOException;
 
         public static CompressionType fromString(String type) {
             return StringToCompressionType.get(type);
@@ -210,6 +228,15 @@ public class PrepareConfig extends Config {
     public void configure(Properties props) {
         this.props = props;
 
+        // format
+        String formatStr = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT,
+                Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
+        format = Format.fromString(formatStr);
+        if (format == null) {
+            throw new IllegalArgumentException(String.format(
+                    "unsupported format '%s'", formatStr));
+        }
+
         // compression type
         String compType = props.getProperty(
                 Config.BI_PREPARE_PARTS_COMPRESSION,
@@ -244,12 +271,8 @@ public class PrepareConfig extends Config {
         timeFormat = props.getProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT);
 
         // output DIR
-        outputDirName = props.getProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR);
-        if (outputDirName == null || outputDirName.isEmpty()) {
-            String msg = String.format("output dir is required e.g. -D%s=./",
-                    Config.BI_PREPARE_PARTS_OUTPUTDIR);
-            throw new IllegalArgumentException(msg);
-        }
+        outputDirName = props.getProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR,
+                Config.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
 
         // error record output DIR
         errorRecordOutputDirName = props
@@ -370,65 +393,31 @@ public class PrepareConfig extends Config {
         }
     }
 
-    public void setFormat(Format format) {
-        this.format = format;
-    }
-
     public Format getFormat() {
         return format;
     }
 
-    public void setCompressionType(CompressionType compressionType) {
-        this.compressionType = compressionType;
-    }
-
-    public CompressionType getUserCompressionType() {
+    public CompressionType getCompressionType() {
         return compressionType;
     }
 
-    public InputStream createFileInputStream(String fileName)
-            throws PreparePartsException {
-        try {
-            if (compressionType.equals(CompressionType.GZIP)) {
-                return new GZIPInputStream(new FileInputStream(fileName));
-            } else if (compressionType.equals(CompressionType.NONE)) {
-                return new FileInputStream(fileName);
-            } else {
-                throw new PreparePartsException("unsupported compress type: "
-                        + compressionType);
-            }
-        } catch (IOException e) {
-            throw new PreparePartsException(e);
-        }
-    }
-
-    public CompressionType getCompressionType(String fileName) throws PreparePartsException {
-        CompressionType userCompressType = getUserCompressionType();
-        if (userCompressType == null) {
-            throw new PreparePartsException("fatal error");
+    public CompressionType checkCompressionType(String fileName) throws PreparePartsException {
+        if (getCompressionType() != CompressionType.AUTO) {
+            return getCompressionType();
         }
 
-        CompressionType[] candidateCompressTypes;
-        if (userCompressType.equals(CompressionType.GZIP)) {
-            candidateCompressTypes = new CompressionType[] { CompressionType.GZIP, };
-        } else if (userCompressType.equals(CompressionType.NONE)) {
-            candidateCompressTypes = new CompressionType[] { CompressionType.NONE, };
-        } else if (userCompressType.equals(CompressionType.AUTO)) {
-            candidateCompressTypes = new CompressionType[] {
-                    CompressionType.GZIP, CompressionType.NONE, };
-        } else {
-            throw new PreparePartsException("unsupported compression type: "
-                    + userCompressType);
-        }
+        CompressionType[] candidateCompressTypes = new CompressionType[] {
+                CompressionType.GZIP, CompressionType.NONE,
+        };
 
         CompressionType compressionType = null;
         for (int i = 0; i < candidateCompressTypes.length; i++) {
             InputStream in = null;
             try {
                 if (candidateCompressTypes[i].equals(CompressionType.GZIP)) {
-                    in = new GZIPInputStream(new FileInputStream(fileName));
+                    in = CompressionType.GZIP.createInputStream(new FileInputStream(fileName));
                 } else if (candidateCompressTypes[i].equals(CompressionType.NONE)) {
-                    in = new FileInputStream(fileName);
+                    in = CompressionType.NONE.createInputStream(new FileInputStream(fileName));
                 } else {
                     throw new PreparePartsException("fatal error");
                 }
@@ -451,17 +440,8 @@ public class PrepareConfig extends Config {
             }
         }
 
-        if (compressionType == null) {
-            throw new PreparePartsException(new IOException(String.format(
-                    "Cannot read file %s with specified compress type: %s",
-                    fileName, userCompressType)));
-        }
-
+        this.compressionType = compressionType;
         return compressionType;
-    }
-
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
     }
 
     public String getEncoding() {
