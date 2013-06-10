@@ -41,6 +41,7 @@ public abstract class FileWriter implements Closeable {
     public abstract void writeString(String v) throws PreparePartsException;
     public abstract void writeInt(int v) throws PreparePartsException;
     public abstract void writeLong(long v) throws PreparePartsException;
+    public abstract void writeDouble(double v) throws PreparePartsException;
     public abstract void writeNil() throws PreparePartsException;
 
     protected abstract void writeEndRow() throws PreparePartsException;

@@ -168,6 +168,15 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
+    public void writeDouble(double v) throws PreparePartsException {
+        try {
+            packer.write(v);
+        } catch (IOException e) {
+            throw new PreparePartsException(e);
+        }
+    }
+
+    @Override
     public void writeNil() throws PreparePartsException {
         try {
             packer.writeNil();

@@ -66,6 +66,11 @@ public class JSONFileWriter extends FileWriter {
     }
 
     @Override
+    public void writeDouble(double v) throws PreparePartsException {
+        recordElements.add(v);
+    }
+
+    @Override
     public void writeNil() throws PreparePartsException {
         recordElements.add(null);
     }
