@@ -19,4 +19,7 @@ package com.treasure_data.bulk_import.prepare_parts.proc;
 
 public interface ColumnProcessor {
 
+    String getColumnName();
+
+    Object execute(Object value);
 }

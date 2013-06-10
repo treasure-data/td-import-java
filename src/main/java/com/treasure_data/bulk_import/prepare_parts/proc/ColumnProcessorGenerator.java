@@ -20,24 +20,68 @@ package com.treasure_data.bulk_import.prepare_parts.proc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.supercsv.cellprocessor.ift.CellProcessor;
+
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class ColumnProcessorGenerator {
 
-    public ColumnProcessor[] generate(String[] columnNames, PrepareConfig.ColumnType[] columnTypes,
+    public static CellProcessor[] generateSampleCellProcessors() {
+        // TODO
+        return null;
+    }
+
+    public static CellProcessor[] generateCellProcessors(
+            com.treasure_data.bulk_import.prepare_parts.FileWriter writer,
+            String[] columnNames, PrepareConfig.ColumnType[] columnTypes,
+            int timeColumnIndex, int aliasTimeColumnIndex, String timeFormat,
+            long timeValue) throws PreparePartsException {
+        // TODO
+        int len = columnTypes.length;
+        List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
+        for (int i = 0; i < len; i++) {
+            cprocs.add(generateCellProcessor(i, columnNames[i], columnTypes[i], writer));
+        }
+        return cprocs.toArray(new CellProcessor[0]);
+    }
+
+    public static ColumnProcessor[] generateColumnProcessors(String[] columnNames,
+            PrepareConfig.ColumnType[] columnTypes,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
-            throws PreparePartsException {
+                    throws PreparePartsException {
         int len = columnTypes.length;
         List<ColumnProcessor> cprocs = new ArrayList<ColumnProcessor>(len);
-
         for (int i = 0; i < len; i++) {
-            String cname = columnNames[i];
-            ColumnProcessor cproc = new CSVColumnProcessor(cname, writer); // csv specific
-        
-            cprocs.add(cproc);
+            cprocs.add(generateColumnProcessor(i, columnNames[i], columnTypes[i], writer));
         }
-
         return cprocs.toArray(new ColumnProcessor[0]);
     }
+
+    public static CellProcessor generateCellProcessor(int index, String columnName,
+            PrepareConfig.ColumnType columnType,
+            com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
+                    throws PreparePartsException {
+        return (CellProcessor) generateColumnProcessor(index, columnName, columnType, writer);
+    }
+
+    public static ColumnProcessor generateColumnProcessor(int index, String columnName,
+            PrepareConfig.ColumnType columnType,
+            com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
+                    throws PreparePartsException {
+        if (columnType == PrepareConfig.ColumnType.INT) {
+            return new CSVStringColumnProc(index, columnName, writer); // TODO
+        } else if (columnType == PrepareConfig.ColumnType.LONG) {
+            return new CSVStringColumnProc(index, columnName, writer); // TODO
+        } else if (columnType == PrepareConfig.ColumnType.DOUBLE) {
+            return new CSVStringColumnProc(index, columnName, writer); // TODO
+        } else if (columnType == PrepareConfig.ColumnType.STRING) {
+            return new CSVStringColumnProc(index, columnName, writer); // TODO
+        } else if (columnType == PrepareConfig.ColumnType.TIME) {
+            return new CSVStringColumnProc(index, columnName, writer); // TODO
+        } else { // otherwise
+            return new CSVStringColumnProc(index, columnName, writer);
+        }
+    }
+
 }
