@@ -46,7 +46,7 @@ public class CSVFileParser extends FileParser {
     private boolean needToAppendTimeColumn = false;
     private int timeColumnIndex = -1;
     private int aliasTimeColumnIndex = -1;
-    private String timeFormat = null;
+    private ExtStrftime timeFormat = null;
     private Long timeValue = 0L;
     private String[] columnNames;
     private ColumnType[] columnTypes;
@@ -112,7 +112,8 @@ public class CSVFileParser extends FileParser {
 
             if ((timeColumnIndex >= 0 || aliasTimeColumnIndex >= 0)
                     || conf.getTimeFormat() != null) {
-                timeFormat = conf.getTimeFormat();
+                String timeFormat = conf.getTimeFormat();
+                this.timeFormat = new ExtStrftime(timeFormat);
             }
 
             // if 'time' and the alias column don't exist,

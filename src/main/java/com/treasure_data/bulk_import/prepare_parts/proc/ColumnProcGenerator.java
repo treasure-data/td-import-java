@@ -24,6 +24,7 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 
 public class ColumnProcGenerator {
 
@@ -35,7 +36,7 @@ public class ColumnProcGenerator {
     public static CellProcessor[] generateCellProcessors(
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer,
             String[] columnNames, PrepareConfig.ColumnType[] columnTypes,
-            int timeColumnIndex, String timeFormat) throws PreparePartsException {
+            int timeColumnIndex, ExtStrftime timeFormat) throws PreparePartsException {
         int len = columnTypes.length;
         List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
         for (int i = 0; i < len; i++) {
@@ -46,7 +47,7 @@ public class ColumnProcGenerator {
     }
 
     public static ColumnProc[] generateColumnProcessors(String[] columnNames,
-            PrepareConfig.ColumnType[] columnTypes, int timeColumnIndex, String timeFormat,
+            PrepareConfig.ColumnType[] columnTypes, int timeColumnIndex, ExtStrftime timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
                     throws PreparePartsException {
         int len = columnTypes.length;
@@ -59,7 +60,7 @@ public class ColumnProcGenerator {
     }
 
     public static CellProcessor generateCellProcessor(int index, String columnName,
-            PrepareConfig.ColumnType columnType, int timeColumnIndex, String timeFormat,
+            PrepareConfig.ColumnType columnType, int timeColumnIndex, ExtStrftime timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
                     throws PreparePartsException {
         return (CellProcessor) generateColumnProcessor(index, columnName, columnType,
@@ -67,7 +68,7 @@ public class ColumnProcGenerator {
     }
 
     public static ColumnProc generateColumnProcessor(int index, String columnName,
-            PrepareConfig.ColumnType columnType, int timeColumnIndex, String timeFormat,
+            PrepareConfig.ColumnType columnType, int timeColumnIndex, ExtStrftime timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
                     throws PreparePartsException {
         if (columnType == PrepareConfig.ColumnType.INT) {
@@ -87,7 +88,7 @@ public class ColumnProcGenerator {
 
     public static ColumnProc generateTimeColumnProcessor(
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer,
-            int aliasTimeColumnIndex, String timeFormat, long timeValue) { // TODO should change timeformat
+            int aliasTimeColumnIndex, ExtStrftime timeFormat, long timeValue) { // TODO should change timeformat
         if (aliasTimeColumnIndex < 0) {
             return new CSVTimeValueColumnProc(timeValue, writer);
         } else {

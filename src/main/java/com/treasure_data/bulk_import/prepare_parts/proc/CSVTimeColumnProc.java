@@ -19,13 +19,14 @@ package com.treasure_data.bulk_import.prepare_parts.proc;
 
 import com.treasure_data.bulk_import.Config;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 
 public class CSVTimeColumnProc extends AbstractCSVColumnProc {
 
-    private String timeFormat; // TODO should change simple time format
+    protected ExtStrftime timeFormat; // TODO should change simple time format
 
     public CSVTimeColumnProc(int index,
-            String timeFormat,
+            ExtStrftime timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
         super(index, null, writer);
         this.timeFormat = timeFormat;
@@ -54,7 +55,11 @@ public class CSVTimeColumnProc extends AbstractCSVColumnProc {
                         "'%s' could not be parsed as an Long", value));
             }
 
-            // TODO uses simple time format
+            if (v == null && timeFormat != null) {
+                v = timeFormat.getTime(sv);
+            } else {
+                return 0;
+            }
         } else {
             final String actualClassName = value.getClass().getName();
             throw new PreparePartsException(String.format(

@@ -15,15 +15,23 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts.proc;
+package com.treasure_data.bulk_import.prepare_parts;
 
-import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
+import java.text.ParseException;
 
-public class CSVAliasTimeColumnProc extends CSVTimeColumnProc {
+import org.apache.catalina.util.Strftime;
 
-    public CSVAliasTimeColumnProc(int aliasIndex,
-            ExtStrftime timeFormat,
-            com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
-        super(aliasIndex, timeFormat, writer);
+public class ExtStrftime extends Strftime {
+
+    public ExtStrftime(String format) {
+        super(format);
+    }
+
+    public synchronized long getTime(String t) {
+        try {
+            return simpleDateFormat.parse(t).getTime() / 1000;
+        } catch (ParseException e) {
+            return 0;
+        }
     }
 }
