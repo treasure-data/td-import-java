@@ -32,8 +32,8 @@ import org.supercsv.prefs.CsvPreference;
 import com.treasure_data.bulk_import.Config;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;
-import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcessor;
-import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcessorGenerator;
+import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
+import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
 
 public class CSVFileParser extends FileParser {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
@@ -41,7 +41,7 @@ public class CSVFileParser extends FileParser {
     private Tokenizer reader;
     private CsvPreference csvPref;
     private CellProcessor[] cprocs;
-    private ColumnProcessor tcproc = null;
+    private ColumnProc tcproc = null;
 
     private boolean needToAppendTimeColumn = false;
     private int timeColumnIndex = -1;
@@ -154,10 +154,10 @@ public class CSVFileParser extends FileParser {
         }
 
         // create cell processors
-        this.cprocs = ColumnProcessorGenerator.generateCellProcessors(
+        this.cprocs = ColumnProcGenerator.generateCellProcessors(
                 writer, columnNames, columnTypes, timeColumnIndex, timeFormat);
         if (needToAppendTimeColumn) {
-            tcproc = ColumnProcessorGenerator.generateTimeColumnProcessor(
+            tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
                     writer, aliasTimeColumnIndex, timeFormat, timeValue);
         }
 
@@ -211,7 +211,7 @@ public class CSVFileParser extends FileParser {
             } catch (Throwable t) {
                 throw new PreparePartsException(String.format(
                         "It cannot translate #%d column '%s'. Please check row data: %s [line: %d]",
-                        i, ((ColumnProcessor) cprocs[i]).getColumnName(),
+                        i, ((ColumnProc) cprocs[i]).getColumnName(),
                         reader.getUntokenizedRow(), getLineNum()));
             }
         }

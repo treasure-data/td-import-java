@@ -25,7 +25,7 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public class ColumnProcessorGenerator {
+public class ColumnProcGenerator {
 
     public static CellProcessor[] generateSampleCellProcessors() {
         // TODO
@@ -45,17 +45,17 @@ public class ColumnProcessorGenerator {
         return cprocs.toArray(new CellProcessor[0]);
     }
 
-    public static ColumnProcessor[] generateColumnProcessors(String[] columnNames,
+    public static ColumnProc[] generateColumnProcessors(String[] columnNames,
             PrepareConfig.ColumnType[] columnTypes, int timeColumnIndex, String timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
                     throws PreparePartsException {
         int len = columnTypes.length;
-        List<ColumnProcessor> cprocs = new ArrayList<ColumnProcessor>(len);
+        List<ColumnProc> cprocs = new ArrayList<ColumnProc>(len);
         for (int i = 0; i < len; i++) {
             cprocs.add(generateColumnProcessor(i, columnNames[i], columnTypes[i],
                     timeColumnIndex, timeFormat, writer));
         }
-        return cprocs.toArray(new ColumnProcessor[0]);
+        return cprocs.toArray(new ColumnProc[0]);
     }
 
     public static CellProcessor generateCellProcessor(int index, String columnName,
@@ -66,7 +66,7 @@ public class ColumnProcessorGenerator {
                 timeColumnIndex, timeFormat, writer);
     }
 
-    public static ColumnProcessor generateColumnProcessor(int index, String columnName,
+    public static ColumnProc generateColumnProcessor(int index, String columnName,
             PrepareConfig.ColumnType columnType, int timeColumnIndex, String timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
                     throws PreparePartsException {
@@ -85,7 +85,7 @@ public class ColumnProcessorGenerator {
         }
     }
 
-    public static ColumnProcessor generateTimeColumnProcessor(
+    public static ColumnProc generateTimeColumnProcessor(
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer,
             int aliasTimeColumnIndex, String timeFormat, long timeValue) { // TODO should change timeformat
         if (aliasTimeColumnIndex < 0) {

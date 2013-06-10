@@ -24,7 +24,7 @@ import org.supercsv.util.CsvContext;
 
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public abstract class AbstractCSVColumnProc implements ColumnProcessor, CellProcessor {
+public abstract class AbstractCSVColumnProc implements ColumnProc, CellProcessor {
 
     private static final Logger LOG = Logger.getLogger(
             AbstractCSVColumnProc.class.getName());
