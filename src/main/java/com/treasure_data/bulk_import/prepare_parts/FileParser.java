@@ -77,7 +77,7 @@ public abstract class FileParser {
         return lineNum;
     }
 
-    public void incrRowNum() {
+    public void incrementRowNum() {
         rowNum++;
     }
 

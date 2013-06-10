@@ -46,7 +46,7 @@ public abstract class FileWriter implements Closeable {
 
     protected abstract void writeEndRow() throws PreparePartsException;
 
-    public void incrRowNum() {
+    public void incrementRowNum() {
         rowNum++;
     }
 

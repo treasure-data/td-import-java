@@ -155,8 +155,7 @@ public class CSVFileParser extends FileParser {
 
         // create cell processors
         this.cprocs = ColumnProcessorGenerator.generateCellProcessors(
-                writer, columnNames, columnTypes, timeColumnIndex,
-                aliasTimeColumnIndex, timeFormat, timeValue);
+                writer, columnNames, columnTypes, timeColumnIndex, timeFormat);
         if (needToAppendTimeColumn) {
             tcproc = ColumnProcessorGenerator.generateTimeColumnProcessor(
                     writer, aliasTimeColumnIndex, timeFormat, timeValue);
@@ -186,7 +185,7 @@ public class CSVFileParser extends FileParser {
         }
 
         // increment row number
-        incrRowNum();
+        incrementRowNum();
 
         int rowSize = row.size();
         if (rowSize != cprocs.length) {
@@ -197,7 +196,10 @@ public class CSVFileParser extends FileParser {
                     "[line: %d]", rowSize, cprocs.length, getLineNum()));
         }
 
+        // write begin of row (map data)
         if (needToAppendTimeColumn) {
+            // if the row doesn't have 'time' column, new 'time' column needs
+            // to be appended to it.
             writer.writeBeginRow(rowSize + 1);
         } else {
             writer.writeBeginRow(rowSize);
@@ -218,54 +220,12 @@ public class CSVFileParser extends FileParser {
             tcproc.execute(row.get(tcproc.getIndex()));
         }
 
+        // write end of row (map data)
         writer.writeEndRow();
-        writer.incrRowNum();
+        writer.incrementRowNum();
 
         return true;
     }
-
-//    private boolean parseList() throws PreparePartsException {
-//        try {
-//
-//            long time = 0;
-//            for (int i = 0; i < allSize; i++) {
-//                if (i == aliasTimeIndex) {
-//                    time = ((Number) row.get(i)).longValue();
-//                }
-//
-//                // i is included in extractedColumnIndexes?
-//                boolean included = false;
-//                for (Integer j : extractedColumnIndexes) {
-//                    if (i == j) { // TODO optimize
-//                        included = true;
-//                        break;
-//                    }
-//                }
-//
-//                // write extracted data with writer
-//                if (included) {
-//                    writer.write(allColumnNames[i]);
-//                    writer.write(row.get(i));
-//                }
-//            }
-//
-//            if (allSize == timeIndex) {
-//                writer.write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-//                if (aliasTimeIndex >= 0) {
-//                    writer.write(time);
-//                } else {
-//                    writer.write(timeValue);
-//                }
-//            }
-//
-//            writer.writeEndRow();
-//
-//            writer.incrRowNum();
-//            return true;
-//        } catch (Exception e) {
-//            throw new PreparePartsException(e);
-//        }
-//    }
 
     public void close() throws PreparePartsException {
         if (reader != null) {
