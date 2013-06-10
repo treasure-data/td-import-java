@@ -30,8 +30,7 @@ public abstract class FileParser {
     public static FileParser newFileParser(PrepareConfig conf)
             throws PreparePartsException {
         PrepareConfig.Format format = conf.getFormat();
-        if (format.equals(PrepareConfig.Format.CSV)
-                || format.equals(PrepareConfig.Format.TSV)) {
+        if (format.equals(PrepareConfig.Format.CSV) || format.equals(PrepareConfig.Format.TSV)) {
             return new CSVFileParser(conf);
         } else if (format.equals(PrepareConfig.Format.JSON)) {
             // return new JSONFileParser(request, result);
@@ -70,7 +69,7 @@ public abstract class FileParser {
         compressionType = conf.checkCompressionType(fileName);
     }
 
-    public void incrLineNum() {
+    public void incrementLineNum() {
         lineNum++;
     }
 

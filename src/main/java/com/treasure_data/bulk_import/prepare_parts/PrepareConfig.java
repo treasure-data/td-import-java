@@ -517,6 +517,10 @@ public class PrepareConfig extends Config {
         return splitSize;
     }
 
+    public char getQuoteChar() {
+        return '"';
+    }
+
     public void setDelimiterChar(char c) {
         this.delimiterChar = c;
     }
