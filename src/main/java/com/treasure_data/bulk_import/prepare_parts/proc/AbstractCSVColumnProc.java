@@ -59,7 +59,7 @@ public abstract class AbstractCSVColumnProc implements ColumnProcessor, CellProc
         LOG.finer(String.format("index=%d, column=%s, value=%s",
                 index, columnName, value));
         try {
-            writer.writeString(columnName);
+            executeKey();
 
             if (value == null) {
                 writer.writeNil();
@@ -70,6 +70,10 @@ public abstract class AbstractCSVColumnProc implements ColumnProcessor, CellProc
         } catch (PreparePartsException e) {
             throw new RuntimeException(e.getCause());
         }
+    }
+
+    protected void executeKey() throws PreparePartsException {
+        writer.writeString(columnName);
     }
 
     protected abstract Object executeValue(final Object value)

@@ -22,15 +22,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.exception.SuperCsvException;
 import org.supercsv.io.CsvListReader;
-import org.supercsv.io.ICsvListReader;
 import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
@@ -46,12 +41,13 @@ public class CSVFileParser extends FileParser {
     private Tokenizer reader;
     private CsvPreference csvPref;
     private CellProcessor[] cprocs;
+    private ColumnProcessor tcproc = null;
 
     private boolean needToAppendTimeColumn = false;
     private int timeColumnIndex = -1;
     private int aliasTimeColumnIndex = -1;
     private String timeFormat = null;
-    private Long timeValue = new Long(-1);
+    private Long timeValue = 0L;
     private String[] columnNames;
     private ColumnType[] columnTypes;
 
@@ -161,6 +157,10 @@ public class CSVFileParser extends FileParser {
         this.cprocs = ColumnProcessorGenerator.generateCellProcessors(
                 writer, columnNames, columnTypes, timeColumnIndex,
                 aliasTimeColumnIndex, timeFormat, timeValue);
+        if (needToAppendTimeColumn) {
+            tcproc = ColumnProcessorGenerator.generateTimeColumnProcessor(
+                    writer, aliasTimeColumnIndex, timeFormat, timeValue);
+        }
 
         List<String> row = new ArrayList<String>();
         boolean moreRead = true;
@@ -215,7 +215,7 @@ public class CSVFileParser extends FileParser {
         }
 
         if (needToAppendTimeColumn) {
-            // TODO
+            tcproc.execute(row.get(tcproc.getIndex()));
         }
 
         writer.writeEndRow();

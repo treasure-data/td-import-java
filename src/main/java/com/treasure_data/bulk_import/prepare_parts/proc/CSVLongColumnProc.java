@@ -28,11 +28,13 @@ public class CSVLongColumnProc extends AbstractCSVColumnProc {
 
     @Override
     public Object executeValue(final Object value) throws PreparePartsException {
+        Long v = null;
+
         if (value instanceof Long) {
-            writer.writeLong((Long) value);
+            v = (Long) value;
         } else if (value instanceof String) {
             try {
-                writer.writeLong(Long.parseLong((String) value));
+                v = Long.parseLong((String) value);
             } catch (NumberFormatException e) {
                 throw new PreparePartsException(String.format(
                         "'%s' could not be parsed as an Long", value));
@@ -44,8 +46,8 @@ public class CSVLongColumnProc extends AbstractCSVColumnProc {
                     actualClassName));
         }
 
-        writer.writeLong((Long) value);
-        return null;
+        writer.writeLong(v);
+        return v;
     }
 
 }

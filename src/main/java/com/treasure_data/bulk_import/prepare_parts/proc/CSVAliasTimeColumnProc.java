@@ -17,36 +17,52 @@
 //
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
+import com.treasure_data.bulk_import.Config;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public class CSVIntColumnProc extends AbstractCSVColumnProc {
+public class CSVAliasTimeColumnProc extends AbstractCSVColumnProc {
 
-    public CSVIntColumnProc(int index, String columnName,
+    private String timeFormat; // TODO should change simple time format
+
+    public CSVAliasTimeColumnProc(int aliasIndex,
+            String timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
-        super(index, columnName, writer);
+        super(aliasIndex, null, writer);
+        this.timeFormat = timeFormat;
     }
 
     @Override
-    public Object executeValue(final Object value) throws PreparePartsException {
-        Integer v = null;
-        if (value instanceof Integer) {
-            v = (Integer) value;
+    public void executeKey() throws PreparePartsException {
+        writer.writeString(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+    }
+
+    @Override
+    public Object executeValue(Object value) throws PreparePartsException {
+        // TODO refine!!!!
+
+        Long v = null;
+
+        if (value instanceof Long) {
+            v = (Long) value;
         } else if (value instanceof String) {
+            String sv = (String) value;
+
             try {
-                v = Integer.parseInt((String) value);
-                writer.writeInt(v);
+                v = Long.parseLong(sv);
             } catch (NumberFormatException e) {
                 throw new PreparePartsException(String.format(
-                        "'%s' could not be parsed as an Integer", value));
+                        "'%s' could not be parsed as an Long", value));
             }
+
+            // TODO uses simple time format
         } else {
             final String actualClassName = value.getClass().getName();
             throw new PreparePartsException(String.format(
-                    "the input value should be of type Integer or String but is of type %s",
+                    "the input value should be of type Long or String but is of type %s",
                     actualClassName));
         }
 
-        writer.writeInt(v);
+        writer.writeLong(v);
         return v;
     }
 

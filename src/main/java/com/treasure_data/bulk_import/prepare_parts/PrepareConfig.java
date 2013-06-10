@@ -205,7 +205,7 @@ public class PrepareConfig extends Config {
     protected CompressionType compressionType;
     protected String encoding;
     protected String aliasTimeColumn;
-    protected long timeValue = -1;
+    protected long timeValue = 0;
     protected String timeFormat;
     protected String errorRecordOutputDirName;
     protected boolean dryRun = false;

@@ -28,11 +28,13 @@ public class CSVDoubleColumnProc extends AbstractCSVColumnProc {
 
     @Override
     public Object executeValue(final Object value) throws PreparePartsException {
+        Double v = null;
+
         if (value instanceof Double) {
-            writer.writeDouble((Double) value);
+            v = (Double) value;
         } else if (value instanceof String) {
             try {
-                writer.writeDouble(Double.parseDouble((String) value));
+                v = Double.parseDouble((String) value);
             } catch (NumberFormatException e) {
                 throw new PreparePartsException(String.format(
                         "'%s' could not be parsed as an Double", value));
@@ -44,8 +46,8 @@ public class CSVDoubleColumnProc extends AbstractCSVColumnProc {
                     actualClassName));
         }
 
-        writer.writeLong((Long) value);
-        return null;
+        writer.writeDouble(v);
+        return v;
     }
 
 }
