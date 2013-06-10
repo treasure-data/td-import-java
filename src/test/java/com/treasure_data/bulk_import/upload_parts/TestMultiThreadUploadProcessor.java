@@ -80,23 +80,4 @@ public class TestMultiThreadUploadProcessor {
 
         assertEquals(0, proc.getErrors().size());
     }
-
-    @Test
-    public void test() throws Exception {
-        int numTasks = 10;
-
-        UploadProcessor child = spy(new UploadProcessor(null, conf));
-        doThrow(new IOException("")).when(child).execute0(any(UploadProcessor.Task.class));
-        proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
-        proc.startWorkers();
-
-        for (int i = 0; i < numTasks; i++) {
-            MultiThreadUploadProcessor.addTask(new UploadProcessor.Task("sess" + i, "file" + i, 10));
-        }
-
-        MultiThreadUploadProcessor.addFinishTask(conf);
-        proc.joinWorkers();
-
-        assertEquals(numTasks, proc.getErrors().size());
-    }
 }
