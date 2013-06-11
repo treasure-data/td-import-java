@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
@@ -70,20 +71,20 @@ public class Main {
             fileNames[i] = args[i + 1];
         }
 
-        PrepareConfig conf = new PrepareConfig();
+        final PrepareConfig conf = new PrepareConfig();
         conf.configure(props);
 
-        PrepareProcessor proc = new PrepareProcessor(conf);
+        MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
+        proc.registerWorkers();
+        proc.startWorkers();
 
-        // scan files that are prepared
+        // scan files that are uploaded
         new Thread(new Runnable() {
             public void run() {
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
-//                        long size = new File(fileNames[i]).length();
-//                        PrepareProcessor.Task task = new PrepareProcessor.Task(
-//                                sessionName, fileNames[i], size);
-//                        MultiThreadPrepareProcessor.addTask(task);
+                        PrepareProcessor.Task task = new PrepareProcessor.Task(fileNames[i]);
+                        MultiThreadPrepareProcessor.addTask(task);
                     } catch (Throwable t) {
                         LOG.severe("Error occurred During 'addTask' method call");
                         LOG.throwing("Main", "addTask", t);
@@ -92,13 +93,15 @@ public class Main {
 
                 // end of file list
                 try {
-//                    MultiThreadPrepareProcessor.addFinishTask(conf);
+                    MultiThreadPrepareProcessor.addFinishTask(conf);
                 } catch (Throwable t) {
                     LOG.severe("Error occurred During 'addFinishTask' method call");
                     LOG.throwing("Main", "addFinishTask", t);
                 }
             }
         }).start();
+
+        proc.joinWorkers();
     }
 
     /**
