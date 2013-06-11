@@ -101,6 +101,11 @@ public class Main {
         }).start();
 
         proc.joinWorkers();
+
+        for (PrepareProcessor.ErrorInfo e : proc.getErrors()) {
+            // TODO should handle errors
+            e.error.printStackTrace();
+        }
     }
 
     /**
