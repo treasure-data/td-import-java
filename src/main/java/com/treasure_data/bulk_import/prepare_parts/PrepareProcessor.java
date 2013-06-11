@@ -68,10 +68,10 @@ public class PrepareProcessor {
 
     public static class ErrorInfo {
         Task task;
-        Throwable error;
+        Throwable error = null;
 
-        long redRows;
-        long writtenRows;
+        long redRows = 0;
+        long writtenRows = 0;
 
         public ErrorInfo() {
         }
@@ -91,6 +91,8 @@ public class PrepareProcessor {
 
         // TODO #MN need type paramters
         ErrorInfo err = new ErrorInfo();
+        err.task = task;
+
         FileParser p = null;
         MsgpackGZIPFileWriter writer = null;
         try {
@@ -98,11 +100,11 @@ public class PrepareProcessor {
             p.configure(task.fileName);
             p.sample(task.createInputStream(conf.getCompressionType()));
 
-//            if (conf.dryRun()) {
-//                // if this processing is dry-run mode, thread of control
-//                // returns back
-//                return new ErrorInfo(task, null, 0, 0);
-//            }
+            if (conf.dryRun()) {
+                // if this processing is dry-run mode, thread of control
+                // returns back
+                return err;
+            }
 
             writer = new MsgpackGZIPFileWriter(conf);
             writer.configure(task.fileName);
@@ -110,11 +112,9 @@ public class PrepareProcessor {
             p.setFileWriter(writer);
             p.parse(task.createInputStream(conf.getCompressionType()));
         } catch (IOException e) {
-            // TODO
-            e.printStackTrace();
+            err.error = e;
         } catch (PreparePartsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            err.error = e;
         } finally {
             if (p != null) {
                 p.closeSilently();
@@ -124,7 +124,6 @@ public class PrepareProcessor {
             }
         }
 
-        err.task = task;
         err.redRows = p.getRowNum();
         err.writtenRows = writer.getRowNum();
 

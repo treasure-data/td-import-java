@@ -45,7 +45,7 @@ public class MultiThreadPrepareProcessor {
                 }
 
                 PrepareProcessor.ErrorInfo error = proc.execute(t);
-                if (error != null) {
+                if (error.error != null) {
                     parent.setErrors(error);
                 }
             }
