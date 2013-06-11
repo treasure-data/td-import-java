@@ -99,29 +99,35 @@ public class PrepareProcessor {
             p = FileParser.newFileParser(conf);
             p.configure(task.fileName);
             p.sample(task.createInputStream(conf.getCompressionType()));
+        } catch (Throwable t) {
+            err.error = t;
+        }
 
-            if (conf.dryRun()) {
-                // if this processing is dry-run mode, thread of control
-                // returns back
-                return err;
+        if (conf.dryRun()) {
+            if (p != null) {
+                p.closeSilently();
             }
 
+            // if this processing is dry-run mode, thread of control
+            // returns back
+            return err;
+        }
+
+        try {
             writer = new MsgpackGZIPFileWriter(conf);
             writer.configure(task.fileName);
 
             p.setFileWriter(writer);
             p.parse(task.createInputStream(conf.getCompressionType()));
-        } catch (IOException e) {
-            err.error = e;
-        } catch (PreparePartsException e) {
-            err.error = e;
-        } finally {
-            if (p != null) {
-                p.closeSilently();
-            }
-            if (writer != null) {
-                writer.closeSilently();
-            }
+        } catch (Throwable t) {
+            err.error = t;
+        }
+
+        if (p != null) {
+            p.closeSilently();
+        }
+        if (writer != null) {
+            writer.closeSilently();
         }
 
         err.redRows = p.getRowNum();
