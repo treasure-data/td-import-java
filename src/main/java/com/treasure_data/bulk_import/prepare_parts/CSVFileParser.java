@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.json.simple.JSONValue;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.Tokenizer;
@@ -128,16 +129,22 @@ public class CSVFileParser extends FileParser {
                 }
             }
 
-            // read sample
-            List<Object> firstRow = null;
+            // read sample rows
+            List<String> firstRow = new ArrayList<String>();
             final int sampleRowSize = conf.getSampleRowSize();
-            CellProcessor[] cprocs = ColumnProcGenerator.generateSampleCellProcessors(
+            CellProcessor[] sampleProcs = ColumnProcGenerator.generateSampleCellProcessors(
                     columnNames, sampleRowSize);
             boolean isFirstRow = false;
             for (int i = 0; i < sampleRowSize; i++) {
-                List<Object> row = sampleReader.read(cprocs);
+                List<Object> row = sampleReader.read(sampleProcs);
                 if (!isFirstRow) {
-                    firstRow = row;
+                    for (Object c : row) {
+                        if (c != null) {
+                            firstRow.add(c.toString());
+                        } else {
+                            firstRow.add(null);
+                        }
+                    }
                     isFirstRow = true;
                 }
 
@@ -152,8 +159,24 @@ public class CSVFileParser extends FileParser {
                 if (i == timeColumnIndex) {
                     columnTypes[i] = PrepareConfig.ColumnType.TIME;
                 } else {
-                    columnTypes[i] = ((ColumnSamplingProc) cprocs[i]).getColumnType();
+                    columnTypes[i] = ((ColumnSamplingProc) sampleProcs[i]).getColumnType();
                 }
+            }
+
+            if (!firstRow.isEmpty()) {
+                // print first sample row
+                JSONFileWriter w = new JSONFileWriter(conf);
+                cprocs = ColumnProcGenerator.generateCellProcessors(
+                        w, columnNames, columnTypes, timeColumnIndex, timeFormat);
+                if (needToAppendTimeColumn) {
+                    tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
+                            w, aliasTimeColumnIndex, timeFormat, timeValue);
+                }
+                parseRow(firstRow, cprocs, w);
+                String ret = JSONValue.toJSONString(w.getRecord());
+                LOG.info("sample row: " + ret);
+            } else {
+                LOG.info("cannot get sample row");
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);
@@ -189,7 +212,12 @@ public class CSVFileParser extends FileParser {
         while (moreRead) {
             incrementLineNum();
             try {
-                moreRead = parseRow(row);
+                // if reader got EOF, it returns false.
+                if (moreRead = reader.readColumns(row)) {
+                    parseRow(row, cprocs, writer);
+                    // increment row number
+                    incrementRowNum();
+                }
             } catch (IOException e) {
                 // if reader throw I/O error, parseRow throws PreparePartsException.
                 LOG.throwing("CSVFileParser", "parseRow", e);
@@ -201,15 +229,9 @@ public class CSVFileParser extends FileParser {
         }
     }
 
-    private boolean parseRow(List<String> row) throws IOException, PreparePartsException {
-        // if reader got EOF, it returns false.
-        if (!reader.readColumns(row)) {
-            return false;
-        }
-
-        // increment row number
-        incrementRowNum();
-
+    private void parseRow(List<String> row, CellProcessor[] cproc,
+            com.treasure_data.bulk_import.prepare_parts.FileWriter w)
+            throws IOException, PreparePartsException {
         int rowSize = row.size();
         if (rowSize != cprocs.length) {
             throw new PreparePartsException(String.format(
@@ -223,9 +245,9 @@ public class CSVFileParser extends FileParser {
         if (needToAppendTimeColumn) {
             // if the row doesn't have 'time' column, new 'time' column needs
             // to be appended to it.
-            writer.writeBeginRow(rowSize + 1);
+            w.writeBeginRow(rowSize + 1);
         } else {
-            writer.writeBeginRow(rowSize);
+            w.writeBeginRow(rowSize);
         }
 
         for (int i = 0; i < rowSize; i++) {
@@ -244,10 +266,8 @@ public class CSVFileParser extends FileParser {
         }
 
         // write end of row (map data)
-        writer.writeEndRow();
-        writer.incrementRowNum();
-
-        return true;
+        w.writeEndRow();
+        w.incrementRowNum();
     }
 
     public void close() throws PreparePartsException {
