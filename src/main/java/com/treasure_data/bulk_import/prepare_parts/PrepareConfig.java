@@ -206,7 +206,7 @@ public class PrepareConfig extends Config {
     protected int numOfPrepareThreads;
     protected String encoding;
     protected String aliasTimeColumn;
-    protected long timeValue = 0;
+    protected long timeValue = -1;
     protected String timeFormat;
     protected String errorRecordOutputDirName;
     protected boolean dryRun = false;
