@@ -78,7 +78,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
         msgpack = new MessagePack();
 
         // outputFilePrefix
-        int lastSepIndex = infileName.lastIndexOf(File.pathSeparator);
+        int lastSepIndex = infileName.lastIndexOf(File.separatorChar);
         outputFilePrefix = infileName.substring(lastSepIndex + 1,
                 infileName.length()).replace('.', '_');
 
