@@ -26,7 +26,7 @@ public class TestPrepareProcessor {
         return new BufferedInputStream(new ByteArrayInputStream(bytes));
     }
 
-    @Test @Ignore
+    @Test
     public void test01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
@@ -38,7 +38,7 @@ public class TestPrepareProcessor {
         conf.configure(props);
         PrepareProcessor proc = new PrepareProcessor(conf);
 
-        String csvtext = "time,user\n" + "1370416181,muga\n";
+        String csvtext = "time,user,age\n" + "1370416181,muga,10\n";
         String fileName = "file01";
 
         PrepareProcessor.Task task = new PrepareProcessor.Task(fileName);

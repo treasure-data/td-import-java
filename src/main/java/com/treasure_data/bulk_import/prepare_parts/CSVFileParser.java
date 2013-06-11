@@ -32,6 +32,7 @@ import org.supercsv.prefs.CsvPreference;
 import com.treasure_data.bulk_import.Config;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;
+import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
 
@@ -111,7 +112,7 @@ public class CSVFileParser extends FileParser {
             }
 
             if ((timeColumnIndex >= 0 || aliasTimeColumnIndex >= 0)
-                    || conf.getTimeFormat() != null) {
+                    && conf.getTimeFormat() != null) {
                 String timeFormat = conf.getTimeFormat();
                 this.timeFormat = new ExtStrftime(timeFormat);
             }
@@ -122,16 +123,33 @@ public class CSVFileParser extends FileParser {
                 needToAppendTimeColumn = true;
             }
 
+            // read sample
+            List<Object> firstRow = null;
+            final int sampleRowSize = conf.getSampleRowSize();
+            CellProcessor[] cprocs = ColumnProcGenerator.generateSampleCellProcessors(
+                    columnNames, sampleRowSize);
+            boolean isFirstRow = false;
+            for (int i = 0; i < sampleRowSize; i++) {
+                List<Object> row = sampleReader.read(cprocs);
+                if (!isFirstRow) {
+                    firstRow = row;
+                    isFirstRow = true;
+                }
+
+                if (row == null || row.isEmpty()) {
+                    break;
+                }
+            }
+
             // initialize types of all columns
             columnTypes = new PrepareConfig.ColumnType[columnNames.length];
             for (int i = 0; i < columnTypes.length; i++) {
-                columnTypes[i] = PrepareConfig.ColumnType.STRING;
-            }
-
-            // TODO read sample
-
-            for (int i = 0; i < columnTypes.length; i++) {
-                //TODO columnTypes[i] = ...
+                if (i == timeColumnIndex) {
+                    columnTypes[i] = PrepareConfig.ColumnType.TIME;
+                } else {
+                    columnTypes[i] = ((ColumnSamplingProc) cprocs[i]).getColumnType();
+                }
+                System.out.println("# column name: " + columnNames[i] + ", type: " + columnTypes[i]);
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);

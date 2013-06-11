@@ -28,7 +28,7 @@ public class CSVTimeColumnProc extends AbstractCSVColumnProc {
     public CSVTimeColumnProc(int index,
             ExtStrftime timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
-        super(index, null, writer);
+        super(index, Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE, writer);
         this.timeFormat = timeFormat;
     }
 
