@@ -26,7 +26,7 @@ public class CSVTimeValueColumnProc extends AbstractCSVColumnProc {
 
     public CSVTimeValueColumnProc(long timeValue,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
-        super(0, null, writer);
+        super(0, Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE, writer);
         this.timeValue = timeValue;
     }
 
