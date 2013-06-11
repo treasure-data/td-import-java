@@ -63,14 +63,11 @@ public class PrepareProcessor {
     }
 
     public static class ErrorInfo {
-        Task task;
-        Throwable error = null;
+        public Task task;
+        public Throwable error = null;
 
-        long redRows = 0;
-        long writtenRows = 0;
-
-        public ErrorInfo() {
-        }
+        public long redRows = 0;
+        public long writtenRows = 0;
     }
 
     private static final Logger LOG = Logger.getLogger(
@@ -99,7 +96,7 @@ public class PrepareProcessor {
             err.error = t;
         }
 
-        if (conf.dryRun()) {
+        if (err.error != null || conf.dryRun()) {
             if (p != null) {
                 p.closeSilently();
             }
