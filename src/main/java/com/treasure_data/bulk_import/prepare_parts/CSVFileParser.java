@@ -119,8 +119,13 @@ public class CSVFileParser extends FileParser {
 
             // if 'time' and the alias column don't exist,
             if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
-                timeValue = conf.getTimeValue();
-                needToAppendTimeColumn = true;
+                if (conf.getTimeValue() >= 0) {
+                    timeValue = conf.getTimeValue();
+                    needToAppendTimeColumn = true;
+                } else {
+                    throw new PreparePartsException(
+                            "Time column not found. --time-column or --time-value option is required");
+                }
             }
 
             // read sample
