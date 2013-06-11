@@ -1,36 +1,25 @@
 package com.treasure_data.bulk_import;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-
-import java.io.ByteArrayInputStream;
 import java.util.Properties;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
-import com.treasure_data.bulk_import.upload_parts.UploadConfig;
-import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
-import com.treasure_data.commands.Config;
-import com.treasure_data.tools.BulkImportTool;
+import com.treasure_data.bulk_import.Config;
 
 public class TestMain {
 
     @Test @Ignore
-    public void testUploadParts01() throws Exception {
+    public void testPrepareParts01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader()
                 .getResourceAsStream("treasure-data.properties"));
-        // bulk_import:create mugasess mugadb sesstest
-        props.setProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR, "./out/");
-        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "2");
-        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOPERFORM, "false");
-        props.setProperty(Config.BI_UPLOAD_PARTS_AUTOCOMMIT, "false");
+
+        //props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
+        props.setProperty(Config.BI_PREPARE_PARTS_PARALLEL, "5");
         final String[] args = new String[] {
-                "upload_parts",
-                "mugasess",
+                "prepare_parts",
                 "./in/from_SQLServer_to_csv_10_v01.csv",
                 "./in/from_SQLServer_to_csv_10_v02.csv",
                 "./in/from_SQLServer_to_csv_10_v03.csv",
@@ -42,7 +31,7 @@ public class TestMain {
                 "./in/from_SQLServer_to_csv_10_v09.csv",
         };
 
-        Main.uploadParts(args, props);
+        Main.prepareParts(args, props);
     }
 
 }
