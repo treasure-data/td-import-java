@@ -61,6 +61,10 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_COMPRESSION = "td.bulk_import.prepare_parts.compression";
     String BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE = "auto";
 
+    // parallel
+    String BI_PREPARE_PARTS_PARALLEL = "td.bulk_import.prepare_parts.prepare-parallel";
+    String BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE = "1";
+
     // encoding [utf-8,...]
     String BI_PREPARE_PARTS_ENCODING = "td.bulk_import.prepare_parts.encoding";
     String BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE = "utf-8";

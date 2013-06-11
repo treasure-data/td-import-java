@@ -203,6 +203,7 @@ public class PrepareConfig extends Config {
 
     protected Format format;
     protected CompressionType compressionType;
+    protected int numOfPrepareThreads;
     protected String encoding;
     protected String aliasTimeColumn;
     protected long timeValue = 0;
@@ -245,6 +246,25 @@ public class PrepareConfig extends Config {
         if (compressionType == null) {
             throw new IllegalArgumentException("unsupported compression type: "
                     + compressionType);
+        }
+
+        // parallel
+        String pthreadNum = props.getProperty(BI_PREPARE_PARTS_PARALLEL,
+                BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE);
+        try {
+            int n = Integer.parseInt(pthreadNum);
+            if (n < 0) {
+                numOfPrepareThreads = 2;
+            } else if (n > 9){
+                numOfPrepareThreads = 8;
+            } else {
+                numOfPrepareThreads = n;
+            }
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "'int' value is required as 'parallel' option e.g. -D%s=5",
+                    BI_UPLOAD_PARTS_PARALLEL);
+            throw new IllegalArgumentException(msg, e);
         }
 
         // encoding
@@ -442,6 +462,10 @@ public class PrepareConfig extends Config {
 
         this.compressionType = compressionType;
         return compressionType;
+    }
+
+    public int getNumOfPrepareThreads() {
+        return numOfPrepareThreads;
     }
 
     public String getEncoding() {

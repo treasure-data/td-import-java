@@ -26,7 +26,7 @@ public class TestPrepareProcessor {
         return new BufferedInputStream(new ByteArrayInputStream(bytes));
     }
 
-    @Test
+    @Test @Ignore
     public void test01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));

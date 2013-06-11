@@ -149,7 +149,6 @@ public class CSVFileParser extends FileParser {
                 } else {
                     columnTypes[i] = ((ColumnSamplingProc) cprocs[i]).getColumnType();
                 }
-                System.out.println("# column name: " + columnNames[i] + ", type: " + columnTypes[i]);
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);

@@ -30,6 +30,9 @@ import java.util.logging.Logger;
 public class PrepareProcessor {
 
     public static class Task {
+        private static final String TAG = "__PREPARE_FINISH__";
+        static final Task FINISH_TASK = new Task(TAG);
+
         String fileName;
 
         boolean isTest = false;
@@ -46,6 +49,20 @@ public class PrepareProcessor {
             } else {
                 return new ByteArrayInputStream(testText.getBytes());
             }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (! (obj instanceof Task)) {
+                return false;
+            }
+
+            Task t = (Task) obj;
+            return t.fileName.equals(fileName);
+        }
+
+        static boolean endTask(Task t) {
+            return t.equals(FINISH_TASK);
         }
     }
 
