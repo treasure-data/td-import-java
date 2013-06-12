@@ -52,20 +52,8 @@ public class PrepareConfig extends Config {
             }
         },
         JSON("json") {
-            @Override
-            public FileParser createFileParser(PrepareConfig conf)
-                    throws PreparePartsException {
-                throw new PreparePartsException(
-                        new UnsupportedOperationException("format: " + this));
-            }
         },
         MSGPACK("msgpack") {
-            @Override
-            public FileParser createFileParser(PrepareConfig conf)
-                    throws PreparePartsException {
-                throw new PreparePartsException(
-                        new UnsupportedOperationException("format: " + this));
-            }
         };
 
         private String format;
@@ -78,8 +66,11 @@ public class PrepareConfig extends Config {
             return format;
         }
 
-        public abstract FileParser createFileParser(PrepareConfig conf)
-                throws PreparePartsException;
+        public FileParser createFileParser(PrepareConfig conf)
+                throws PreparePartsException {
+            throw new PreparePartsException(
+                    new UnsupportedOperationException("format: " + this));
+        }
 
         public static Format fromString(String format) {
             return StringToFormat.get(format);
