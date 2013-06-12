@@ -273,7 +273,7 @@ public class PrepareConfig extends Config {
         try {
             createCharsetDecoder(encoding);
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException(e.getMessage());
         }
 
         // time column
@@ -473,9 +473,8 @@ public class PrepareConfig extends Config {
         return numOfPrepareThreads;
     }
 
-    public CharsetDecoder createCharsetDecoder(String encoding)
-            throws PreparePartsException {
-        return Charset.forName(encoding).newDecoder()
+    public void createCharsetDecoder(String encoding) throws Exception {
+        charsetDecoder = Charset.forName(encoding).newDecoder()
                 .onMalformedInput(CodingErrorAction.REPORT)
                 .onUnmappableCharacter(CodingErrorAction.REPORT);
     }
