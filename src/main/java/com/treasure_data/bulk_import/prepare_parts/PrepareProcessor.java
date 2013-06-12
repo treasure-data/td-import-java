@@ -89,7 +89,7 @@ public class PrepareProcessor {
         FileParser p = null;
         MsgpackGZIPFileWriter writer = null;
         try {
-            p = FileParser.newFileParser(conf);
+            p = conf.getFormat().createFileParser(conf);
             p.configure(task.fileName);
             p.sample(task.createInputStream(conf.getCompressionType()));
         } catch (Throwable t) {

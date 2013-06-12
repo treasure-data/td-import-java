@@ -20,36 +20,11 @@ package com.treasure_data.bulk_import.prepare_parts;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
 import java.util.logging.Logger;
 
 public abstract class FileParser {
-    // TODO #MN should consider type parameters
-    public static FileParser newFileParser(PrepareConfig conf)
-            throws PreparePartsException {
-        PrepareConfig.Format format = conf.getFormat();
-        if (format.equals(PrepareConfig.Format.CSV) || format.equals(PrepareConfig.Format.TSV)) {
-            return new CSVFileParser(conf);
-        } else if (format.equals(PrepareConfig.Format.JSON)) {
-            // return new JSONFileParser(request, result);
-            throw new PreparePartsException(new UnsupportedOperationException(
-                    "format: " + format));
-        } else if (format.equals(PrepareConfig.Format.MSGPACK)) {
-            throw new PreparePartsException(new UnsupportedOperationException(
-                    "format: " + format));
-        } else {
-            throw new PreparePartsException("Invalid format: " + format);
-        }
-    }
-
-    private static final Logger LOG = Logger.getLogger(FileParser.class
-            .getName());
-
-    static final CharsetDecoder UTF_8 = Charset.forName("UTF-8")
-            .newDecoder().onMalformedInput(CodingErrorAction.REPORT)
-            .onUnmappableCharacter(CodingErrorAction.REPORT);
+    private static final Logger LOG = Logger.getLogger(FileParser.class.getName());
 
     protected PrepareConfig conf;
     protected long lineNum = 0;

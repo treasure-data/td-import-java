@@ -36,7 +36,37 @@ import com.treasure_data.bulk_import.Config;
 public class PrepareConfig extends Config {
 
     public static enum Format {
-        CSV("csv"), TSV("tsv"), JSON("json"), MSGPACK("msgpack");
+        // TODO #MN should consider type parameters
+        CSV("csv") {
+            @Override
+            public FileParser createFileParser(PrepareConfig conf)
+                    throws PreparePartsException {
+                return new CSVFileParser(conf);
+            }
+        },
+        TSV("tsv") {
+            @Override
+            public FileParser createFileParser(PrepareConfig conf)
+                    throws PreparePartsException {
+                return new CSVFileParser(conf);
+            }
+        },
+        JSON("json") {
+            @Override
+            public FileParser createFileParser(PrepareConfig conf)
+                    throws PreparePartsException {
+                throw new PreparePartsException(
+                        new UnsupportedOperationException("format: " + this));
+            }
+        },
+        MSGPACK("msgpack") {
+            @Override
+            public FileParser createFileParser(PrepareConfig conf)
+                    throws PreparePartsException {
+                throw new PreparePartsException(
+                        new UnsupportedOperationException("format: " + this));
+            }
+        };
 
         private String format;
 
@@ -47,6 +77,9 @@ public class PrepareConfig extends Config {
         public String format() {
             return format;
         }
+
+        public abstract FileParser createFileParser(PrepareConfig conf)
+                throws PreparePartsException;
 
         public static Format fromString(String format) {
             return StringToFormat.get(format);
