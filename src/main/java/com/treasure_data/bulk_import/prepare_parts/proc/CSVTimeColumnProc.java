@@ -41,7 +41,7 @@ public class CSVTimeColumnProc extends AbstractCSVColumnProc {
     public Object executeValue(Object value) throws PreparePartsException {
         // TODO refine!!!!
 
-        Long v = null;
+        Long v = 0L;
 
         if (value instanceof Long) {
             v = (Long) value;
@@ -57,8 +57,6 @@ public class CSVTimeColumnProc extends AbstractCSVColumnProc {
 
             if (v == null && timeFormat != null) {
                 v = timeFormat.getTime(sv);
-            } else {
-                return 0;
             }
         } else {
             final String actualClassName = value.getClass().getName();
