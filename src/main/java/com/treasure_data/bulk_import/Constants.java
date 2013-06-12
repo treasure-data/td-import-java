@@ -67,7 +67,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // encoding [utf-8,...]
     String BI_PREPARE_PARTS_ENCODING = "td.bulk_import.prepare_parts.encoding";
-    String BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE = "utf-8";
+    String BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE = "UTF-8";
 
     // time-column NAME; default='time'
     String BI_PREPARE_PARTS_TIMECOLUMN = "td.bulk_import.prepare_parts.time-column";

@@ -70,7 +70,7 @@ public class CSVFileParser extends FileParser {
     public void sample(InputStream in) throws PreparePartsException {
         // create sample reader
         CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
-                in, decoder), csvPref);
+                in, charsetDecoder), csvPref);
 
         try {
             // extract column names
@@ -163,32 +163,42 @@ public class CSVFileParser extends FileParser {
                 }
             }
 
+            String ret = null;
             if (!firstRow.isEmpty()) {
                 // print first sample row
                 JSONFileWriter w = new JSONFileWriter(conf);
+
                 cprocs = ColumnProcGenerator.generateCellProcessors(
                         w, columnNames, columnTypes, timeColumnIndex, timeFormat);
                 if (needToAppendTimeColumn) {
                     tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
                             w, aliasTimeColumnIndex, timeFormat, timeValue);
                 }
-                parseRow(firstRow, cprocs, w);
-                String ret = JSONValue.toJSONString(w.getRecord());
+
+                try {
+                    parseRow(firstRow, cprocs, w);
+                    ret = JSONValue.toJSONString(w.getRecord());
+                } finally {
+                    if (w != null) {
+                        w.closeSilently();
+                    }
+                }
+            }
+
+            if (ret != null) {
                 LOG.info("sample row: " + ret);
-            } else {
+            } else  {
                 LOG.info("cannot get sample row");
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);
-        } finally {
-
         }
     }
 
     @Override
     public void parse(InputStream in) throws PreparePartsException {
         // create reader
-        reader = new Tokenizer(new InputStreamReader(in, decoder), csvPref);
+        reader = new Tokenizer(new InputStreamReader(in, charsetDecoder), csvPref);
         if (conf.hasColumnHeader()) {
             // header line is skipped
             try {

@@ -203,8 +203,8 @@ public class PrepareConfig extends Config {
 
     protected Format format;
     protected CompressionType compressionType;
+    protected CharsetDecoder charsetDecoder;
     protected int numOfPrepareThreads;
-    protected String encoding;
     protected String aliasTimeColumn;
     protected long timeValue = -1;
     protected String timeFormat;
@@ -268,8 +268,13 @@ public class PrepareConfig extends Config {
         }
 
         // encoding
-        encoding = props.getProperty(Config.BI_PREPARE_PARTS_ENCODING,
+        String encoding = props.getProperty(Config.BI_PREPARE_PARTS_ENCODING,
                 Config.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
+        try {
+            createCharsetDecoder(encoding);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
 
         // time column
         aliasTimeColumn = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN);
@@ -468,20 +473,15 @@ public class PrepareConfig extends Config {
         return numOfPrepareThreads;
     }
 
-    public String getEncoding() {
-        return encoding;
+    public CharsetDecoder createCharsetDecoder(String encoding)
+            throws PreparePartsException {
+        return Charset.forName(encoding).newDecoder()
+                .onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT);
     }
 
     public CharsetDecoder getCharsetDecoder() throws PreparePartsException {
-        // encoding
-        if (encoding.equals("utf-8")) {
-            return Charset.forName("UTF-8").newDecoder()
-                    .onMalformedInput(CodingErrorAction.REPORT)
-                    .onUnmappableCharacter(CodingErrorAction.REPORT);
-        } else {
-            // TODO any more...
-            throw new PreparePartsException(new UnsupportedOperationException());
-        }
+        return charsetDecoder;
     }
 
     public void setAliasTimeColumn(String aliasColumn) {
