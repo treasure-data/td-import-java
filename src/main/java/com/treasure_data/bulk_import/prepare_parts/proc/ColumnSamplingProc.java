@@ -22,12 +22,27 @@ import static com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnTy
 import static com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType.LONG;
 import static com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType.STRING;
 
+import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.util.CsvContext;
 
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class ColumnSamplingProc extends AbstractCSVColumnProc {
+
+    public static PrepareConfig.ColumnType getColumnType(CellProcessor cellProc) {
+        if (!(cellProc instanceof ColumnSamplingProc)) {
+            throw new IllegalArgumentException();
+        }
+        return ((ColumnSamplingProc) cellProc).getColumnType();
+    }
+
+    public static PrepareConfig.ColumnType getColumnType(ColumnProc colProc) {
+        if (!(colProc instanceof ColumnSamplingProc)) {
+            throw new IllegalArgumentException();
+        }
+        return ((ColumnSamplingProc) colProc).getColumnType();
+    }
 
     private int sampleRow;
     private int[] scores = new int[] { 0, 0, 0, 0 };

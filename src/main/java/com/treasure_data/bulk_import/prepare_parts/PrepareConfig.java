@@ -168,7 +168,11 @@ public class PrepareConfig extends Config {
     }
 
     public static enum ColumnType {
-        INT("int", 0), LONG("long", 1), DOUBLE("double", 2), STRING("string", 3), TIME("time", 4);
+        INT("int", 0),
+        LONG("long", 1),
+        DOUBLE("double", 2),
+        STRING("string", 3),
+        TIME("time", 4);
 
         private String type;
 
@@ -414,26 +418,34 @@ public class PrepareConfig extends Config {
                 Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR_DEFAULTVALUE);
 
         // exclude-columns
-        String eColumns = props.getProperty(
+        String excludeColumns = props.getProperty(
                 Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
-        if (eColumns != null && !eColumns.isEmpty()) {
-            excludeColumns = eColumns.split(",");
+        if (excludeColumns != null && !excludeColumns.isEmpty()) {
+            this.excludeColumns = excludeColumns.split(",");
+            for (String c : this.excludeColumns) {
+                if (c.equals(Config.BI_PREPARE_PARTS_TIMECOLUMN)) {
+                    throw new IllegalArgumentException(
+                            "'time' column cannot be included in excluded columns");
+                }
+            }
         } else {
-            excludeColumns = new String[0];
+            this.excludeColumns = new String[0];
         }
 
         // only-columns
-        String oColumns = props.getProperty(
-                Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
-        if (oColumns != null && !oColumns.isEmpty()) {
-            if (eColumns != null && !eColumns.isEmpty()) {
-                throw new IllegalArgumentException(String.format("%s and %s must not be used",
-                        Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS,
-                        Config.BI_PREPARE_PARTS_ONLY_COLUMNS));
+        String onlyColumns = props.getProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
+        if (onlyColumns != null && !onlyColumns.isEmpty()) {
+            this.onlyColumns = onlyColumns.split(",");
+            for (String oc : this.onlyColumns) {
+                for (String ec : this.excludeColumns) {
+                    if (oc.equals(ec)) {
+                        throw new IllegalArgumentException(
+                                "'exclude' columns include specified 'only' columns");
+                    }
+                }
             }
-            onlyColumns = oColumns.split(",");
         } else {
-            onlyColumns = new String[0];
+            this.onlyColumns = new String[0];
         }
 
         // row size with sample reader
@@ -516,57 +528,28 @@ public class PrepareConfig extends Config {
         return charsetDecoder;
     }
 
-    public void setAliasTimeColumn(String aliasColumn) {
-        this.aliasTimeColumn = aliasColumn;
-    }
-
     public String getAliasTimeColumn() {
         return aliasTimeColumn;
-    }
-
-    public void setTimeValue(long timeValue) {
-        // initial value of timeValue is '-1'
-        this.timeValue = timeValue;
     }
 
     public long getTimeValue() {
         return timeValue;
     }
 
-    public void setTimeFormat(String timeFormat) {
-        this.timeFormat = timeFormat;
-    }
-
     public String getTimeFormat() {
         return timeFormat;
-    }
-
-    public void setErrorRecordOutputDirName(String dirName) {
-        this.errorRecordOutputDirName = dirName;
     }
 
     public String getErrorRecordOutputDirName() {
         return errorRecordOutputDirName;
     }
 
-    public void setDryRun(boolean flag) {
-        this.dryRun = flag;
-    }
-
     public boolean dryRun() {
         return dryRun;
     }
 
-    public void setOutputDirName(String dirName) {
-        this.outputDirName = dirName;
-    }
-
     public String getOutputDirName() {
         return outputDirName;
-    }
-
-    public void setSplitSize(int size) {
-        this.splitSize = size;
     }
 
     public int getSplitSize() {
@@ -577,72 +560,36 @@ public class PrepareConfig extends Config {
         return '"';
     }
 
-    public void setDelimiterChar(char c) {
-        this.delimiterChar = c;
-    }
-
     public char getDelimiterChar() {
         return delimiterChar;
-    }
-
-    public void setNewLine(NewLine newline) {
-        this.newline = newline;
     }
 
     public NewLine getNewline() {
         return newline;
     }
 
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
-    }
-
     public String[] getColumnNames() {
         return columnNames;
-    }
-
-    public void setColumnTypes(String[] types) {
-        this.columnTypes = types;
     }
 
     public String[] getColumnTypes() {
         return columnTypes;
     }
 
-    public void setHasColumnHeader(boolean flag) {
-        hasColumnHeader = flag;
-    }
-
     public boolean hasColumnHeader() {
         return hasColumnHeader;
-    }
-
-    public void setTypeErrorMode(String mode) {
-        typeErrorMode = mode;
     }
 
     public String getTypeErrorMode() {
         return typeErrorMode;
     }
 
-    public void setExcludeColumns(String[] columns) {
-        this.excludeColumns = columns;
-    }
-
     public String[] getExcludeColumns() {
         return excludeColumns;
     }
 
-    public void setOnlyColumns(String[] columns) {
-        this.onlyColumns = columns;
-    }
-
     public String[] getOnlyColumns() {
         return onlyColumns;
-    }
-
-    public void setSampleRowSize(int size) {
-        this.sampleRowSize = size;
     }
 
     public int getSampleRowSize() {

@@ -36,6 +36,7 @@ import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
+import com.treasure_data.bulk_import.prepare_parts.proc.SkipColumnProc;
 
 public class CSVFileParser extends FileParser {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
@@ -159,39 +160,79 @@ public class CSVFileParser extends FileParser {
                 if (i == timeColumnIndex) {
                     columnTypes[i] = PrepareConfig.ColumnType.TIME;
                 } else {
-                    columnTypes[i] = ((ColumnSamplingProc) sampleProcs[i]).getColumnType();
+                    columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
                 }
             }
 
-            String ret = null;
-            if (!firstRow.isEmpty()) {
-                // print first sample row
-                JSONFileWriter w = new JSONFileWriter(conf);
+            // print first sample row
+            JSONFileWriter w = new JSONFileWriter(conf);
 
-                cprocs = ColumnProcGenerator.generateCellProcessors(
-                        w, columnNames, columnTypes, timeColumnIndex, timeFormat);
-                if (needToAppendTimeColumn) {
-                    tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
-                            w, aliasTimeColumnIndex, timeFormat, timeValue);
-                }
-
-                try {
-                    parseRow(firstRow, cprocs, w);
-                    ret = JSONValue.toJSONString(w.getRecord());
-                } finally {
-                    if (w != null) {
-                        w.closeSilently();
-                    }
-                }
+            CellProcessor[] onelineProcs = ColumnProcGenerator.generateCellProcessors(
+                    w, columnNames, columnTypes, timeColumnIndex, timeFormat);
+            if (needToAppendTimeColumn) {
+                tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
+                        w, aliasTimeColumnIndex, timeFormat, timeValue);
             }
 
-            if (ret != null) {
-                LOG.info("sample row: " + ret);
-            } else  {
-                LOG.info("cannot get sample row");
+            // add attributes of exclude/only columns to column types
+            addExcludeAndOnlyColumnsFilter(onelineProcs);
+
+            try {
+                parseRow(firstRow, onelineProcs, w);
+                String ret = JSONValue.toJSONString(w.getRecord());
+                if (ret != null) {
+                    LOG.info("sample row: " + ret);
+                } else  {
+                    LOG.info("cannot get sample row");
+                }
+            } finally {
+                if (w != null) {
+                    w.closeSilently();
+                }
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);
+        }
+    }
+
+    private void addExcludeAndOnlyColumnsFilter(CellProcessor[] cellProcs) {
+        String[] excludeColumns = conf.getExcludeColumns();
+        String[] onlyColumns = conf.getOnlyColumns();
+        for (int i = 0; i < cellProcs.length; i++) {
+            ColumnProc colProc = (ColumnProc) cellProcs[i];
+            String cname = colProc.getColumnName();
+
+            // check exclude columns
+            boolean isExcluded = false;
+            for (String excludeColumn : excludeColumns) {
+                if (cname.equals(excludeColumn)) {
+                    isExcluded = true;
+                    break;
+                }
+            }
+
+            if (isExcluded) {
+                cellProcs[i] = new SkipColumnProc(colProc);
+                continue;
+            }
+
+            // check only columns
+            if (onlyColumns.length == 0) {
+                continue;
+            }
+
+            boolean isOnly = false;
+            for (String onlyColumn : onlyColumns) {
+                if (cname.equals(onlyColumn)) {
+                    isOnly = true;
+                    break;
+                }
+            }
+
+            if (!isOnly) {
+                cellProcs[i] = new SkipColumnProc(colProc);
+                continue; // not needed though,..
+            }
         }
     }
 
@@ -210,12 +251,15 @@ public class CSVFileParser extends FileParser {
         }
 
         // create cell processors
-        this.cprocs = ColumnProcGenerator.generateCellProcessors(
+        cprocs = ColumnProcGenerator.generateCellProcessors(
                 writer, columnNames, columnTypes, timeColumnIndex, timeFormat);
         if (needToAppendTimeColumn) {
             tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
                     writer, aliasTimeColumnIndex, timeFormat, timeValue);
         }
+
+        // add attributes of exclude/only columns to column types
+        addExcludeAndOnlyColumnsFilter(cprocs);
 
         List<String> row = new ArrayList<String>();
         boolean moreRead = true;
@@ -239,16 +283,16 @@ public class CSVFileParser extends FileParser {
         }
     }
 
-    private void parseRow(List<String> row, CellProcessor[] cproc,
+    private void parseRow(List<String> row, CellProcessor[] cellProcs,
             com.treasure_data.bulk_import.prepare_parts.FileWriter w)
             throws IOException, PreparePartsException {
         int rowSize = row.size();
-        if (rowSize != cprocs.length) {
+        if (rowSize != cellProcs.length) {
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must match the number of " +
                     "CellProcessors (%d): check that the number of CellProcessors you have " +
                     "defined matches the expected number of columns being read/written " +
-                    "[line: %d]", rowSize, cprocs.length, getLineNum()));
+                    "[line: %d]", rowSize, cellProcs.length, getLineNum()));
         }
 
         // write begin of row (map data)
@@ -262,11 +306,11 @@ public class CSVFileParser extends FileParser {
 
         for (int i = 0; i < rowSize; i++) {
             try {
-                cprocs[i].execute(row.get(i), null);
+                cellProcs[i].execute(row.get(i), null);
             } catch (Throwable t) {
                 throw new PreparePartsException(String.format(
                         "It cannot translate #%d column '%s'. Please check row data: %s [line: %d]",
-                        i, ((ColumnProc) cprocs[i]).getColumnName(),
+                        i, ((ColumnProc) cellProcs[i]).getColumnName(),
                         reader.getUntokenizedRow(), getLineNum()));
             }
         }
