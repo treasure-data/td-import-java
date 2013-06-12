@@ -195,47 +195,6 @@ public class CSVFileParser extends FileParser {
         }
     }
 
-    private void addExcludeAndOnlyColumnsFilter(CellProcessor[] cellProcs) {
-        String[] excludeColumns = conf.getExcludeColumns();
-        String[] onlyColumns = conf.getOnlyColumns();
-        for (int i = 0; i < cellProcs.length; i++) {
-            ColumnProc colProc = (ColumnProc) cellProcs[i];
-            String cname = colProc.getColumnName();
-
-            // check exclude columns
-            boolean isExcluded = false;
-            for (String excludeColumn : excludeColumns) {
-                if (cname.equals(excludeColumn)) {
-                    isExcluded = true;
-                    break;
-                }
-            }
-
-            if (isExcluded) {
-                cellProcs[i] = new SkipColumnProc(colProc);
-                continue;
-            }
-
-            // check only columns
-            if (onlyColumns.length == 0) {
-                continue;
-            }
-
-            boolean isOnly = false;
-            for (String onlyColumn : onlyColumns) {
-                if (cname.equals(onlyColumn)) {
-                    isOnly = true;
-                    break;
-                }
-            }
-
-            if (!isOnly) {
-                cellProcs[i] = new SkipColumnProc(colProc);
-                continue; // not needed though,..
-            }
-        }
-    }
-
     @Override
     public void parse(InputStream in) throws PreparePartsException {
         // create reader
@@ -333,4 +292,46 @@ public class CSVFileParser extends FileParser {
             }
         }
     }
+
+    void addExcludeAndOnlyColumnsFilter(CellProcessor[] cellProcs) {
+        String[] excludeColumns = conf.getExcludeColumns();
+        String[] onlyColumns = conf.getOnlyColumns();
+        for (int i = 0; i < cellProcs.length; i++) {
+            ColumnProc colProc = (ColumnProc) cellProcs[i];
+            String cname = colProc.getColumnName();
+
+            // check exclude columns
+            boolean isExcluded = false;
+            for (String excludeColumn : excludeColumns) {
+                if (cname.equals(excludeColumn)) {
+                    isExcluded = true;
+                    break;
+                }
+            }
+
+            if (isExcluded) {
+                cellProcs[i] = new SkipColumnProc(colProc);
+                continue;
+            }
+
+            // check only columns
+            if (onlyColumns.length == 0) {
+                continue;
+            }
+
+            boolean isOnly = false;
+            for (String onlyColumn : onlyColumns) {
+                if (cname.equals(onlyColumn)) {
+                    isOnly = true;
+                    break;
+                }
+            }
+
+            if (!isOnly) {
+                cellProcs[i] = new SkipColumnProc(colProc);
+                continue; // not needed though,..
+            }
+        }
+    }
+
 }
