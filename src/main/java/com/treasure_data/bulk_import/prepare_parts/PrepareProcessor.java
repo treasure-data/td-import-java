@@ -18,16 +18,24 @@
 package com.treasure_data.bulk_import.prepare_parts;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
+
+import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
+import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 
 public class PrepareProcessor {
 
     public static class Task {
         private static final String TAG = "__PREPARE_FINISH__";
         static final Task FINISH_TASK = new Task(TAG);
+
+        static boolean endTask(Task t) {
+            return t.equals(FINISH_TASK);
+        }
 
         String fileName;
 
@@ -47,6 +55,10 @@ public class PrepareProcessor {
             }
         }
 
+        protected void finish(ErrorInfo err) {
+            // do nothing
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (! (obj instanceof Task)) {
@@ -56,15 +68,29 @@ public class PrepareProcessor {
             Task t = (Task) obj;
             return t.fileName.equals(fileName);
         }
+    }
 
-        static boolean endTask(Task t) {
-            return t.equals(FINISH_TASK);
+    public static class UploadTask extends Task {
+        String sessionName;
+
+        public UploadTask(String sessionName, String fileName) {
+            super(fileName);
+            this.sessionName = sessionName;
+        }
+
+        @Override
+        public void finish(ErrorInfo err) {
+            long size = new File(err.outputFileName).length();
+            UploadProcessor.Task task = new UploadProcessor.Task(
+                    sessionName, err.outputFileName, size);
+            MultiThreadUploadProcessor.addTask(task);
         }
     }
 
     public static class ErrorInfo {
         public Task task;
         public Throwable error = null;
+        public String outputFileName;
 
         public long redRows = 0;
         public long writtenRows = 0;
@@ -125,6 +151,8 @@ public class PrepareProcessor {
 
         err.redRows = p.getRowNum();
         err.writtenRows = writer.getRowNum();
+
+        task.finish(err);
 
         LOG.info(String.format("Converted file '%s', %d entries",
                 task.fileName, err.writtenRows));

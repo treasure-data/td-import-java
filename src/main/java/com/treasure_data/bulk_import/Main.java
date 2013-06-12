@@ -18,6 +18,7 @@
 package com.treasure_data.bulk_import;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -171,6 +172,62 @@ public class Main {
         proc.joinWorkers();
     }
 
+    public static void prepareAndUploadParts(final String[] args, Properties props)
+            throws Exception {
+        if (args.length < 3) {
+            throw new IllegalArgumentException("File names not specified");
+        }
+
+        LOG.info(String.format("Start %s and %s commands",
+                Config.CMD_UPLOAD_PARTS, Config.CMD_PREPARE_PARTS));
+
+        final String sessionName = args[1];
+        final String[] fileNames = new String[args.length - 2];
+        for (int i = 0; i < args.length - 2; i++) {
+            fileNames[i] = args[i + 2];
+        }
+
+        final UploadConfig conf = new UploadConfig();
+        conf.configure(props);
+
+        MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(conf);
+        prepareProc.registerWorkers();
+        prepareProc.startWorkers();
+
+        MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(conf);
+        uploadProc.registerWorkers();
+        uploadProc.startWorkers();
+
+        // scan files that are uploaded
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < fileNames.length; i++) {
+                    try {
+                        PrepareProcessor.UploadTask task =
+                                new PrepareProcessor.UploadTask(sessionName, fileNames[i]);
+                        MultiThreadPrepareProcessor.addTask(task);
+                    } catch (Throwable t) {
+                        LOG.severe("Error occurred During 'addTask' method call");
+                        LOG.throwing("Main", "addTask", t);
+                    }
+                }
+
+                // end of file list
+                try {
+                    MultiThreadPrepareProcessor.addFinishTask(conf);
+                } catch (Throwable t) {
+                    LOG.severe("Error occurred During 'addFinishTask' method call");
+                    LOG.throwing("Main", "addFinishTask", t);
+                }
+            }
+        }).start();
+
+        prepareProc.joinWorkers();
+
+        MultiThreadUploadProcessor.addFinishTask(conf);
+        uploadProc.joinWorkers();
+    }
+
     public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
             throw new IllegalArgumentException("Command not specified");
@@ -181,10 +238,26 @@ public class Main {
         if (commandName.equals(Config.CMD_PREPARE_PARTS)) {
             prepareParts(args, props);
         } else if (commandName.equals(Config.CMD_UPLOAD_PARTS)) {
-            uploadParts(args, props);
+            if (!includePrepareProcessing(props)) {
+                uploadParts(args, props);
+            } else {
+                prepareAndUploadParts(args, props);
+            }
         } else {
             throw new IllegalArgumentException(
                     "Not support command: " + commandName);
         }
     }
+
+    private static boolean includePrepareProcessing(Properties props) {
+        // TODO FIXME #MN this method should be considered more...
+        for (Iterator<Object> keyIter = props.keySet().iterator(); keyIter.hasNext(); ) {
+            String key = (String) keyIter.next();
+            if (key.startsWith("td.bulk_import.prepare_parts.")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
