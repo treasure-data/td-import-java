@@ -55,7 +55,7 @@ public class PrepareProcessor {
             }
         }
 
-        protected void finish(ErrorInfo err) {
+        protected void finishHook(String outputFileName) {
             // do nothing
         }
 
@@ -79,10 +79,10 @@ public class PrepareProcessor {
         }
 
         @Override
-        public void finish(ErrorInfo err) {
-            long size = new File(err.outputFileName).length();
+        public void finishHook(String outputFileName) {
+            long size = new File(outputFileName).length();
             UploadProcessor.Task task = new UploadProcessor.Task(
-                    sessionName, err.outputFileName, size);
+                    sessionName, outputFileName, size);
             MultiThreadUploadProcessor.addTask(task);
         }
     }
@@ -90,7 +90,6 @@ public class PrepareProcessor {
     public static class ErrorInfo {
         public Task task;
         public Throwable error = null;
-        public String outputFileName;
 
         public long redRows = 0;
         public long writtenRows = 0;
@@ -136,7 +135,7 @@ public class PrepareProcessor {
             writer = new MsgpackGZIPFileWriter(conf);
             writer.configure(task.fileName);
 
-            p.setFileWriter(writer);
+            p.setFileWriter(task, writer);
             p.parse(task.createInputStream(conf.getCompressionType()));
         } catch (Throwable t) {
             err.error = t;
@@ -151,8 +150,6 @@ public class PrepareProcessor {
 
         err.redRows = p.getRowNum();
         err.writtenRows = writer.getRowNum();
-
-        task.finish(err);
 
         LOG.info(String.format("Converted file '%s', %d entries",
                 task.fileName, err.writtenRows));

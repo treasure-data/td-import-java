@@ -26,6 +26,7 @@ public abstract class FileWriter implements Closeable {
             .getLogger(FileWriter.class.getName());
 
     protected PrepareConfig conf;
+    protected PrepareProcessor.Task task;
     protected long rowNum = 0;
 
     protected FileWriter(PrepareConfig conf) {
@@ -34,6 +35,10 @@ public abstract class FileWriter implements Closeable {
 
     protected abstract void configure(String infileName)
             throws PreparePartsException;
+
+    public void setTask(PrepareProcessor.Task task) {
+        this.task = task;
+    }
 
     protected abstract void writeBeginRow(int size) throws PreparePartsException;
 

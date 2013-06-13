@@ -68,7 +68,9 @@ public abstract class FileParser {
         return charsetDecoder;
     }
 
-    public void setFileWriter(com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
+    public void setFileWriter(PrepareProcessor.Task task,
+            com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
+        writer.setTask(task);
         this.writer = writer;
     }
 

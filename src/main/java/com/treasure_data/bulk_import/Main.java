@@ -185,6 +185,7 @@ public class Main {
         final String[] fileNames = new String[args.length - 2];
         for (int i = 0; i < args.length - 2; i++) {
             fileNames[i] = args[i + 2];
+            System.out.println("# file name: " + fileNames[i]);
         }
 
         final UploadConfig conf = new UploadConfig();

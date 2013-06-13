@@ -199,6 +199,10 @@ public class MsgpackGZIPFileWriter extends FileWriter {
 
     @Override
     public void close() throws IOException {
+        if (task != null && outputFile != null) {
+            task.finishHook(outputFile.getName());
+        }
+
         if (packer != null) {
             packer.flush();
             packer.close();
