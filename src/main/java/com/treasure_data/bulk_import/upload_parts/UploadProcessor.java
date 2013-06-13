@@ -162,6 +162,7 @@ public class UploadProcessor {
     private static final Logger LOG = Logger.getLogger(UploadProcessor.class.getName());
 
     private static SessionSummary summary;
+    private static RetryClient2 retryClient = new RetryClient2();
 
     private BulkImportClient client;
     private UploadConfig conf;
@@ -220,7 +221,7 @@ public class UploadProcessor {
         summary = null;
         LOG.fine(String.format("Show session '%s'", sessName));
         try {
-            new RetryClient2().retry(new Retryable2(){
+            retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
                     summary = client.showSession(sessName);
@@ -236,7 +237,7 @@ public class UploadProcessor {
             final UploadConfig conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Freeze session '%s'", sessName));
         try {
-            new RetryClient2().retry(new Retryable2(){
+            retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
                     Session session = new Session(sessName, null, null);
@@ -254,7 +255,7 @@ public class UploadProcessor {
             final UploadConfig conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Perform session '%s'", sessName));
         try {
-            new RetryClient2().retry(new Retryable2(){
+            retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
                     Session session = new Session(sessName, null, null);
@@ -275,7 +276,7 @@ public class UploadProcessor {
         long waitTime = System.currentTimeMillis();
         while (true) {
             try {
-                new RetryClient2().retry(new Retryable2(){
+                retryClient.retry(new Retryable2(){
                     @Override
                     public void doTry() throws ClientException, IOException {
                         summary = client.showSession(sessName);
@@ -308,7 +309,7 @@ public class UploadProcessor {
             final UploadConfig conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Commit session '%s'", sessName));
         try {
-            new RetryClient2().retry(new Retryable2(){
+            retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
                     Session session = new Session(sessName, null, null);
