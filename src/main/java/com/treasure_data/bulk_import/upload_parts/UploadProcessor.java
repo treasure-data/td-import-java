@@ -30,6 +30,49 @@ import com.treasure_data.model.bulkimport.Session;
 
 public class UploadProcessor {
 
+    static class RetryClient2 {
+        interface Retryable2 {
+            void doTry() throws ClientException, IOException;
+        }
+
+        public void retry(Retryable2 r, String sessionName, String partID,
+                int retryCount, long waitSec) throws IOException {
+            ClientException firstException = null;
+            int count = 0;
+            while (true) {
+                try {
+                    r.doTry();
+                    if (count > 0) {
+                        LOG.warning(String.format("Retry succeeded. %s.'%s'",
+                                sessionName, partID));
+                    }
+                    break;
+                } catch (ClientException e) {
+                    if (firstException == null) {
+                        firstException = e;
+                    }
+                    LOG.warning(String.format(
+                            "ClientError occurred. the cause is '%s'. %s.'%s'",
+                            e.getMessage(), sessionName, partID));
+                    if (count >= retryCount) {
+                        LOG.warning(String.format(
+                                "Retry count exceeded limit. %s.'%s'",
+                                sessionName, partID));
+                        throw new IOException("Retry failed", firstException);
+                    } else {
+                        count++;
+                        LOG.warning(String.format("Retrying. %s.'%s'",
+                                sessionName, partID));
+                        try {
+                            Thread.sleep(waitSec);
+                        } catch (InterruptedException ex) { // ignore
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static class Task {
         private static final String TAG = "__FINISH__";
 
@@ -132,46 +175,4 @@ public class UploadProcessor {
                         Thread.currentThread().getName(), (time / 1000)));
     }
 
-    static class RetryClient2 {
-        interface Retryable2 {
-            void doTry() throws ClientException, IOException;
-        }
-
-        public void retry(Retryable2 r, String sessionName, String partID,
-                int retryCount, long waitSec) throws IOException {
-            ClientException firstException = null;
-            int count = 0;
-            while (true) {
-                try {
-                    r.doTry();
-                    if (count > 0) {
-                        LOG.warning(String.format("Retry succeeded. %s.'%s'",
-                                sessionName, partID));
-                    }
-                    break;
-                } catch (ClientException e) {
-                    if (firstException == null) {
-                        firstException = e;
-                    }
-                    LOG.warning(String.format(
-                            "ClientError occurred. the cause is '%s'. %s.'%s'",
-                            e.getMessage(), sessionName, partID));
-                    if (count >= retryCount) {
-                        LOG.warning(String.format(
-                                "Retry count exceeded limit. %s.'%s'",
-                                sessionName, partID));
-                        throw new IOException("Retry failed", firstException);
-                    } else {
-                        count++;
-                        LOG.warning(String.format("Retrying. %s.'%s'",
-                                sessionName, partID));
-                        try {
-                            Thread.sleep(waitSec);
-                        } catch (InterruptedException ex) { // ignore
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
