@@ -11,6 +11,7 @@ import static org.mockito.Mockito.spy;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,11 +49,10 @@ public class TestUnploadProcessor {
     private UploadConfig conf;
     private UploadProcessor proc;
 
-    private String sessName;
-    private String fileName;
-    private long size;
+    Random rand = new Random(new Random().nextInt());
 
     private UploadProcessor.Task task;
+    private UploadProcessor.ErrorInfo err;
 
     @Before
     public void createResources() throws Exception {
@@ -62,13 +62,6 @@ public class TestUnploadProcessor {
 
         // upload processor
         proc = new UploadProcessor(null, conf);
-
-        sessName = "sess01";
-        fileName = "file01";
-        size = 10;
-
-        // task
-        task = new UploadProcessor.Task(sessName, fileName, size);
     }
 
     @After
@@ -81,10 +74,13 @@ public class TestUnploadProcessor {
         proc = spy(proc);
         doNothing().when(proc).executeUpload(any(UploadProcessor.Task.class));
 
+        int count = rand.nextInt(100);
+
         // test
-        UploadProcessor.ErrorInfo err = proc.execute(task);
-        assertEquals(task, err.task);
-        assertEquals(null, err.error);
+        for (int i = 0; i < count; i++) {
+            task = createTask(i);
+            assertEqualsNormalTask(task);
+        }
     }
 
     @Test
@@ -94,25 +90,46 @@ public class TestUnploadProcessor {
         doThrow(new IOException("dummy")).when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
-        UploadProcessor.ErrorInfo error = proc.execute(task);
-        assertTrue(error.task.equals(task));
-        assertTrue(error.error instanceof IOException);
+        int count = rand.nextInt(100);
+        for (int i = 0; i < count; i++) {
+            task = createTask(i);
+            failTask(task);
+        }
     }
 
     @Test
-    public void returnIOErrorWhenItThrowsClientError() throws Exception {
+    public void returnIOErrorWhenExecuteMethodThrowsClientError() throws Exception {
         // configure mock
         proc = spy(proc);
         doThrow(new ClientException("dummy")).when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
-        UploadProcessor.ErrorInfo error = proc.execute(task);
-        assertTrue(error.task.equals(task));
-        assertTrue(error.error instanceof IOException);
+        int count = 1;
+        for (int i = 0; i < count; i++) {
+            task = createTask(i);
+            failTask(task);
+        }
     }
 
     @Test
     public void equalsFinishTasks() {
         assertTrue(UploadProcessor.Task.FINISH_TASK.equals(UploadProcessor.Task.FINISH_TASK));
     }
+
+    private UploadProcessor.Task createTask(int i) {
+        return new UploadProcessor.Task("sess" + i, "file" + i, 32 + i * 32);
+    }
+
+    private void assertEqualsNormalTask(UploadProcessor.Task task) {
+        err = proc.execute(task);
+        assertEquals(task, err.task);
+        assertEquals(null, err.error);
+    }
+
+    private void failTask(UploadProcessor.Task task) {
+        err = proc.execute(task);
+        assertEquals(task, err.task);
+        assertTrue(err.error instanceof IOException);
+    }
+
 }
