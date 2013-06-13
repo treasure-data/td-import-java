@@ -208,8 +208,10 @@
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
+          <!-- 
           <parallel>methods</parallel>
           <threadCount>${surefire.threadCount}</threadCount>
+           -->
         </configuration>
         <dependencies>
           <dependency>
