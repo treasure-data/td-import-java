@@ -88,7 +88,7 @@ public class TestMultiThreadUploadProcessor {
         proc.startWorkers();
 
         for (int i = 0; i < numTasks; i++) {
-            MultiThreadUploadProcessor.addTask(new UploadProcessor.Task("sess" + i, "file" + i, 10));
+            MultiThreadUploadProcessor.addTask(UploadProcessorTestUtil.createTask(i));
         }
 
         MultiThreadUploadProcessor.addFinishTask(conf);
@@ -107,7 +107,7 @@ public class TestMultiThreadUploadProcessor {
         proc.startWorkers();
 
         for (int i = 0; i < numTasks; i++) {
-            MultiThreadUploadProcessor.addTask(new UploadProcessor.Task("sess" + i, "file" + i, 10));
+            MultiThreadUploadProcessor.addTask(UploadProcessorTestUtil.createTask(i));
         }
 
         MultiThreadUploadProcessor.addFinishTask(conf);
@@ -129,7 +129,7 @@ public class TestMultiThreadUploadProcessor {
         proc.startWorkers();
 
         for (int i = 0; i < numTasks; i++) {
-            MultiThreadUploadProcessor.addTask(new UploadProcessor.Task("sess" + i, "file" + i, 10));
+            MultiThreadUploadProcessor.addTask(UploadProcessorTestUtil.createTask(i));
         }
 
         MultiThreadUploadProcessor.addFinishTask(conf);

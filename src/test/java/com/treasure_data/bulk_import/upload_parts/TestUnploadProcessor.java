@@ -78,8 +78,8 @@ public class TestUnploadProcessor {
 
         // test
         for (int i = 0; i < count; i++) {
-            task = createTask(i);
-            assertEqualsNormalTask(task);
+            task = UploadProcessorTestUtil.createTask(i);
+            UploadProcessorTestUtil.executeTaskNormally(proc, task, proc.execute(task));
         }
     }
 
@@ -92,8 +92,8 @@ public class TestUnploadProcessor {
         // test
         int count = rand.nextInt(100);
         for (int i = 0; i < count; i++) {
-            task = createTask(i);
-            failTask(task);
+            task = UploadProcessorTestUtil.createTask(i);
+            UploadProcessorTestUtil.failTask(proc, task, proc.execute(task));
         }
     }
 
@@ -106,30 +106,14 @@ public class TestUnploadProcessor {
         // test
         int count = 1;
         for (int i = 0; i < count; i++) {
-            task = createTask(i);
-            failTask(task);
+            task = UploadProcessorTestUtil.createTask(i);
+            UploadProcessorTestUtil.failTask(proc, task, proc.execute(task));
         }
     }
 
     @Test
     public void equalsFinishTasks() {
         assertTrue(UploadProcessor.Task.FINISH_TASK.equals(UploadProcessor.Task.FINISH_TASK));
-    }
-
-    private UploadProcessor.Task createTask(int i) {
-        return new UploadProcessor.Task("sess" + i, "file" + i, 32 + i * 32);
-    }
-
-    private void assertEqualsNormalTask(UploadProcessor.Task task) {
-        err = proc.execute(task);
-        assertEquals(task, err.task);
-        assertEquals(null, err.error);
-    }
-
-    private void failTask(UploadProcessor.Task task) {
-        err = proc.execute(task);
-        assertEquals(task, err.task);
-        assertTrue(err.error instanceof IOException);
     }
 
 }
