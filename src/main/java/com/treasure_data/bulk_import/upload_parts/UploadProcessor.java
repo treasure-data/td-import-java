@@ -27,14 +27,52 @@ import java.util.logging.Logger;
 import com.treasure_data.client.ClientException;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.model.bulkimport.Session;
+import com.treasure_data.model.bulkimport.SessionSummary;
 
 public class UploadProcessor {
 
-    static class RetryClient2 {
-        interface Retryable2 {
-            void doTry() throws ClientException, IOException;
-        }
+    static interface Retryable2 {
+        void doTry() throws ClientException, IOException;
+    }
 
+    static class RetryClient2 {
+        public void retry(Retryable2 r, String sessionName,
+                int retryCount, long waitSec) throws IOException {
+            ClientException firstException = null;
+            int count = 0;
+            while (true) {
+                try {
+                    r.doTry();
+                    if (count > 0) {
+                        LOG.warning(String.format("Retry succeeded. %s",
+                                sessionName));
+                    }
+                    break;
+                } catch (ClientException e) {
+                    if (firstException == null) {
+                        firstException = e;
+                    }
+                    LOG.warning(String.format(
+                            "ClientError occurred. the cause is '%s'. %s",
+                            e.getMessage(), sessionName));
+                    if (count >= retryCount) {
+                        LOG.warning(String.format("Retry count exceeded limit. %s",
+                                sessionName));
+                        throw new IOException("Retry failed", firstException);
+                    } else {
+                        count++;
+                        LOG.warning(String.format("Retrying. %s", sessionName));
+                        try {
+                            Thread.sleep(waitSec);
+                        } catch (InterruptedException ex) { // ignore
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    static class RetryClient3 {
         public void retry(Retryable2 r, String sessionName, String partID,
                 int retryCount, long waitSec) throws IOException {
             ClientException firstException = null;
@@ -123,6 +161,8 @@ public class UploadProcessor {
 
     private static final Logger LOG = Logger.getLogger(UploadProcessor.class.getName());
 
+    private static SessionSummary summary;
+
     private BulkImportClient client;
     private UploadConfig conf;
 
@@ -138,7 +178,7 @@ public class UploadProcessor {
                     task.fileName, task.size, task.sessName, task.partName));
 
             long time = System.currentTimeMillis();
-            new RetryClient2().retry(new RetryClient2.Retryable2() {
+            new RetryClient3().retry(new Retryable2() {
                 @Override
                 public void doTry() throws ClientException, IOException {
                     execute0(task);
@@ -175,4 +215,110 @@ public class UploadProcessor {
                         Thread.currentThread().getName(), (time / 1000)));
     }
 
+    public static SessionSummary showSession(final BulkImportClient client,
+            final UploadConfig conf, final String sessName) throws UploadPartsException {
+        summary = null;
+        LOG.fine(String.format("Show session '%s'", sessName));
+        try {
+            new RetryClient2().retry(new Retryable2(){
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    summary = client.showSession(sessName);
+                }
+            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+        } catch (IOException e) {
+            LOG.severe(e.getMessage());
+        }
+        return summary;
+    }
+
+    public static ErrorInfo freezeSession(final BulkImportClient client,
+            final UploadConfig conf, final String sessName) throws UploadPartsException {
+        LOG.info(String.format("Freeze session '%s'", sessName));
+        try {
+            new RetryClient2().retry(new Retryable2(){
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    Session session = new Session(sessName, null, null);
+                    client.freezeSession(session);
+                }
+            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+            return null;
+        } catch (IOException e) {
+            LOG.severe(e.getMessage());
+            return new ErrorInfo(null, e);
+        }
+    }
+
+    public static ErrorInfo performSession(final BulkImportClient client,
+            final UploadConfig conf, final String sessName) throws UploadPartsException {
+        LOG.info(String.format("Perform session '%s'", sessName));
+        try {
+            new RetryClient2().retry(new Retryable2(){
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    Session session = new Session(sessName, null, null);
+                    client.performSession(session);
+                }
+            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+            return null;
+        } catch (IOException e) {
+            LOG.severe(e.getMessage());
+            return new ErrorInfo(null, e);
+        }
+    }
+
+    public static ErrorInfo waitPerform(final BulkImportClient client,
+            final UploadConfig conf, final String sessName) throws UploadPartsException {
+        LOG.info(String.format("Wait session performing '%s'", sessName));
+
+        long waitTime = System.currentTimeMillis();
+        while (true) {
+            try {
+                new RetryClient2().retry(new Retryable2(){
+                    @Override
+                    public void doTry() throws ClientException, IOException {
+                        summary = client.showSession(sessName);
+                    }
+                }, sessName, conf.getRetryCount(), conf.getWaitSec());
+
+                if (summary.getStatus() == "ready") {
+                    break;
+                } else if (summary.getStatus() == "uploading") {
+                    throw new IOException("performing failed");
+                }
+
+                try {
+                    long deltaTime = System.currentTimeMillis() - waitTime;
+                    LOG.fine(String.format("Waiting for %d sec.", (deltaTime / 1000)));
+                    Thread.sleep(3 * 1000);
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+            } catch (IOException e) {
+                LOG.severe(e.getMessage());
+                return new ErrorInfo(null, e);
+            }
+        }
+
+        return null;
+    }
+
+    public static ErrorInfo commitSession(final BulkImportClient client,
+            final UploadConfig conf, final String sessName) throws UploadPartsException {
+        LOG.info(String.format("Commit session '%s'", sessName));
+        try {
+            new RetryClient2().retry(new Retryable2(){
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    Session session = new Session(sessName, null, null);
+                    client.commitSession(session);
+                }
+            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+            return null;
+        } catch (IOException e) {
+            LOG.severe(e.getMessage());
+            return new ErrorInfo(null, e);
+        }
+    }
 }

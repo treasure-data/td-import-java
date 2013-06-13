@@ -17,14 +17,17 @@
 //
 package com.treasure_data.bulk_import.upload_parts;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
+import com.treasure_data.model.bulkimport.SessionSummary;
 
 public class MultiThreadUploadProcessor {
     static class Worker extends Thread {
@@ -56,6 +59,7 @@ public class MultiThreadUploadProcessor {
         }
     }
 
+    private static final Logger LOG = Logger.getLogger(MultiThreadUploadProcessor.class.getName());
     private static BlockingQueue<UploadProcessor.Task> taskQueue;
 
     static {
@@ -134,9 +138,48 @@ public class MultiThreadUploadProcessor {
         }
     }
 
-    // auto perform
+    public static void processAfterUploading(BulkImportClient client,
+            UploadConfig conf, String sessName) throws UploadPartsException {
+        if (!conf.autoPerform()) {
+            return;
+        }
 
-    // freeze
+        // freeze
+        UploadProcessor.freezeSession(client, conf, sessName);
 
-    // perform
+        // perform
+        UploadProcessor.performSession(client, conf, sessName);
+
+        if (!conf.autoCommit()) {
+            return;
+        }
+
+        // wait performing
+        UploadProcessor.waitPerform(client, conf, sessName);
+
+        // check error of perform
+        SessionSummary summary = UploadProcessor.showSession(client, conf, sessName);
+        LOG.info(String.format(
+                "Show summary of bulk import session '%s'", summary.getName()));
+        LOG.info("  perform job ID: " + summary.getJobID());
+        LOG.info("  valid parts: " + summary.getValidParts());
+        LOG.info("  error parts: " + summary.getErrorParts());
+        LOG.info("  valid records: " + summary.getValidRecords());
+        LOG.info("  error records: " + summary.getErrorRecords());
+
+        if (summary.getErrorParts() != 0 || summary.getErrorRecords() != 0) {
+            String msg = String.format(
+                    "Performing failed: error parts = %d, error records = %d",
+                    summary.getErrorParts(), summary.getErrorRecords());
+            LOG.severe(msg);
+            msg = String.format(
+                    "Check the status of bulk import session %s with 'td bulk_import:show %s'",
+                    summary.getName(), summary.getName());
+            LOG.severe(msg);
+            throw new UploadPartsException(msg);
+        }
+
+        // commit
+        UploadProcessor.commitSession(client, conf, sessName);
+    }
 }
