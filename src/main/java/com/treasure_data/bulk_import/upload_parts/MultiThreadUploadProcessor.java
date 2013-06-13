@@ -137,6 +137,7 @@ public class MultiThreadUploadProcessor {
         }
     }
 
+    // TODO need strict error handling
     public static void processAfterUploading(BulkImportClient client,
             UploadConfig conf, String sessName) throws UploadPartsException {
         if (!conf.autoPerform()) {

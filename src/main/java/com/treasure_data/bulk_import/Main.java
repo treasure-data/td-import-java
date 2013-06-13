@@ -28,6 +28,8 @@ import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadConfig;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
+import com.treasure_data.client.TreasureDataClient;
+import com.treasure_data.client.bulkimport.BulkImportClient;
 
 public class Main {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
@@ -170,6 +172,11 @@ public class Main {
         }).start();
 
         proc.joinWorkers();
+
+        // TODO need strict error handling
+        MultiThreadUploadProcessor.processAfterUploading(new BulkImportClient(
+                new TreasureDataClient(conf.getProperties())), conf,
+                sessionName);
     }
 
     public static void prepareAndUploadParts(final String[] args, Properties props)
@@ -226,6 +233,11 @@ public class Main {
 
         MultiThreadUploadProcessor.addFinishTask(conf);
         uploadProc.joinWorkers();
+
+        // TODO need strict error handling
+        MultiThreadUploadProcessor.processAfterUploading(new BulkImportClient(
+                new TreasureDataClient(conf.getProperties())), conf,
+                sessionName);
     }
 
     public static void main(final String[] args) throws Exception {
