@@ -24,16 +24,16 @@ import org.supercsv.util.CsvContext;
 
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public abstract class AbstractCSVColumnProc implements ColumnProc, CellProcessor {
+public abstract class AbstractColumnProc implements ColumnProc, CellProcessor {
 
     private static final Logger LOG = Logger.getLogger(
-            AbstractCSVColumnProc.class.getName());
+            AbstractColumnProc.class.getName());
 
     protected int index;
     protected String columnName;
     protected com.treasure_data.bulk_import.prepare_parts.FileWriter writer;
 
-    protected AbstractCSVColumnProc(int index, String columnName,
+    protected AbstractColumnProc(int index, String columnName,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
         this.index = index;
         if (columnName == null) {
@@ -52,10 +52,14 @@ public abstract class AbstractCSVColumnProc implements ColumnProc, CellProcessor
     }
 
     public Object execute(final Object value) {
-        return execute(value, null);
+        return executeKeyValue(value);
     }
 
     public Object execute(final Object value, final CsvContext context) {
+        return executeKeyValue(value);
+    }
+
+    public Object executeKeyValue(final Object value) {
         LOG.finer(String.format("index=%d, column=%s, value=%s",
                 index, columnName, value));
         try {

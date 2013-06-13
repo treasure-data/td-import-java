@@ -19,24 +19,34 @@ package com.treasure_data.bulk_import.prepare_parts.proc;
 
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public class CSVStringColumnProc extends AbstractCSVColumnProc {
+public class LongColumnProc extends AbstractColumnProc {
 
-    public CSVStringColumnProc(int index, String columnName,
+    public LongColumnProc(int index, String columnName,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
         super(index, columnName, writer);
     }
 
     @Override
-    public Object executeValue(Object value) throws PreparePartsException {
-        String v = null;
+    public Object executeValue(final Object value) throws PreparePartsException {
+        Long v = null;
 
-        if (!(value instanceof String)) {
-            throw new ClassCastException(String.format(
-                    "'%s' cannot be cast to String type", value));
+        if (value instanceof Long) {
+            v = (Long) value;
+        } else if (value instanceof String) {
+            try {
+                v = Long.parseLong((String) value);
+            } catch (NumberFormatException e) {
+                throw new PreparePartsException(String.format(
+                        "'%s' could not be parsed as an Long", value));
+            }
+        } else {
+            final String actualClassName = value.getClass().getName();
+            throw new PreparePartsException(String.format(
+                    "the input value should be of type Long or String but is of type %s",
+                    actualClassName));
         }
 
-        v = (String) value;
-        writer.writeString(v);
+        writer.writeLong(v);
         return v;
     }
 

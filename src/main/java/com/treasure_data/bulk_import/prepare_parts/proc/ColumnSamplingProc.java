@@ -28,7 +28,7 @@ import org.supercsv.util.CsvContext;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public class ColumnSamplingProc extends AbstractCSVColumnProc {
+public class ColumnSamplingProc extends AbstractColumnProc {
 
     public static PrepareConfig.ColumnType getColumnType(CellProcessor cellProc) {
         if (!(cellProc instanceof ColumnSamplingProc)) {

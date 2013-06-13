@@ -17,30 +17,27 @@
 //
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
-import com.treasure_data.bulk_import.Config;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public class CSVTimeValueColumnProc extends AbstractCSVColumnProc {
+public class StringColumnProc extends AbstractColumnProc {
 
-    private long timeValue;
-
-    public CSVTimeValueColumnProc(long timeValue,
+    public StringColumnProc(int index, String columnName,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
-        super(0, Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE, writer);
-        this.timeValue = timeValue;
-    }
-
-    @Override
-    public void executeKey() throws PreparePartsException {
-        writer.writeString(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+        super(index, columnName, writer);
     }
 
     @Override
     public Object executeValue(Object value) throws PreparePartsException {
-        // value is dummy
+        String v = null;
 
-        writer.writeLong(timeValue);
-        return timeValue;
+        if (!(value instanceof String)) {
+            throw new ClassCastException(String.format(
+                    "'%s' cannot be cast to String type", value));
+        }
+
+        v = (String) value;
+        writer.writeString(v);
+        return v;
     }
 
 }

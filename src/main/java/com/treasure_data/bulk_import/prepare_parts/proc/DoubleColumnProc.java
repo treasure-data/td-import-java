@@ -19,9 +19,9 @@ package com.treasure_data.bulk_import.prepare_parts.proc;
 
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public class CSVDoubleColumnProc extends AbstractCSVColumnProc {
+public class DoubleColumnProc extends AbstractColumnProc {
 
-    public CSVDoubleColumnProc(int index, String columnName,
+    public DoubleColumnProc(int index, String columnName,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
         super(index, columnName, writer);
     }

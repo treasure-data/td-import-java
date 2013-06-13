@@ -19,9 +19,9 @@ package com.treasure_data.bulk_import.prepare_parts.proc;
 
 import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 
-public class CSVAliasTimeColumnProc extends CSVTimeColumnProc {
+public class AliasTimeColumnProc extends TimeColumnProc {
 
-    public CSVAliasTimeColumnProc(int aliasIndex,
+    public AliasTimeColumnProc(int aliasIndex,
             ExtStrftime timeFormat,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
         super(aliasIndex, timeFormat, writer);

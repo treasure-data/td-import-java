@@ -77,15 +77,15 @@ public class ColumnProcGenerator {
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer)
                     throws PreparePartsException {
         if (columnType == PrepareConfig.ColumnType.INT) {
-            return new CSVIntColumnProc(index, columnName, writer);
+            return new IntColumnProc(index, columnName, writer);
         } else if (columnType == PrepareConfig.ColumnType.LONG) {
-            return new CSVLongColumnProc(index, columnName, writer);
+            return new LongColumnProc(index, columnName, writer);
         } else if (columnType == PrepareConfig.ColumnType.DOUBLE) {
-            return new CSVDoubleColumnProc(index, columnName, writer);
+            return new DoubleColumnProc(index, columnName, writer);
         } else if (columnType == PrepareConfig.ColumnType.STRING) {
-            return new CSVStringColumnProc(index, columnName, writer);
+            return new StringColumnProc(index, columnName, writer);
         } else if (columnType == PrepareConfig.ColumnType.TIME) {
-            return new CSVTimeColumnProc(index, timeFormat, writer);
+            return new TimeColumnProc(index, timeFormat, writer);
         } else { // otherwise
             throw new UnsupportedOperationException();
         }
@@ -95,9 +95,9 @@ public class ColumnProcGenerator {
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer,
             int aliasTimeColumnIndex, ExtStrftime timeFormat, long timeValue) { // TODO should change timeformat
         if (aliasTimeColumnIndex < 0) {
-            return new CSVTimeValueColumnProc(timeValue, writer);
+            return new TimeValueColumnProc(timeValue, writer);
         } else {
-            return new CSVAliasTimeColumnProc(aliasTimeColumnIndex, timeFormat, writer);
+            return new AliasTimeColumnProc(aliasTimeColumnIndex, timeFormat, writer);
         }
     }
 }

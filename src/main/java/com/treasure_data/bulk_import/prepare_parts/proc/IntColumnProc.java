@@ -17,55 +17,36 @@
 //
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
-import com.treasure_data.bulk_import.Config;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 
-public class CSVTimeColumnProc extends AbstractCSVColumnProc {
+public class IntColumnProc extends AbstractColumnProc {
 
-    protected ExtStrftime timeFormat; // TODO should change simple time format
-
-    public CSVTimeColumnProc(int index,
-            ExtStrftime timeFormat,
+    public IntColumnProc(int index, String columnName,
             com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
-        super(index, Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE, writer);
-        this.timeFormat = timeFormat;
+        super(index, columnName, writer);
     }
 
     @Override
-    public void executeKey() throws PreparePartsException {
-        writer.writeString(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-    }
-
-    @Override
-    public Object executeValue(Object value) throws PreparePartsException {
-        // TODO refine!!!!
-
-        Long v = 0L;
-
-        if (value instanceof Long) {
-            v = (Long) value;
+    public Object executeValue(final Object value) throws PreparePartsException {
+        Integer v = null;
+        if (value instanceof Integer) {
+            v = (Integer) value;
         } else if (value instanceof String) {
-            String sv = (String) value;
-
             try {
-                v = Long.parseLong(sv);
+                v = Integer.parseInt((String) value);
+                writer.writeInt(v);
             } catch (NumberFormatException e) {
                 throw new PreparePartsException(String.format(
-                        "'%s' could not be parsed as an Long", value));
-            }
-
-            if (v == null && timeFormat != null) {
-                v = timeFormat.getTime(sv);
+                        "'%s' could not be parsed as an Integer", value));
             }
         } else {
             final String actualClassName = value.getClass().getName();
             throw new PreparePartsException(String.format(
-                    "the input value should be of type Long or String but is of type %s",
+                    "the input value should be of type Integer or String but is of type %s",
                     actualClassName));
         }
 
-        writer.writeLong(v);
+        writer.writeInt(v);
         return v;
     }
 
