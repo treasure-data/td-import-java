@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare_parts.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,12 +31,16 @@ import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
 import com.treasure_data.bulk_import.prepare_parts.proc.SkipColumnProc;
+import com.treasure_data.bulk_import.prepare_parts.writer.FileWriter;
+import com.treasure_data.bulk_import.prepare_parts.writer.JSONFileWriter;
 
 public class CSVFileParser extends FileParser {
     private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
@@ -243,7 +247,7 @@ public class CSVFileParser extends FileParser {
     }
 
     private void parseRow(List<String> row, CellProcessor[] cellProcs,
-            com.treasure_data.bulk_import.prepare_parts.FileWriter w)
+            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter w)
             throws IOException, PreparePartsException {
         int rowSize = row.size();
         if (rowSize != cellProcs.length) {

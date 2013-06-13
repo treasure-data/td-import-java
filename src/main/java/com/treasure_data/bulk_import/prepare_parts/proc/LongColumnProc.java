@@ -22,7 +22,7 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 public class LongColumnProc extends AbstractColumnProc {
 
     public LongColumnProc(int index, String columnName,
-            com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
+            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
         super(index, columnName, writer);
     }
 

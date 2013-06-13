@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare_parts.writer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,12 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+
 public class JSONFileWriter extends FileWriter {
 
     private Map<String, Object> record;
     private List<Object> recordElements;
 
-    protected JSONFileWriter(PrepareConfig conf) {
+    public JSONFileWriter(PrepareConfig conf) {
         super(conf);
     }
 
@@ -76,7 +79,7 @@ public class JSONFileWriter extends FileWriter {
     }
 
     @Override
-    protected void writeEndRow() throws PreparePartsException {
+    public void writeEndRow() throws PreparePartsException {
         int size = recordElements.size() / 2;
         for (int i = 0; i < size; i++) {
             String key = (String) recordElements.get(2 * i);

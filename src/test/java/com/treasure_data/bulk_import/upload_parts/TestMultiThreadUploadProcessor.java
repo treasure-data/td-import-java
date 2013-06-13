@@ -54,12 +54,12 @@ public class TestMultiThreadUploadProcessor {
         conf = new UploadConfig();
         conf.configure(System.getProperties());
 
-        // multi-thread upload processor
+        // create multi-thread upload processor
         proc = new MultiThreadUploadProcessor(conf);
     }
 
     @After
-    public void closeResources() throws Exception {
+    public void destroyResources() throws Exception {
     }
 
     @Test
@@ -80,4 +80,7 @@ public class TestMultiThreadUploadProcessor {
 
         assertEquals(0, proc.getErrors().size());
     }
+
+    // random tests
+    // some tests for error handling
 }

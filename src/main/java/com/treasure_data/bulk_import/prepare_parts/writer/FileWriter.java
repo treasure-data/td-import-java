@@ -15,11 +15,16 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare_parts.writer;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Logger;
+
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor.Task;
 
 public abstract class FileWriter implements Closeable {
     private static final Logger LOG = Logger
@@ -40,16 +45,16 @@ public abstract class FileWriter implements Closeable {
         this.task = task;
     }
 
-    protected abstract void writeBeginRow(int size) throws PreparePartsException;
+    public abstract void writeBeginRow(int size) throws PreparePartsException;
 
-    protected abstract void write(Object v) throws PreparePartsException;
+    public abstract void write(Object v) throws PreparePartsException;
     public abstract void writeString(String v) throws PreparePartsException;
     public abstract void writeInt(int v) throws PreparePartsException;
     public abstract void writeLong(long v) throws PreparePartsException;
     public abstract void writeDouble(double v) throws PreparePartsException;
     public abstract void writeNil() throws PreparePartsException;
 
-    protected abstract void writeEndRow() throws PreparePartsException;
+    public abstract void writeEndRow() throws PreparePartsException;
 
     public void incrementRowNum() {
         rowNum++;

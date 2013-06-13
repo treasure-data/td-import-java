@@ -23,7 +23,7 @@ public class AliasTimeColumnProc extends TimeColumnProc {
 
     public AliasTimeColumnProc(int aliasIndex,
             ExtStrftime timeFormat,
-            com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
+            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
         super(aliasIndex, timeFormat, writer);
     }
 }

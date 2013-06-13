@@ -31,10 +31,10 @@ public abstract class AbstractColumnProc implements ColumnProc, CellProcessor {
 
     protected int index;
     protected String columnName;
-    protected com.treasure_data.bulk_import.prepare_parts.FileWriter writer;
+    protected com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer;
 
     protected AbstractColumnProc(int index, String columnName,
-            com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
+            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
         this.index = index;
         if (columnName == null) {
             throw new NullPointerException("column name is null.");

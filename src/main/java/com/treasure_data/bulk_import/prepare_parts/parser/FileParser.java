@@ -15,13 +15,20 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare_parts.parser;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.CharsetDecoder;
 import java.util.logging.Logger;
+
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.CompressionType;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor.Task;
+import com.treasure_data.bulk_import.prepare_parts.writer.FileWriter;
 
 public abstract class FileParser {
     private static final Logger LOG = Logger.getLogger(FileParser.class.getName());
@@ -31,7 +38,7 @@ public abstract class FileParser {
     protected long rowNum = 0;
     protected CharsetDecoder charsetDecoder;
     protected PrepareConfig.CompressionType compressionType;
-    protected com.treasure_data.bulk_import.prepare_parts.FileWriter writer;
+    protected com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer;
 
     private PrintWriter errWriter = null;
 
@@ -69,7 +76,7 @@ public abstract class FileParser {
     }
 
     public void setFileWriter(PrepareProcessor.Task task,
-            com.treasure_data.bulk_import.prepare_parts.FileWriter writer) {
+            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
         writer.setTask(task);
         this.writer = writer;
     }

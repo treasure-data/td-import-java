@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare_parts.writer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -28,6 +28,9 @@ import java.util.zip.GZIPOutputStream;
 
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
+
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class MsgpackGZIPFileWriter extends FileWriter {
     static class DataSizeChecker extends FilterOutputStream {
