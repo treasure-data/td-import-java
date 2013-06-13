@@ -181,7 +181,7 @@ public class UploadProcessor {
             new RetryClient3().retry(new Retryable2() {
                 @Override
                 public void doTry() throws ClientException, IOException {
-                    execute0(task);
+                    executeUpload(task);
                 }
             }, task.sessName, task.partName, conf.getRetryCount(),
                     conf.getWaitSec() * 1000);
@@ -198,7 +198,7 @@ public class UploadProcessor {
         }
     }
 
-    protected void execute0(final Task task) throws ClientException, IOException {
+    protected void executeUpload(final Task task) throws ClientException, IOException {
         LOG.fine(String
                 .format("Upload file '%s' (size %d) to session '%s' as part '%s' by thread '%s'",
                         task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));

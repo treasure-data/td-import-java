@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -70,11 +71,15 @@ public class TestUnploadProcessor {
         task = new UploadProcessor.Task(sessName, fileName, size);
     }
 
+    @After
+    public void destroyResources() throws Exception {
+    }
+
     @Test
     public void returnNilWhenItWorksNormally() throws Exception {
         // configure mock
         proc = spy(proc);
-        doNothing().when(proc).execute0(any(UploadProcessor.Task.class));
+        doNothing().when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
         assertEquals(null, proc.execute(task));
@@ -84,7 +89,7 @@ public class TestUnploadProcessor {
     public void returnErroInfoWhenItThrowsIOException() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new IOException("")).when(proc).execute0(any(UploadProcessor.Task.class));
+        doThrow(new IOException("")).when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
         UploadProcessor.ErrorInfo error = proc.execute(task);
@@ -96,7 +101,7 @@ public class TestUnploadProcessor {
     public void returnErroInfoWhenItThrowsClientException() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new ClientException("")).when(proc).execute0(any(UploadProcessor.Task.class));
+        doThrow(new ClientException("")).when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
         UploadProcessor.ErrorInfo error = proc.execute(task);

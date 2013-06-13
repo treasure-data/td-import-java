@@ -67,7 +67,7 @@ public class TestMultiThreadUploadProcessor {
         int numTasks = 10;
 
         UploadProcessor child = spy(new UploadProcessor(null, conf));
-        doNothing().when(child).execute0(any(UploadProcessor.Task.class));
+        doNothing().when(child).executeUpload(any(UploadProcessor.Task.class));
         proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         proc.startWorkers();
 
