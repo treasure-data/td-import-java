@@ -1,4 +1,4 @@
-td-java
+td-bulk-import-java
 =======
 
-Java Extension to CUI for Treasure Data
+Treasure Data Bulk Import Tool in Java.
