@@ -18,6 +18,7 @@
 package com.treasure_data.bulk_import.upload_parts;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ public class UploadProcessor {
 
     public static class Task {
         private static final String TAG = "__FINISH__";
+
         static final Task FINISH_TASK = new Task(TAG, TAG, 0);
 
         String sessName;
@@ -40,7 +42,9 @@ public class UploadProcessor {
 
         public Task(String sessName, String fileName, long size) {
             this.sessName = sessName;
-            this.partName = fileName.replace('.', '_');
+            int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
+            this.partName = fileName.substring(lastSepIndex + 1,
+                    fileName.length()).replace('.', '_');
             this.fileName = fileName;
             this.size = size;
         }
