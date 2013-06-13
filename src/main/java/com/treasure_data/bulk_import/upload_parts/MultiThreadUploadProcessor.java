@@ -17,7 +17,6 @@
 //
 package com.treasure_data.bulk_import.upload_parts;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -50,9 +49,9 @@ public class MultiThreadUploadProcessor {
                     break;
                 }
 
-                UploadProcessor.ErrorInfo error = proc.execute(t);
-                if (error != null) {
-                    parent.setErrors(error);
+                UploadProcessor.ErrorInfo err = proc.execute(t);
+                if (err.error != null) {
+                    parent.setErrors(err);
                 }
             }
             isFinished.set(true);

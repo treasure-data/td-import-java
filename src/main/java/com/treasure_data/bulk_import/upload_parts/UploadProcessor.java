@@ -149,13 +149,11 @@ public class UploadProcessor {
         }
     }
 
-    static class ErrorInfo {
-        Task task;
-        Throwable error;
+    public static class ErrorInfo {
+        public Task task;
+        public Throwable error;
 
-        public ErrorInfo(Task task, Throwable error) {
-            this.task = task;
-            this.error = error;
+        public ErrorInfo() {
         }
     }
 
@@ -173,6 +171,8 @@ public class UploadProcessor {
     }
 
     public ErrorInfo execute(final Task task) {
+        ErrorInfo err = new ErrorInfo();
+        err.task = task;
         try {
             LOG.info(String.format(
                     "Upload file '%s' (size %d) to session '%s' as part '%s'",
@@ -191,12 +191,11 @@ public class UploadProcessor {
             LOG.info(String
                     .format("Uploaded file '%s' (size %d) to session '%s' as part '%s' (time: %d sec.)",
                             task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
-
-            return null;
         } catch (IOException e) {
             LOG.severe(e.getMessage());
-            return new ErrorInfo(task, e);
+            err.error = e;
         }
+        return err;
     }
 
     protected void executeUpload(final Task task) throws ClientException, IOException {
@@ -218,8 +217,9 @@ public class UploadProcessor {
 
     public static SessionSummary showSession(final BulkImportClient client,
             final UploadConfig conf, final String sessName) throws UploadPartsException {
-        summary = null;
         LOG.fine(String.format("Show session '%s'", sessName));
+
+        summary = null;
         try {
             retryClient.retry(new Retryable2(){
                 @Override
@@ -229,6 +229,7 @@ public class UploadProcessor {
             }, sessName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
             LOG.severe(e.getMessage());
+            throw new UploadPartsException(e);
         }
         return summary;
     }
@@ -236,6 +237,8 @@ public class UploadProcessor {
     public static ErrorInfo freezeSession(final BulkImportClient client,
             final UploadConfig conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Freeze session '%s'", sessName));
+
+        ErrorInfo err = new ErrorInfo();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
@@ -244,16 +247,18 @@ public class UploadProcessor {
                     client.freezeSession(session);
                 }
             }, sessName, conf.getRetryCount(), conf.getWaitSec());
-            return null;
         } catch (IOException e) {
             LOG.severe(e.getMessage());
-            return new ErrorInfo(null, e);
+            err.error = e;
         }
+        return err;
     }
 
     public static ErrorInfo performSession(final BulkImportClient client,
             final UploadConfig conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Perform session '%s'", sessName));
+
+        ErrorInfo err = new ErrorInfo();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
@@ -262,14 +267,14 @@ public class UploadProcessor {
                     client.performSession(session);
                 }
             }, sessName, conf.getRetryCount(), conf.getWaitSec());
-            return null;
         } catch (IOException e) {
             LOG.severe(e.getMessage());
-            return new ErrorInfo(null, e);
+            err.error = e;
         }
+        return err;
     }
 
-    public static ErrorInfo waitPerform(final BulkImportClient client,
+    public static void waitPerform(final BulkImportClient client,
             final UploadConfig conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Wait session performing '%s'", sessName));
 
@@ -298,16 +303,16 @@ public class UploadProcessor {
                 }
             } catch (IOException e) {
                 LOG.severe(e.getMessage());
-                return new ErrorInfo(null, e);
+                throw new UploadPartsException(e);
             }
         }
-
-        return null;
     }
 
     public static ErrorInfo commitSession(final BulkImportClient client,
             final UploadConfig conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Commit session '%s'", sessName));
+
+        ErrorInfo err = new ErrorInfo();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
@@ -316,10 +321,10 @@ public class UploadProcessor {
                     client.commitSession(session);
                 }
             }, sessName, conf.getRetryCount(), conf.getWaitSec());
-            return null;
         } catch (IOException e) {
             LOG.severe(e.getMessage());
-            return new ErrorInfo(null, e);
+            err.error = e;
         }
+        return err;
     }
 }

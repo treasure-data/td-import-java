@@ -76,37 +76,39 @@ public class TestUnploadProcessor {
     }
 
     @Test
-    public void returnNilWhenItWorksNormally() throws Exception {
+    public void returnNonErrorWhenExecuteMethodWorksNormally() throws Exception {
         // configure mock
         proc = spy(proc);
         doNothing().when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
-        assertEquals(null, proc.execute(task));
+        UploadProcessor.ErrorInfo err = proc.execute(task);
+        assertEquals(task, err.task);
+        assertEquals(null, err.error);
     }
 
     @Test
-    public void returnErroInfoWhenItThrowsIOException() throws Exception {
+    public void returnIOErrorWhenExecuteMethodThrowsIOError() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new IOException("")).when(proc).executeUpload(any(UploadProcessor.Task.class));
+        doThrow(new IOException("dummy")).when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
         UploadProcessor.ErrorInfo error = proc.execute(task);
-        assertTrue(error.error instanceof IOException);
         assertTrue(error.task.equals(task));
+        assertTrue(error.error instanceof IOException);
     }
 
     @Test
-    public void returnErroInfoWhenItThrowsClientException() throws Exception {
+    public void returnIOErrorWhenItThrowsClientError() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new ClientException("")).when(proc).executeUpload(any(UploadProcessor.Task.class));
+        doThrow(new ClientException("dummy")).when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
         UploadProcessor.ErrorInfo error = proc.execute(task);
-        assertTrue(error.error instanceof IOException);
         assertTrue(error.task.equals(task));
+        assertTrue(error.error instanceof IOException);
     }
 
     @Test
