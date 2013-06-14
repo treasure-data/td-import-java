@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONValue;
+
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
@@ -88,7 +90,11 @@ public class JSONFileWriter extends FileWriter {
         }
     }
 
-    public Map<String, Object> getRecord() {
+    public String toJSONString() {
+        return JSONValue.toJSONString(getRecord());
+    }
+
+    private Map<String, Object> getRecord() {
         return record;
     }
 

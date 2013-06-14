@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.json.simple.JSONValue;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.Tokenizer;
@@ -183,7 +182,7 @@ public class CSVFileParser extends FileParser {
 
             try {
                 parseRow(firstRow, onelineProcs, w);
-                String ret = JSONValue.toJSONString(w.getRecord());
+                String ret = w.toJSONString();
                 if (ret != null) {
                     LOG.info("sample row: " + ret);
                 } else  {
