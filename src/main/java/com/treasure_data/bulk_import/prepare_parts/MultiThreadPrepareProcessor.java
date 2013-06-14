@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 public class MultiThreadPrepareProcessor {
     static class Worker extends Thread {
@@ -53,6 +54,7 @@ public class MultiThreadPrepareProcessor {
         }
     }
 
+    private static final Logger LOG = Logger.getLogger(MultiThreadPrepareProcessor.class.getName());
     private static BlockingQueue<PrepareProcessor.Task> taskQueue;
 
     static {

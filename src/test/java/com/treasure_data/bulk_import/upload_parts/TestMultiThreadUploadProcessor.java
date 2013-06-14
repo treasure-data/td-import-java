@@ -50,6 +50,7 @@ public class TestMultiThreadUploadProcessor {
         proc.joinWorkers();
     }
 
+    private Properties props;
     private UploadConfig conf;
     private MultiThreadUploadProcessor proc;
 
@@ -63,7 +64,7 @@ public class TestMultiThreadUploadProcessor {
         numWorkers = (rand.nextInt(100) % 8) + 1;
         numTasks = rand.nextInt(100);
 
-        Properties props = System.getProperties();
+        props = System.getProperties();
         props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "" + numWorkers);
 
         // create upload config

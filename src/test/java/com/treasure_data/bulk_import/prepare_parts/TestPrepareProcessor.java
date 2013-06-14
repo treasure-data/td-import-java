@@ -3,14 +3,11 @@ package com.treasure_data.bulk_import.prepare_parts;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -89,7 +86,7 @@ public class TestPrepareProcessor {
         proc = spy(proc);
 
         for (int i = 0; i < numTasks; i++) {
-            task = createTask(i, numRows);
+            task = PrepareProcessorTestUtil.createTask(i, numRows);
             err = proc.execute(task);
             assertEquals(task, err.task);
             assertEquals(null, err.error);
@@ -103,23 +100,10 @@ public class TestPrepareProcessor {
         proc = spy(proc);
 
         for (int i = 0; i < numTasks; i++) {
-            task = new PrepareProcessor.Task("dummyfile" + i);
+            task = PrepareProcessorTestUtil.createErrorTask(i);
             err = proc.execute(task);
             assertEquals(task, err.task);
-            assertTrue(err.error instanceof FileNotFoundException);
+            assertTrue(err.error instanceof IOException);
         }
-    }
-
-    public static PrepareProcessor.Task createTask(int i, int numRows) {
-        StringBuilder sbuf = new StringBuilder();
-        sbuf.append("time,user,age\n");
-        for (int j = 0; j < numRows; j++) {
-            sbuf.append(String.format("1370416181,muga%d,%d\n", i, i));
-        }
-
-        PrepareProcessor.Task t = new PrepareProcessor.Task("file" + i);
-        t.isTest = true;
-        t.testText = sbuf.toString();
-        return t;
     }
 }
