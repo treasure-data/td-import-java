@@ -42,6 +42,7 @@ public abstract class AbstractColumnProcTestUtil {
 
     @After
     public void destroyResources() throws Exception {
+        w.closeSilently();
     }
 
     public abstract AbstractColumnProc getColumnProc();
