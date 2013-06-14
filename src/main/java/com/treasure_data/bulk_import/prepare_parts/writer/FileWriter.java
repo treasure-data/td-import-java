@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor.Task;
 
 public abstract class FileWriter implements Closeable {
     private static final Logger LOG = Logger
@@ -38,6 +37,8 @@ public abstract class FileWriter implements Closeable {
         this.conf = conf;
     }
 
+    // TODO FIXME
+    // the argument type is bad.. we should change to 'Task'?
     protected abstract void configure(String infileName)
             throws PreparePartsException;
 
