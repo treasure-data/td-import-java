@@ -31,7 +31,7 @@ public class StringColumnProc extends AbstractColumnProc {
         String v = null;
 
         if (!(value instanceof String)) {
-            throw new ClassCastException(String.format(
+            throw new PreparePartsException(String.format(
                     "'%s' cannot be cast to String type", value));
         }
 

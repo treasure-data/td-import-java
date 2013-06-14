@@ -72,7 +72,7 @@ public abstract class AbstractColumnProc implements ColumnProc, CellProcessor {
 
             return executeValue(value);
         } catch (PreparePartsException e) {
-            throw new RuntimeException(e.getCause());
+            throw new RuntimeException(e);
         }
     }
 

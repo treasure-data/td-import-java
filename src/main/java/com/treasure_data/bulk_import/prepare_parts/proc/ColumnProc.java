@@ -17,11 +17,13 @@
 //
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+
 public interface ColumnProc {
 
     int getIndex();
 
     String getColumnName();
 
-    Object execute(Object value);
+    Object execute(Object value) throws PreparePartsException;
 }
