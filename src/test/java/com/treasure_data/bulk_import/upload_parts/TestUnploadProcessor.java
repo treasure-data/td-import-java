@@ -66,7 +66,7 @@ public class TestUnploadProcessor {
         // create upload processor
         proc = new UploadProcessor(null, conf);
 
-        numTasks = rand.nextInt(100);
+        numTasks = rand.nextInt(30) + 1;
     }
 
     @After

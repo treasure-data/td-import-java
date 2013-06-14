@@ -61,8 +61,8 @@ public class TestMultiThreadUploadProcessor {
 
     @Before
     public void createResources() throws Exception {
-        numWorkers = (rand.nextInt(100) % 8) + 1;
-        numTasks = rand.nextInt(100);
+        numWorkers = (rand.nextInt(30) % 8) + 1;
+        numTasks = rand.nextInt(30) + 1;
 
         props = System.getProperties();
         props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "" + numWorkers);
