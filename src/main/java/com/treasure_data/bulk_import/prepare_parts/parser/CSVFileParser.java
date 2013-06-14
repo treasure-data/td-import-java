@@ -271,8 +271,8 @@ public class CSVFileParser extends FileParser {
                 cellProcs[i].execute(row.get(i), null);
             } catch (Throwable t) {
                 throw new PreparePartsException(String.format(
-                        "It cannot translate #%d column '%s'. Please check row data: %s [line: %d]",
-                        i, ((ColumnProc) cellProcs[i]).getColumnName(),
+                        "It cannot translate #%d column '%s' (%s). Please check row data: %s [line: %d]",
+                        i, ((ColumnProc) cellProcs[i]).getColumnName(), t.getMessage(),
                         reader.getUntokenizedRow(), getLineNum()));
             }
         }
