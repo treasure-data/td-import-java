@@ -6,15 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
+
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
-public class MockFileWriter extends FileWriter {
+@Ignore
+public class TestFileWriter extends FileWriter {
 
     private Map<String, Object> row;
     private List<Object> columnKeyValues;
 
-    public MockFileWriter(PrepareConfig conf) {
+    public TestFileWriter(PrepareConfig conf) {
         super(conf);
     }
 
