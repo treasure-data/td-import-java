@@ -22,7 +22,7 @@ public class TestFileWriter extends FileWriter {
     }
 
     @Override
-    protected void configure(String infileName) throws PreparePartsException {
+    public void configure(String infileName) throws PreparePartsException {
     }
 
     @Override
