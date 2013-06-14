@@ -45,22 +45,28 @@ public class TestUnploadProcessor {
         proc.execute(task);
     }
 
+    private Properties props;
     private UploadConfig conf;
     private UploadProcessor proc;
-
-    Random rand = new Random(new Random().nextInt());
 
     private UploadProcessor.Task task;
     private UploadProcessor.ErrorInfo err;
 
+    Random rand = new Random(new Random().nextInt());
+    private int numTasks;
+
     @Before
     public void createResources() throws Exception {
+        props = System.getProperties();
+
         // create upload config
         conf = new UploadConfig();
-        conf.configure(System.getProperties());
+        conf.configure(props);
 
         // create upload processor
         proc = new UploadProcessor(null, conf);
+
+        numTasks = rand.nextInt(100);
     }
 
     @After
@@ -73,10 +79,8 @@ public class TestUnploadProcessor {
         proc = spy(proc);
         doNothing().when(proc).executeUpload(any(UploadProcessor.Task.class));
 
-        int count = rand.nextInt(100);
-
         // test
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < numTasks; i++) {
             task = UploadProcessorTestUtil.createTask(i);
             UploadProcessorTestUtil.executeTaskNormally(proc, task, proc.execute(task));
         }
@@ -89,8 +93,7 @@ public class TestUnploadProcessor {
         doThrow(new IOException("dummy")).when(proc).executeUpload(any(UploadProcessor.Task.class));
 
         // test
-        int count = rand.nextInt(100);
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < numTasks; i++) {
             task = UploadProcessorTestUtil.createTask(i);
             UploadProcessorTestUtil.failTask(proc, task, proc.execute(task));
         }
