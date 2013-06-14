@@ -1,8 +1,5 @@
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
-
-import java.util.Date;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,21 +26,14 @@ public class TestDoubleColumnProc extends AbstractColumnProcTestUtil {
 
     @Test
     public void returnOriginalArgumentNormally01() throws Exception {
-        executeNormalObject(10.1, 10.1);
+        double value = rand.nextDouble();
+        executeNormalObject(value, value);
     }
 
     @Test
     public void returnOriginalArgumentNormally02() throws Exception {
-        executeNormalObject("10.1", 10.1);
+        double value = rand.nextDouble();
+        executeNormalObject("" + value, value);
     }
 
-    @Test
-    public void gotRuntimeErrorWhenNonStringValueIsPassed01() throws Exception {
-        executeBadObject("muga");
-    }
-
-    @Test
-    public void gotRuntimeErrorWhenNonStringValueIsPassed02() throws Exception {
-        executeBadObject(new Date());
-    }
 }

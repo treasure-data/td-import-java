@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 
@@ -78,5 +79,15 @@ public abstract class AbstractColumnProcTestUtil {
             assertTrue(t.getCause() instanceof PreparePartsException);
         }
         w.writeEndRow();
+    }
+
+    @Test
+    public void gotRuntimeErrorWhenCannotParsedStringValueIsPassed() throws Exception {
+        executeBadObject("muga");
+    }
+
+    @Test
+    public void gotRuntimeErrorWhenInvalidTypeValueIsPassed() throws Exception {
+        executeBadObject(new Date());
     }
 }
