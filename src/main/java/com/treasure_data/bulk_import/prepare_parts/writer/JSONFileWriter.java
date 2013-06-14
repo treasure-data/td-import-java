@@ -51,8 +51,8 @@ public class JSONFileWriter extends FileWriter {
     }
 
     @Override
-    public void write(Object o) throws PreparePartsException {
-        recordElements.add(o);
+    public void write(Object v) throws PreparePartsException {
+        recordElements.add(v);
     }
 
     @Override
