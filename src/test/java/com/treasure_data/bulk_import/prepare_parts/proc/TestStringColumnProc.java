@@ -1,14 +1,8 @@
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class TestStringColumnProc extends AbstractColumnProcTestUtil {
 
@@ -32,27 +26,11 @@ public class TestStringColumnProc extends AbstractColumnProcTestUtil {
 
     @Test
     public void returnOriginalArgumentNormally() throws Exception {
-        String value = "muga";
-
-        w.writeBeginRow(1);
-        assertEquals(value, proc.execute(value));
-        w.writeEndRow();
-
-        hasColumn(columnName, value);
+        executeNormalObject("muga", "muga");
     }
 
     @Test
     public void gotCastErrorWhenNonStringValueIsPassed() throws Exception {
-        int value = 100;
-
-        w.writeBeginRow(1);
-        try {
-            assertEquals(value, proc.execute(value));
-            fail();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            assertTrue(t instanceof PreparePartsException);
-        }
-        w.writeEndRow();
+        executeBadObject(100);
     }
 }

@@ -1,14 +1,11 @@
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class TestIntColumnProc extends AbstractColumnProcTestUtil {
 
@@ -31,28 +28,22 @@ public class TestIntColumnProc extends AbstractColumnProcTestUtil {
     }
 
     @Test
-    public void returnOriginalArgumentNormally() throws Exception {
-        int value = 10;
-
-        w.writeBeginRow(1);
-        assertEquals(value, proc.execute(value));
-        w.writeEndRow();
-
-        hasColumn(columnName, value);
+    public void returnOriginalArgumentNormally01() throws Exception {
+        executeNormalObject(10, 10);
     }
 
     @Test
-    public void gotRuntimeErrorWhenNonStringValueIsPassed() throws Exception {
-        String value = "muga";
+    public void returnOriginalArgumentNormally02() throws Exception {
+        executeNormalObject("10", 10);
+    }
 
-        w.writeBeginRow(1);
-        try {
-            assertEquals(value, proc.execute(value));
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof RuntimeException);
-            assertTrue(t.getCause() instanceof PreparePartsException);
-        }
-        w.writeEndRow();
+    @Test
+    public void gotRuntimeErrorWhenNonStringValueIsPassed01() throws Exception {
+        executeBadObject("muga");
+    }
+
+    @Test
+    public void gotRuntimeErrorWhenNonStringValueIsPassed02() throws Exception {
+        executeBadObject(new Date());
     }
 }
