@@ -81,7 +81,7 @@ public class MultiThreadPrepareProcessor {
         errors = new ArrayList<PrepareProcessor.ErrorInfo>();
     }
 
-    protected void setErrors(PrepareProcessor.ErrorInfo error) {
+    protected synchronized void setErrors(PrepareProcessor.ErrorInfo error) {
         errors.add(error);
     }
 

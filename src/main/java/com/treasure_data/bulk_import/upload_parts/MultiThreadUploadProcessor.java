@@ -85,7 +85,7 @@ public class MultiThreadUploadProcessor {
         errors = new ArrayList<UploadProcessor.ErrorInfo>();
     }
 
-    protected void setErrors(UploadProcessor.ErrorInfo error) {
+    protected synchronized void setErrors(UploadProcessor.ErrorInfo error) {
         errors.add(error);
     }
 
