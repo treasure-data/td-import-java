@@ -8,6 +8,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+
 public class TestStringColumnProc extends AbstractColumnProcTestUtil {
 
     private StringColumnProc proc;
@@ -48,7 +50,8 @@ public class TestStringColumnProc extends AbstractColumnProcTestUtil {
             assertEquals(value, proc.execute(value));
             fail();
         } catch (Throwable t) {
-            assertTrue(t instanceof ClassCastException);
+            t.printStackTrace();
+            assertTrue(t instanceof PreparePartsException);
         }
         w.writeEndRow();
     }
