@@ -53,4 +53,7 @@ public abstract class AbstractColumnProcTestUtil {
         assertEquals(columnName, getColumnProc().getColumnName());
     }
 
+    public void hasColumn(String name, Object value) {
+        assertEquals(value, w.getRow().get(name));
+    }
 }

@@ -36,7 +36,7 @@ public class TestStringColumnProc extends AbstractColumnProcTestUtil {
         assertEquals(value, proc.execute(value));
         w.writeEndRow();
 
-        assertEquals(value, w.getRow().get(columnName));
+        hasColumn(columnName, value);
     }
 
     @Test
