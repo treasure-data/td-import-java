@@ -1,6 +1,5 @@
 package com.treasure_data.bulk_import.upload_parts;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
@@ -56,11 +55,11 @@ public class TestUnploadProcessor {
 
     @Before
     public void createResources() throws Exception {
-        // upload config
+        // create upload config
         conf = new UploadConfig();
         conf.configure(System.getProperties());
 
-        // upload processor
+        // create upload processor
         proc = new UploadProcessor(null, conf);
     }
 

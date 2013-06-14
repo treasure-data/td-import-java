@@ -48,7 +48,8 @@ public class PrepareProcessor {
             this.fileName = fileName;
         }
 
-        protected InputStream createInputStream(PrepareConfig.CompressionType compressionType)
+        protected InputStream createInputStream(
+                PrepareConfig.CompressionType compressionType)
                 throws IOException {
             if (!isTest) {
                 return compressionType.createInputStream(new FileInputStream(fileName));
@@ -109,7 +110,6 @@ public class PrepareProcessor {
     public ErrorInfo execute(final Task task) {
         LOG.info(String.format("Convert file '%s'", task.fileName));
 
-        // TODO #MN need type paramters
         ErrorInfo err = new ErrorInfo();
         err.task = task;
 
