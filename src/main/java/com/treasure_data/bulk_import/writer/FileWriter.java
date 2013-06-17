@@ -27,6 +27,33 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 
 public abstract class FileWriter implements Closeable {
+    /**
+     * TODO
+     * TODO
+     * public TDLogTableWriter implements Writer {
+     *   public void configure(TDLogTableWriterConfiguration conf) {
+     *     this.generator = new MessagePackMapGenerator(conf.getKeys(), conf.getColumnTypes());
+     *   }
+     *
+     *   public void next(Row row) {
+     *     if(size is larger than Xxx) {
+     *       conf.getOutputFileListener().completeFile(currentFilePath);
+     *       currentFilePath = createTempFilePath(conf.getOutputBaseDirectory());
+     *       conf.getOutputFileListener().beginFile(currentFilePath);
+     *     }
+     *     generator.generate(row);
+     *     // ...
+     *   }
+     * }
+     *
+     */
+    /**
+     * TODO
+     * TODO
+     * public interface Writer {
+     *   public void next(Row row);
+     * }
+     */
     private static final Logger LOG = Logger
             .getLogger(FileWriter.class.getName());
 

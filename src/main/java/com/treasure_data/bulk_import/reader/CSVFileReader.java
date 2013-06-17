@@ -231,6 +231,17 @@ public class CSVFileReader extends FileReader {
 
     private List<String> row = new ArrayList<String>();
 
+    /**
+     * TODO
+     * TODO need refactoring
+     *
+     *  public boolean next() [
+     *    String[] rows = csvParser.read();
+     *    converters.each_with_index {|c,i| c.convertInto(rows[i], row.values[i]) } <-- type convert
+     *    w.next(row); <-- do semantic convert and write msgpack.gz file
+     *  }
+     *  * create converter objects and should be set
+     */
     @Override
     public boolean next() throws PreparePartsException {
         boolean moreRead = true;
