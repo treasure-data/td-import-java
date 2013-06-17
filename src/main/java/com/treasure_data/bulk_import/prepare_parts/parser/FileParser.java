@@ -26,8 +26,6 @@ import java.util.logging.Logger;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.CompressionType;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor.Task;
 import com.treasure_data.bulk_import.prepare_parts.writer.FileWriter;
 
 public abstract class FileParser {
@@ -38,7 +36,7 @@ public abstract class FileParser {
     protected long rowNum = 0;
     protected CharsetDecoder charsetDecoder;
     protected PrepareConfiguration.CompressionType compressionType;
-    protected com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer;
+    protected FileWriter writer;
 
     private PrintWriter errWriter = null;
 
@@ -75,8 +73,7 @@ public abstract class FileParser {
         return charsetDecoder;
     }
 
-    public void setFileWriter(PrepareProcessor.Task task,
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
+    public void setFileWriter(PrepareProcessor.Task task, FileWriter writer) {
         writer.setTask(task);
         this.writer = writer;
     }
