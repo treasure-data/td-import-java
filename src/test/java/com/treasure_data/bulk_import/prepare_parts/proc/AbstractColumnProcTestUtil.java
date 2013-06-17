@@ -41,6 +41,10 @@ public abstract class AbstractColumnProcTestUtil {
         w.configure("dummy");
 
         index = rand.nextInt(100);
+        initializeColumnName();
+    }
+
+    protected void initializeColumnName() {
         columnName = "col" + index;
     }
 
