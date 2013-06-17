@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts.parser;
+package com.treasure_data.bulk_import.reader;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.writer.FileWriter;
+import com.treasure_data.bulk_import.writer.FileWriter;
 
 public abstract class FileParser {
     private static final Logger LOG = Logger.getLogger(FileParser.class.getName());

@@ -39,7 +39,7 @@ public class ColumnProcGenerator {
     }
 
     public static CellProcessor[] generateCellProcessors(
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer,
+            com.treasure_data.bulk_import.writer.FileWriter writer,
             String[] columnNames, PrepareConfiguration.ColumnType[] columnTypes,
             int timeColumnIndex, ExtStrftime timeFormat) throws PreparePartsException {
         int len = columnTypes.length;
@@ -53,7 +53,7 @@ public class ColumnProcGenerator {
 
     public static ColumnProc[] generateColumnProcessors(String[] columnNames,
             PrepareConfiguration.ColumnType[] columnTypes, int timeColumnIndex, ExtStrftime timeFormat,
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer)
+            com.treasure_data.bulk_import.writer.FileWriter writer)
                     throws PreparePartsException {
         int len = columnTypes.length;
         List<ColumnProc> cprocs = new ArrayList<ColumnProc>(len);
@@ -66,7 +66,7 @@ public class ColumnProcGenerator {
 
     public static CellProcessor generateCellProcessor(int index, String columnName,
             PrepareConfiguration.ColumnType columnType, int timeColumnIndex, ExtStrftime timeFormat,
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer)
+            com.treasure_data.bulk_import.writer.FileWriter writer)
                     throws PreparePartsException {
         return (CellProcessor) generateColumnProcessor(index, columnName, columnType,
                 timeColumnIndex, timeFormat, writer);
@@ -74,7 +74,7 @@ public class ColumnProcGenerator {
 
     public static ColumnProc generateColumnProcessor(int index, String columnName,
             PrepareConfiguration.ColumnType columnType, int timeColumnIndex, ExtStrftime timeFormat,
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer)
+            com.treasure_data.bulk_import.writer.FileWriter writer)
                     throws PreparePartsException {
         if (columnType == PrepareConfiguration.ColumnType.INT) {
             return new IntColumnProc(index, columnName, writer);
@@ -92,7 +92,7 @@ public class ColumnProcGenerator {
     }
 
     public static ColumnProc generateTimeColumnProcessor(
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer,
+            com.treasure_data.bulk_import.writer.FileWriter writer,
             int aliasTimeColumnIndex, ExtStrftime timeFormat, long timeValue) { // TODO should change timeformat
         if (aliasTimeColumnIndex < 0) {
             return new TimeValueColumnProc(timeValue, writer);

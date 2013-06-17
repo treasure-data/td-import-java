@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts.writer;
+package com.treasure_data.bulk_import.writer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

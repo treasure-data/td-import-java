@@ -27,7 +27,7 @@ public class TimeColumnProc extends AbstractColumnProc {
 
     public TimeColumnProc(int index,
             ExtStrftime timeFormat,
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
+            com.treasure_data.bulk_import.writer.FileWriter writer) {
         super(index, Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE, writer);
         this.timeFormat = timeFormat;
     }

@@ -32,8 +32,8 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.prepare_parts.parser.CSVFileParser;
-import com.treasure_data.bulk_import.prepare_parts.parser.FileParser;
+import com.treasure_data.bulk_import.reader.CSVFileParser;
+import com.treasure_data.bulk_import.reader.FileParser;
 
 public class PrepareConfiguration extends Configuration {
 

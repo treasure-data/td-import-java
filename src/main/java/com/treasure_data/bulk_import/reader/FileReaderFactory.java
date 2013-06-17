@@ -15,10 +15,10 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts.parser;
+package com.treasure_data.bulk_import.reader;
 
 import com.treasure_data.bulk_import.ValueType;
-import com.treasure_data.bulk_import.prepare_parts.writer.FileWriter;
+import com.treasure_data.bulk_import.writer.FileWriter;
 
 public interface FileReaderFactory {
     public ValueType[] getTypes();

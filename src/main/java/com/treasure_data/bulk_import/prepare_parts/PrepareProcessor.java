@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.prepare_parts.parser.FileParser;
-import com.treasure_data.bulk_import.prepare_parts.writer.MsgpackGZIPFileWriter;
+import com.treasure_data.bulk_import.reader.FileParser;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
+import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
 public class PrepareProcessor {
 

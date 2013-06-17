@@ -22,7 +22,7 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 public class IntColumnProc extends AbstractColumnProc {
 
     public IntColumnProc(int index, String columnName,
-            com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
+            com.treasure_data.bulk_import.writer.FileWriter writer) {
         super(index, columnName, writer);
     }
 
