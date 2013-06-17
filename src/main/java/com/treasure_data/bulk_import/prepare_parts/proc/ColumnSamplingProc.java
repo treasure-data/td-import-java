@@ -17,27 +17,27 @@
 //
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
-import static com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType.DOUBLE;
-import static com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType.INT;
-import static com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType.LONG;
-import static com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType.STRING;
+import static com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.ColumnType.DOUBLE;
+import static com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.ColumnType.INT;
+import static com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.ColumnType.LONG;
+import static com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.ColumnType.STRING;
 
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.util.CsvContext;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class ColumnSamplingProc extends AbstractColumnProc {
 
-    public static PrepareConfig.ColumnType getColumnType(CellProcessor cellProc) {
+    public static PrepareConfiguration.ColumnType getColumnType(CellProcessor cellProc) {
         if (!(cellProc instanceof ColumnSamplingProc)) {
             throw new IllegalArgumentException();
         }
         return ((ColumnSamplingProc) cellProc).getColumnType();
     }
 
-    public static PrepareConfig.ColumnType getColumnType(ColumnProc colProc) {
+    public static PrepareConfiguration.ColumnType getColumnType(ColumnProc colProc) {
         if (!(colProc instanceof ColumnSamplingProc)) {
             throw new IllegalArgumentException();
         }
@@ -52,7 +52,7 @@ public class ColumnSamplingProc extends AbstractColumnProc {
         this.sampleRow = sampleRow;
     }
 
-    public PrepareConfig.ColumnType getColumnType() {
+    public PrepareConfiguration.ColumnType getColumnType() {
         int max = -sampleRow;
         int maxIndex = 0;
         for (int i = 0; i < scores.length; i++) {
@@ -61,7 +61,7 @@ public class ColumnSamplingProc extends AbstractColumnProc {
                 maxIndex = i;
             }
         }
-        return PrepareConfig.ColumnType.fromInt(maxIndex);
+        return PrepareConfiguration.ColumnType.fromInt(maxIndex);
     }
 
     @Override

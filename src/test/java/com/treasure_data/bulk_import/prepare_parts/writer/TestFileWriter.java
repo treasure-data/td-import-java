@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.junit.Ignore;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 @Ignore
@@ -17,7 +17,7 @@ public class TestFileWriter extends FileWriter {
     private Map<String, Object> row;
     private List<Object> columnKeyValues;
 
-    public TestFileWriter(PrepareConfig conf) {
+    public TestFileWriter(PrepareConfiguration conf) {
         super(conf);
     }
 

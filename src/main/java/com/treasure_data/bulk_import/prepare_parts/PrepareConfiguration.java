@@ -31,24 +31,24 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.parser.CSVFileParser;
 import com.treasure_data.bulk_import.prepare_parts.parser.FileParser;
 
-public class PrepareConfig extends Config {
+public class PrepareConfiguration extends Configuration {
 
     public static enum Format {
         // TODO #MN should consider type parameters
         CSV("csv") {
             @Override
-            public FileParser createFileParser(PrepareConfig conf)
+            public FileParser createFileParser(PrepareConfiguration conf)
                     throws PreparePartsException {
                 return new CSVFileParser(conf);
             }
         },
         TSV("tsv") {
             @Override
-            public FileParser createFileParser(PrepareConfig conf)
+            public FileParser createFileParser(PrepareConfiguration conf)
                     throws PreparePartsException {
                 return new CSVFileParser(conf);
             }
@@ -68,7 +68,7 @@ public class PrepareConfig extends Config {
             return format;
         }
 
-        public FileParser createFileParser(PrepareConfig conf)
+        public FileParser createFileParser(PrepareConfiguration conf)
                 throws PreparePartsException {
             throw new PreparePartsException(
                     new UnsupportedOperationException("format: " + this));
@@ -226,7 +226,7 @@ public class PrepareConfig extends Config {
     }
 
     private static final Logger LOG = Logger
-            .getLogger(PrepareConfig.class.getName());
+            .getLogger(PrepareConfiguration.class.getName());
 
     // FIXME this field is also declared in td-client.Config.
     protected Properties props;
@@ -253,15 +253,15 @@ public class PrepareConfig extends Config {
     protected String[] onlyColumns;
     protected int sampleRowSize;
 
-    public PrepareConfig() {
+    public PrepareConfiguration() {
     }
 
     public void configure(Properties props) {
         this.props = props;
 
         // format
-        String formatStr = props.getProperty(Config.BI_PREPARE_PARTS_FORMAT,
-                Config.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
+        String formatStr = props.getProperty(Configuration.BI_PREPARE_PARTS_FORMAT,
+                Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
         format = Format.fromString(formatStr);
         if (format == null) {
             throw new IllegalArgumentException(String.format(
@@ -270,8 +270,8 @@ public class PrepareConfig extends Config {
 
         // compression type
         String compType = props.getProperty(
-                Config.BI_PREPARE_PARTS_COMPRESSION,
-                Config.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE);
+                Configuration.BI_PREPARE_PARTS_COMPRESSION,
+                Configuration.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE);
         compressionType = CompressionType.fromString(compType);
         if (compressionType == null) {
             throw new IllegalArgumentException("unsupported compression type: "
@@ -298,8 +298,8 @@ public class PrepareConfig extends Config {
         }
 
         // encoding
-        String encoding = props.getProperty(Config.BI_PREPARE_PARTS_ENCODING,
-                Config.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
+        String encoding = props.getProperty(Configuration.BI_PREPARE_PARTS_ENCODING,
+                Configuration.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
         try {
             createCharsetDecoder(encoding);
         } catch (Exception e) {
@@ -307,61 +307,61 @@ public class PrepareConfig extends Config {
         }
 
         // time column
-        aliasTimeColumn = props.getProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN);
+        aliasTimeColumn = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN);
 
         // time column value
-        String tValue = props.getProperty(Config.BI_PREPARE_PARTS_TIMEVALUE);
+        String tValue = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE);
         if (tValue != null) {
             try {
                 timeValue = Long.parseLong(tValue);
             } catch (NumberFormatException e) {
                 String msg = String.format(
                         "time value is required as long type (unix timestamp) e.g. -D%s=1360141200",
-                        Config.BI_PREPARE_PARTS_TIMEVALUE);
+                        Configuration.BI_PREPARE_PARTS_TIMEVALUE);
                 throw new IllegalArgumentException(msg, e);
             }
         }
 
         // time format
-        timeFormat = props.getProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT);
+        timeFormat = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT);
 
         // output DIR
-        outputDirName = props.getProperty(Config.BI_PREPARE_PARTS_OUTPUTDIR,
-                Config.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
+        outputDirName = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR,
+                Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
 
         // error record output DIR
         errorRecordOutputDirName = props
-                .getProperty(Config.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
+                .getProperty(Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
 
         // dry-run mode
-        String drun = props.getProperty(Config.BI_PREPARE_PARTS_DRYRUN,
-                Config.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
+        String drun = props.getProperty(Configuration.BI_PREPARE_PARTS_DRYRUN,
+                Configuration.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
         dryRun = drun != null && drun.equals("true");
 
         // split size
         String sSize = props.getProperty(
-                Config.BI_PREPARE_PARTS_SPLIT_SIZE,
-                Config.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
+                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
+                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
         try {
             splitSize = Integer.parseInt(sSize);
         } catch (NumberFormatException e) {
             String msg = String.format(
                     "split size is required as int type e.g. -D%s=%s",
-                    Config.BI_PREPARE_PARTS_SPLIT_SIZE,
-                    Config.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
+                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
+                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
             throw new IllegalArgumentException(msg, e);
         }
 
         // delimiter
-        if (format.equals(PrepareConfig.Format.CSV)) {
+        if (format.equals(PrepareConfiguration.Format.CSV)) {
             delimiterChar = props.getProperty(
-                    Config.BI_PREPARE_PARTS_DELIMITER,
-                    Config.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE).charAt(
+                    Configuration.BI_PREPARE_PARTS_DELIMITER,
+                    Configuration.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE).charAt(
                     0);
-        } else if (format.equals(PrepareConfig.Format.TSV)) {
+        } else if (format.equals(PrepareConfiguration.Format.TSV)) {
             delimiterChar = props.getProperty(
-                    Config.BI_PREPARE_PARTS_DELIMITER,
-                    Config.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
+                    Configuration.BI_PREPARE_PARTS_DELIMITER,
+                    Configuration.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
                     0);
         } else {
             // fatal error. i mean here might be not executed
@@ -370,8 +370,8 @@ public class PrepareConfig extends Config {
         LOG.config(String.format("use '%s' as delimiterChar", delimiterChar));
 
         // newline
-        String nLine = props.getProperty(Config.BI_PREPARE_PARTS_NEWLINE,
-                Config.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE);
+        String nLine = props.getProperty(Configuration.BI_PREPARE_PARTS_NEWLINE,
+                Configuration.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE);
         try {
             newline = NewLine.valueOf(nLine);
         } catch (IllegalArgumentException e) {
@@ -381,12 +381,12 @@ public class PrepareConfig extends Config {
 
         // column header
         String columnHeader = props.getProperty(
-                Config.BI_PREPARE_PARTS_COLUMNHEADER,
-                Config.BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE);
+                Configuration.BI_PREPARE_PARTS_COLUMNHEADER,
+                Configuration.BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE);
         if (!columnHeader.equals("true")) {
             // columns
             String columns = props.getProperty(
-                    Config.BI_PREPARE_PARTS_COLUMNS);
+                    Configuration.BI_PREPARE_PARTS_COLUMNS);
             if (columns != null && !columns.isEmpty()) {
                 columnNames = columns.split(",");
             } else {
@@ -398,7 +398,7 @@ public class PrepareConfig extends Config {
         }
 
         // column types
-        String cTypes = props.getProperty(Config.BI_PREPARE_PARTS_COLUMNTYPES);
+        String cTypes = props.getProperty(Configuration.BI_PREPARE_PARTS_COLUMNTYPES);
         if (cTypes != null && !cTypes.isEmpty()) {
             columnTypes = cTypes.split(",");
         } else {
@@ -407,16 +407,16 @@ public class PrepareConfig extends Config {
 
         // type-conversion-error
         typeErrorMode = props.getProperty(
-                Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR,
-                Config.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR_DEFAULTVALUE);
+                Configuration.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR,
+                Configuration.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR_DEFAULTVALUE);
 
         // exclude-columns
         String excludeColumns = props.getProperty(
-                Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
+                Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
         if (excludeColumns != null && !excludeColumns.isEmpty()) {
             this.excludeColumns = excludeColumns.split(",");
             for (String c : this.excludeColumns) {
-                if (c.equals(Config.BI_PREPARE_PARTS_TIMECOLUMN)) {
+                if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN)) {
                     throw new IllegalArgumentException(
                             "'time' column cannot be included in excluded columns");
                 }
@@ -426,7 +426,7 @@ public class PrepareConfig extends Config {
         }
 
         // only-columns
-        String onlyColumns = props.getProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS);
+        String onlyColumns = props.getProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS);
         if (onlyColumns != null && !onlyColumns.isEmpty()) {
             this.onlyColumns = onlyColumns.split(",");
             for (String oc : this.onlyColumns) {
@@ -443,15 +443,15 @@ public class PrepareConfig extends Config {
 
         // row size with sample reader
         String sRowSize = props.getProperty(
-                Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
+                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
+                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
         try {
             sampleRowSize = Integer.parseInt(sRowSize);
         } catch (NumberFormatException e) {
             String msg = String.format(
                     "sample row size is required as int type e.g. -D%s=%s",
-                    Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                    Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
+                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
+                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
             throw new IllegalArgumentException(msg, e);
         }
     }

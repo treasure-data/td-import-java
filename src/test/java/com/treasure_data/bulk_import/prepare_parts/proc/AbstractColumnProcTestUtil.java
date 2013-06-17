@@ -13,14 +13,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.writer.TestFileWriter;
 
 @Ignore
 public abstract class AbstractColumnProcTestUtil {
     protected Properties props;
-    protected PrepareConfig conf;
+    protected PrepareConfiguration conf;
     protected TestFileWriter w;
 
     protected int index;
@@ -33,7 +33,7 @@ public abstract class AbstractColumnProcTestUtil {
         props = System.getProperties();
 
         // create prepare config
-        conf = new PrepareConfig();
+        conf = new PrepareConfiguration();
         conf.configure(props);
 
         // create file writer

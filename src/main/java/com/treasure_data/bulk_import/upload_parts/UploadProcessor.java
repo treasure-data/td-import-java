@@ -163,9 +163,9 @@ public class UploadProcessor {
     private static RetryClient2 retryClient = new RetryClient2();
 
     private BulkImportClient client;
-    private UploadConfig conf;
+    private UploadConfiguration conf;
 
-    public UploadProcessor(BulkImportClient client, UploadConfig conf) {
+    public UploadProcessor(BulkImportClient client, UploadConfiguration conf) {
         this.conf = conf;
         this.client = client;
     }
@@ -216,7 +216,7 @@ public class UploadProcessor {
     }
 
     public static SessionSummary showSession(final BulkImportClient client,
-            final UploadConfig conf, final String sessName) throws UploadPartsException {
+            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
         LOG.fine(String.format("Show session '%s'", sessName));
 
         summary = null;
@@ -235,7 +235,7 @@ public class UploadProcessor {
     }
 
     public static ErrorInfo freezeSession(final BulkImportClient client,
-            final UploadConfig conf, final String sessName) throws UploadPartsException {
+            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Freeze session '%s'", sessName));
 
         ErrorInfo err = new ErrorInfo();
@@ -255,7 +255,7 @@ public class UploadProcessor {
     }
 
     public static ErrorInfo performSession(final BulkImportClient client,
-            final UploadConfig conf, final String sessName) throws UploadPartsException {
+            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Perform session '%s'", sessName));
 
         ErrorInfo err = new ErrorInfo();
@@ -275,7 +275,7 @@ public class UploadProcessor {
     }
 
     public static void waitPerform(final BulkImportClient client,
-            final UploadConfig conf, final String sessName) throws UploadPartsException {
+            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Wait session performing '%s'", sessName));
 
         long waitTime = System.currentTimeMillis();
@@ -309,7 +309,7 @@ public class UploadProcessor {
     }
 
     public static ErrorInfo commitSession(final BulkImportClient client,
-            final UploadConfig conf, final String sessName) throws UploadPartsException {
+            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Commit session '%s'", sessName));
 
         ErrorInfo err = new ErrorInfo();

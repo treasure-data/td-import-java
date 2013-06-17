@@ -17,7 +17,7 @@
 //
 package com.treasure_data.bulk_import.prepare_parts.proc;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 
@@ -28,13 +28,13 @@ public class TimeColumnProc extends AbstractColumnProc {
     public TimeColumnProc(int index,
             ExtStrftime timeFormat,
             com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer) {
-        super(index, Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE, writer);
+        super(index, Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE, writer);
         this.timeFormat = timeFormat;
     }
 
     @Override
     public void executeKey() throws PreparePartsException {
-        writer.writeString(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+        writer.writeString(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
     }
 
     @Override

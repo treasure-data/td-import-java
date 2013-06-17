@@ -29,7 +29,7 @@ import java.util.zip.GZIPOutputStream;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class MsgpackGZIPFileWriter extends FileWriter {
@@ -72,7 +72,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     private String outputFilePrefix;
     private File outputFile;
 
-    public MsgpackGZIPFileWriter(PrepareConfig conf) {
+    public MsgpackGZIPFileWriter(PrepareConfiguration conf) {
         super(conf);
     }
 

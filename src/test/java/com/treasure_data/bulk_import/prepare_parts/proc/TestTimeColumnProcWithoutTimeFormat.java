@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.Configuration;
 
 public class TestTimeColumnProcWithoutTimeFormat extends AbstractColumnProcTestUtil {
 
@@ -18,7 +18,7 @@ public class TestTimeColumnProcWithoutTimeFormat extends AbstractColumnProcTestU
 
     @Override
     protected void initializeColumnName() {
-        columnName = Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE;
+        columnName = Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE;
     }
 
     @After

@@ -65,17 +65,17 @@ public class MultiThreadPrepareProcessor {
         taskQueue.add(task);
     }
 
-    public static synchronized void addFinishTask(PrepareConfig conf) {
+    public static synchronized void addFinishTask(PrepareConfiguration conf) {
         for (int i = 0; i < conf.getNumOfPrepareThreads(); i++) {
             taskQueue.add(PrepareProcessor.Task.FINISH_TASK);
         }
     }
 
-    private PrepareConfig conf;
+    private PrepareConfiguration conf;
     private List<Worker> workers;
     private List<PrepareProcessor.ErrorInfo> errors;
 
-    public MultiThreadPrepareProcessor(PrepareConfig conf) {
+    public MultiThreadPrepareProcessor(PrepareConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
         errors = new ArrayList<PrepareProcessor.ErrorInfo>();
@@ -95,7 +95,7 @@ public class MultiThreadPrepareProcessor {
         }
     }
 
-    protected Worker createWorker(PrepareConfig conf) {
+    protected Worker createWorker(PrepareConfiguration conf) {
         return new Worker(this, createPrepareProcessor(conf));
     }
 
@@ -103,7 +103,7 @@ public class MultiThreadPrepareProcessor {
         workers.add(w);
     }
 
-    protected PrepareProcessor createPrepareProcessor(PrepareConfig conf) {
+    protected PrepareProcessor createPrepareProcessor(PrepareConfiguration conf) {
         return new PrepareProcessor(conf);
     }
 

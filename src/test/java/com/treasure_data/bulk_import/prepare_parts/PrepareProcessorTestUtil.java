@@ -29,7 +29,7 @@ public class PrepareProcessorTestUtil {
         PrepareProcessor.Task t = new PrepareProcessor.Task("file" + i);
         t = spy(t);
         doThrow(new IOException("dummy")).when(t).createInputStream(
-                any(PrepareConfig.CompressionType.class));
+                any(PrepareConfiguration.CompressionType.class));
         return t;
     }
 }

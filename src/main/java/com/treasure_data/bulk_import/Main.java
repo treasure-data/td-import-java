@@ -23,10 +23,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
-import com.treasure_data.bulk_import.upload_parts.UploadConfig;
+import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
@@ -66,14 +66,14 @@ public class Main {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        LOG.info(String.format("Start %s command", Config.CMD_PREPARE_PARTS));
+        LOG.info(String.format("Start %s command", Configuration.CMD_PREPARE_PARTS));
 
         final String[] fileNames = new String[args.length - 1];
         for (int i = 0; i < args.length - 1; i++) {
             fileNames[i] = args[i + 1];
         }
 
-        final PrepareConfig conf = new PrepareConfig();
+        final PrepareConfiguration conf = new PrepareConfiguration();
         conf.configure(props);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
@@ -131,7 +131,7 @@ public class Main {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        LOG.info(String.format("Start %s command", Config.CMD_UPLOAD_PARTS));
+        LOG.info(String.format("Start %s command", Configuration.CMD_UPLOAD_PARTS));
 
         final String sessionName = args[1];
         final String[] fileNames = new String[args.length - 2];
@@ -139,7 +139,7 @@ public class Main {
             fileNames[i] = args[i + 2];
         }
 
-        final UploadConfig conf = new UploadConfig();
+        final UploadConfiguration conf = new UploadConfiguration();
         conf.configure(props);
 
         MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
@@ -186,7 +186,7 @@ public class Main {
         }
 
         LOG.info(String.format("Start %s and %s commands",
-                Config.CMD_UPLOAD_PARTS, Config.CMD_PREPARE_PARTS));
+                Configuration.CMD_UPLOAD_PARTS, Configuration.CMD_PREPARE_PARTS));
 
         final String sessionName = args[1];
         final String[] fileNames = new String[args.length - 2];
@@ -194,7 +194,7 @@ public class Main {
             fileNames[i] = args[i + 2];
         }
 
-        final UploadConfig conf = new UploadConfig();
+        final UploadConfiguration conf = new UploadConfiguration();
         conf.configure(props);
 
         MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(conf);
@@ -247,9 +247,9 @@ public class Main {
 
         String commandName = args[0];
         Properties props = System.getProperties();
-        if (commandName.equals(Config.CMD_PREPARE_PARTS)) {
+        if (commandName.equals(Configuration.CMD_PREPARE_PARTS)) {
             prepareParts(args, props);
-        } else if (commandName.equals(Config.CMD_UPLOAD_PARTS)) {
+        } else if (commandName.equals(Configuration.CMD_UPLOAD_PARTS)) {
             if (!includePrepareProcessing(props)) {
                 uploadParts(args, props);
             } else {

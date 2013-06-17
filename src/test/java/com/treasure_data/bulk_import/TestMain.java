@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.Configuration;
 
 public class TestMain {
 
@@ -15,10 +15,10 @@ public class TestMain {
         props.load(this.getClass().getClassLoader()
                 .getResourceAsStream("treasure-data.properties"));
 
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
         //props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
-        props.setProperty(Config.BI_PREPARE_PARTS_PARALLEL, "2");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "2");
         final String[] args = new String[] {
                 "prepare_parts",
                 "./in/sample.csv",
@@ -45,9 +45,9 @@ public class TestMain {
 
         //props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
-        props.setProperty(Config.BI_PREPARE_PARTS_PARALLEL, "1");
-        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "1");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "1");
+        props.setProperty(Configuration.BI_UPLOAD_PARTS_PARALLEL, "1");
         final String[] args = new String[] {
                 "upload_parts",
                 "mugasess",

@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.Configuration;
 
 public class TestMultiThreadPrepareProcessor {
 
@@ -23,12 +23,12 @@ public class TestMultiThreadPrepareProcessor {
     public void test01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
-        props.setProperty(Config.BI_PREPARE_PARTS_PARALLEL, "3");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "3");
 
-        PrepareConfig conf = new PrepareConfig();
+        PrepareConfiguration conf = new PrepareConfiguration();
         conf = spy(conf);
-        doReturn(PrepareConfig.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
-        doReturn(PrepareConfig.CompressionType.NONE).when(conf).getCompressionType();
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
         conf.configure(props);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
@@ -51,7 +51,7 @@ public class TestMultiThreadPrepareProcessor {
     }
 
     private Properties props;
-    private PrepareConfig conf;
+    private PrepareConfiguration conf;
     private MultiThreadPrepareProcessor proc;
 
     Random rand = new Random(new Random().nextInt());
@@ -67,10 +67,10 @@ public class TestMultiThreadPrepareProcessor {
         numRows = rand.nextInt(100);
 
         props = System.getProperties();
-        props.setProperty(Config.BI_PREPARE_PARTS_PARALLEL, "" + numWorkers);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "" + numWorkers);
 
         // create prepare config
-        conf = new PrepareConfig();
+        conf = new PrepareConfiguration();
         conf.configure(props);
 
         // create multi-thread prepare processor

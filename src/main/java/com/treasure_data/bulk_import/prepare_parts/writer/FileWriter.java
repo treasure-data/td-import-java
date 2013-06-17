@@ -21,7 +21,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 
@@ -29,11 +29,11 @@ public abstract class FileWriter implements Closeable {
     private static final Logger LOG = Logger
             .getLogger(FileWriter.class.getName());
 
-    protected PrepareConfig conf;
+    protected PrepareConfiguration conf;
     protected PrepareProcessor.Task task;
     protected long rowNum = 0;
 
-    protected FileWriter(PrepareConfig conf) {
+    protected FileWriter(PrepareConfiguration conf) {
         this.conf = conf;
     }
 

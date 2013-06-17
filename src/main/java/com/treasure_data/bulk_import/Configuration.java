@@ -19,7 +19,7 @@ package com.treasure_data.bulk_import;
 
 import com.treasure_data.bulk_import.Constants;
 
-public class Config extends com.treasure_data.client.Config implements
+public class Configuration extends com.treasure_data.client.Config implements
         Constants {
 
 }

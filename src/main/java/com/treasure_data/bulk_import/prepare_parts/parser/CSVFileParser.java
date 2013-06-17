@@ -29,11 +29,11 @@ import org.supercsv.io.CsvListReader;
 import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.ColumnType;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
@@ -57,7 +57,7 @@ public class CSVFileParser extends FileParser {
     private String[] columnNames;
     private ColumnType[] columnTypes;
 
-    public CSVFileParser(PrepareConfig conf) throws PreparePartsException {
+    public CSVFileParser(PrepareConfiguration conf) throws PreparePartsException {
         super(conf);
     }
 
@@ -94,7 +94,7 @@ public class CSVFileParser extends FileParser {
             // the index is zero.
             for (int i = 0; i < columnNames.length; i++) {
                 if (columnNames[i].equals(
-                        Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+                        Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
                     timeColumnIndex = i;
                     break;
                 }
@@ -158,10 +158,10 @@ public class CSVFileParser extends FileParser {
             }
 
             // initialize types of all columns
-            columnTypes = new PrepareConfig.ColumnType[columnNames.length];
+            columnTypes = new PrepareConfiguration.ColumnType[columnNames.length];
             for (int i = 0; i < columnTypes.length; i++) {
                 if (i == timeColumnIndex) {
-                    columnTypes[i] = PrepareConfig.ColumnType.TIME;
+                    columnTypes[i] = PrepareConfiguration.ColumnType.TIME;
                 } else {
                     columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
                 }

@@ -69,17 +69,17 @@ public class MultiThreadUploadProcessor {
         taskQueue.add(task);
     }
 
-    public static synchronized void addFinishTask(UploadConfig conf) {
+    public static synchronized void addFinishTask(UploadConfiguration conf) {
         for (int i = 0; i < conf.getNumOfUploadThreads(); i++) {
             taskQueue.add(UploadProcessor.Task.FINISH_TASK);
         }
     }
 
-    private UploadConfig conf;
+    private UploadConfiguration conf;
     private List<Worker> workers;
     private List<UploadProcessor.ErrorInfo> errors;
 
-    public MultiThreadUploadProcessor(UploadConfig conf) {
+    public MultiThreadUploadProcessor(UploadConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
         errors = new ArrayList<UploadProcessor.ErrorInfo>();
@@ -99,7 +99,7 @@ public class MultiThreadUploadProcessor {
         }
     }
 
-    protected Worker createWorker(UploadConfig conf) {
+    protected Worker createWorker(UploadConfiguration conf) {
         return new Worker(this, createUploadProcessor(conf));
     }
 
@@ -107,11 +107,11 @@ public class MultiThreadUploadProcessor {
         workers.add(w);
     }
 
-    protected UploadProcessor createUploadProcessor(UploadConfig conf) {
+    protected UploadProcessor createUploadProcessor(UploadConfiguration conf) {
         return new UploadProcessor(createBulkImportClient(conf), conf);
     }
 
-    protected BulkImportClient createBulkImportClient(UploadConfig conf) {
+    protected BulkImportClient createBulkImportClient(UploadConfiguration conf) {
         return new BulkImportClient(new TreasureDataClient(conf.getProperties()));
     }
 
@@ -139,7 +139,7 @@ public class MultiThreadUploadProcessor {
 
     // TODO need strict error handling
     public static void processAfterUploading(BulkImportClient client,
-            UploadConfig conf, String sessName) throws UploadPartsException {
+            UploadConfiguration conf, String sessName) throws UploadPartsException {
         if (!conf.autoPerform()) {
             return;
         }

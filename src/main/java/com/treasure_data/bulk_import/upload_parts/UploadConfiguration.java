@@ -19,9 +19,9 @@ package com.treasure_data.bulk_import.upload_parts;
 
 import java.util.Properties;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 
-public class UploadConfig extends PrepareConfig {
+public class UploadConfiguration extends PrepareConfiguration {
 
     protected boolean autoPerform;
     protected boolean autoCommit;
@@ -29,7 +29,7 @@ public class UploadConfig extends PrepareConfig {
     protected int retryCount;
     protected long waitSec;
 
-    public UploadConfig() {
+    public UploadConfiguration() {
         super();
     }
 
@@ -115,7 +115,7 @@ public class UploadConfig extends PrepareConfig {
     }
 
     public Object clone() {
-        UploadConfig conf = new UploadConfig();
+        UploadConfiguration conf = new UploadConfiguration();
         conf.props = props;
         conf.autoPerform = autoPerform;
         conf.autoCommit = autoCommit;

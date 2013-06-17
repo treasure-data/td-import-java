@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.Config;
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.client.ClientException;
 
 public class TestMultiThreadUploadProcessor {
@@ -28,7 +28,7 @@ public class TestMultiThreadUploadProcessor {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
 
-        UploadConfig conf = new UploadConfig();
+        UploadConfiguration conf = new UploadConfiguration();
         conf.configure(props);
         MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
         proc.registerWorkers();
@@ -51,7 +51,7 @@ public class TestMultiThreadUploadProcessor {
     }
 
     private Properties props;
-    private UploadConfig conf;
+    private UploadConfiguration conf;
     private MultiThreadUploadProcessor proc;
 
     Random rand = new Random(new Random().nextInt());
@@ -65,10 +65,10 @@ public class TestMultiThreadUploadProcessor {
         numTasks = rand.nextInt(30) + 1;
 
         props = System.getProperties();
-        props.setProperty(Config.BI_UPLOAD_PARTS_PARALLEL, "" + numWorkers);
+        props.setProperty(Configuration.BI_UPLOAD_PARTS_PARALLEL, "" + numWorkers);
 
         // create upload config
-        conf = new UploadConfig();
+        conf = new UploadConfiguration();
         conf.configure(props);
 
         // create multi-thread upload processor

@@ -23,26 +23,26 @@ import java.io.PrintWriter;
 import java.nio.charset.CharsetDecoder;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig.CompressionType;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.CompressionType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor.Task;
 import com.treasure_data.bulk_import.prepare_parts.writer.FileWriter;
 
 public abstract class FileParser {
     private static final Logger LOG = Logger.getLogger(FileParser.class.getName());
 
-    protected PrepareConfig conf;
+    protected PrepareConfiguration conf;
     protected long lineNum = 0;
     protected long rowNum = 0;
     protected CharsetDecoder charsetDecoder;
-    protected PrepareConfig.CompressionType compressionType;
+    protected PrepareConfiguration.CompressionType compressionType;
     protected com.treasure_data.bulk_import.prepare_parts.writer.FileWriter writer;
 
     private PrintWriter errWriter = null;
 
-    protected FileParser(PrepareConfig conf) {
+    protected FileParser(PrepareConfiguration conf) {
         this.conf = conf;
     }
 

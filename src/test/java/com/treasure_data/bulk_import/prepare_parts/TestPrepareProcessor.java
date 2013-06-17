@@ -31,10 +31,10 @@ public class TestPrepareProcessor {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
 
-        PrepareConfig conf = new PrepareConfig();
+        PrepareConfiguration conf = new PrepareConfiguration();
         conf = spy(conf);
-        doReturn(PrepareConfig.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
-        doReturn(PrepareConfig.CompressionType.NONE).when(conf).getCompressionType();
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
         conf.configure(props);
         PrepareProcessor proc = new PrepareProcessor(conf);
 
@@ -49,7 +49,7 @@ public class TestPrepareProcessor {
     }
 
     private Properties props;
-    private PrepareConfig conf;
+    private PrepareConfiguration conf;
     private PrepareProcessor proc;
 
     private PrepareProcessor.Task task;
@@ -64,11 +64,11 @@ public class TestPrepareProcessor {
         props = System.getProperties();
 
         // create prepare conf
-        conf = new PrepareConfig();
+        conf = new PrepareConfiguration();
         conf.configure(props);
         conf = spy(conf);
-        doReturn(PrepareConfig.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
-        doReturn(PrepareConfig.CompressionType.NONE).when(conf).getCompressionType();
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
 
         // create prepare processor
         proc = new PrepareProcessor(conf);

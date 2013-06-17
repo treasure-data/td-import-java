@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfig;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class JSONFileWriter extends FileWriter {
@@ -33,7 +33,7 @@ public class JSONFileWriter extends FileWriter {
     private Map<String, Object> record;
     private List<Object> recordElements;
 
-    public JSONFileWriter(PrepareConfig conf) {
+    public JSONFileWriter(PrepareConfiguration conf) {
         super(conf);
     }
 

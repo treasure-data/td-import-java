@@ -30,7 +30,7 @@ public class TestUnploadProcessor {
         TreasureDataClient tdclient = new TreasureDataClient(props);
         BulkImportClient client = new BulkImportClient(tdclient);
 
-        UploadConfig conf = new UploadConfig();
+        UploadConfiguration conf = new UploadConfiguration();
         conf.configure(props);
         UploadProcessor proc = new UploadProcessor(client, conf);
 
@@ -46,7 +46,7 @@ public class TestUnploadProcessor {
     }
 
     private Properties props;
-    private UploadConfig conf;
+    private UploadConfiguration conf;
     private UploadProcessor proc;
 
     private UploadProcessor.Task task;
@@ -60,7 +60,7 @@ public class TestUnploadProcessor {
         props = System.getProperties();
 
         // create upload config
-        conf = new UploadConfig();
+        conf = new UploadConfiguration();
         conf.configure(props);
 
         // create upload processor

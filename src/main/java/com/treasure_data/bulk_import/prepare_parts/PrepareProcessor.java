@@ -49,7 +49,7 @@ public class PrepareProcessor {
         }
 
         protected InputStream createInputStream(
-                PrepareConfig.CompressionType compressionType)
+                PrepareConfiguration.CompressionType compressionType)
                 throws IOException {
             if (!isTest) {
                 return compressionType.createInputStream(new FileInputStream(fileName));
@@ -101,9 +101,9 @@ public class PrepareProcessor {
     private static final Logger LOG = Logger.getLogger(
             PrepareProcessor.class.getName());
 
-    protected PrepareConfig conf;
+    protected PrepareConfiguration conf;
 
-    public PrepareProcessor(PrepareConfig conf) {
+    public PrepareProcessor(PrepareConfiguration conf) {
         this.conf = conf;
     }
 
