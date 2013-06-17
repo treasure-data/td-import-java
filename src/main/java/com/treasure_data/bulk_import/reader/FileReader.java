@@ -17,12 +17,14 @@
 //
 package com.treasure_data.bulk_import.reader;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.CharsetDecoder;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.ValueType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -42,6 +44,14 @@ public abstract class FileReader {
 
     protected FileReader(PrepareConfiguration conf) {
         this.conf = conf;
+    }
+
+    public String[] getKeys() {
+        return null; // TODO
+    }
+
+    public ValueType[] getTypes() {
+        return null; // TODO
     }
 
     public void configure(String fileName) throws PreparePartsException {
@@ -73,7 +83,7 @@ public abstract class FileReader {
         return charsetDecoder;
     }
 
-    public void setFileWriter(PrepareProcessor.Task task, FileWriter writer) {
+    public void setFileWriter(PrepareProcessor.Task task, FileWriter writer) throws PreparePartsException, IOException {
         writer.setTask(task);
         this.writer = writer;
     }
@@ -98,7 +108,7 @@ public abstract class FileReader {
 
     public abstract void sample(InputStream in) throws PreparePartsException;
 
-    public abstract void parse(InputStream in) throws PreparePartsException;
+    public abstract boolean next() throws PreparePartsException;
 
     public abstract void close() throws PreparePartsException;
 

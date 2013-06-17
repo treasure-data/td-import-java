@@ -21,6 +21,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.ValueType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -33,13 +34,24 @@ public abstract class FileWriter implements Closeable {
     protected PrepareProcessor.Task task;
     protected long rowNum = 0;
 
+    protected String[] keys;
+    protected ValueType[] types;
+
     protected FileWriter(PrepareConfiguration conf) {
         this.conf = conf;
     }
 
+    public void setKeys(String[] keys) {
+        this.keys = keys;
+    }
+
+    public void setTypes(ValueType[] types) {
+        this.types = types;
+    }
+
     // TODO FIXME
     // the argument type is bad.. we should change to 'Task'?
-    protected abstract void configure(String infileName)
+    public abstract void configure(String infileName)
             throws PreparePartsException;
 
     public void setTask(PrepareProcessor.Task task) {

@@ -33,6 +33,7 @@ import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
@@ -199,8 +200,12 @@ public class CSVFileReader extends FileReader {
     }
 
     @Override
-    public void parse(InputStream in) throws PreparePartsException {
+    public void setFileWriter(PrepareProcessor.Task task, FileWriter writer) throws PreparePartsException, IOException {
+        writer.setTask(task);
+        this.writer = writer;
+
         // create reader
+        InputStream in = task.createInputStream(conf.getCompressionType());
         reader = new Tokenizer(new InputStreamReader(in, charsetDecoder), csvPref);
         if (conf.hasColumnHeader()) {
             // header line is skipped
@@ -222,31 +227,33 @@ public class CSVFileReader extends FileReader {
 
         // add attributes of exclude/only columns to column types
         addExcludeAndOnlyColumnsFilter(cprocs);
-
-        List<String> row = new ArrayList<String>();
-        boolean moreRead = true;
-        while (moreRead) {
-            incrementLineNum();
-            try {
-                // if reader got EOF, it returns false.
-                if (moreRead = reader.readColumns(row)) {
-                    parseRow(row, cprocs, writer);
-                    // increment row number
-                    incrementRowNum();
-                }
-            } catch (IOException e) {
-                // if reader throw I/O error, parseRow throws PreparePartsException.
-                LOG.throwing("CSVFileParser", "parseRow", e);
-                throw new PreparePartsException(e);
-            } catch (PreparePartsException e) {
-                LOG.warning(e.getMessage());
-                // TODO the row data should be written to error rows file
-            }
-        }
     }
 
-    private void parseRow(List<String> row, CellProcessor[] cellProcs,
-            com.treasure_data.bulk_import.writer.FileWriter w)
+    private List<String> row = new ArrayList<String>();
+
+    @Override
+    public boolean next() throws PreparePartsException {
+        boolean moreRead = true;
+        incrementLineNum();
+        try {
+            // if reader got EOF, it returns false.
+            if (moreRead = reader.readColumns(row)) {
+                parseRow(row, cprocs, writer);
+                // increment row number
+                incrementRowNum();
+            }
+        } catch (IOException e) {
+            // if reader throw I/O error, parseRow throws PreparePartsException.
+            LOG.throwing("CSVFileParser", "parseRow", e);
+            throw new PreparePartsException(e);
+        } catch (PreparePartsException e) {
+            LOG.warning(e.getMessage());
+            // TODO the row data should be written to error rows file
+        }
+        return moreRead;
+    }
+
+    private void parseRow(List<String> row, CellProcessor[] cellProcs, FileWriter w)
             throws IOException, PreparePartsException {
         int rowSize = row.size();
         if (rowSize != cellProcs.length) {

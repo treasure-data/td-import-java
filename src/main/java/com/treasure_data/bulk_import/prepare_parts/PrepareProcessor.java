@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import com.treasure_data.bulk_import.reader.FileReader;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
+import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
 public class PrepareProcessor {
@@ -48,7 +49,7 @@ public class PrepareProcessor {
             this.fileName = fileName;
         }
 
-        protected InputStream createInputStream(
+        public InputStream createInputStream(
                 PrepareConfiguration.CompressionType compressionType)
                 throws IOException {
             if (!isTest) {
@@ -113,19 +114,19 @@ public class PrepareProcessor {
         ErrorInfo err = new ErrorInfo();
         err.task = task;
 
-        FileReader p = null;
-        MsgpackGZIPFileWriter writer = null;
+        FileReader r = null;
+        FileWriter w = null;
         try {
-            p = conf.getFormat().createFileParser(conf);
-            p.configure(task.fileName);
-            p.sample(task.createInputStream(conf.getCompressionType()));
+            r = conf.getFormat().createFileParser(conf);
+            r.configure(task.fileName);
+            r.sample(task.createInputStream(conf.getCompressionType()));
         } catch (Throwable t) {
             err.error = t;
         }
 
         if (err.error != null || conf.dryRun()) {
-            if (p != null) {
-                p.closeSilently();
+            if (r != null) {
+                r.closeSilently();
             }
 
             // if this processing is dry-run mode, thread of control
@@ -134,24 +135,30 @@ public class PrepareProcessor {
         }
 
         try {
-            writer = new MsgpackGZIPFileWriter(conf);
-            writer.configure(task.fileName);
+            w = new MsgpackGZIPFileWriter(conf);
+            w.configure(task.fileName);
 
-            p.setFileWriter(task, writer);
-            p.parse(task.createInputStream(conf.getCompressionType()));
+            w.setKeys(r.getKeys());
+            w.setTypes(r.getTypes());
+
+            r.setFileWriter(task, w);
+
+            while (r.next()) {
+                ;
+            }
         } catch (Throwable t) {
             err.error = t;
         }
 
-        if (p != null) {
-            p.closeSilently();
+        if (r != null) {
+            r.closeSilently();
         }
-        if (writer != null) {
-            writer.closeSilently();
+        if (w != null) {
+            w.closeSilently();
         }
 
-        err.redRows = p.getRowNum();
-        err.writtenRows = writer.getRowNum();
+        err.redRows = r.getRowNum();
+        err.writtenRows = w.getRowNum();
 
         LOG.info(String.format("Converted file '%s', %d entries",
                 task.fileName, err.writtenRows));
