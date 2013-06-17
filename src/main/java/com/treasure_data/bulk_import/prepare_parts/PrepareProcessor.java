@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.reader.FileParser;
+import com.treasure_data.bulk_import.reader.FileReader;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
@@ -113,7 +113,7 @@ public class PrepareProcessor {
         ErrorInfo err = new ErrorInfo();
         err.task = task;
 
-        FileParser p = null;
+        FileReader p = null;
         MsgpackGZIPFileWriter writer = null;
         try {
             p = conf.getFormat().createFileParser(conf);

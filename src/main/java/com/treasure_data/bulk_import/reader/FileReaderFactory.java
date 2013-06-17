@@ -25,5 +25,5 @@ public interface FileReaderFactory {
 
     public String[] getKeys();
 
-    public FileParser createReader(FileWriter w);
+    public FileReader createReader(FileWriter w);
 }

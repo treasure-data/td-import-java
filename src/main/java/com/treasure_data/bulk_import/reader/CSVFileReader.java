@@ -41,8 +41,8 @@ import com.treasure_data.bulk_import.prepare_parts.proc.SkipColumnProc;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.JSONFileWriter;
 
-public class CSVFileParser extends FileParser {
-    private static final Logger LOG = Logger.getLogger(CSVFileParser.class.getName());
+public class CSVFileReader extends FileReader {
+    private static final Logger LOG = Logger.getLogger(CSVFileReader.class.getName());
 
     private Tokenizer reader;
     private CsvPreference csvPref;
@@ -57,7 +57,7 @@ public class CSVFileParser extends FileParser {
     private String[] columnNames;
     private ColumnType[] columnTypes;
 
-    public CSVFileParser(PrepareConfiguration conf) throws PreparePartsException {
+    public CSVFileReader(PrepareConfiguration conf) throws PreparePartsException {
         super(conf);
     }
 

@@ -32,8 +32,8 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.reader.CSVFileParser;
-import com.treasure_data.bulk_import.reader.FileParser;
+import com.treasure_data.bulk_import.reader.CSVFileReader;
+import com.treasure_data.bulk_import.reader.FileReader;
 
 public class PrepareConfiguration extends Configuration {
 
@@ -41,16 +41,16 @@ public class PrepareConfiguration extends Configuration {
         // TODO #MN should consider type parameters
         CSV("csv") {
             @Override
-            public FileParser createFileParser(PrepareConfiguration conf)
+            public FileReader createFileParser(PrepareConfiguration conf)
                     throws PreparePartsException {
-                return new CSVFileParser(conf);
+                return new CSVFileReader(conf);
             }
         },
         TSV("tsv") {
             @Override
-            public FileParser createFileParser(PrepareConfiguration conf)
+            public FileReader createFileParser(PrepareConfiguration conf)
                     throws PreparePartsException {
-                return new CSVFileParser(conf);
+                return new CSVFileReader(conf);
             }
         },
         JSON("json") {
@@ -68,7 +68,7 @@ public class PrepareConfiguration extends Configuration {
             return format;
         }
 
-        public FileParser createFileParser(PrepareConfiguration conf)
+        public FileReader createFileParser(PrepareConfiguration conf)
                 throws PreparePartsException {
             throw new PreparePartsException(
                     new UnsupportedOperationException("format: " + this));

@@ -28,8 +28,8 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public abstract class FileParser {
-    private static final Logger LOG = Logger.getLogger(FileParser.class.getName());
+public abstract class FileReader {
+    private static final Logger LOG = Logger.getLogger(FileReader.class.getName());
 
     protected PrepareConfiguration conf;
     protected long lineNum = 0;
@@ -40,7 +40,7 @@ public abstract class FileParser {
 
     private PrintWriter errWriter = null;
 
-    protected FileParser(PrepareConfiguration conf) {
+    protected FileReader(PrepareConfiguration conf) {
         this.conf = conf;
     }
 
