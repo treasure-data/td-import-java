@@ -40,7 +40,7 @@ public class PrepareProcessor {
             return t.equals(FINISH_TASK);
         }
 
-        String fileName;
+        public String fileName;
 
         boolean isTest = false;
         String testText = null;
@@ -84,6 +84,8 @@ public class PrepareProcessor {
 
         @Override
         public void finishHook(String outputFileName) {
+            super.finishHook(outputFileName);
+
             long size = new File(outputFileName).length();
             UploadProcessor.Task task = new UploadProcessor.Task(
                     sessionName, outputFileName, size);
@@ -114,51 +116,44 @@ public class PrepareProcessor {
         ErrorInfo err = new ErrorInfo();
         err.task = task;
 
-        FileReader r = null;
+        // create and initialize file writer
         FileWriter w = null;
         try {
-            r = conf.getFormat().createFileParser(conf);
-            r.configure(task.fileName);
-            r.sample(task.createInputStream(conf.getCompressionType()));
-        } catch (Throwable t) {
-            err.error = t;
-        }
-
-        if (err.error != null || conf.dryRun()) {
-            if (r != null) {
-                r.closeSilently();
-            }
-
-            // if this processing is dry-run mode, thread of control
-            // returns back
-            return err;
-        }
-
-        try {
             w = new MsgpackGZIPFileWriter(conf);
-            w.configure(task.fileName);
+            w.configure(task);
+        } catch (Exception e) {
+            err.error = e;
+        }
 
-            w.setKeys(r.getKeys());
-            w.setTypes(r.getTypes());
+        // create and initialize file reader
+        FileReader r = null;
+        try {
+            r = conf.getFormat().createFileParser(conf, w);
+            r.configure(task);
+        } catch (Exception e) {
+            err.error = e;
+        }
 
-            r.setFileWriter(task, w);
+        if (w != null && r != null) {
+            try {
+                while (r.next()) {
+                    ;
+                }
 
-            while (r.next()) {
-                ;
+                err.redRows = r.getRowNum();
+                err.writtenRows = w.getRowNum();
+            } catch (Exception e) {
+                err.error = e;
             }
-        } catch (Throwable t) {
-            err.error = t;
         }
 
         if (r != null) {
             r.closeSilently();
         }
+
         if (w != null) {
             w.closeSilently();
         }
-
-        err.redRows = r.getRowNum();
-        err.writtenRows = w.getRowNum();
 
         LOG.info(String.format("Converted file '%s', %d entries",
                 task.fileName, err.writtenRows));
