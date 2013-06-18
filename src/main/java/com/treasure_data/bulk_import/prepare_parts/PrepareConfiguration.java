@@ -32,8 +32,10 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.ValueType;
 import com.treasure_data.bulk_import.reader.CSVFileReader;
 import com.treasure_data.bulk_import.reader.FileReader;
+import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class PrepareConfiguration extends Configuration {
 
@@ -41,16 +43,16 @@ public class PrepareConfiguration extends Configuration {
         // TODO #MN should consider type parameters
         CSV("csv") {
             @Override
-            public FileReader createFileParser(PrepareConfiguration conf)
+            public FileReader createFileParser(PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
-                return new CSVFileReader(conf);
+                return new CSVFileReader(conf, writer);
             }
         },
         TSV("tsv") {
             @Override
-            public FileReader createFileParser(PrepareConfiguration conf)
+            public FileReader createFileParser(PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
-                return new CSVFileReader(conf);
+                return new CSVFileReader(conf, writer);
             }
         },
         JSON("json") {
@@ -68,7 +70,7 @@ public class PrepareConfiguration extends Configuration {
             return format;
         }
 
-        public FileReader createFileParser(PrepareConfiguration conf)
+        public FileReader createFileParser(PrepareConfiguration conf, FileWriter writer)
                 throws PreparePartsException {
             throw new PreparePartsException(
                     new UnsupportedOperationException("format: " + this));
@@ -252,6 +254,9 @@ public class PrepareConfiguration extends Configuration {
     protected String[] excludeColumns;
     protected String[] onlyColumns;
     protected int sampleRowSize;
+
+    protected String[] keys;
+    protected ValueType[] valueTypes;
 
     public PrepareConfiguration() {
     }
@@ -587,5 +592,12 @@ public class PrepareConfiguration extends Configuration {
 
     public int getSampleRowSize() {
         return sampleRowSize;
+    }
+
+    public String[] getKeys() {
+        return keys;
+    }
+    public ValueType[] getValueTypes() {
+        return valueTypes;
     }
 }
