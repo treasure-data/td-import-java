@@ -72,6 +72,11 @@ public class PrepareProcessor {
             Task t = (Task) obj;
             return t.fileName.equals(fileName);
         }
+
+        @Override
+        public String toString() {
+            return String.format("prepare_task{file=%s}", fileName);
+        }
     }
 
     public static class UploadTask extends Task {
@@ -90,6 +95,12 @@ public class PrepareProcessor {
             UploadProcessor.Task task = new UploadProcessor.Task(
                     sessionName, outputFileName, size);
             MultiThreadUploadProcessor.addTask(task);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("prepare_upload_task{file=%s, session=%s}",
+                    fileName, sessionName);
         }
     }
 
@@ -112,6 +123,7 @@ public class PrepareProcessor {
 
     public ErrorInfo execute(final Task task) {
         LOG.info(String.format("Convert file '%s'", task.fileName));
+        LOG.fine(String.format("Process task '%s'", task));
 
         ErrorInfo err = new ErrorInfo();
         err.task = task;
