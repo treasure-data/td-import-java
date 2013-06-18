@@ -80,7 +80,7 @@ public class PrepareProcessor {
     }
 
     public static class UploadTask extends Task {
-        String sessionName;
+        public String sessionName;
 
         public UploadTask(String sessionName, String fileName) {
             super(fileName);
@@ -140,7 +140,7 @@ public class PrepareProcessor {
         // create and initialize file reader
         FileReader r = null;
         try {
-            r = conf.getFormat().createFileParser(conf, w);
+            r = conf.getFormat().createFileReader(conf, w);
             r.configure(task);
         } catch (Exception e) {
             err.error = e;

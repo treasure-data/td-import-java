@@ -43,14 +43,14 @@ public class PrepareConfiguration extends Configuration {
         // TODO #MN should consider type parameters
         CSV("csv") {
             @Override
-            public FileReader createFileParser(PrepareConfiguration conf, FileWriter writer)
+            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
                 return new CSVFileReader(conf, writer);
             }
         },
         TSV("tsv") {
             @Override
-            public FileReader createFileParser(PrepareConfiguration conf, FileWriter writer)
+            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
                 return new CSVFileReader(conf, writer);
             }
@@ -70,7 +70,7 @@ public class PrepareConfiguration extends Configuration {
             return format;
         }
 
-        public FileReader createFileParser(PrepareConfiguration conf, FileWriter writer)
+        public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
                 throws PreparePartsException {
             throw new PreparePartsException(
                     new UnsupportedOperationException("format: " + this));
