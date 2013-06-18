@@ -108,8 +108,16 @@ public class PrepareProcessor {
         public Task task;
         public Throwable error = null;
 
+        public long redLines = 0;
         public long redRows = 0;
         public long writtenRows = 0;
+
+        @Override
+        public String toString() {
+            return String.format(
+                    "prepare_error_info{task=%s, redLines=%d, redRows=%d, writtenRows=%d}",
+                    task, redLines, redRows, writtenRows);
+        }
     }
 
     private static final Logger LOG = Logger.getLogger(
@@ -148,10 +156,15 @@ public class PrepareProcessor {
 
         if (w != null && r != null) {
             try {
+                r.resetLineNum();
+                r.resetRowNum();
+                w.resetRowNum();
+
                 while (r.next()) {
                     ;
                 }
 
+                err.redLines = r.getLineNum();
                 err.redRows = r.getRowNum();
                 err.writtenRows = w.getRowNum();
             } catch (Exception e) {
