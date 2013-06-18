@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 public class MultiThreadPrepareProcessor {
-    static class Worker extends Thread {
+    public static class Worker extends Thread {
         private MultiThreadPrepareProcessor parent;
         private PrepareProcessor proc;
         AtomicBoolean isFinished = new AtomicBoolean(false);
@@ -92,6 +92,12 @@ public class MultiThreadPrepareProcessor {
     public void registerWorkers() {
         for (int i = 0; i < conf.getNumOfPrepareThreads(); i++) {
             addWorker(createWorker(conf));
+        }
+    }
+
+    public void registerWorkers(Worker[] ws) {
+        for (Worker w : ws) {
+            workers.add(w);
         }
     }
 
