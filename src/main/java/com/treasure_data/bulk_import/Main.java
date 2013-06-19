@@ -105,8 +105,14 @@ public class Main {
 
         proc.joinWorkers();
 
+        if (proc.getErrors().size() > 0) {
+            LOG.warning(String.format(
+                    "Some errors occurred during %s processing. " +
+                    "Please check the following messages.",
+                    Configuration.CMD_PREPARE_PARTS));
+        }
+
         for (PrepareProcessor.ErrorInfo e : proc.getErrors()) {
-            // TODO should handle errors
             e.error.printStackTrace();
         }
     }
