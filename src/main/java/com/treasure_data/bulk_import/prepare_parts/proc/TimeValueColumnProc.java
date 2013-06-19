@@ -32,14 +32,14 @@ public class TimeValueColumnProc extends AbstractColumnProc {
 
     @Override
     public void executeKey() throws PreparePartsException {
-        writer.writeString(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+        writer.write(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
     }
 
     @Override
     public Object executeValue(Object value) throws PreparePartsException {
         // value is dummy
 
-        writer.writeLong(timeValue);
+        writer.write(timeValue);
         return timeValue;
     }
 

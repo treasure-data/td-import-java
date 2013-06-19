@@ -46,7 +46,7 @@ public class DoubleColumnProc extends AbstractColumnProc {
                     actualClassName));
         }
 
-        writer.writeDouble(v);
+        writer.write(v);
         return v;
     }
 

@@ -77,7 +77,7 @@ public abstract class AbstractColumnProc implements ColumnProc, CellProcessor {
     }
 
     protected void executeKey() throws PreparePartsException {
-        writer.writeString(columnName);
+        writer.write(columnName);
     }
 
     protected abstract Object executeValue(final Object value)

@@ -34,7 +34,7 @@ public class TimeColumnProc extends AbstractColumnProc {
 
     @Override
     public void executeKey() throws PreparePartsException {
-        writer.writeString(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+        writer.write(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class TimeColumnProc extends AbstractColumnProc {
                     actualClassName));
         }
 
-        writer.writeLong(v);
+        writer.write(v);
         return v;
     }
 

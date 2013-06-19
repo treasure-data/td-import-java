@@ -36,7 +36,7 @@ public class StringColumnProc extends AbstractColumnProc {
         }
 
         v = (String) value;
-        writer.writeString(v);
+        writer.write(v);
         return v;
     }
 

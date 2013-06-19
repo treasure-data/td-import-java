@@ -46,7 +46,7 @@ public class LongColumnProc extends AbstractColumnProc {
                     actualClassName));
         }
 
-        writer.writeLong(v);
+        writer.write(v);
         return v;
     }
 

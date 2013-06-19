@@ -34,7 +34,7 @@ public class IntColumnProc extends AbstractColumnProc {
         } else if (value instanceof String) {
             try {
                 v = Integer.parseInt((String) value);
-                writer.writeInt(v);
+                writer.write(v);
             } catch (NumberFormatException e) {
                 throw new PreparePartsException(String.format(
                         "'%s' could not be parsed as an Integer", value));
@@ -46,7 +46,7 @@ public class IntColumnProc extends AbstractColumnProc {
                     actualClassName));
         }
 
-        writer.writeInt(v);
+        writer.write(v);
         return v;
     }
 
