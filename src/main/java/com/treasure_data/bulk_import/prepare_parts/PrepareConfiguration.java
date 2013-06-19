@@ -100,6 +100,7 @@ public class PrepareConfiguration extends Configuration {
                 return new CSVFileReader(conf, writer);
             }
         },
+        //MYSQL("mysql") {},
         JSON("json") {
         },
         MSGPACK("msgpack") {
