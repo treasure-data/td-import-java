@@ -57,6 +57,10 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_FORMAT = "td.bulk_import.prepare_parts.format";
     String BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE = "csv"; // default 'csv'
 
+    // output format [msgpackgz]; default=msgpackgz
+    String BI_PREPARE_PARTS_OUTPUTFORMAT = "td.bulk_import.prepare_parts.outputformat";
+    String BI_PREPARE_PARTS_OUTPUTFORMAT_DEFAULTVALUE = "msgpackgz";
+
     // compress [gzip,.., auto]; default=auto detect
     String BI_PREPARE_PARTS_COMPRESSION = "td.bulk_import.prepare_parts.compression";
     String BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE = "auto";

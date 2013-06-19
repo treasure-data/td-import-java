@@ -32,12 +32,57 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.ValueType;
+import com.treasure_data.bulk_import.ColumnType;
 import com.treasure_data.bulk_import.reader.CSVFileReader;
 import com.treasure_data.bulk_import.reader.FileReader;
 import com.treasure_data.bulk_import.writer.FileWriter;
+import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
 public class PrepareConfiguration extends Configuration {
+
+    public static enum OutputFormat {
+        MSGPACKGZ("msgpackgz") {
+            @Override
+            public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+                return new MsgpackGZIPFileWriter(conf);
+            }
+        };
+
+        private String outputFormat;
+
+        OutputFormat(String outputFormat) {
+            this.outputFormat = outputFormat;
+        }
+
+        public String outputFormat() {
+            return outputFormat;
+        }
+
+        public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+            throw new PreparePartsException(
+                    new UnsupportedOperationException("output format: " + this));
+        }
+
+        public static OutputFormat fromString(String outputFormat) {
+            return StringToOutputFormat.get(outputFormat);
+        }
+
+        private static class StringToOutputFormat {
+            private static final Map<String, OutputFormat> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, OutputFormat> map = new HashMap<String, OutputFormat>();
+                for (OutputFormat elem : OutputFormat.values()) {
+                    map.put(elem.outputFormat(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static OutputFormat get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
 
     public static enum Format {
         // TODO #MN should consider type parameters
@@ -162,71 +207,6 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
-    public static enum ColumnType {
-        INT("int", 0),
-        LONG("long", 1),
-        DOUBLE("double", 2),
-        STRING("string", 3),
-        TIME("time", 4);
-
-        private String type;
-
-        private int index;
-
-        ColumnType(String type, int index) {
-            this.type = type;
-            this.index = index;
-        }
-
-        public String type() {
-            return type;
-        }
-
-        public int index() {
-            return index;
-        }
-
-        public static ColumnType fromString(String type) {
-            return StringToColumnType.get(type);
-        }
-
-        public static ColumnType fromInt(int index) {
-            return IntToColumnType.get(index);
-        }
-
-        private static class StringToColumnType {
-            private static final Map<String, ColumnType> REVERSE_DICTIONARY;
-
-            static {
-                Map<String, ColumnType> map = new HashMap<String, ColumnType>();
-                for (ColumnType elem : ColumnType.values()) {
-                    map.put(elem.type, elem);
-                }
-                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
-            }
-
-            static ColumnType get(String key) {
-                return REVERSE_DICTIONARY.get(key);
-            }
-        }
-
-        private static class IntToColumnType {
-            private static final Map<Integer, ColumnType> REVERSE_DICTIONARY;
-
-            static {
-                Map<Integer, ColumnType> map = new HashMap<Integer, ColumnType>();
-                for (ColumnType elem : ColumnType.values()) {
-                    map.put(elem.index, elem);
-                }
-                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
-            }
-
-            static ColumnType get(Integer index) {
-                return REVERSE_DICTIONARY.get(index);
-            }
-        }
-    }
-
     private static final Logger LOG = Logger
             .getLogger(PrepareConfiguration.class.getName());
 
@@ -234,6 +214,7 @@ public class PrepareConfiguration extends Configuration {
     protected Properties props;
 
     protected Format format;
+    protected OutputFormat outputFormat = OutputFormat.MSGPACKGZ;
     protected CompressionType compressionType;
     protected CharsetDecoder charsetDecoder;
     protected int numOfPrepareThreads;
@@ -248,7 +229,7 @@ public class PrepareConfiguration extends Configuration {
     protected char delimiterChar;
     protected NewLine newline;
     protected String[] columnNames;
-    protected String[] columnTypes;
+    protected ColumnType[] columnTypes;
     protected boolean hasColumnHeader;
     protected String typeErrorMode;
     protected String[] excludeColumns;
@@ -256,7 +237,7 @@ public class PrepareConfiguration extends Configuration {
     protected int sampleRowSize;
 
     protected String[] keys;
-    protected ValueType[] valueTypes;
+    protected ColumnType[] valueTypes;
 
     public PrepareConfiguration() {
     }
@@ -265,13 +246,10 @@ public class PrepareConfiguration extends Configuration {
         this.props = props;
 
         // format
-        String formatStr = props.getProperty(Configuration.BI_PREPARE_PARTS_FORMAT,
-                Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
-        format = Format.fromString(formatStr);
-        if (format == null) {
-            throw new IllegalArgumentException(String.format(
-                    "unsupported format '%s'", formatStr));
-        }
+        setFormat();
+
+        // output format
+        setOutputFormat();
 
         // compression type
         String compType = props.getProperty(
@@ -402,13 +380,7 @@ public class PrepareConfiguration extends Configuration {
             hasColumnHeader = true;
         }
 
-        // column types
-        String cTypes = props.getProperty(Configuration.BI_PREPARE_PARTS_COLUMNTYPES);
-        if (cTypes != null && !cTypes.isEmpty()) {
-            columnTypes = cTypes.split(",");
-        } else {
-            columnTypes = new String[0];
-        }
+        setColumnTypes();
 
         // type-conversion-error
         typeErrorMode = props.getProperty(
@@ -461,8 +433,32 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
+    public void setFormat() {
+        String formatStr = props.getProperty(Configuration.BI_PREPARE_PARTS_FORMAT,
+                Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
+        format = Format.fromString(formatStr);
+        if (format == null) {
+            throw new IllegalArgumentException(String.format(
+                    "unsupported format '%s'", formatStr));
+        }
+    }
+
     public Format getFormat() {
         return format;
+    }
+
+    public void setOutputFormat() {
+        String outputFormatStr = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT,
+                Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT_DEFAULTVALUE);
+        outputFormat = OutputFormat.fromString(outputFormatStr);
+        if (outputFormat == null) {
+            throw new IllegalArgumentException(String.format(
+                    "unsupported format '%s'", outputFormatStr));
+        }
+    }
+
+    public OutputFormat getOutputFormat() {
+        return outputFormat;
     }
 
     public CompressionType getCompressionType() {
@@ -570,7 +566,24 @@ public class PrepareConfiguration extends Configuration {
         return columnNames;
     }
 
-    public String[] getColumnTypes() {
+    public void setColumnTypes() {
+        String types = props.getProperty(Configuration.BI_PREPARE_PARTS_COLUMNTYPES);
+        if (types != null && !types.isEmpty()) {
+            String[] splited = types.split(",");
+            columnTypes = new ColumnType[splited.length];
+            for (int i = 0; i < columnTypes.length; i++) {
+                columnTypes[i] = ColumnType.fromString(splited[i].toLowerCase());
+            }
+        } else {
+            columnTypes = new ColumnType[0];
+        }
+    }
+
+    public void setColumnTypes(ColumnType[] columnTypes) {
+        this.columnTypes = columnTypes;
+    }
+
+    public ColumnType[] getColumnTypes() {
         return columnTypes;
     }
 
@@ -594,10 +607,11 @@ public class PrepareConfiguration extends Configuration {
         return sampleRowSize;
     }
 
+    public void setKeys(String[] keys) {
+        this.keys = keys;
+    }
+
     public String[] getKeys() {
         return keys;
-    }
-    public ValueType[] getValueTypes() {
-        return valueTypes;
     }
 }
