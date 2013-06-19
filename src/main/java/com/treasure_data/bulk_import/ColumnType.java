@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum ValueType {
+public enum ColumnType {
     STRING("string") {
         @Override
         public Row.ColumnValue createColumnValue() {
@@ -65,7 +65,7 @@ public enum ValueType {
 
     private String name;
 
-    ValueType(String name) {
+    ColumnType(String name) {
         this.name = name;
     }
 
@@ -76,22 +76,22 @@ public enum ValueType {
     public abstract Row.ColumnValue createColumnValue();
     public abstract Converter getTypeConverter();
 
-    public static ValueType fromString(String name) {
+    public static ColumnType fromString(String name) {
         return StringToValueType.get(name);
     }
 
     private static class StringToValueType {
-        private static final Map<String, ValueType> REVERSE_DICTIONARY;
+        private static final Map<String, ColumnType> REVERSE_DICTIONARY;
 
         static {
-            Map<String, ValueType> map = new HashMap<String, ValueType>();
-            for (ValueType elem : ValueType.values()) {
+            Map<String, ColumnType> map = new HashMap<String, ColumnType>();
+            for (ColumnType elem : ColumnType.values()) {
                 map.put(elem.getName(), elem);
             }
             REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
         }
 
-        static ValueType get(String key) {
+        static ColumnType get(String key) {
             return REVERSE_DICTIONARY.get(key);
         }
     }
