@@ -28,7 +28,6 @@ import com.treasure_data.bulk_import.reader.FileReader;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 import com.treasure_data.bulk_import.writer.FileWriter;
-import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
 public class PrepareProcessor {
 
@@ -139,7 +138,7 @@ public class PrepareProcessor {
         // create and initialize file writer
         FileWriter w = null;
         try {
-            w = new MsgpackGZIPFileWriter(conf);
+            w = conf.getOutputFormat().createFileWriter(conf);
             w.configure(task);
         } catch (Exception e) {
             err.error = e;
