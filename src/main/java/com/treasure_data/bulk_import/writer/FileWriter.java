@@ -21,39 +21,14 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.ValueType;
+import com.treasure_data.bulk_import.Row;
+import com.treasure_data.bulk_import.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 
 public abstract class FileWriter implements Closeable {
-    /**
-     * TODO
-     * TODO
-     * public TDLogTableWriter implements Writer {
-     *   public void configure(TDLogTableWriterConfiguration conf) {
-     *     this.generator = new MessagePackMapGenerator(conf.getKeys(), conf.getColumnTypes());
-     *   }
-     *
-     *   public void next(Row row) {
-     *     if(size is larger than Xxx) {
-     *       conf.getOutputFileListener().completeFile(currentFilePath);
-     *       currentFilePath = createTempFilePath(conf.getOutputBaseDirectory());
-     *       conf.getOutputFileListener().beginFile(currentFilePath);
-     *     }
-     *     generator.generate(row);
-     *     // ...
-     *   }
-     * }
-     *
-     */
-    /**
-     * TODO
-     * TODO
-     * public interface Writer {
-     *   public void next(Row row);
-     * }
-     */
+
     private static final Logger LOG = Logger
             .getLogger(FileWriter.class.getName());
 
@@ -62,39 +37,39 @@ public abstract class FileWriter implements Closeable {
     protected long rowNum = 0;
 
     protected String[] keys;
-    protected ValueType[] types;
+    protected ColumnType[] valueTypes;
 
     protected FileWriter(PrepareConfiguration conf) {
         this.conf = conf;
     }
 
-    public void setKeys(String[] keys) {
-        this.keys = keys;
-    }
-
-    public void setTypes(ValueType[] types) {
-        this.types = types;
-    }
-
-    // TODO FIXME
-    // the argument type is bad.. we should change to 'Task'?
-    public abstract void configure(String infileName)
-            throws PreparePartsException;
-
-    public void setTask(PrepareProcessor.Task task) {
+    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
         this.task = task;
+        this.keys = conf.getKeys();
+        this.valueTypes = conf.getColumnTypes();
+    }
+
+    public void next(Row row) throws PreparePartsException {
+        int size = row.getValues().length;
+        writeBeginRow(size);
+        for (int i = 0; i < size; i++) {
+            write(keys[i]);
+            row.getValue(i).write(this);
+        }
+        writeEndRow();
     }
 
     public abstract void writeBeginRow(int size) throws PreparePartsException;
-
-    public abstract void write(Object v) throws PreparePartsException;
-    public abstract void writeString(String v) throws PreparePartsException;
-    public abstract void writeInt(int v) throws PreparePartsException;
-    public abstract void writeLong(long v) throws PreparePartsException;
-    public abstract void writeDouble(double v) throws PreparePartsException;
     public abstract void writeNil() throws PreparePartsException;
-
+    public abstract void write(String v) throws PreparePartsException;
+    public abstract void write(int v) throws PreparePartsException;
+    public abstract void write(long v) throws PreparePartsException;
+    public abstract void write(double v) throws PreparePartsException;
     public abstract void writeEndRow() throws PreparePartsException;
+
+    public void resetRowNum() {
+        rowNum = 0;
+    }
 
     public void incrementRowNum() {
         rowNum++;

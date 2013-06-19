@@ -31,6 +31,7 @@ import org.msgpack.packer.Packer;
 
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 
 public class MsgpackGZIPFileWriter extends FileWriter {
     static class DataSizeChecker extends FilterOutputStream {
@@ -77,13 +78,15 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void configure(String infileName) throws PreparePartsException {
+    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+        super.configure(task);
+
         msgpack = new MessagePack();
 
         // outputFilePrefix
-        int lastSepIndex = infileName.lastIndexOf(File.separatorChar);
-        outputFilePrefix = infileName.substring(lastSepIndex + 1,
-                infileName.length()).replace('.', '_');
+        String inName = task.fileName;
+        int lastSepIndex = inName.lastIndexOf(File.separatorChar);
+        outputFilePrefix = inName.substring(lastSepIndex + 1, inName.length()).replace('.', '_');
 
         // outputDir
         outputDirName = conf.getOutputDirName();
@@ -135,16 +138,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void write(Object o) throws PreparePartsException {
-        try {
-            packer.write(o);
-        } catch (IOException e) {
-            throw new PreparePartsException(e);
-        }
-    }
-
-    @Override
-    public void writeString(String v) throws PreparePartsException {
+    public void write(String v) throws PreparePartsException {
         try {
             packer.write(v);
         } catch (IOException e) {
@@ -153,7 +147,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void writeInt(int v) throws PreparePartsException {
+    public void write(int v) throws PreparePartsException {
         try {
             packer.write(v);
         } catch (IOException e) {
@@ -162,7 +156,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void writeLong(long v) throws PreparePartsException {
+    public void write(long v) throws PreparePartsException {
         try {
             packer.write(v);
         } catch (IOException e) {
@@ -171,7 +165,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void writeDouble(double v) throws PreparePartsException {
+    public void write(double v) throws PreparePartsException {
         try {
             packer.write(v);
         } catch (IOException e) {

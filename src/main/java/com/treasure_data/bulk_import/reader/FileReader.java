@@ -17,14 +17,16 @@
 //
 package com.treasure_data.bulk_import.reader;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.CharsetDecoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.ValueType;
+import com.treasure_data.bulk_import.Row;
+import com.treasure_data.bulk_import.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -34,29 +36,62 @@ public abstract class FileReader {
     private static final Logger LOG = Logger.getLogger(FileReader.class.getName());
 
     protected PrepareConfiguration conf;
+    protected FileWriter writer;
+
+    protected String[] keys;
+
+    protected List<String> rawRow = new ArrayList<String>();
+    protected Row convertedRow;
+
+    protected ColumnType[] valueTypes;
+    protected ColumnType.Converter[] converters;
+
     protected long lineNum = 0;
     protected long rowNum = 0;
     protected CharsetDecoder charsetDecoder;
     protected PrepareConfiguration.CompressionType compressionType;
-    protected FileWriter writer;
 
     private PrintWriter errWriter = null;
 
-    protected FileReader(PrepareConfiguration conf) {
+    protected FileReader(PrepareConfiguration conf, FileWriter writer) {
         this.conf = conf;
+        this.writer = writer;
     }
 
-    public String[] getKeys() {
-        return null; // TODO
+    public void setKeys(String[] keys) {
+        this.keys = keys;
     }
 
-    public ValueType[] getTypes() {
-        return null; // TODO
+    public void setValueTypes(ColumnType[] valueTypes) {
+        this.valueTypes = valueTypes;
     }
 
-    public void configure(String fileName) throws PreparePartsException {
+    public ColumnType[] getValueTypes() {
+        return valueTypes;
+    }
+
+    public void initializeTypeConverters() {
+        converters = new ColumnType.Converter[valueTypes.length];
+        for (int i = 0; i < valueTypes.length; i++) {
+            converters[i] = valueTypes[i].createTypeConverter();
+        }
+    }
+
+    public void initializeConvertedRow() {
+        Row.ColumnValue[] values = new Row.ColumnValue[valueTypes.length];
+        for (int i = 0; i < valueTypes.length; i++) {
+            values[i] = valueTypes[i].createColumnValue();
+        }
+        convertedRow = new Row(values);
+    }
+
+    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
         charsetDecoder = conf.getCharsetDecoder();
-        compressionType = conf.checkCompressionType(fileName);
+        compressionType = conf.checkCompressionType(task.fileName);
+    }
+
+    public void resetLineNum() {
+        lineNum = 0;
     }
 
     public void incrementLineNum() {
@@ -65,6 +100,10 @@ public abstract class FileReader {
 
     public long getLineNum() {
         return lineNum;
+    }
+
+    public void resetRowNum() {
+        rowNum = 0;
     }
 
     public void incrementRowNum() {
@@ -81,11 +120,6 @@ public abstract class FileReader {
 
     public CharsetDecoder getDecorder() {
         return charsetDecoder;
-    }
-
-    public void setFileWriter(PrepareProcessor.Task task, FileWriter writer) throws PreparePartsException, IOException {
-        writer.setTask(task);
-        this.writer = writer;
     }
 
     public void setErrorRecordWriter(OutputStream errStream) {
@@ -106,7 +140,7 @@ public abstract class FileReader {
         }
     }
 
-    public abstract void sample(InputStream in) throws PreparePartsException;
+//    public abstract void sample(InputStream in) throws PreparePartsException;
 
     public abstract boolean next() throws PreparePartsException;
 

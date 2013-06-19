@@ -30,11 +30,13 @@ import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.Row;
+import com.treasure_data.bulk_import.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.ColumnType;
+import com.treasure_data.bulk_import.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
@@ -58,155 +60,25 @@ public class CSVFileReader extends FileReader {
     private String[] columnNames;
     private ColumnType[] columnTypes;
 
-    public CSVFileReader(PrepareConfiguration conf) throws PreparePartsException {
-        super(conf);
+    public CSVFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
+        super(conf, writer);
     }
 
     @Override
-    public void configure(String fileName) throws PreparePartsException {
-        super.configure(fileName);
+    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+        super.configure(task);
 
         // CSV preference
         csvPref = new CsvPreference.Builder(conf.getQuoteChar(),
                 conf.getDelimiterChar(), conf.getNewline().newline()).build();
-    }
-
-    @Override
-    public void sample(InputStream in) throws PreparePartsException {
-        // create sample reader
-        CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
-                in, charsetDecoder), csvPref);
-
+        // TODO FIXME sampling??
         try {
-            // extract column names
-            // e.g. 
-            // 1) [ "time", "name", "price" ]
-            // 2) [ "timestamp", "name", "price" ]
-            // 3) [ "name", "price" ]
-            if (conf.hasColumnHeader()) {
-                List<String> columnList = sampleReader.read();
-                columnNames = columnList.toArray(new String[0]);
-            } else {
-                columnNames = conf.getColumnNames();
-            }
-
-            // get index of 'time' column
-            // [ "time", "name", "price" ] as all columns is given,
-            // the index is zero.
-            for (int i = 0; i < columnNames.length; i++) {
-                if (columnNames[i].equals(
-                        Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                    timeColumnIndex = i;
-                    break;
-                }
-            }
-
-            // get index of specified alias time column
-            // [ "timestamp", "name", "price" ] as all columns and
-            // "timestamp" as alias time column are given, the index is zero.
-            //
-            // if 'time' column exists in row data, the specified alias
-            // time column is ignore.
-            if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
-                for (int i = 0; i < columnNames.length; i++) {
-                    if (columnNames[i].equals(conf.getAliasTimeColumn())) {
-                        aliasTimeColumnIndex = i;
-                        needToAppendTimeColumn = true;
-                        break;
-                    }
-                }
-            }
-
-            if ((timeColumnIndex >= 0 || aliasTimeColumnIndex >= 0)
-                    && conf.getTimeFormat() != null) {
-                String timeFormat = conf.getTimeFormat();
-                this.timeFormat = new ExtStrftime(timeFormat);
-            }
-
-            // if 'time' and the alias column don't exist,
-            if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
-                if (conf.getTimeValue() >= 0) {
-                    timeValue = conf.getTimeValue();
-                    needToAppendTimeColumn = true;
-                } else {
-                    throw new PreparePartsException(
-                            "Time column not found. --time-column or --time-value option is required");
-                }
-            }
-
-            // read sample rows
-            List<String> firstRow = new ArrayList<String>();
-            final int sampleRowSize = conf.getSampleRowSize();
-            CellProcessor[] sampleProcs = ColumnProcGenerator.generateSampleCellProcessors(
-                    columnNames, sampleRowSize);
-            boolean isFirstRow = false;
-            for (int i = 0; i < sampleRowSize; i++) {
-                List<Object> row = sampleReader.read(sampleProcs);
-                if (!isFirstRow) {
-                    for (Object c : row) {
-                        if (c != null) {
-                            firstRow.add(c.toString());
-                        } else {
-                            firstRow.add(null);
-                        }
-                    }
-                    isFirstRow = true;
-                }
-
-                if (row == null || row.isEmpty()) {
-                    break;
-                }
-            }
-
-            // initialize types of all columns
-            columnTypes = new PrepareConfiguration.ColumnType[columnNames.length];
-            for (int i = 0; i < columnTypes.length; i++) {
-                if (i == timeColumnIndex) {
-                    columnTypes[i] = PrepareConfiguration.ColumnType.TIME;
-                } else {
-                    columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
-                }
-            }
-
-            // print first sample row
-            JSONFileWriter w = new JSONFileWriter(conf);
-
-            CellProcessor[] onelineProcs = ColumnProcGenerator.generateCellProcessors(
-                    w, columnNames, columnTypes, timeColumnIndex, timeFormat);
-            if (needToAppendTimeColumn) {
-                tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
-                        w, aliasTimeColumnIndex, timeFormat, timeValue);
-            }
-
-            // add attributes of exclude/only columns to column types
-            addExcludeAndOnlyColumnsFilter(onelineProcs);
-
-            try {
-                parseRow(firstRow, onelineProcs, w);
-                String ret = w.toJSONString();
-                if (ret != null) {
-                    LOG.info("sample row: " + ret);
-                } else  {
-                    LOG.info("cannot get sample row");
-                }
-            } finally {
-                if (w != null) {
-                    w.closeSilently();
-                }
-            }
+            reader = new Tokenizer(new InputStreamReader(
+                    task.createInputStream(conf.getCompressionType()), charsetDecoder), csvPref);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
-    }
 
-    @Override
-    public void setFileWriter(PrepareProcessor.Task task, FileWriter writer) throws PreparePartsException, IOException {
-        writer.setTask(task);
-        this.writer = writer;
-
-        // create reader
-        InputStream in = task.createInputStream(conf.getCompressionType());
-        reader = new Tokenizer(new InputStreamReader(in, charsetDecoder), csvPref);
         if (conf.hasColumnHeader()) {
             // header line is skipped
             try {
@@ -217,51 +89,204 @@ public class CSVFileReader extends FileReader {
             }
         }
 
-        // create cell processors
-        cprocs = ColumnProcGenerator.generateCellProcessors(
-                writer, columnNames, columnTypes, timeColumnIndex, timeFormat);
-        if (needToAppendTimeColumn) {
-            tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
-                    writer, aliasTimeColumnIndex, timeFormat, timeValue);
-        }
-
-        // add attributes of exclude/only columns to column types
-        addExcludeAndOnlyColumnsFilter(cprocs);
+        // TODO debug
+        // TODO
+        this.setKeys(new String[] { "foo", "var", "baz" });
+        this.setValueTypes(new ColumnType[] { ColumnType.LONG, ColumnType.STRING, ColumnType.INT });
+        this.initializeTypeConverters();
+        this.initializeConvertedRow();
     }
 
-    private List<String> row = new ArrayList<String>();
+//    @Override
+//    public void sample(InputStream in) throws PreparePartsException {
+//        // create sample reader
+//        CsvListReader sampleReader = new CsvListReader(new InputStreamReader(
+//                in, charsetDecoder), csvPref);
+//
+//        try {
+//            // extract column names
+//            // e.g. 
+//            // 1) [ "time", "name", "price" ]
+//            // 2) [ "timestamp", "name", "price" ]
+//            // 3) [ "name", "price" ]
+//            if (conf.hasColumnHeader()) {
+//                List<String> columnList = sampleReader.read();
+//                columnNames = columnList.toArray(new String[0]);
+//            } else {
+//                columnNames = conf.getColumnNames();
+//            }
+//
+//            // get index of 'time' column
+//            // [ "time", "name", "price" ] as all columns is given,
+//            // the index is zero.
+//            for (int i = 0; i < columnNames.length; i++) {
+//                if (columnNames[i].equals(
+//                        Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+//                    timeColumnIndex = i;
+//                    break;
+//                }
+//            }
+//
+//            // get index of specified alias time column
+//            // [ "timestamp", "name", "price" ] as all columns and
+//            // "timestamp" as alias time column are given, the index is zero.
+//            //
+//            // if 'time' column exists in row data, the specified alias
+//            // time column is ignore.
+//            if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
+//                for (int i = 0; i < columnNames.length; i++) {
+//                    if (columnNames[i].equals(conf.getAliasTimeColumn())) {
+//                        aliasTimeColumnIndex = i;
+//                        needToAppendTimeColumn = true;
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            if ((timeColumnIndex >= 0 || aliasTimeColumnIndex >= 0)
+//                    && conf.getTimeFormat() != null) {
+//                String timeFormat = conf.getTimeFormat();
+//                this.timeFormat = new ExtStrftime(timeFormat);
+//            }
+//
+//            // if 'time' and the alias column don't exist,
+//            if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
+//                if (conf.getTimeValue() >= 0) {
+//                    timeValue = conf.getTimeValue();
+//                    needToAppendTimeColumn = true;
+//                } else {
+//                    throw new PreparePartsException(
+//                            "Time column not found. --time-column or --time-value option is required");
+//                }
+//            }
+//
+//            // read sample rows
+//            List<String> firstRow = new ArrayList<String>();
+//            final int sampleRowSize = conf.getSampleRowSize();
+//            CellProcessor[] sampleProcs = ColumnProcGenerator.generateSampleCellProcessors(
+//                    columnNames, sampleRowSize);
+//            boolean isFirstRow = false;
+//            for (int i = 0; i < sampleRowSize; i++) {
+//                List<Object> row = sampleReader.read(sampleProcs);
+//                if (!isFirstRow) {
+//                    for (Object c : row) {
+//                        if (c != null) {
+//                            firstRow.add(c.toString());
+//                        } else {
+//                            firstRow.add(null);
+//                        }
+//                    }
+//                    isFirstRow = true;
+//                }
+//
+//                if (row == null || row.isEmpty()) {
+//                    break;
+//                }
+//            }
+//
+//            // initialize types of all columns
+//            columnTypes = new PrepareConfiguration.ColumnType[columnNames.length];
+//            for (int i = 0; i < columnTypes.length; i++) {
+//                if (i == timeColumnIndex) {
+//                    columnTypes[i] = PrepareConfiguration.ColumnType.TIME;
+//                } else {
+//                    columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
+//                }
+//            }
+//
+//            // print first sample row
+//            JSONFileWriter w = new JSONFileWriter(conf);
+//
+//            CellProcessor[] onelineProcs = ColumnProcGenerator.generateCellProcessors(
+//                    w, columnNames, columnTypes, timeColumnIndex, timeFormat);
+//            if (needToAppendTimeColumn) {
+//                tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
+//                        w, aliasTimeColumnIndex, timeFormat, timeValue);
+//            }
+//
+//            // add attributes of exclude/only columns to column types
+//            addExcludeAndOnlyColumnsFilter(onelineProcs);
+//
+//            try {
+//                parseRow(firstRow, onelineProcs, w);
+//                String ret = w.toJSONString();
+//                if (ret != null) {
+//                    LOG.info("sample row: " + ret);
+//                } else  {
+//                    LOG.info("cannot get sample row");
+//                }
+//            } finally {
+//                if (w != null) {
+//                    w.closeSilently();
+//                }
+//            }
+//        } catch (IOException e) {
+//            throw new PreparePartsException(e);
+//        }
+//    }
 
-    /**
-     * TODO
-     * TODO need refactoring
-     *
-     *  public boolean next() [
-     *    String[] rows = csvParser.read();
-     *    converters.each_with_index {|c,i| c.convertInto(rows[i], row.values[i]) } <-- type convert
-     *    w.next(row); <-- do semantic convert and write msgpack.gz file
-     *  }
-     *  * create converter objects and should be set
-     */
+//    @Override
+//    public void setFileWriter(PrepareProcessor.Task task, FileWriter writer) throws PreparePartsException, IOException {
+//        writer.setTask(task);
+//        this.writer = writer;
+//
+//        // create reader
+//        InputStream in = task.createInputStream(conf.getCompressionType());
+//        reader = new Tokenizer(new InputStreamReader(in, charsetDecoder), csvPref);
+//        if (conf.hasColumnHeader()) {
+//            // header line is skipped
+//            try {
+//                reader.readColumns(new ArrayList<String>());
+//                incrementLineNum();
+//            } catch (IOException e) {
+//                throw new PreparePartsException(e);
+//            }
+//        }
+//
+//        // create cell processors
+//        cprocs = ColumnProcGenerator.generateCellProcessors(
+//                writer, columnNames, columnTypes, timeColumnIndex, timeFormat);
+//        if (needToAppendTimeColumn) {
+//            tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
+//                    writer, aliasTimeColumnIndex, timeFormat, timeValue);
+//        }
+//
+//        // add attributes of exclude/only columns to column types
+//        addExcludeAndOnlyColumnsFilter(cprocs);
+//    }
+
     @Override
     public boolean next() throws PreparePartsException {
-        boolean moreRead = true;
         incrementLineNum();
         try {
             // if reader got EOF, it returns false.
-            if (moreRead = reader.readColumns(row)) {
-                parseRow(row, cprocs, writer);
-                // increment row number
-                incrementRowNum();
+            boolean moreRead = reader.readColumns(rawRow);
+            if (!moreRead) {
+                return false;
             }
+
+            // convert each column type in row
+            for (int i = 0; i < rawRow.size(); i++) {
+                Row.ColumnValue v = convertedRow.getValue(i);
+                converters[i].convertInto(rawRow.get(i), v);
+                convertedRow.setValue(i, v);
+            }
+
+            // write each column value
+            writer.next(convertedRow);
+            writer.incrementRowNum();
+            //parseRow(rawRow, cprocs, writer);
+            incrementRowNum();
+            // TODO FIXME increment row number on writer side
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
             LOG.throwing("CSVFileParser", "parseRow", e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
-            LOG.warning(e.getMessage());
             // TODO the row data should be written to error rows file
+            LOG.warning(e.getMessage());
         }
-        return moreRead;
+        return true;
     }
 
     private void parseRow(List<String> row, CellProcessor[] cellProcs, FileWriter w)
