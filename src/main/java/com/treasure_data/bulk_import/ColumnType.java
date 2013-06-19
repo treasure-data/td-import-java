@@ -28,7 +28,7 @@ public enum ColumnType {
             return new Row.StringColumnValue();
         }
         @Override
-        public Converter getTypeConverter() {
+        public Converter createTypeConverter() {
             return Converter.STRING;
         }
     },
@@ -38,7 +38,7 @@ public enum ColumnType {
             return new Row.IntColumnValue();
         }
         @Override
-        public Converter getTypeConverter() {
+        public Converter createTypeConverter() {
             return Converter.INT;
         }
     },
@@ -48,7 +48,7 @@ public enum ColumnType {
             return new Row.LongColumnValue();
         }
         @Override
-        public Converter getTypeConverter() {
+        public Converter createTypeConverter() {
             return Converter.LONG;
         }
     },
@@ -58,7 +58,7 @@ public enum ColumnType {
             return new Row.DoubleColumnValue();
         }
         @Override
-        public Converter getTypeConverter() {
+        public Converter createTypeConverter() {
             return Converter.DOUBLE;
         }
     };
@@ -74,7 +74,7 @@ public enum ColumnType {
     }
 
     public abstract Row.ColumnValue createColumnValue();
-    public abstract Converter getTypeConverter();
+    public abstract Converter createTypeConverter();
 
     public static ColumnType fromString(String name) {
         return StringToValueType.get(name);
