@@ -17,14 +17,110 @@
 //
 package com.treasure_data.bulk_import;
 
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.writer.FileWriter;
+
 public class Row {
     private ColumnValue[] values;
+
+    public Row(ColumnValue[] values) {
+        this.values = values;
+    }
 
     public void setValues(ColumnValue[] values) {
         this.values = values;
     }
 
+    public void setValue(int i, ColumnValue value) {
+        this.values[i] = value;
+    }
+
     public ColumnValue[] getValues() {
         return values;
     }
+
+    public ColumnValue getValue(int i) {
+        return values[i];
+    }
+
+    public static interface ColumnValue {
+        void write(FileWriter with) throws PreparePartsException;
+    }
+
+    public static class StringColumnValue implements ColumnValue {
+
+        private String v;
+
+        public void setString(String v) {
+            this.v = v;
+        }
+
+        public String getString() {
+            return v;
+        }
+
+        @Override
+        public void write(FileWriter with) throws PreparePartsException {
+            if (v != null) {
+                with.write(v);
+            } else {
+                with.writeNil();
+            }
+        }
+    }
+
+    public static class IntColumnValue implements ColumnValue {
+
+        private int v;
+
+        public void setInt(int v) {
+            this.v = v;
+        }
+
+        public int getInt() {
+            return v;
+        }
+
+        @Override
+        public void write(FileWriter with) throws PreparePartsException {
+            with.write(v);
+        }
+    }
+
+    public static class LongColumnValue implements ColumnValue {
+
+        private long v;
+
+        public void setLong(long v) {
+            this.v = v;
+        }
+
+        public long getLong() {
+            return v;
+        }
+
+        @Override
+        public void write(FileWriter with) throws PreparePartsException {
+            with.write(v);
+        }
+    }
+
+    public static class DoubleColumnValue implements ColumnValue {
+
+        private double v;
+
+        public void setDouble(double v) {
+            this.v = v;
+        }
+
+        public double getDouble() {
+            return v;
+        }
+
+        @Override
+        public void write(FileWriter with) throws PreparePartsException {
+            with.write(v);
+        }
+    }
+
 }
