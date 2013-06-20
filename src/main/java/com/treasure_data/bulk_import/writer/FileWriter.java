@@ -51,17 +51,36 @@ public abstract class FileWriter implements Closeable {
         this.columnTypes = columnTypes;
     }
 
-    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+    public void configure(PrepareProcessor.Task task)
+            throws PreparePartsException {
         this.task = task;
     }
 
     public void next(Row row) throws PreparePartsException {
         int size = row.getValues().length;
-        writeBeginRow(size);
+
+        // begin writing
+        if (row.needAdditionalTimeColumn()) {
+            // if the row doesn't have 'time' column, new 'time' column needs
+            // to be appended to it.
+            writeBeginRow(size + 1);
+        } else {
+            writeBeginRow(size);
+        }
+
+        // write columns
         for (int i = 0; i < size; i++) {
             write(columnNames[i]);
             row.getValue(i).write(this);
         }
+
+        if (row.needAdditionalTimeColumn()) {
+            Row.TimeColumnValue tc = row.getTimeColumnValue();
+            //tc.write(row.getValue(tc.getIndex()));
+            tc.write(this);
+        }
+
+        // end
         writeEndRow();
     }
 

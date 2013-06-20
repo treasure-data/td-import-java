@@ -47,10 +47,9 @@ public class CSVFileReader extends FileReader {
 
     protected CsvPreference csvPref;
     private Tokenizer reader;
-    private CellProcessor[] cprocs;
-    private ColumnProc tcproc = null;
+    private Row.TimeColumnValue timeColumnValue = null;
 
-    private boolean needToAppendTimeColumn = false;
+    private boolean needAdditionalTimeColumn = false;
     private int timeColumnIndex = -1;
     private int aliasTimeColumnIndex = -1;
     private ExtStrftime timeFormat = null;
@@ -80,7 +79,7 @@ public class CSVFileReader extends FileReader {
             throw new NullPointerException("columnTypes is null.");
         }
 
-        initializeConvertedRow();
+        initializeConvertedRow(needAdditionalTimeColumn, timeColumnValue);
 
         try {
             reader = new Tokenizer(new InputStreamReader(
@@ -142,7 +141,8 @@ public class CSVFileReader extends FileReader {
                 for (int i = 0; i < columnNames.length; i++) {
                     if (columnNames[i].equals(conf.getAliasTimeColumn())) {
                         aliasTimeColumnIndex = i;
-                        needToAppendTimeColumn = true;
+                        needAdditionalTimeColumn = true;
+                        timeColumnValue = new Row.AliasTimeColumnValue(i, null);
                         break;
                     }
                 }
@@ -157,8 +157,8 @@ public class CSVFileReader extends FileReader {
             // if 'time' and the alias column don't exist,
             if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
                 if (conf.getTimeValue() >= 0) {
-                    timeValue = conf.getTimeValue();
-                    needToAppendTimeColumn = true;
+                    needAdditionalTimeColumn = true;
+                    timeColumnValue = new Row.TimeValueTimeColumnValue(conf.getTimeValue());
                 } else {
                     throw new PreparePartsException(
                             "Time column not found. --time-column or --time-value option is required");
@@ -194,7 +194,9 @@ public class CSVFileReader extends FileReader {
                 columnTypes = new ColumnType[columnNames.length];
                 for (int i = 0; i < columnTypes.length; i++) {
                     if (i == timeColumnIndex) {
-                        columnTypes[i] = ColumnType.TIME;
+                        // TODO
+                        //columnTypes[i] = ColumnType.TIME;
+                        columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
                     } else {
                         columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
                     }
@@ -204,13 +206,6 @@ public class CSVFileReader extends FileReader {
 
 //            // print first sample row
 //            JSONFileWriter w = new JSONFileWriter(conf);
-//
-//            CellProcessor[] onelineProcs = ColumnProcGenerator.generateCellProcessors(
-//                    w, columnNames, columnTypes, timeColumnIndex, timeFormat);
-//            if (needToAppendTimeColumn) {
-//                tcproc = ColumnProcGenerator.generateTimeColumnProcessor(
-//                        w, aliasTimeColumnIndex, timeFormat, timeValue);
-//            }
 //
 //            // add attributes of exclude/only columns to column types
 //            addExcludeAndOnlyColumnsFilter(onelineProcs);
@@ -243,16 +238,21 @@ public class CSVFileReader extends FileReader {
                 return false;
             }
 
-            // convert each column type in row
-            for (int i = 0; i < rawRow.size(); i++) {
-                Row.ColumnValue v = convertedRow.getValue(i);
-                columnTypes[i].convertTypeInto(rawRow.get(i), v);
-                //converters[i].convertInto(rawRow.get(i), v);
-                convertedRow.setValue(i, v);
+            int rawRowSize = rawRow.size();
+            if (rawRowSize != columnTypes.length) {
+                throw new PreparePartsException(String.format(
+                        "The number of columns to be processed (%d) must match the number of " +
+                        "column types (%d): check that the number of column types you have " +
+                        "defined matches the expected number of columns being read/written " +
+                        "[line: %d]", rawRowSize, columnTypes.length, getLineNum()));
             }
+
+            // convert each column in row
+            convertTypesOfColumns();
 
             // write each column value
             writer.next(convertedRow);
+
             writer.incrementRowNum();
             //parseRow(rawRow, cprocs, writer);
             incrementRowNum();
@@ -268,48 +268,12 @@ public class CSVFileReader extends FileReader {
         return true;
     }
 
-    private void parseRow(List<String> row, CellProcessor[] cellProcs, FileWriter w)
-            throws IOException, PreparePartsException {
-        int rowSize = row.size();
-        if (rowSize != cellProcs.length) {
-            throw new PreparePartsException(String.format(
-                    "The number of columns to be processed (%d) must match the number of " +
-                    "CellProcessors (%d): check that the number of CellProcessors you have " +
-                    "defined matches the expected number of columns being read/written " +
-                    "[line: %d]", rowSize, cellProcs.length, getLineNum()));
+    void convertTypesOfColumns() {
+        for (int i = 0; i < rawRow.size(); i++) {
+            Row.ColumnValue v = convertedRow.getValue(i);
+            columnTypes[i].convertTypeInto(rawRow.get(i), v);
+            convertedRow.setValue(i, v);
         }
-
-        // write begin of row (map data)
-        if (needToAppendTimeColumn) {
-            // if the row doesn't have 'time' column, new 'time' column needs
-            // to be appended to it.
-            w.writeBeginRow(rowSize + 1);
-        } else {
-            w.writeBeginRow(rowSize);
-        }
-
-        for (int i = 0; i < rowSize; i++) {
-            try {
-                cellProcs[i].execute(row.get(i), null);
-            } catch (Throwable t) {
-                if (t instanceof RuntimeException) {
-                    throw (PreparePartsException) t.getCause();
-                } else {
-                    throw new PreparePartsException(String.format(
-                            "It cannot translate #%d column '%s' (%s). Please check row data: %s [line: %d]",
-                            i, ((ColumnProc) cellProcs[i]).getColumnName(), t.getMessage(),
-                            reader.getUntokenizedRow(), getLineNum()));
-                }
-            }
-        }
-
-        if (needToAppendTimeColumn) {
-            tcproc.execute(row.get(tcproc.getIndex()));
-        }
-
-        // write end of row (map data)
-        w.writeEndRow();
-        w.incrementRowNum();
     }
 
     public void close() throws PreparePartsException {

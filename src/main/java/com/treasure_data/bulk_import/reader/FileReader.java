@@ -67,12 +67,13 @@ public abstract class FileReader {
         return columnTypes;
     }
 
-    public void initializeConvertedRow() {
+    public void initializeConvertedRow(boolean needAdditionalTimeColumn,
+            Row.TimeColumnValue timeColumnValue) {
         Row.ColumnValue[] values = new Row.ColumnValue[columnTypes.length];
         for (int i = 0; i < columnTypes.length; i++) {
             values[i] = columnTypes[i].createColumnValue();
         }
-        convertedRow = new Row(values);
+        convertedRow = new Row(values, needAdditionalTimeColumn, timeColumnValue);
     }
 
     public void resetLineNum() {
