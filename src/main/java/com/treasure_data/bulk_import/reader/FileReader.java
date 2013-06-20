@@ -118,8 +118,6 @@ public abstract class FileReader {
         }
     }
 
-//    public abstract void sample(InputStream in) throws PreparePartsException;
-
     public abstract boolean next() throws PreparePartsException;
 
     public abstract void close() throws PreparePartsException;

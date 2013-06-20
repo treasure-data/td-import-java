@@ -80,7 +80,7 @@ public class CSVFileReader extends FileReader {
             throw new NullPointerException("columnTypes is null.");
         }
 
-        initializeConvertedRow(); // TODO
+        initializeConvertedRow();
 
         try {
             reader = new Tokenizer(new InputStreamReader(
