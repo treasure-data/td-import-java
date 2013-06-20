@@ -17,14 +17,20 @@
 //
 package com.treasure_data.bulk_import;
 
+import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class Row {
     private ColumnValue[] values;
+    private boolean needAdditionalTimeColumn = false;
+    private Row.TimeColumnValue timeColumnValue;
 
-    public Row(ColumnValue[] values) {
+    public Row(ColumnValue[] values, boolean needAdditionalTimeColumn,
+            Row.TimeColumnValue timeColumnValue) {
         this.values = values;
+        this.needAdditionalTimeColumn = needAdditionalTimeColumn;
+        this.timeColumnValue = timeColumnValue;
     }
 
     public void setValues(ColumnValue[] values) {
@@ -41,6 +47,14 @@ public class Row {
 
     public ColumnValue getValue(int i) {
         return values[i];
+    }
+
+    public boolean needAdditionalTimeColumn() {
+        return needAdditionalTimeColumn;
+    }
+
+    public Row.TimeColumnValue getTimeColumnValue() {
+        return timeColumnValue;
     }
 
     public static interface ColumnValue {
@@ -106,7 +120,6 @@ public class Row {
     }
 
     public static class DoubleColumnValue implements ColumnValue {
-
         private double v;
 
         public void setDouble(double v) {
@@ -124,8 +137,14 @@ public class Row {
     }
 
     public static class TimeColumnValue implements ColumnValue {
-        // TODO FIXME
-        private long v;
+        protected int index;
+        protected ExtStrftime timeFormat;
+        protected long v;
+
+        public TimeColumnValue(int index, ExtStrftime timeFormat) {
+            this.index = index;
+            this.timeFormat = timeFormat;
+        }
 
         public void setLong(long v) {
             this.v = v;
@@ -135,9 +154,35 @@ public class Row {
             return v;
         }
 
+        public int getIndex() {
+            return index;
+        }
+
         @Override
         public void write(FileWriter with) throws PreparePartsException {
             with.write(v);
+        }
+    }
+
+    public static class AliasTimeColumnValue extends TimeColumnValue {
+        public AliasTimeColumnValue(int index, ExtStrftime timeFormat) {
+            super(index, timeFormat);
+        }
+    }
+
+    public static class TimeValueTimeColumnValue extends TimeColumnValue {
+        private long timeValue;
+
+        public TimeValueTimeColumnValue(long timeValue) {
+            super(-1, null);
+            this.timeValue = timeValue;
+        }
+
+        public void setLong(long v) {
+        }
+
+        public long getLong() {
+            return timeValue;
         }
     }
 }

@@ -65,17 +65,6 @@ public enum ColumnType {
         public void convertTypeInto(String v, Row.ColumnValue cv) {
             ((Row.DoubleColumnValue) cv).setDouble(Double.parseDouble(v));
         }
-    },
-    TIME("time", -1) {
-        @Override
-        public Row.ColumnValue createColumnValue() {
-            return new Row.TimeColumnValue();
-        }
-
-        @Override
-        public void convertTypeInto(String v, Row.ColumnValue cv) {
-            ((Row.TimeColumnValue) cv).setLong(Long.parseLong(v));
-        }
     };
 
     private String name;
