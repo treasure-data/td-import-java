@@ -154,6 +154,9 @@ public class PrepareProcessor {
         }
 
         if (w != null && r != null) {
+            w.setColumnNames(r.getColumnNames());
+            w.setColumnTypes(r.getColumnTypes());
+
             try {
                 r.resetLineNum();
                 r.resetRowNum();
@@ -167,6 +170,7 @@ public class PrepareProcessor {
                 err.redRows = r.getRowNum();
                 err.writtenRows = w.getRowNum();
             } catch (Exception e) {
+                e.printStackTrace();
                 err.error = e;
             }
         }
