@@ -123,4 +123,21 @@ public class Row {
         }
     }
 
+    public static class TimeColumnValue implements ColumnValue {
+        // TODO FIXME
+        private long v;
+
+        public void setLong(long v) {
+            this.v = v;
+        }
+
+        public long getLong() {
+            return v;
+        }
+
+        @Override
+        public void write(FileWriter with) throws PreparePartsException {
+            with.write(v);
+        }
+    }
 }
