@@ -233,18 +233,20 @@ public class CSVFileReader extends FileReader {
         incrementLineNum();
         try {
             // if reader got EOF, it returns false.
-            boolean moreRead = reader.readColumns(rawRow);
-            if (!moreRead) {
+            if (!reader.readColumns(rawRow)) {
                 return false;
             }
+
+            incrementRowNum();
 
             int rawRowSize = rawRow.size();
             if (rawRowSize != columnTypes.length) {
                 throw new PreparePartsException(String.format(
-                        "The number of columns to be processed (%d) must match the number of " +
-                        "column types (%d): check that the number of column types you have " +
-                        "defined matches the expected number of columns being read/written " +
-                        "[line: %d]", rawRowSize, columnTypes.length, getLineNum()));
+                        "The number of columns to be processed (%d) must " +
+                        "match the number of column types (%d): check that the " +
+                        "number of column types you have defined matches the " +
+                        "expected number of columns being read/written [line: %d]",
+                        rawRowSize, columnTypes.length, getLineNum()));
             }
 
             // convert each column in row
@@ -252,11 +254,7 @@ public class CSVFileReader extends FileReader {
 
             // write each column value
             writer.next(convertedRow);
-
             writer.incrementRowNum();
-            //parseRow(rawRow, cprocs, writer);
-            incrementRowNum();
-            // TODO FIXME increment row number on writer side
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
             LOG.throwing("CSVFileParser", "parseRow", e);
