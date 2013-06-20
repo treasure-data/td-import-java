@@ -18,13 +18,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class TestPrepareProcessor {
+import com.treasure_data.bulk_import.ColumnType;
 
-    public InputStream foo() {
-        String csvtext = "time,user\n" + "1370416181,muga\n";
-        byte[] bytes = csvtext.getBytes();
-        return new BufferedInputStream(new ByteArrayInputStream(bytes));
-    }
+public class TestPrepareProcessor {
 
     @Test @Ignore
     public void test01() throws Exception {
@@ -47,6 +43,7 @@ public class TestPrepareProcessor {
 
         PrepareProcessor.ErrorInfo err = proc.execute(task);
     }
+
 
     private Properties props;
     private PrepareConfiguration conf;
@@ -103,7 +100,7 @@ public class TestPrepareProcessor {
             task = PrepareProcessorTestUtil.createErrorTask(i);
             err = proc.execute(task);
             assertEquals(task, err.task);
-            assertTrue(err.error instanceof IOException);
+            assertTrue(err.error instanceof PreparePartsException);
         }
     }
 }

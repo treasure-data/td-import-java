@@ -142,6 +142,7 @@ public class PrepareProcessor {
             w.configure(task);
         } catch (Exception e) {
             err.error = e;
+            return err;
         }
 
         // create and initialize file reader
@@ -151,6 +152,7 @@ public class PrepareProcessor {
             r.configure(task);
         } catch (Exception e) {
             err.error = e;
+            return err;
         }
 
         if (w != null && r != null) {
