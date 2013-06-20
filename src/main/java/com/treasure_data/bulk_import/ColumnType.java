@@ -21,66 +21,109 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.treasure_data.bulk_import.Row.ColumnValue;
+
 public enum ColumnType {
-    STRING("string") {
+    STRING("string", 0) {
         @Override
         public Row.ColumnValue createColumnValue() {
             return new Row.StringColumnValue();
         }
+
         @Override
-        public Converter createTypeConverter() {
-            return Converter.STRING;
+        public void convertTypeInto(String v, Row.ColumnValue cv) {
+            ((Row.StringColumnValue) cv).setString(v);
         }
     },
-    INT("int") {
+    INT("int", 1) {
         @Override
         public Row.ColumnValue createColumnValue() {
             return new Row.IntColumnValue();
         }
+
         @Override
-        public Converter createTypeConverter() {
-            return Converter.INT;
+        public void convertTypeInto(String v, Row.ColumnValue cv) {
+            ((Row.IntColumnValue) cv).setInt(Integer.parseInt(v));
         }
     },
-    LONG("long") {
+    LONG("long", 2) {
         @Override
         public Row.ColumnValue createColumnValue() {
             return new Row.LongColumnValue();
         }
+
         @Override
-        public Converter createTypeConverter() {
-            return Converter.LONG;
+        public void convertTypeInto(String v, Row.ColumnValue cv) {
+            ((Row.LongColumnValue) cv).setLong(Long.parseLong(v));
         }
     },
-    DOUBLE("double") {
+    DOUBLE("double", 3) {
         @Override
         public Row.ColumnValue createColumnValue() {
             return new Row.DoubleColumnValue();
         }
+
         @Override
-        public Converter createTypeConverter() {
-            return Converter.DOUBLE;
+        public void convertTypeInto(String v, Row.ColumnValue cv) {
+            ((Row.DoubleColumnValue) cv).setDouble(Double.parseDouble(v));
+        }
+    },
+    TIME("time", -1) {
+        @Override
+        public Row.ColumnValue createColumnValue() {
+            return new Row.TimeColumnValue();
+        }
+
+        @Override
+        public void convertTypeInto(String v, Row.ColumnValue cv) {
+            ((Row.TimeColumnValue) cv).setLong(Long.parseLong(v));
         }
     };
 
     private String name;
+    private int index;
 
-    ColumnType(String name) {
+    ColumnType(String name, int index) {
         this.name = name;
+        this.index = index;
     }
 
     public String getName() {
         return name;
     }
 
-    public abstract Row.ColumnValue createColumnValue();
-    public abstract Converter createTypeConverter();
-
-    public static ColumnType fromString(String name) {
-        return StringToValueType.get(name);
+    public int getIndex() {
+        return index;
     }
 
-    private static class StringToValueType {
+    public abstract Row.ColumnValue createColumnValue();
+    public abstract void convertTypeInto(String v, Row.ColumnValue cv);
+
+    public static ColumnType fromInt(int index) {
+        return IntToColumnType.get(index);
+    }
+
+    public static ColumnType fromString(String name) {
+        return StringToColumnType.get(name);
+    }
+
+    private static class IntToColumnType {
+        private static final Map<Integer, ColumnType> REVERSE_DICTIONARY;
+
+        static {
+            Map<Integer, ColumnType> map = new HashMap<Integer, ColumnType>();
+            for (ColumnType elem : ColumnType.values()) {
+                map.put(elem.getIndex(), elem);
+            }
+            REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+        }
+
+        static ColumnType get(Integer index) {
+            return REVERSE_DICTIONARY.get(index);
+        }
+    }
+
+    private static class StringToColumnType {
         private static final Map<String, ColumnType> REVERSE_DICTIONARY;
 
         static {
@@ -93,65 +136,6 @@ public enum ColumnType {
 
         static ColumnType get(String key) {
             return REVERSE_DICTIONARY.get(key);
-        }
-    }
-
-    public static enum Converter {
-        STRING("string") {
-            @Override
-            public void convertInto(String v, Row.ColumnValue cv) {
-                ((Row.StringColumnValue) cv).setString(v);
-            }
-        },
-        INT("int") {
-            @Override
-            public void convertInto(String v, Row.ColumnValue cv) {
-                ((Row.IntColumnValue) cv).setInt(Integer.parseInt(v));
-            }
-        },
-        LONG("long") {
-            @Override
-            public void convertInto(String v, Row.ColumnValue cv) {
-                ((Row.LongColumnValue) cv).setLong(Long.parseLong(v));
-            }
-        },
-        DOUBLE("double") {
-            @Override
-            public void convertInto(String v, Row.ColumnValue cv) {
-                ((Row.DoubleColumnValue) cv).setDouble(Double.parseDouble(v));
-            }
-        };
-
-        private String name;
-
-        Converter(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public abstract void convertInto(String v, Row.ColumnValue cv);
-
-        public static Converter fromString(String name) {
-            return StringToTypeConverter.get(name);
-        }
-
-        private static class StringToTypeConverter {
-            private static final Map<String, Converter> REVERSE_DICTIONARY;
-
-            static {
-                Map<String, Converter> map = new HashMap<String, Converter>();
-                for (Converter elem : Converter.values()) {
-                    map.put(elem.getName(), elem);
-                }
-                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
-            }
-
-            static Converter get(String key) {
-                return REVERSE_DICTIONARY.get(key);
-            }
         }
     }
 }
