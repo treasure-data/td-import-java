@@ -38,7 +38,7 @@ public abstract class AbstractColumnProcTestUtil {
 
         // create file writer
         w = new TestFileWriter(conf);
-        w.configure("dummy");
+        w.configure(null);
 
         index = rand.nextInt(100);
         initializeColumnName();
