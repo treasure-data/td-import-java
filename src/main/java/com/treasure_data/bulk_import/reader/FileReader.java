@@ -20,7 +20,6 @@ package com.treasure_data.bulk_import.reader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -38,17 +37,14 @@ public abstract class FileReader {
     protected PrepareConfiguration conf;
     protected FileWriter writer;
 
-    protected String[] keys;
-
     protected List<String> rawRow = new ArrayList<String>();
     protected Row convertedRow;
 
-    protected ColumnType[] valueTypes;
-    protected ColumnType.Converter[] converters;
+    protected String[] columnNames;
+    protected ColumnType[] columnTypes;
 
     protected long lineNum = 0;
     protected long rowNum = 0;
-    protected CharsetDecoder charsetDecoder;
     protected PrepareConfiguration.CompressionType compressionType;
 
     private PrintWriter errWriter = null;
@@ -58,36 +54,26 @@ public abstract class FileReader {
         this.writer = writer;
     }
 
-    public void setKeys(String[] keys) {
-        this.keys = keys;
+    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+        compressionType = conf.checkCompressionType(task.fileName);
+        columnNames = conf.getColumnNames();
+        columnTypes = conf.getColumnTypes();
     }
 
-    public void setValueTypes(ColumnType[] valueTypes) {
-        this.valueTypes = valueTypes;
+    public String[] getColumnNames() {
+        return columnNames;
     }
 
-    public ColumnType[] getValueTypes() {
-        return valueTypes;
-    }
-
-    public void initializeTypeConverters() {
-        converters = new ColumnType.Converter[valueTypes.length];
-        for (int i = 0; i < valueTypes.length; i++) {
-            converters[i] = valueTypes[i].createTypeConverter();
-        }
+    public ColumnType[] getColumnTypes() {
+        return columnTypes;
     }
 
     public void initializeConvertedRow() {
-        Row.ColumnValue[] values = new Row.ColumnValue[valueTypes.length];
-        for (int i = 0; i < valueTypes.length; i++) {
-            values[i] = valueTypes[i].createColumnValue();
+        Row.ColumnValue[] values = new Row.ColumnValue[columnTypes.length];
+        for (int i = 0; i < columnTypes.length; i++) {
+            values[i] = columnTypes[i].createColumnValue();
         }
         convertedRow = new Row(values);
-    }
-
-    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
-        charsetDecoder = conf.getCharsetDecoder();
-        compressionType = conf.checkCompressionType(task.fileName);
     }
 
     public void resetLineNum() {
@@ -112,14 +98,6 @@ public abstract class FileReader {
 
     public long getRowNum() {
         return rowNum;
-    }
-
-    public void setDecorder(CharsetDecoder decorder) {
-        this.charsetDecoder = decorder;
-    }
-
-    public CharsetDecoder getDecorder() {
-        return charsetDecoder;
     }
 
     public void setErrorRecordWriter(OutputStream errStream) {

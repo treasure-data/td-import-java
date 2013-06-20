@@ -36,24 +36,30 @@ public abstract class FileWriter implements Closeable {
     protected PrepareProcessor.Task task;
     protected long rowNum = 0;
 
-    protected String[] keys;
-    protected ColumnType[] valueTypes;
+    protected String[] columnNames;
+    protected ColumnType[] columnTypes;
 
     protected FileWriter(PrepareConfiguration conf) {
         this.conf = conf;
     }
 
+    public void setColumnNames(String[] columnNames) {
+        this.columnNames = columnNames;
+    }
+
+    public void setColumnTypes(ColumnType[] columnTypes) {
+        this.columnTypes = columnTypes;
+    }
+
     public void configure(PrepareProcessor.Task task) throws PreparePartsException {
         this.task = task;
-        this.keys = conf.getKeys();
-        this.valueTypes = conf.getColumnTypes();
     }
 
     public void next(Row row) throws PreparePartsException {
         int size = row.getValues().length;
         writeBeginRow(size);
         for (int i = 0; i < size; i++) {
-            write(keys[i]);
+            write(columnNames[i]);
             row.getValue(i).write(this);
         }
         writeEndRow();
