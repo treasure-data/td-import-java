@@ -28,16 +28,16 @@ import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 
 public class ColumnProcGenerator {
 
-//    public static CellProcessor[] generateSampleCellProcessors(String[] columnNames,
-//            int sampleRow) throws PreparePartsException {
-//        int len = columnNames.length;
-//        List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
-//        for (int i = 0; i < len; i++) {
-//            cprocs.add(new ColumnSamplingProc(i, columnNames[i], sampleRow));
-//        }
-//        return cprocs.toArray(new CellProcessor[0]);
-//    }
-//
+    public static CellProcessor[] generateSampleCellProcessors(String[] columnNames,
+            int sampleRow) throws PreparePartsException {
+        int len = columnNames.length;
+        List<CellProcessor> cprocs = new ArrayList<CellProcessor>(len);
+        for (int i = 0; i < len; i++) {
+            cprocs.add(new ColumnSamplingProc(i, columnNames[i], sampleRow));
+        }
+        return cprocs.toArray(new CellProcessor[0]);
+    }
+
 //    public static CellProcessor[] generateCellProcessors(
 //            com.treasure_data.bulk_import.writer.FileWriter writer,
 //            String[] columnNames, PrepareConfiguration.ColumnType[] columnTypes,
