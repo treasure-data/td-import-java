@@ -253,14 +253,7 @@ public class PrepareConfiguration extends Configuration {
         setOutputFormat();
 
         // compression type
-        String compType = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_COMPRESSION,
-                Configuration.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE);
-        compressionType = CompressionType.fromString(compType);
-        if (compressionType == null) {
-            throw new IllegalArgumentException("unsupported compression type: "
-                    + compressionType);
-        }
+        setCompressionType();
 
         // parallel
         String pthreadNum = props.getProperty(BI_PREPARE_PARTS_PARALLEL,
@@ -435,7 +428,8 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setFormat() {
-        String formatStr = props.getProperty(Configuration.BI_PREPARE_PARTS_FORMAT,
+        String formatStr = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_FORMAT,
                 Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
         format = Format.fromString(formatStr);
         if (format == null) {
@@ -449,7 +443,8 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setOutputFormat() {
-        String outputFormatStr = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT,
+        String outputFormatStr = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT,
                 Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT_DEFAULTVALUE);
         outputFormat = OutputFormat.fromString(outputFormatStr);
         if (outputFormat == null) {
@@ -460,6 +455,17 @@ public class PrepareConfiguration extends Configuration {
 
     public OutputFormat getOutputFormat() {
         return outputFormat;
+    }
+
+    public void setCompressionType() {
+        String compType = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_COMPRESSION,
+                Configuration.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE);
+        compressionType = CompressionType.fromString(compType);
+        if (compressionType == null) {
+            throw new IllegalArgumentException(String.format(
+                    "unsupported compression type: %s", compressionType));
+        }
     }
 
     public CompressionType getCompressionType() {
@@ -563,6 +569,10 @@ public class PrepareConfiguration extends Configuration {
         return newline;
     }
 
+    public void setColumnNames(String[] columnNames) {
+        this.columnNames = columnNames;
+    }
+
     public String[] getColumnNames() {
         return columnNames;
     }
@@ -606,13 +616,5 @@ public class PrepareConfiguration extends Configuration {
 
     public int getSampleRowSize() {
         return sampleRowSize;
-    }
-
-    public void setKeys(String[] keys) {
-        this.keys = keys;
-    }
-
-    public String[] getKeys() {
-        return keys;
     }
 }
