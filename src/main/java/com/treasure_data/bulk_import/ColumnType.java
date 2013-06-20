@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.treasure_data.bulk_import.Row.ColumnValue;
-
 public enum ColumnType {
     STRING("string", 0) {
         @Override

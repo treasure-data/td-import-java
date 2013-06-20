@@ -17,7 +17,6 @@
 //
 package com.treasure_data.bulk_import.reader;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
