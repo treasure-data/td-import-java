@@ -118,7 +118,7 @@ public class TestMultiThreadPrepareProcessor {
 
         assertEquals(numTasks, proc.getErrors().size());
         for (PrepareProcessor.ErrorInfo err : proc.getErrors()) {
-            assertTrue(err.error instanceof IOException);
+            assertTrue(err.error instanceof PreparePartsException);
         }
     }
 }
