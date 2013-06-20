@@ -10,6 +10,7 @@ import org.junit.Ignore;
 
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 @Ignore
@@ -23,7 +24,7 @@ public class TestFileWriter extends FileWriter {
     }
 
     @Override
-    public void configure(String infileName) throws PreparePartsException {
+    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
     }
 
     @Override
@@ -36,27 +37,22 @@ public class TestFileWriter extends FileWriter {
     }
 
     @Override
-    public void write(Object v) throws PreparePartsException {
+    public void write(String v) throws PreparePartsException {
         columnKeyValues.add(v);
     }
 
     @Override
-    public void writeString(String v) throws PreparePartsException {
+    public void write(int v) throws PreparePartsException {
         columnKeyValues.add(v);
     }
 
     @Override
-    public void writeInt(int v) throws PreparePartsException {
+    public void write(long v) throws PreparePartsException {
         columnKeyValues.add(v);
     }
 
     @Override
-    public void writeLong(long v) throws PreparePartsException {
-        columnKeyValues.add(v);
-    }
-
-    @Override
-    public void writeDouble(double v) throws PreparePartsException {
+    public void write(double v) throws PreparePartsException {
         columnKeyValues.add(v);
     }
 
