@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Row;
@@ -42,6 +44,7 @@ public abstract class FileReader {
 
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
+    protected Set<Integer> skipColumns = new HashSet<Integer>();
 
     protected long lineNum = 0;
     protected long rowNum = 0;
@@ -66,6 +69,10 @@ public abstract class FileReader {
 
     public ColumnType[] getColumnTypes() {
         return columnTypes;
+    }
+
+    public Set<Integer> getSkipColumns() {
+        return skipColumns;
     }
 
     public void initializeConvertedRow(Row.TimeColumnValue timeColumnValue) {

@@ -188,13 +188,15 @@ public class CSVFileReader extends FileReader {
 
             initializeConvertedRow(timeColumnValue);
 
+            // check properties of exclude/only columns
+            setSkipColumns();
+
+
             // print first sample row
             JSONFileWriter w = new JSONFileWriter(conf);
             w.setColumnNames(getColumnNames());
             w.setColumnTypes(getColumnTypes());
-
-//            // add attributes of exclude/only columns to column types
-//            addExcludeAndOnlyColumnsFilter(onelineProcs);
+            w.setSkipColumns(getSkipColumns());
 
             try {
                 rawRow.addAll(firstRow);
@@ -235,24 +237,21 @@ public class CSVFileReader extends FileReader {
         }
     }
 
-    void addExcludeAndOnlyColumnsFilter(CellProcessor[] cellProcs) {
+    void setSkipColumns() { // TODO FIXME should rename the method
         String[] excludeColumns = conf.getExcludeColumns();
         String[] onlyColumns = conf.getOnlyColumns();
-        for (int i = 0; i < cellProcs.length; i++) {
-            ColumnProc colProc = (ColumnProc) cellProcs[i];
-            String cname = colProc.getColumnName();
-
+        for (int i = 0; i < columnNames.length; i++) {
             // check exclude columns
             boolean isExcluded = false;
             for (String excludeColumn : excludeColumns) {
-                if (cname.equals(excludeColumn)) {
+                if (columnNames[i].equals(excludeColumn)) {
                     isExcluded = true;
                     break;
                 }
             }
 
             if (isExcluded) {
-                cellProcs[i] = new SkipColumnProc(colProc);
+                skipColumns.add(i);
                 continue;
             }
 
@@ -263,14 +262,14 @@ public class CSVFileReader extends FileReader {
 
             boolean isOnly = false;
             for (String onlyColumn : onlyColumns) {
-                if (cname.equals(onlyColumn)) {
+                if (columnNames[i].equals(onlyColumn)) {
                     isOnly = true;
                     break;
                 }
             }
 
             if (!isOnly) {
-                cellProcs[i] = new SkipColumnProc(colProc);
+                skipColumns.add(i);
                 continue; // not needed though,..
             }
         }

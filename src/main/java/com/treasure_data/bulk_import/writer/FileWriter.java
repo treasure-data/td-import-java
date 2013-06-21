@@ -19,6 +19,8 @@ package com.treasure_data.bulk_import.writer;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
@@ -40,6 +42,7 @@ public abstract class FileWriter implements Closeable {
 
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
+    protected Set<Integer> skipColumns;
 
     protected FileWriter(PrepareConfiguration conf) {
         this.conf = conf;
@@ -51,6 +54,10 @@ public abstract class FileWriter implements Closeable {
 
     public void setColumnTypes(ColumnType[] columnTypes) {
         this.columnTypes = columnTypes;
+    }
+
+    public void setSkipColumns(Set<Integer> skipColumns) {
+        this.skipColumns = skipColumns;
     }
 
     public void configure(PrepareProcessor.Task task)
@@ -72,6 +79,10 @@ public abstract class FileWriter implements Closeable {
 
         // write columns
         for (int i = 0; i < size; i++) {
+            if (skipColumns.contains(i)) {
+                continue;
+            }
+
             write(columnNames[i]);
             if (i == row.getTimeColumnIndex()) {
                 row.getTimeColumnValue().write(row.getValue(i), this);
