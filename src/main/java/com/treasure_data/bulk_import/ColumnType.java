@@ -21,49 +21,72 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.writer.FileWriter;
+
 public enum ColumnType {
     STRING("string", 0) {
         @Override
         public Row.ColumnValue createColumnValue() {
-            return new Row.StringColumnValue();
+            return new Row.StringColumnValue(this);
         }
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
             cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+            with.write(filter, (Row.StringColumnValue) v);
         }
     },
     INT("int", 1) {
         @Override
         public Row.ColumnValue createColumnValue() {
-            return new Row.IntColumnValue();
+            return new Row.IntColumnValue(this);
         }
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
             cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+            with.write(filter, (Row.IntColumnValue) v);
         }
     },
     LONG("long", 2) {
         @Override
         public Row.ColumnValue createColumnValue() {
-            return new Row.LongColumnValue();
+            return new Row.LongColumnValue(this);
         }
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
             cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+            with.write(filter, (Row.LongColumnValue) v);
         }
     },
     DOUBLE("double", 3) {
         @Override
         public Row.ColumnValue createColumnValue() {
-            return new Row.DoubleColumnValue();
+            return new Row.DoubleColumnValue(this);
         }
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
             cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+            with.write(filter, (Row.DoubleColumnValue) v);
         }
     };
 
@@ -85,6 +108,10 @@ public enum ColumnType {
 
     public abstract Row.ColumnValue createColumnValue();
     public abstract void convertTypeInto(String v, Row.ColumnValue cv);
+    public abstract void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException;
+//    public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+//        filter.write(v, with);
+//    }
 
     public static ColumnType fromInt(int index) {
         return IntToColumnType.get(index);
