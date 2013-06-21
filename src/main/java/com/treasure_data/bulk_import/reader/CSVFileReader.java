@@ -35,9 +35,7 @@ import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
-import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProc;
 import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
-import com.treasure_data.bulk_import.prepare_parts.proc.SkipColumnProc;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.JSONFileWriter;
 
