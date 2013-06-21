@@ -220,52 +220,11 @@ public class CSVFileReader extends FileReader {
     }
 
     @Override
-    public boolean next() throws PreparePartsException {
-        // TODO FIXME this method should be moved to FileReader class??
-        incrementLineNum();
-        try {
-            // if reader got EOF, it returns false.
-            if (!reader.readColumns(rawRow)) {
-                return false;
-            }
-
-            incrementRowNum();
-
-            int rawRowSize = rawRow.size();
-            if (rawRowSize != columnTypes.length) {
-                throw new PreparePartsException(String.format(
-                        "The number of columns to be processed (%d) must " +
-                        "match the number of column types (%d): check that the " +
-                        "number of column types you have defined matches the " +
-                        "expected number of columns being read/written [line: %d]",
-                        rawRowSize, columnTypes.length, getLineNum()));
-            }
-
-            // convert each column in row
-            convertTypesOfColumns();
-
-            // write each column value
-            writer.next(convertedRow);
-            writer.incrementRowNum();
-        } catch (IOException e) {
-            // if reader throw I/O error, parseRow throws PreparePartsException.
-            LOG.throwing("CSVFileParser", "parseRow", e);
-            throw new PreparePartsException(e);
-        } catch (PreparePartsException e) {
-            // TODO the row data should be written to error rows file
-            LOG.warning(e.getMessage());
-        }
-        return true;
+    public boolean readRow() throws IOException {
+        return reader.readColumns(rawRow);
     }
 
-    void convertTypesOfColumns() {
-        for (int i = 0; i < rawRow.size(); i++) {
-            Row.ColumnValue v = convertedRow.getValue(i);
-            columnTypes[i].convertTypeInto(rawRow.get(i), v);
-            convertedRow.setValue(i, v);
-        }
-    }
-
+    @Override
     public void close() throws PreparePartsException {
         if (reader != null) {
             try {

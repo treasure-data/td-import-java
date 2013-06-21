@@ -17,6 +17,7 @@
 //
 package com.treasure_data.bulk_import.reader;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -117,7 +118,52 @@ public abstract class FileReader {
         }
     }
 
-    public abstract boolean next() throws PreparePartsException;
+    public abstract boolean readRow() throws IOException;
+
+    public boolean next() throws PreparePartsException {
+        incrementLineNum();
+        try {
+            // if reader got EOF, it returns false.
+            if (!readRow()) {
+                return false;
+            }
+
+            incrementRowNum();
+
+            int rawRowSize = rawRow.size();
+            if (rawRowSize != columnTypes.length) {
+                throw new PreparePartsException(String.format(
+                        "The number of columns to be processed (%d) must " +
+                        "match the number of column types (%d): check that the " +
+                        "number of column types you have defined matches the " +
+                        "expected number of columns being read/written [line: %d]",
+                        rawRowSize, columnTypes.length, getLineNum()));
+            }
+
+            // convert each column in row
+            convertTypesOfColumns();
+
+            // write each column value
+            writer.next(convertedRow);
+            writer.incrementRowNum();
+        } catch (IOException e) {
+            // if reader throw I/O error, parseRow throws PreparePartsException.
+            LOG.throwing("CSVFileParser", "parseRow", e);
+            throw new PreparePartsException(e);
+        } catch (PreparePartsException e) {
+            // TODO the row data should be written to error rows file
+            LOG.warning(e.getMessage());
+        }
+        return true;
+    }
+
+    public void convertTypesOfColumns() {
+        for (int i = 0; i < rawRow.size(); i++) {
+            Row.ColumnValue v = convertedRow.getValue(i);
+            columnTypes[i].convertTypeInto(rawRow.get(i), v);
+            convertedRow.setValue(i, v);
+        }
+    }
 
     public abstract void close() throws PreparePartsException;
 
