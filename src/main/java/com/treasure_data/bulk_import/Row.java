@@ -25,11 +25,14 @@ public class Row {
     private ColumnValue[] values;
     private boolean needAdditionalTimeColumn = false;
     private Row.TimeColumnValue timeColumnValue;
+    private int timeIndex = -1;
 
-    public Row(ColumnValue[] values, boolean needAdditionalTimeColumn,
-            Row.TimeColumnValue timeColumnValue) {
+    public Row(ColumnValue[] values, Row.TimeColumnValue timeColumnValue) {
         this.values = values;
-        this.needAdditionalTimeColumn = needAdditionalTimeColumn;
+        needAdditionalTimeColumn = timeColumnValue instanceof Row.TimeColumnValue;
+        if (!needAdditionalTimeColumn) {
+            timeIndex = ((Row.TimeColumnValue) timeColumnValue).getIndex();
+        }
         this.timeColumnValue = timeColumnValue;
     }
 

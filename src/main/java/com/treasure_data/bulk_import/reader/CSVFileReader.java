@@ -187,7 +187,7 @@ public class CSVFileReader extends FileReader {
                         conf.getTimeValue());
             }
 
-            initializeConvertedRow(timeColumnValue instanceof Row.TimeColumnValue, timeColumnValue);
+            initializeConvertedRow(timeColumnValue);
 
             // print first sample row
             JSONFileWriter w = new JSONFileWriter(conf);
