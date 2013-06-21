@@ -31,7 +31,6 @@ import org.supercsv.prefs.CsvPreference;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.Row;
 import com.treasure_data.bulk_import.ColumnType;
-import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -49,12 +48,6 @@ public class CSVFileReader extends FileReader {
     private Tokenizer reader;
     private Row.TimeColumnValue timeColumnValue = null;
 
-    private boolean needAdditionalTimeColumn = false;
-    private int timeColumnIndex = -1;
-    private int aliasTimeColumnIndex = -1;
-    private ExtStrftime timeFormat = null;
-    private Long timeValue = 0L;
-
     public CSVFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
         super(conf, writer);
     }
@@ -70,16 +63,6 @@ public class CSVFileReader extends FileReader {
         // if conf object doesn't have column names, types, etc,
         // sample method checks those values.
         sample(task);
-
-        // validations of columnNames and columnTypes
-        if (columnNames == null || columnNames.length == 0) {
-            throw new NullPointerException("columnNames is null.");
-        }
-        if (columnTypes == null || columnTypes.length == 0) {
-            throw new NullPointerException("columnTypes is null.");
-        }
-
-        initializeConvertedRow(needAdditionalTimeColumn, timeColumnValue);
 
         try {
             reader = new Tokenizer(new InputStreamReader(
@@ -107,6 +90,9 @@ public class CSVFileReader extends FileReader {
         }
 
         try {
+            int timeColumnIndex = -1;
+            int aliasTimeColumnIndex = -1;
+
             // extract column names
             // e.g. 
             // 1) [ "time", "name", "price" ]
@@ -141,24 +127,14 @@ public class CSVFileReader extends FileReader {
                 for (int i = 0; i < columnNames.length; i++) {
                     if (columnNames[i].equals(conf.getAliasTimeColumn())) {
                         aliasTimeColumnIndex = i;
-                        needAdditionalTimeColumn = true;
-                        timeColumnValue = new Row.AliasTimeColumnValue(i, null);
                         break;
                     }
                 }
             }
 
-            if ((timeColumnIndex >= 0 || aliasTimeColumnIndex >= 0)
-                    && conf.getTimeFormat() != null) {
-                String timeFormat = conf.getTimeFormat();
-                this.timeFormat = new ExtStrftime(timeFormat);
-            }
-
-            // if 'time' and the alias column don't exist,
+            // if 'time' and the alias columns don't exist, ...
             if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
                 if (conf.getTimeValue() >= 0) {
-                    needAdditionalTimeColumn = true;
-                    timeColumnValue = new Row.TimeValueTimeColumnValue(conf.getTimeValue());
                 } else {
                     throw new PreparePartsException(
                             "Time column not found. --time-column or --time-value option is required");
@@ -193,36 +169,50 @@ public class CSVFileReader extends FileReader {
             if (columnTypes == null || columnTypes.length == 0) {
                 columnTypes = new ColumnType[columnNames.length];
                 for (int i = 0; i < columnTypes.length; i++) {
-                    if (i == timeColumnIndex) {
-                        // TODO
-                        //columnTypes[i] = ColumnType.TIME;
-                        columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
-                    } else {
-                        columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
-                    }
+                    columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
                 }
                 conf.setColumnTypes(columnTypes);
             }
 
-//            // print first sample row
-//            JSONFileWriter w = new JSONFileWriter(conf);
-//
+            // initialize time column value
+            if (timeColumnIndex >= 0) {
+                timeColumnValue = new Row.TimeColumnValue(timeColumnIndex,
+                        columnTypes[timeColumnIndex], conf.getTimeFormat());
+            } else if (aliasTimeColumnIndex >= 0) {
+                timeColumnValue = new Row.AliasTimeColumnValue(
+                        aliasTimeColumnIndex,
+                        columnTypes[aliasTimeColumnIndex], conf.getTimeFormat());
+            } else {
+                timeColumnValue = new Row.TimeValueTimeColumnValue(
+                        conf.getTimeValue());
+            }
+
+            initializeConvertedRow(timeColumnValue instanceof Row.TimeColumnValue, timeColumnValue);
+
+            // print first sample row
+            JSONFileWriter w = new JSONFileWriter(conf);
+            w.setColumnNames(getColumnNames());
+            w.setColumnTypes(getColumnTypes());
+
 //            // add attributes of exclude/only columns to column types
 //            addExcludeAndOnlyColumnsFilter(onelineProcs);
-//
-//            try {
-//                parseRow(firstRow, onelineProcs, w);
-//                String ret = w.toJSONString();
-//                if (ret != null) {
-//                    LOG.info("sample row: " + ret);
-//                } else  {
-//                    LOG.info("cannot get sample row");
-//                }
-//            } finally {
-//                if (w != null) {
-//                    w.closeSilently();
-//                }
-//            }
+
+            try {
+                // convert each column in row
+                convertTypesOfColumns();
+                // write each column value
+                w.next(convertedRow);
+                String ret = w.toJSONString();
+                if (ret != null) {
+                    LOG.info("sample row: " + ret);
+                } else  {
+                    LOG.info("cannot get sample row");
+                }
+            } finally {
+                if (w != null) {
+                    w.closeSilently();
+                }
+            }
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
