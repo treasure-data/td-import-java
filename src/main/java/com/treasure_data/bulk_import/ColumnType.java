@@ -37,7 +37,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
             with.write(filter, (Row.StringColumnValue) v);
         }
     },
@@ -53,7 +54,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
             with.write(filter, (Row.IntColumnValue) v);
         }
     },
@@ -69,7 +71,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
             with.write(filter, (Row.LongColumnValue) v);
         }
     },
@@ -85,7 +88,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
+        public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
             with.write(filter, (Row.DoubleColumnValue) v);
         }
     };
