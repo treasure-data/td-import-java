@@ -138,11 +138,13 @@ public class Row {
 
     public static class TimeColumnValue implements ColumnValue {
         protected int index;
+        protected ColumnType columnType;
         protected ExtStrftime timeFormat;
         protected long v;
 
-        public TimeColumnValue(int index, ExtStrftime timeFormat) {
+        public TimeColumnValue(int index, ColumnType columnType, ExtStrftime timeFormat) {
             this.index = index;
+            this.columnType = columnType;
             this.timeFormat = timeFormat;
         }
 
@@ -165,8 +167,8 @@ public class Row {
     }
 
     public static class AliasTimeColumnValue extends TimeColumnValue {
-        public AliasTimeColumnValue(int index, ExtStrftime timeFormat) {
-            super(index, timeFormat);
+        public AliasTimeColumnValue(int index, ColumnType columnType, ExtStrftime timeFormat) {
+            super(index, columnType, timeFormat);
         }
     }
 
@@ -174,7 +176,7 @@ public class Row {
         private long timeValue;
 
         public TimeValueTimeColumnValue(long timeValue) {
-            super(-1, null);
+            super(-1, null, null);
             this.timeValue = timeValue;
         }
 
