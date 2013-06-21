@@ -177,11 +177,10 @@ public class CSVFileReader extends FileReader {
             // initialize time column value
             if (timeColumnIndex >= 0) {
                 timeColumnValue = new Row.TimeColumnValue(timeColumnIndex,
-                        columnTypes[timeColumnIndex], conf.getTimeFormat());
+                        conf.getTimeFormat());
             } else if (aliasTimeColumnIndex >= 0) {
                 timeColumnValue = new Row.AliasTimeColumnValue(
-                        aliasTimeColumnIndex,
-                        columnTypes[aliasTimeColumnIndex], conf.getTimeFormat());
+                        aliasTimeColumnIndex, conf.getTimeFormat());
             } else {
                 timeColumnValue = new Row.TimeValueTimeColumnValue(
                         conf.getTimeValue());
@@ -198,6 +197,8 @@ public class CSVFileReader extends FileReader {
 //            addExcludeAndOnlyColumnsFilter(onelineProcs);
 
             try {
+                rawRow.addAll(firstRow);
+
                 // convert each column in row
                 convertTypesOfColumns();
                 // write each column value
@@ -220,6 +221,7 @@ public class CSVFileReader extends FileReader {
 
     @Override
     public boolean next() throws PreparePartsException {
+        // TODO FIXME this method should be moved to FileReader class??
         incrementLineNum();
         try {
             // if reader got EOF, it returns false.

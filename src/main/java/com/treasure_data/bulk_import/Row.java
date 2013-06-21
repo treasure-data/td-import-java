@@ -25,13 +25,13 @@ public class Row {
     private ColumnValue[] values;
     private boolean needAdditionalTimeColumn = false;
     private Row.TimeColumnValue timeColumnValue;
-    private int timeIndex = -1;
+    private int timeColumnIndex = -1;
 
     public Row(ColumnValue[] values, Row.TimeColumnValue timeColumnValue) {
         this.values = values;
-        needAdditionalTimeColumn = timeColumnValue instanceof Row.TimeColumnValue;
+        needAdditionalTimeColumn = !(timeColumnValue instanceof Row.TimeColumnValue);
         if (!needAdditionalTimeColumn) {
-            timeIndex = ((Row.TimeColumnValue) timeColumnValue).getIndex();
+            timeColumnIndex = ((Row.TimeColumnValue) timeColumnValue).getIndex();
         }
         this.timeColumnValue = timeColumnValue;
     }
@@ -56,19 +56,23 @@ public class Row {
         return needAdditionalTimeColumn;
     }
 
+    public int getTimeColumnIndex() {
+        return timeColumnIndex;
+    }
+
     public Row.TimeColumnValue getTimeColumnValue() {
         return timeColumnValue;
     }
 
     public static interface ColumnValue {
+        void set(String v);
         void write(FileWriter with) throws PreparePartsException;
     }
 
     public static class StringColumnValue implements ColumnValue {
-
         private String v;
 
-        public void setString(String v) {
+        public void set(String v) {
             this.v = v;
         }
 
@@ -87,11 +91,10 @@ public class Row {
     }
 
     public static class IntColumnValue implements ColumnValue {
-
         private int v;
 
-        public void setInt(int v) {
-            this.v = v;
+        public void set(String v) {
+            this.v = Integer.parseInt(v);
         }
 
         public int getInt() {
@@ -105,11 +108,10 @@ public class Row {
     }
 
     public static class LongColumnValue implements ColumnValue {
-
         private long v;
 
-        public void setLong(long v) {
-            this.v = v;
+        public void set(String v) {
+            this.v = Long.parseLong(v);
         }
 
         public long getLong() {
@@ -125,8 +127,8 @@ public class Row {
     public static class DoubleColumnValue implements ColumnValue {
         private double v;
 
-        public void setDouble(double v) {
-            this.v = v;
+        public void set(String v) {
+            this.v = Double.parseDouble(v);
         }
 
         public double getDouble() {
@@ -141,37 +143,48 @@ public class Row {
 
     public static class TimeColumnValue implements ColumnValue {
         protected int index;
-        protected ColumnType columnType;
         protected ExtStrftime timeFormat;
         protected long v;
 
-        public TimeColumnValue(int index, ColumnType columnType, ExtStrftime timeFormat) {
+        public TimeColumnValue(int index, ExtStrftime timeFormat) {
             this.index = index;
-            this.columnType = columnType;
             this.timeFormat = timeFormat;
         }
 
-        public void setLong(long v) {
-            this.v = v;
-        }
-
-        public long getLong() {
-            return v;
+        public void set(String v) {
+            throw new UnsupportedOperationException("not implemented method");
         }
 
         public int getIndex() {
             return index;
         }
 
-        @Override
+        public ExtStrftime getTimeFormat() {
+            return timeFormat;
+        }
+
         public void write(FileWriter with) throws PreparePartsException {
-            with.write(v);
+            throw new PreparePartsException("not implemented method");
+        }
+
+        public void write(Row.ColumnValue v, FileWriter with) throws PreparePartsException {
+            if (v instanceof Row.StringColumnValue) {
+                with.write(this, (Row.StringColumnValue) v);
+            } else if (v instanceof Row.IntColumnValue) {
+                with.write(this, (Row.IntColumnValue) v);
+            } else if (v instanceof Row.LongColumnValue) {
+                with.write(this, (Row.LongColumnValue) v);
+            } else if (v instanceof Row.DoubleColumnValue) {
+                with.write(this, (Row.DoubleColumnValue) v);
+            } else {
+                throw new PreparePartsException("fatal error");
+            }
         }
     }
 
     public static class AliasTimeColumnValue extends TimeColumnValue {
-        public AliasTimeColumnValue(int index, ColumnType columnType, ExtStrftime timeFormat) {
-            super(index, columnType, timeFormat);
+        public AliasTimeColumnValue(int index, ExtStrftime timeFormat) {
+            super(index, timeFormat);
         }
     }
 
@@ -179,15 +192,16 @@ public class Row {
         private long timeValue;
 
         public TimeValueTimeColumnValue(long timeValue) {
-            super(-1, null, null);
+            super(-1, null);
             this.timeValue = timeValue;
         }
 
-        public void setLong(long v) {
+        public void write(FileWriter with) throws PreparePartsException {
+            with.write(timeValue);
         }
 
-        public long getLong() {
-            return timeValue;
+        public void write(Row.ColumnValue v, FileWriter with) throws PreparePartsException {
+            this.write(with); // v is ignore
         }
     }
 }

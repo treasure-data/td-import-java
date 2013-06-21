@@ -30,7 +30,7 @@ public enum ColumnType {
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
-            ((Row.StringColumnValue) cv).setString(v);
+            cv.set(v);
         }
     },
     INT("int", 1) {
@@ -41,7 +41,7 @@ public enum ColumnType {
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
-            ((Row.IntColumnValue) cv).setInt(Integer.parseInt(v));
+            cv.set(v);
         }
     },
     LONG("long", 2) {
@@ -52,7 +52,7 @@ public enum ColumnType {
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
-            ((Row.LongColumnValue) cv).setLong(Long.parseLong(v));
+            cv.set(v);
         }
     },
     DOUBLE("double", 3) {
@@ -63,7 +63,7 @@ public enum ColumnType {
 
         @Override
         public void convertTypeInto(String v, Row.ColumnValue cv) {
-            ((Row.DoubleColumnValue) cv).setDouble(Double.parseDouble(v));
+            cv.set(v);
         }
     };
 

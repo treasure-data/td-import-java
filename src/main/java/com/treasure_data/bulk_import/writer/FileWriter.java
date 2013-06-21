@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Row;
 import com.treasure_data.bulk_import.ColumnType;
+import com.treasure_data.bulk_import.Row.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -71,13 +72,16 @@ public abstract class FileWriter implements Closeable {
         // write columns
         for (int i = 0; i < size; i++) {
             write(columnNames[i]);
-            row.getValue(i).write(this);
+            if (i == row.getTimeColumnIndex()) {
+                row.getTimeColumnValue().write(row.getValue(i), this);
+            } else {
+                row.getValue(i).write(this);
+            }
         }
 
         if (row.needAdditionalTimeColumn()) {
-            Row.TimeColumnValue tc = row.getTimeColumnValue();
-            //tc.write(row.getValue(tc.getIndex()));
-            tc.write(this);
+            TimeColumnValue tcValue = row.getTimeColumnValue();
+            tcValue.write(row.getValue(tcValue.getIndex()), this);
         }
 
         // end
@@ -90,6 +94,10 @@ public abstract class FileWriter implements Closeable {
     public abstract void write(int v) throws PreparePartsException;
     public abstract void write(long v) throws PreparePartsException;
     public abstract void write(double v) throws PreparePartsException;
+    public abstract void write(Row.TimeColumnValue filter, Row.StringColumnValue v) throws PreparePartsException;
+    public abstract void write(Row.TimeColumnValue filter, Row.IntColumnValue v) throws PreparePartsException;
+    public abstract void write(Row.TimeColumnValue filter, Row.LongColumnValue v) throws PreparePartsException;
+    public abstract void write(Row.TimeColumnValue filter, Row.DoubleColumnValue v) throws PreparePartsException;
     public abstract void writeEndRow() throws PreparePartsException;
 
     public void resetRowNum() {

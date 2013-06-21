@@ -29,6 +29,7 @@ import java.util.zip.GZIPOutputStream;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
+import com.treasure_data.bulk_import.Row;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -171,6 +172,39 @@ public class MsgpackGZIPFileWriter extends FileWriter {
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
+    }
+
+    @Override
+    public void write(Row.TimeColumnValue filter, Row.StringColumnValue v) throws PreparePartsException {
+        String timeString = v.getString();
+        long time = 0;
+        try {
+            time = Long.parseLong(timeString);
+        } catch (Throwable t) {
+            throw new PreparePartsException(String.format(
+                    "'%s' could not be parsed as long type", timeString));
+        }
+
+        if (time == 0 && filter.getTimeFormat() != null) {
+            time = filter.getTimeFormat().getTime(timeString);
+        }
+
+        write(time);
+    }
+
+    @Override
+    public void write(Row.TimeColumnValue filter, Row.IntColumnValue v) throws PreparePartsException {
+        v.write(this);
+    }
+
+    @Override
+    public void write(Row.TimeColumnValue filter, Row.LongColumnValue v) throws PreparePartsException {
+        v.write(this);
+    }
+
+    @Override
+    public void write(Row.TimeColumnValue filter, Row.DoubleColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
     }
 
     @Override
