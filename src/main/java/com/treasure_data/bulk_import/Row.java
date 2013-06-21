@@ -208,7 +208,7 @@ public class Row {
         private long timeValue;
 
         public TimeValueTimeColumnValue(long timeValue) {
-            super(-1, null);
+            super(0, null);
             this.timeValue = timeValue;
         }
 
