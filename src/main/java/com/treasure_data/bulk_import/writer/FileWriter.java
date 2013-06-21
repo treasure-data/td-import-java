@@ -27,6 +27,7 @@ import com.treasure_data.bulk_import.Row.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.commands.Config;
 
 public abstract class FileWriter implements Closeable {
 
@@ -80,6 +81,7 @@ public abstract class FileWriter implements Closeable {
         }
 
         if (row.needAdditionalTimeColumn()) {
+            write(Config.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
             TimeColumnValue tcValue = row.getTimeColumnValue();
             tcValue.write(row.getValue(tcValue.getIndex()), this);
         }

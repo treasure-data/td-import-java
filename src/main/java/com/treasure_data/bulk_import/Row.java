@@ -29,7 +29,9 @@ public class Row {
 
     public Row(ColumnValue[] values, Row.TimeColumnValue timeColumnValue) {
         this.values = values;
-        needAdditionalTimeColumn = !(timeColumnValue instanceof Row.TimeColumnValue);
+        needAdditionalTimeColumn =
+                timeColumnValue instanceof Row.AliasTimeColumnValue ||
+                timeColumnValue instanceof Row.TimeValueTimeColumnValue;
         if (!needAdditionalTimeColumn) {
             timeColumnIndex = ((Row.TimeColumnValue) timeColumnValue).getIndex();
         }
