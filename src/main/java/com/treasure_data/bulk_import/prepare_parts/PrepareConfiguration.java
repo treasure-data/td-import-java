@@ -537,8 +537,8 @@ public class PrepareConfiguration extends Configuration {
         return timeValue;
     }
 
-    public String getTimeFormat() {
-        return timeFormat;
+    public ExtStrftime getTimeFormat() {
+        return timeFormat == null ? null : new ExtStrftime(timeFormat);
     }
 
     public String getErrorRecordOutputDirName() {
