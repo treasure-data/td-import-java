@@ -144,9 +144,10 @@ public class CSVFileReader extends FileReader {
                 sampleColumnValues[i] = new SampleColumnValue(sampleRowSize);
             }
 
-            // read sample rows
+            // read some rows
             for (int i = 0; i < sampleRowSize; i++) {
                 sampleReader.readColumns(row);
+
                 if (row == null || row.isEmpty()) {
                     break;
                 }
@@ -156,11 +157,16 @@ public class CSVFileReader extends FileReader {
                     isFirstRow = true;
                 }
 
-                // sampling
                 if (sampleColumnValues.length != row.size()) {
-                    // TODO
+                    throw new PreparePartsException(String.format(
+                            "The number of columns to be processed (%d) must " +
+                            "match the number of column types (%d): check that the " +
+                            "number of column types you have defined matches the " +
+                            "expected number of columns being read/written [line: %d]",
+                            row.size(), columnTypes.length, i));
                 }
 
+                // sampling
                 for (int j = 0; j < sampleColumnValues.length; j++) {
                     sampleColumnValues[j].set(row.get(j));
                 }
@@ -245,7 +251,7 @@ public class CSVFileReader extends FileReader {
         }
     }
 
-    void setSkipColumns() { // TODO FIXME should rename the method
+    void setSkipColumns() {
         String[] excludeColumns = conf.getExcludeColumns();
         String[] onlyColumns = conf.getOnlyColumns();
         for (int i = 0; i < columnNames.length; i++) {
