@@ -215,7 +215,7 @@ public class CSVFileReader extends FileReader {
                 }
             } finally {
                 if (w != null) {
-                    w.closeSilently();
+                    w.close();
                 }
             }
         } catch (IOException e) {
@@ -237,13 +237,11 @@ public class CSVFileReader extends FileReader {
     }
 
     @Override
-    public void close() throws PreparePartsException {
+    public void close() throws IOException {
+        super.close();
+
         if (reader != null) {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                throw new PreparePartsException(e);
-            }
+            reader.close();
         }
     }
 

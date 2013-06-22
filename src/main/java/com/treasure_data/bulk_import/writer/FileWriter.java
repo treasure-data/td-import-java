@@ -128,13 +128,6 @@ public abstract class FileWriter implements Closeable {
         return rowNum;
     }
 
+    // Closeable#close()
     public abstract void close() throws IOException;
-
-    public void closeSilently() {
-        try {
-            close();
-        } catch (IOException e) {
-            LOG.severe(e.getMessage());
-        }
-    }
 }

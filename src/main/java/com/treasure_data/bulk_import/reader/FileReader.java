@@ -17,6 +17,7 @@
 //
 package com.treasure_data.bulk_import.reader;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -35,7 +36,7 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public abstract class FileReader {
+public abstract class FileReader implements Closeable {
     private static final Logger LOG = Logger.getLogger(FileReader.class.getName());
 
     protected PrepareConfiguration conf;
@@ -121,12 +122,6 @@ public abstract class FileReader {
         }
     }
 
-    public void closeErrorRecordWriter() {
-        if (errWriter != null) {
-            errWriter.close();
-        }
-    }
-
     public abstract boolean readRow() throws IOException;
 
     public boolean next() throws PreparePartsException {
@@ -174,14 +169,10 @@ public abstract class FileReader {
         }
     }
 
-    public abstract void close() throws PreparePartsException;
-
-    public void closeSilently() {
-        try {
-            close();
-            closeErrorRecordWriter();
-        } catch (PreparePartsException e) {
-            LOG.severe(e.getMessage());
+    // Closeable#close()
+    public void close() throws IOException {
+        if (errWriter != null) {
+            errWriter.close();
         }
     }
 }

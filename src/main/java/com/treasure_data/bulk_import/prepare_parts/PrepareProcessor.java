@@ -179,11 +179,21 @@ public class PrepareProcessor {
         }
 
         if (r != null) {
-            r.closeSilently();
+            try {
+                r.close();
+            } catch (IOException e) {
+                err.error = e;
+                return err;
+            }
         }
 
         if (w != null) {
-            w.closeSilently();
+            try {
+                w.close();
+            } catch (IOException e) {
+                err.error = e;
+                return err;
+            }
         }
 
         LOG.info(String.format("Converted file '%s', %d entries",
