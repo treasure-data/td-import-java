@@ -17,7 +17,6 @@
 //
 package com.treasure_data.bulk_import.model;
 
-
 public class Row {
     private ColumnValue[] values;
     private boolean needAdditionalTimeColumn = false;

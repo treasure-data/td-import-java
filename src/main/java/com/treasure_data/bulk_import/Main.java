@@ -105,16 +105,7 @@ public class Main {
 
         proc.joinWorkers();
 
-        if (proc.getErrors().size() > 0) {
-            LOG.warning(String.format(
-                    "Some errors occurred during %s processing. " +
-                    "Please check the following messages.",
-                    Configuration.CMD_PREPARE_PARTS));
-        }
-
-        for (PrepareProcessor.ErrorInfo e : proc.getErrors()) {
-            e.error.printStackTrace();
-        }
+        outputErrors(proc, Configuration.CMD_PREPARE_PARTS);
     }
 
     /**
@@ -244,6 +235,21 @@ public class Main {
         MultiThreadUploadProcessor.processAfterUploading(new BulkImportClient(
                 new TreasureDataClient(conf.getProperties())), conf,
                 sessionName);
+    }
+
+
+    private static void outputErrors(MultiThreadPrepareProcessor proc, String cmd) {
+        if (proc.getErrors().size() == 0) {
+            return;
+        }
+
+        LOG.warning(String.format(
+                "Some errors occurred during %s processing. " +
+                "Please check the following messages.", cmd));
+
+        for (PrepareProcessor.ErrorInfo e : proc.getErrors()) {
+            e.error.printStackTrace();
+        }
     }
 
     public static void main(final String[] args) throws Exception {

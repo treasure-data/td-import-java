@@ -19,7 +19,6 @@ package com.treasure_data.bulk_import.writer;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
