@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvListReader;
 import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
@@ -34,8 +32,6 @@ import com.treasure_data.bulk_import.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.proc.ColumnSamplingProc;
-import com.treasure_data.bulk_import.prepare_parts.proc.ColumnProcGenerator;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.JSONFileWriter;
 
@@ -78,11 +74,12 @@ public class CSVFileReader extends FileReader {
 
     private void sample(PrepareProcessor.Task task) throws PreparePartsException {
         // create sample reader
-        CsvListReader sampleReader = null;
+        Tokenizer sampleReader = null;
+        List<String> row = new ArrayList<String>();
         try {
-            // TODO sample reader is not closed
-            sampleReader = new CsvListReader(new InputStreamReader(
-                    task.createInputStream(conf.getCompressionType()), conf.getCharsetDecoder()), csvPref);
+            sampleReader = new Tokenizer(new InputStreamReader(
+                    task.createInputStream(conf.getCompressionType()),
+                    conf.getCharsetDecoder()), csvPref);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -97,9 +94,9 @@ public class CSVFileReader extends FileReader {
             // 2) [ "timestamp", "name", "price" ]
             // 3) [ "name", "price" ]
             if (conf.hasColumnHeader()) {
-                List<String> columnList = sampleReader.read();
+                sampleReader.readColumns(row);
                 if (columnNames == null || columnNames.length == 0) {
-                    columnNames = columnList.toArray(new String[0]);
+                    columnNames = row.toArray(new String[0]);
                     conf.setColumnNames(columnNames);
                 }
             }
@@ -139,27 +136,33 @@ public class CSVFileReader extends FileReader {
                 }
             }
 
-            // read sample rows
+            boolean isFirstRow = false;
             List<String> firstRow = new ArrayList<String>();
             final int sampleRowSize = conf.getSampleRowSize();
-            CellProcessor[] sampleProcs = ColumnProcGenerator.generateSampleCellProcessors(
-                    columnNames, sampleRowSize);
-            boolean isFirstRow = false;
+            Row.SampleColumnValue[] sampleColumnValues = new Row.SampleColumnValue[columnNames.length];
+            for (int i = 0; i < sampleColumnValues.length; i++) {
+                sampleColumnValues[i] = new Row.SampleColumnValue(sampleRowSize);
+            }
+
+            // read sample rows
             for (int i = 0; i < sampleRowSize; i++) {
-                List<Object> row = sampleReader.read(sampleProcs);
+                sampleReader.readColumns(row);
+                if (row == null || row.isEmpty()) {
+                    break;
+                }
+
                 if (!isFirstRow) {
-                    for (Object c : row) {
-                        if (c != null) {
-                            firstRow.add(c.toString());
-                        } else {
-                            firstRow.add(null);
-                        }
-                    }
+                    firstRow.addAll(row);
                     isFirstRow = true;
                 }
 
-                if (row == null || row.isEmpty()) {
-                    break;
+                // sampling
+                if (sampleColumnValues.length != row.size()) {
+                    // TODO
+                }
+
+                for (int j = 0; j < sampleColumnValues.length; j++) {
+                    sampleColumnValues[j].set(row.get(j));
                 }
             }
 
@@ -167,7 +170,7 @@ public class CSVFileReader extends FileReader {
             if (columnTypes == null || columnTypes.length == 0) {
                 columnTypes = new ColumnType[columnNames.length];
                 for (int i = 0; i < columnTypes.length; i++) {
-                    columnTypes[i] = ColumnSamplingProc.getColumnType(sampleProcs[i]);
+                    columnTypes[i] = sampleColumnValues[i].getColumnType();
                 }
                 conf.setColumnTypes(columnTypes);
             }
@@ -191,12 +194,13 @@ public class CSVFileReader extends FileReader {
 
 
             // print first sample row
-            JSONFileWriter w = new JSONFileWriter(conf);
-            w.setColumnNames(getColumnNames());
-            w.setColumnTypes(getColumnTypes());
-            w.setSkipColumns(getSkipColumns());
-
+            JSONFileWriter w = null;
             try {
+                w = new JSONFileWriter(conf);
+                w.setColumnNames(getColumnNames());
+                w.setColumnTypes(getColumnTypes());
+                w.setSkipColumns(getSkipColumns());
+
                 rawRow.addAll(firstRow);
 
                 // convert each column in row
