@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.ColumnType;
+import com.treasure_data.bulk_import.model.ColumnType;
 
 public class TestPrepareProcessor {
 

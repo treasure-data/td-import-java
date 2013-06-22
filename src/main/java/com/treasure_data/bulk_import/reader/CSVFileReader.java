@@ -27,8 +27,8 @@ import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.Row;
-import com.treasure_data.bulk_import.ColumnType;
+import com.treasure_data.bulk_import.model.ColumnType;
+import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -73,20 +73,17 @@ public class CSVFileReader extends FileReader {
     }
 
     private void sample(PrepareProcessor.Task task) throws PreparePartsException {
-        // create sample reader
         Tokenizer sampleReader = null;
+
+        int timeColumnIndex = -1;
+        int aliasTimeColumnIndex = -1;
         List<String> row = new ArrayList<String>();
+
         try {
+            // create sample reader
             sampleReader = new Tokenizer(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
                     conf.getCharsetDecoder()), csvPref);
-        } catch (IOException e) {
-            throw new PreparePartsException(e);
-        }
-
-        try {
-            int timeColumnIndex = -1;
-            int aliasTimeColumnIndex = -1;
 
             // extract column names
             // e.g. 
@@ -220,6 +217,14 @@ public class CSVFileReader extends FileReader {
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);
+        } finally {
+            if (sampleReader != null) {
+                try {
+                    sampleReader.close();
+                } catch (IOException e) {
+                    throw new PreparePartsException(e);
+                }
+            }
         }
     }
 

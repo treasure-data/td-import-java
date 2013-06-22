@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.junit.Ignore;
 
-import com.treasure_data.bulk_import.Row;
+import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;

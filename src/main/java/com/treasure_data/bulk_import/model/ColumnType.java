@@ -15,12 +15,18 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import;
+package com.treasure_data.bulk_import.model;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.treasure_data.bulk_import.model.Row.ColumnValue;
+import com.treasure_data.bulk_import.model.Row.DoubleColumnValue;
+import com.treasure_data.bulk_import.model.Row.IntColumnValue;
+import com.treasure_data.bulk_import.model.Row.LongColumnValue;
+import com.treasure_data.bulk_import.model.Row.StringColumnValue;
+import com.treasure_data.bulk_import.model.Row.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.writer.FileWriter;
 

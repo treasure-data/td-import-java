@@ -24,9 +24,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.Row;
-import com.treasure_data.bulk_import.ColumnType;
-import com.treasure_data.bulk_import.Row.TimeColumnValue;
+import com.treasure_data.bulk_import.model.ColumnType;
+import com.treasure_data.bulk_import.model.Row;
+import com.treasure_data.bulk_import.model.Row.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;

@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.ColumnType;
+import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.reader.CSVFileReader;
 import com.treasure_data.bulk_import.reader.FileReader;
 import com.treasure_data.bulk_import.writer.FileWriter;
