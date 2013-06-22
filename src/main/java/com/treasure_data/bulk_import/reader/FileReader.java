@@ -27,7 +27,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.model.ColumnType;
+import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.Row;
+import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -75,8 +77,8 @@ public abstract class FileReader {
         return skipColumns;
     }
 
-    public void initializeConvertedRow(Row.TimeColumnValue timeColumnValue) {
-        Row.ColumnValue[] values = new Row.ColumnValue[columnTypes.length];
+    public void initializeConvertedRow(TimeColumnValue timeColumnValue) {
+        ColumnValue[] values = new ColumnValue[columnTypes.length];
         for (int i = 0; i < columnTypes.length; i++) {
             values[i] = columnTypes[i].createColumnValue();
         }
@@ -166,7 +168,7 @@ public abstract class FileReader {
 
     public void convertTypesOfColumns() {
         for (int i = 0; i < rawRow.size(); i++) {
-            Row.ColumnValue v = convertedRow.getValue(i);
+            ColumnValue v = convertedRow.getValue(i);
             columnTypes[i].convertTypeInto(rawRow.get(i), v);
             convertedRow.setValue(i, v);
         }

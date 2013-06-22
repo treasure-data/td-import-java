@@ -27,8 +27,11 @@ import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
 import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
-import com.treasure_data.bulk_import.model.Row;
+import com.treasure_data.bulk_import.model.SampleColumnValue;
+import com.treasure_data.bulk_import.model.TimeColumnValue;
+import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -40,7 +43,7 @@ public class CSVFileReader extends FileReader {
 
     protected CsvPreference csvPref;
     private Tokenizer reader;
-    private Row.TimeColumnValue timeColumnValue = null;
+    private TimeColumnValue timeColumnValue = null;
 
     public CSVFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
         super(conf, writer);
@@ -136,9 +139,9 @@ public class CSVFileReader extends FileReader {
             boolean isFirstRow = false;
             List<String> firstRow = new ArrayList<String>();
             final int sampleRowSize = conf.getSampleRowSize();
-            Row.SampleColumnValue[] sampleColumnValues = new Row.SampleColumnValue[columnNames.length];
+            SampleColumnValue[] sampleColumnValues = new SampleColumnValue[columnNames.length];
             for (int i = 0; i < sampleColumnValues.length; i++) {
-                sampleColumnValues[i] = new Row.SampleColumnValue(sampleRowSize);
+                sampleColumnValues[i] = new SampleColumnValue(sampleRowSize);
             }
 
             // read sample rows
@@ -174,13 +177,13 @@ public class CSVFileReader extends FileReader {
 
             // initialize time column value
             if (timeColumnIndex >= 0) {
-                timeColumnValue = new Row.TimeColumnValue(timeColumnIndex,
+                timeColumnValue = new TimeColumnValue(timeColumnIndex,
                         conf.getTimeFormat());
             } else if (aliasTimeColumnIndex >= 0) {
-                timeColumnValue = new Row.AliasTimeColumnValue(
+                timeColumnValue = new AliasTimeColumnValue(
                         aliasTimeColumnIndex, conf.getTimeFormat());
             } else {
-                timeColumnValue = new Row.TimeValueTimeColumnValue(
+                timeColumnValue = new TimeValueTimeColumnValue(
                         conf.getTimeValue());
             }
 

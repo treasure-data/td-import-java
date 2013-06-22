@@ -29,7 +29,11 @@ import java.util.zip.GZIPOutputStream;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
-import com.treasure_data.bulk_import.model.Row;
+import com.treasure_data.bulk_import.model.DoubleColumnValue;
+import com.treasure_data.bulk_import.model.IntColumnValue;
+import com.treasure_data.bulk_import.model.LongColumnValue;
+import com.treasure_data.bulk_import.model.StringColumnValue;
+import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -175,7 +179,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void write(Row.TimeColumnValue filter, Row.StringColumnValue v) throws PreparePartsException {
+    public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
         String timeString = v.getString();
         long time = 0;
         try {
@@ -193,17 +197,17 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void write(Row.TimeColumnValue filter, Row.IntColumnValue v) throws PreparePartsException {
+    public void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
         v.write(this);
     }
 
     @Override
-    public void write(Row.TimeColumnValue filter, Row.LongColumnValue v) throws PreparePartsException {
+    public void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
         v.write(this);
     }
 
     @Override
-    public void write(Row.TimeColumnValue filter, Row.DoubleColumnValue v) throws PreparePartsException {
+    public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
         throw new PreparePartsException("not implemented method");
     }
 

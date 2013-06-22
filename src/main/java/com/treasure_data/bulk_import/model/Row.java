@@ -17,23 +17,20 @@
 //
 package com.treasure_data.bulk_import.model;
 
-import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class Row {
     private ColumnValue[] values;
     private boolean needAdditionalTimeColumn = false;
-    private Row.TimeColumnValue timeColumnValue;
+    private TimeColumnValue timeColumnValue;
     private int timeColumnIndex = -1;
 
-    public Row(ColumnValue[] values, Row.TimeColumnValue timeColumnValue) {
+    public Row(ColumnValue[] values, TimeColumnValue timeColumnValue) {
         this.values = values;
         needAdditionalTimeColumn =
-                timeColumnValue instanceof Row.AliasTimeColumnValue ||
-                timeColumnValue instanceof Row.TimeValueTimeColumnValue;
+                timeColumnValue instanceof AliasTimeColumnValue ||
+                timeColumnValue instanceof TimeValueTimeColumnValue;
         if (!needAdditionalTimeColumn) {
-            timeColumnIndex = ((Row.TimeColumnValue) timeColumnValue).getIndex();
+            timeColumnIndex = ((TimeColumnValue) timeColumnValue).getIndex();
         }
         this.timeColumnValue = timeColumnValue;
     }
@@ -62,217 +59,7 @@ public class Row {
         return timeColumnIndex;
     }
 
-    public Row.TimeColumnValue getTimeColumnValue() {
+    public TimeColumnValue getTimeColumnValue() {
         return timeColumnValue;
-    }
-
-    public static interface ColumnValue {
-        ColumnType getColumnType();
-        void set(String v);
-        void write(FileWriter with) throws PreparePartsException;
-    }
-
-    public static abstract class AbstractColumnValue implements ColumnValue {
-        private ColumnType columnType;
-
-        public AbstractColumnValue(ColumnType columnType) {
-            this.columnType = columnType;
-        }
-
-        public ColumnType getColumnType() {
-            return columnType;
-        }
-    }
-
-    public static class StringColumnValue extends AbstractColumnValue {
-        private String v;
-
-        public StringColumnValue(ColumnType columnType) {
-            super(columnType);
-        }
-
-        public void set(String v) {
-            this.v = v;
-        }
-
-        public String getString() {
-            return v;
-        }
-
-        @Override
-        public void write(FileWriter with) throws PreparePartsException {
-            if (v != null) {
-                with.write(v);
-            } else {
-                with.writeNil();
-            }
-        }
-    }
-
-    public static class IntColumnValue extends AbstractColumnValue {
-        private int v;
-
-        public IntColumnValue(ColumnType columnType) {
-            super(columnType);
-        }
-
-        public void set(String v) {
-            this.v = Integer.parseInt(v);
-        }
-
-        public int getInt() {
-            return v;
-        }
-
-        @Override
-        public void write(FileWriter with) throws PreparePartsException {
-            with.write(v);
-        }
-    }
-
-    public static class LongColumnValue extends AbstractColumnValue {
-        private long v;
-
-        public LongColumnValue(ColumnType columnType) {
-            super(columnType);
-        }
-
-        public void set(String v) {
-            this.v = Long.parseLong(v);
-        }
-
-        public long getLong() {
-            return v;
-        }
-
-        @Override
-        public void write(FileWriter with) throws PreparePartsException {
-            with.write(v);
-        }
-    }
-
-    public static class DoubleColumnValue extends AbstractColumnValue {
-        private double v;
-
-        public DoubleColumnValue(ColumnType columnType) {
-            super(columnType);
-        }
-
-        public void set(String v) {
-            this.v = Double.parseDouble(v);
-        }
-
-        public double getDouble() {
-            return v;
-        }
-
-        @Override
-        public void write(FileWriter with) throws PreparePartsException {
-            with.write(v);
-        }
-    }
-
-    public static class TimeColumnValue {
-        protected int index;
-        protected ExtStrftime timeFormat;
-
-        public TimeColumnValue(int index, ExtStrftime timeFormat) {
-            this.index = index;
-            this.timeFormat = timeFormat;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public ExtStrftime getTimeFormat() {
-            return timeFormat;
-        }
-
-        public void write(FileWriter with) throws PreparePartsException {
-            throw new PreparePartsException("not implemented method");
-        }
-
-        public void write(Row.ColumnValue v, FileWriter with) throws PreparePartsException {
-            v.getColumnType().filterAndWrite(v, this, with);
-        }
-    }
-
-    public static class AliasTimeColumnValue extends TimeColumnValue {
-        public AliasTimeColumnValue(int index, ExtStrftime timeFormat) {
-            super(index, timeFormat);
-        }
-    }
-
-    public static class TimeValueTimeColumnValue extends TimeColumnValue {
-        private long timeValue;
-
-        public TimeValueTimeColumnValue(long timeValue) {
-            super(0, null);
-            this.timeValue = timeValue;
-        }
-
-        public void write(FileWriter with) throws PreparePartsException {
-            with.write(timeValue);
-        }
-
-        public void write(Row.ColumnValue v, FileWriter with) throws PreparePartsException {
-            this.write(with); // v is ignore
-        }
-    }
-
-    public static class SampleColumnValue {
-        private int sampleRow;
-        private int[] scores = new int[] { 0, 0, 0, 0 };
-
-        public SampleColumnValue(int sampleRow) {
-            this.sampleRow = sampleRow;
-        }
-
-        public void set(String value) {
-            if (value == null) {
-                // any score are not changed
-                return;
-            }
-
-            // value looks like String object?
-            scores[ColumnType.STRING.getIndex()] += 1;
-
-            // value looks like Double object?
-            try {
-                Double.parseDouble((String) value);
-                scores[ColumnType.DOUBLE.getIndex()] += 1;
-            } catch (NumberFormatException e) {
-                // ignore
-            }
-
-            // value looks like Long object?
-            try {
-                Long.parseLong((String) value);
-                scores[ColumnType.LONG.getIndex()] += 1;
-            } catch (NumberFormatException e) {
-                // ignore
-            }
-
-            // value looks like Integer object?
-            try {
-                Integer.parseInt((String) value);
-                scores[ColumnType.INT.getIndex()] += 1;
-            } catch (NumberFormatException e) {
-                // ignore
-            }
-        }
-
-        public ColumnType getColumnType() {
-            int max = -sampleRow;
-            int maxIndex = 0;
-            for (int i = 0; i < scores.length; i++) {
-                if (max < scores[i]) {
-                    max = scores[i];
-                    maxIndex = i;
-                }
-            }
-            return ColumnType.fromInt(maxIndex);
-        }
     }
 }

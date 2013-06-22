@@ -25,8 +25,12 @@ import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
+import com.treasure_data.bulk_import.model.DoubleColumnValue;
+import com.treasure_data.bulk_import.model.IntColumnValue;
+import com.treasure_data.bulk_import.model.LongColumnValue;
 import com.treasure_data.bulk_import.model.Row;
-import com.treasure_data.bulk_import.model.Row.TimeColumnValue;
+import com.treasure_data.bulk_import.model.StringColumnValue;
+import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -107,10 +111,10 @@ public abstract class FileWriter implements Closeable {
     public abstract void write(int v) throws PreparePartsException;
     public abstract void write(long v) throws PreparePartsException;
     public abstract void write(double v) throws PreparePartsException;
-    public abstract void write(Row.TimeColumnValue filter, Row.StringColumnValue v) throws PreparePartsException;
-    public abstract void write(Row.TimeColumnValue filter, Row.IntColumnValue v) throws PreparePartsException;
-    public abstract void write(Row.TimeColumnValue filter, Row.LongColumnValue v) throws PreparePartsException;
-    public abstract void write(Row.TimeColumnValue filter, Row.DoubleColumnValue v) throws PreparePartsException;
+    public abstract void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
+    public abstract void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
+    public abstract void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
+    public abstract void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException;
     public abstract void writeEndRow() throws PreparePartsException;
 
     public void resetRowNum() {
