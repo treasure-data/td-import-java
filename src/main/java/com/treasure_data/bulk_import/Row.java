@@ -220,4 +220,59 @@ public class Row {
             this.write(with); // v is ignore
         }
     }
+
+    public static class SampleColumnValue {
+        private int sampleRow;
+        private int[] scores = new int[] { 0, 0, 0, 0 };
+
+        public SampleColumnValue(int sampleRow) {
+            this.sampleRow = sampleRow;
+        }
+
+        public void set(String value) {
+            if (value == null) {
+                // any score are not changed
+                return;
+            }
+
+            // value looks like String object?
+            scores[ColumnType.STRING.getIndex()] += 1;
+
+            // value looks like Double object?
+            try {
+                Double.parseDouble((String) value);
+                scores[ColumnType.DOUBLE.getIndex()] += 1;
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+
+            // value looks like Long object?
+            try {
+                Long.parseLong((String) value);
+                scores[ColumnType.LONG.getIndex()] += 1;
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+
+            // value looks like Integer object?
+            try {
+                Integer.parseInt((String) value);
+                scores[ColumnType.INT.getIndex()] += 1;
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+
+        public ColumnType getColumnType() {
+            int max = -sampleRow;
+            int maxIndex = 0;
+            for (int i = 0; i < scores.length; i++) {
+                if (max < scores[i]) {
+                    max = scores[i];
+                    maxIndex = i;
+                }
+            }
+            return ColumnType.fromInt(maxIndex);
+        }
+    }
 }
