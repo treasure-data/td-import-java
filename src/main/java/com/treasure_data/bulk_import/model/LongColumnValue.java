@@ -27,7 +27,7 @@ public class LongColumnValue extends AbstractColumnValue {
         super(columnType);
     }
 
-    public void set(String v) throws PreparePartsException {
+    public void parse(String v) throws PreparePartsException {
         try {
             this.v = Long.parseLong(v);
         } catch (Exception e) {

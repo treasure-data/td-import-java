@@ -41,7 +41,7 @@ public class TestStringColumnValue extends ColumnValueTestUtil<String> {
     @Test
     public void returnNormalValues() throws Exception {
         for (int i = 0; i < expecteds.size(); i++) {
-            columnValue.set("" + expecteds.get(i));
+            columnValue.parse("" + expecteds.get(i));
             assertColumnValueEquals(expecteds.get(i),
                     (StringColumnValue) columnValue);
         }

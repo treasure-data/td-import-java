@@ -46,7 +46,7 @@ public class ColumnValueTestUtil<T> {
     @Test
     public void throwPreparePartErrorWhenItParsesInvalidValues() throws Exception {
         try {
-            columnValue.set(invalidValue());
+            columnValue.parse(invalidValue());
             fail();
         } catch (Throwable t) {
             assertTrue(t instanceof PreparePartsException);

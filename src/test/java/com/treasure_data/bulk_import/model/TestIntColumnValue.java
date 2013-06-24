@@ -32,7 +32,7 @@ public class TestIntColumnValue extends ColumnValueTestUtil<Integer> {
     @Test
     public void returnNormalValues() throws Exception {
         for (int i = 0; i < expecteds.size(); i++) {
-            columnValue.set("" + expecteds.get(i));
+            columnValue.parse("" + expecteds.get(i));
             assertColumnValueEquals(expecteds.get(i),
                     (IntColumnValue) columnValue);
         }

@@ -27,7 +27,7 @@ public class IntColumnValue extends AbstractColumnValue {
         super(columnType);
     }
 
-    public void set(String v) throws PreparePartsException {
+    public void parse(String v) throws PreparePartsException {
         try {
             this.v = Integer.parseInt(v);
         } catch (Exception e) {

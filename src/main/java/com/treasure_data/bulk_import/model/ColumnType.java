@@ -34,7 +34,7 @@ public enum ColumnType {
         @Override
         public void convertTypeInto(String v, ColumnValue cv)
                 throws PreparePartsException {
-            cv.set(v);
+            cv.parse(v);
         }
 
         @Override
@@ -52,7 +52,7 @@ public enum ColumnType {
         @Override
         public void convertTypeInto(String v, ColumnValue cv)
                 throws PreparePartsException {
-            cv.set(v);
+            cv.parse(v);
         }
 
         @Override
@@ -70,7 +70,7 @@ public enum ColumnType {
         @Override
         public void convertTypeInto(String v, ColumnValue cv)
                 throws PreparePartsException {
-            cv.set(v);
+            cv.parse(v);
         }
 
         @Override
@@ -88,7 +88,7 @@ public enum ColumnType {
         @Override
         public void convertTypeInto(String v, ColumnValue cv)
                 throws PreparePartsException {
-            cv.set(v);
+            cv.parse(v);
         }
 
         @Override
