@@ -19,12 +19,12 @@ import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 @Ignore
-public class TestFileWriter extends FileWriter {
+public class FileWriterTestUtil extends FileWriter {
 
     private Map<String, Object> row;
     private List<Object> columnKeyValues;
 
-    public TestFileWriter(PrepareConfiguration conf) {
+    public FileWriterTestUtil(PrepareConfiguration conf) {
         super(conf);
     }
 
