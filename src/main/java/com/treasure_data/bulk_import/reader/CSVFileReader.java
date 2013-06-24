@@ -42,7 +42,7 @@ public class CSVFileReader extends FileReader {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class.getName());
 
     protected CsvPreference csvPref;
-    private Tokenizer reader;
+    private Tokenizer tokenizer;
 
     public CSVFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
         super(conf, writer);
@@ -61,12 +61,12 @@ public class CSVFileReader extends FileReader {
         sample(task);
 
         try {
-            reader = new Tokenizer(new InputStreamReader(
+            tokenizer = new Tokenizer(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
                     conf.getCharsetDecoder()), csvPref);
             if (conf.hasColumnHeader()) {
                 // header line is skipped
-                reader.readColumns(new ArrayList<String>());
+                tokenizer.readColumns(new ArrayList<String>());
                 incrementLineNum();
             }
         } catch (IOException e) {
@@ -75,7 +75,7 @@ public class CSVFileReader extends FileReader {
     }
 
     private void sample(PrepareProcessor.Task task) throws PreparePartsException {
-        Tokenizer sampleReader = null;
+        Tokenizer sampleTokenizer = null;
 
         int timeColumnIndex = -1;
         int aliasTimeColumnIndex = -1;
@@ -83,7 +83,7 @@ public class CSVFileReader extends FileReader {
 
         try {
             // create sample reader
-            sampleReader = new Tokenizer(new InputStreamReader(
+            sampleTokenizer = new Tokenizer(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
                     conf.getCharsetDecoder()), csvPref);
 
@@ -93,7 +93,7 @@ public class CSVFileReader extends FileReader {
             // 2) [ "timestamp", "name", "price" ]
             // 3) [ "name", "price" ]
             if (conf.hasColumnHeader()) {
-                sampleReader.readColumns(row);
+                sampleTokenizer.readColumns(row);
                 if (columnNames == null || columnNames.length == 0) {
                     columnNames = row.toArray(new String[0]);
                     conf.setColumnNames(columnNames);
@@ -145,7 +145,7 @@ public class CSVFileReader extends FileReader {
 
             // read some rows
             for (int i = 0; i < sampleRowSize; i++) {
-                sampleReader.readColumns(row);
+                sampleTokenizer.readColumns(row);
 
                 if (row == null || row.isEmpty()) {
                     break;
@@ -197,7 +197,6 @@ public class CSVFileReader extends FileReader {
             // check properties of exclude/only columns
             setSkipColumns();
 
-
             // print first sample row
             JSONFileWriter w = null;
             try {
@@ -227,9 +226,9 @@ public class CSVFileReader extends FileReader {
         } catch (IOException e) {
             throw new PreparePartsException(e);
         } finally {
-            if (sampleReader != null) {
+            if (sampleTokenizer != null) {
                 try {
-                    sampleReader.close();
+                    sampleTokenizer.close();
                 } catch (IOException e) {
                     throw new PreparePartsException(e);
                 }
@@ -239,15 +238,15 @@ public class CSVFileReader extends FileReader {
 
     @Override
     public boolean readRow() throws IOException {
-        return reader.readColumns(rawRow);
+        return tokenizer.readColumns(rawRow);
     }
 
     @Override
     public void close() throws IOException {
         super.close();
 
-        if (reader != null) {
-            reader.close();
+        if (tokenizer != null) {
+            tokenizer.close();
         }
     }
 
