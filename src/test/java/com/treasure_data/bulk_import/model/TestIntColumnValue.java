@@ -1,18 +1,11 @@
 package com.treasure_data.bulk_import.model;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-
-public class TestIntColumnValue extends ColumnValueTestUtil {
+public class TestIntColumnValue extends ColumnValueTestUtil<Integer> {
 
     @Before
     public void createResources() throws Exception {
@@ -25,13 +18,8 @@ public class TestIntColumnValue extends ColumnValueTestUtil {
         super.destroyResources();
     }
 
-    public String invalidValue() {
-        return "muga";
-    }
-
-    @Test
-    public void returnNormalValues() throws Exception {
-        List<Integer> expecteds = new ArrayList<Integer>();
+    @Override
+    public void createExpecteds() {
         expecteds.add(Integer.MAX_VALUE);
         expecteds.add(Integer.MIN_VALUE);
 
@@ -39,23 +27,19 @@ public class TestIntColumnValue extends ColumnValueTestUtil {
         for (int i = 0; i < numExec; i++) {
             expecteds.add(rand.nextInt());
         }
-
-        for (int i = 0; i < expecteds.size(); i++) {
-            int expected = expecteds.get(i);
-            columnValue.set("" + expected);
-            IntColumnValue actual = (IntColumnValue) columnValue;
-            ColumnValueTestUtil.assertEquals(expected, actual);
-        }
     }
 
     @Test
-    public void throwPreparePartErrorWhenItParsesInvalidValues() throws Exception {
-        try {
-            columnValue.set(invalidValue());
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof PreparePartsException);
+    public void returnNormalValues() throws Exception {
+        for (int i = 0; i < expecteds.size(); i++) {
+            columnValue.set("" + expecteds.get(i));
+            assertColumnValueEquals(expecteds.get(i),
+                    (IntColumnValue) columnValue);
         }
     }
-    
+
+    void assertColumnValueEquals(int expected, IntColumnValue actual) {
+        Assert.assertEquals(expected, actual.getInt());
+    }
+
 }

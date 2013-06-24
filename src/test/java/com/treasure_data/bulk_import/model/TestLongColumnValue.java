@@ -1,18 +1,11 @@
 package com.treasure_data.bulk_import.model;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-
-public class TestLongColumnValue extends ColumnValueTestUtil {
+public class TestLongColumnValue extends ColumnValueTestUtil<Long> {
 
     @Before
     public void createResources() throws Exception {
@@ -25,13 +18,8 @@ public class TestLongColumnValue extends ColumnValueTestUtil {
         super.destroyResources();
     }
 
-    public String invalidValue() {
-        return "muga";
-    }
-
-    @Test
-    public void returnNormalValues() throws Exception {
-        List<Long> expecteds = new ArrayList<Long>();
+    @Override
+    public void createExpecteds() {
         expecteds.add(Long.MAX_VALUE);
         expecteds.add(Long.MIN_VALUE);
 
@@ -39,23 +27,18 @@ public class TestLongColumnValue extends ColumnValueTestUtil {
         for (int i = 0; i < numExec; i++) {
             expecteds.add(rand.nextLong());
         }
-
-        for (int i = 0; i < expecteds.size(); i++) {
-            long expected = expecteds.get(i);
-            columnValue.set("" + expected);
-            LongColumnValue actual = (LongColumnValue) columnValue;
-            ColumnValueTestUtil.assertEquals(expected, actual);
-        }
     }
 
     @Test
-    public void throwPreparePartErrorWhenItParsesInvalidValues() throws Exception {
-        try {
-            columnValue.set(invalidValue());
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof PreparePartsException);
+    public void returnNormalValues() throws Exception {
+        for (int i = 0; i < expecteds.size(); i++) {
+            columnValue.set("" + expecteds.get(i));
+            assertColumnValueEquals(expecteds.get(i),
+                    (LongColumnValue) columnValue);
         }
     }
-    
+
+    void assertColumnValueEquals(long expected, LongColumnValue actual) {
+        Assert.assertEquals(expected, actual.getLong());
+    }
 }

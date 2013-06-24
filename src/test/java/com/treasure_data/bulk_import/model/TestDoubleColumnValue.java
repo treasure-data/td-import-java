@@ -1,18 +1,11 @@
 package com.treasure_data.bulk_import.model;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-
-public class TestDoubleColumnValue extends ColumnValueTestUtil {
+public class TestDoubleColumnValue extends ColumnValueTestUtil<Double> {
 
     @Before
     public void createResources() throws Exception {
@@ -25,13 +18,8 @@ public class TestDoubleColumnValue extends ColumnValueTestUtil {
         super.destroyResources();
     }
 
-    public String invalidValue() {
-        return "muga";
-    }
-
-    @Test
-    public void returnNormalValues() throws Exception {
-        List<Double> expecteds = new ArrayList<Double>();
+    @Override
+    public void createExpecteds() {
         expecteds.add(Double.MAX_VALUE);
         expecteds.add(Double.MIN_VALUE);
 
@@ -39,23 +27,18 @@ public class TestDoubleColumnValue extends ColumnValueTestUtil {
         for (int i = 0; i < numExec; i++) {
             expecteds.add(rand.nextDouble());
         }
-
-        for (int i = 0; i < expecteds.size(); i++) {
-            double expected = expecteds.get(i);
-            columnValue.set("" + expected);
-            DoubleColumnValue actual = (DoubleColumnValue) columnValue;
-            ColumnValueTestUtil.assertEquals(expected, actual);
-        }
     }
 
     @Test
-    public void throwPreparePartErrorWhenItParsesInvalidValues() throws Exception {
-        try {
-            columnValue.set(invalidValue());
-            fail();
-        } catch (Throwable t) {
-            assertTrue(t instanceof PreparePartsException);
+    public void returnNormalValues() throws Exception {
+        for (int i = 0; i < expecteds.size(); i++) {
+            columnValue.set("" + expecteds.get(i));
+            assertColumnValueEquals(expecteds.get(i),
+                    (DoubleColumnValue) columnValue);
         }
     }
-    
+
+    void assertColumnValueEquals(double expected, DoubleColumnValue actual) {
+        Assert.assertEquals(expected, actual.getDouble(), 0);
+    }
 }

@@ -1,18 +1,16 @@
 package com.treasure_data.bulk_import.model;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-
-public class TestStringColumnValue extends ColumnValueTestUtil {
+public class TestStringColumnValue extends ColumnValueTestUtil<String> {
 
     @Before
     public void createResources() throws Exception {
@@ -25,8 +23,8 @@ public class TestStringColumnValue extends ColumnValueTestUtil {
         super.destroyResources();
     }
 
-    @Test
-    public void returnNormalValues() throws Exception {
+    @Override
+    public void createExpecteds() {
         List<String> expecteds = new ArrayList<String>();
 
         int numExec = rand.nextInt(10000);
@@ -38,13 +36,19 @@ public class TestStringColumnValue extends ColumnValueTestUtil {
             }
             expecteds.add(sbuf.toString());
         }
+    }
 
+    @Test
+    public void returnNormalValues() throws Exception {
         for (int i = 0; i < expecteds.size(); i++) {
-            String expected = expecteds.get(i);
-            columnValue.set("" + expected);
-            StringColumnValue actual = (StringColumnValue) columnValue;
-            ColumnValueTestUtil.assertEquals(expected, actual);
+            columnValue.set("" + expecteds.get(i));
+            assertColumnValueEquals(expecteds.get(i),
+                    (StringColumnValue) columnValue);
         }
+    }
+
+    void assertColumnValueEquals(String expected, StringColumnValue actual) {
+        Assert.assertEquals(expected, actual.getString());
     }
 
     @Test
