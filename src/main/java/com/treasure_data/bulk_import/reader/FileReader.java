@@ -52,7 +52,6 @@ public abstract class FileReader implements Closeable {
 
     protected long lineNum = 0;
     protected long rowNum = 0;
-    protected PrepareConfiguration.CompressionType compressionType;
 
     private PrintWriter errWriter = null;
 
@@ -62,7 +61,6 @@ public abstract class FileReader implements Closeable {
     }
 
     public void configure(PrepareProcessor.Task task) throws PreparePartsException {
-        compressionType = conf.checkCompressionType(task.fileName);
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
     }
