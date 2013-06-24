@@ -41,4 +41,9 @@ public class TestLongColumnValue extends ColumnValueTestUtil<Long> {
     void assertColumnValueEquals(long expected, LongColumnValue actual) {
         Assert.assertEquals(expected, actual.getLong());
     }
+
+    @Override
+    public void assertWrittenValueEquals(int index) {
+        Assert.assertEquals(expecteds.get(index), (Long) writer.getRow().get(KEY));
+    }
 }

@@ -41,4 +41,10 @@ public class TestDoubleColumnValue extends ColumnValueTestUtil<Double> {
     void assertColumnValueEquals(double expected, DoubleColumnValue actual) {
         Assert.assertEquals(expected, actual.getDouble(), 0);
     }
+
+    @Override
+    public void assertWrittenValueEquals(int index) {
+        Assert.assertEquals(expecteds.get(index), (Double) writer.getRow().get(KEY));
+    }
+
 }

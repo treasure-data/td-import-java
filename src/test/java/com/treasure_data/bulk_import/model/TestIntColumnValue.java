@@ -11,6 +11,7 @@ public class TestIntColumnValue extends ColumnValueTestUtil<Integer> {
     public void createResources() throws Exception {
         super.createResources();
         columnValue = new IntColumnValue(ColumnType.INT);
+
     }
 
     @After
@@ -40,6 +41,11 @@ public class TestIntColumnValue extends ColumnValueTestUtil<Integer> {
 
     void assertColumnValueEquals(int expected, IntColumnValue actual) {
         Assert.assertEquals(expected, actual.getInt());
+    }
+
+    @Override
+    public void assertWrittenValueEquals(int index) {
+        Assert.assertEquals(expecteds.get(index), (Integer) writer.getRow().get(KEY));
     }
 
 }

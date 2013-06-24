@@ -21,8 +21,8 @@ import com.treasure_data.bulk_import.writer.FileWriter;
 @Ignore
 public class FileWriterTestUtil extends FileWriter {
 
-    private Map<String, Object> row;
-    private List<Object> columnKeyValues;
+    private Map<String, Object> row = new HashMap<String, Object>();
+    private List<Object> columnKeyValues = new ArrayList<Object>();
 
     public FileWriterTestUtil(PrepareConfiguration conf) {
         super(conf);
@@ -34,11 +34,9 @@ public class FileWriterTestUtil extends FileWriter {
 
     @Override
     public void writeBeginRow(int size) throws PreparePartsException {
-        if (row != null || columnKeyValues != null) {
-            throw new IllegalStateException("row must be null");
+        if (!row.isEmpty() || !columnKeyValues.isEmpty()) {
+            throw new IllegalStateException("row must be empty");
         }
-        row = new HashMap<String, Object>();
-        columnKeyValues = new ArrayList<Object>();
     }
 
     @Override
@@ -118,6 +116,15 @@ public class FileWriterTestUtil extends FileWriter {
         if (columnKeyValues != null) {
             columnKeyValues.clear();
             columnKeyValues = null;
+        }
+    }
+
+    public void clear() throws IOException {
+        if (row != null) {
+            row.clear();
+        }
+        if (columnKeyValues != null) {
+            columnKeyValues.clear();
         }
     }
 
