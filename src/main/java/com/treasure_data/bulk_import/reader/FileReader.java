@@ -161,7 +161,7 @@ public abstract class FileReader implements Closeable {
         return true;
     }
 
-    public void convertTypesOfColumns() {
+    public void convertTypesOfColumns() throws PreparePartsException {
         for (int i = 0; i < rawRow.size(); i++) {
             ColumnValue v = convertedRow.getValue(i);
             columnTypes[i].convertTypeInto(rawRow.get(i), v);

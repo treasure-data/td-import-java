@@ -27,8 +27,12 @@ public class DoubleColumnValue extends AbstractColumnValue {
         super(columnType);
     }
 
-    public void set(String v) {
-        this.v = Double.parseDouble(v);
+    public void set(String v) throws PreparePartsException {
+        try {
+            this.v = Double.parseDouble(v);
+        } catch (Exception e) {
+            throw new PreparePartsException(e);
+        }
     }
 
     public double getDouble() {

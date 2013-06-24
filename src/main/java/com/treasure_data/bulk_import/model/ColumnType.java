@@ -32,7 +32,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv) {
+        public void convertTypeInto(String v, ColumnValue cv)
+                throws PreparePartsException {
             cv.set(v);
         }
 
@@ -49,7 +50,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv) {
+        public void convertTypeInto(String v, ColumnValue cv)
+                throws PreparePartsException {
             cv.set(v);
         }
 
@@ -66,7 +68,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv) {
+        public void convertTypeInto(String v, ColumnValue cv)
+                throws PreparePartsException {
             cv.set(v);
         }
 
@@ -83,7 +86,8 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv) {
+        public void convertTypeInto(String v, ColumnValue cv)
+                throws PreparePartsException {
             cv.set(v);
         }
 
@@ -111,11 +115,12 @@ public enum ColumnType {
     }
 
     public abstract ColumnValue createColumnValue();
-    public abstract void convertTypeInto(String v, ColumnValue cv);
-    public abstract void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with) throws PreparePartsException;
-//    public void filterAndWrite(Row.ColumnValue v, Row.TimeColumnValue filter, FileWriter with) throws PreparePartsException {
-//        filter.write(v, with);
-//    }
+
+    public abstract void convertTypeInto(String v, ColumnValue cv)
+            throws PreparePartsException;
+
+    public abstract void filterAndWrite(ColumnValue v, TimeColumnValue filter,
+            FileWriter with) throws PreparePartsException;
 
     public static ColumnType fromInt(int index) {
         return IntToColumnType.get(index);
