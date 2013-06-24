@@ -55,5 +55,10 @@ public class TestStringColumnValue extends ColumnValueTestUtil<String> {
     public void throwPreparePartErrorWhenItParsesInvalidValues() throws Exception {
         assertTrue(true);
     }
-    
+
+    @Override
+    public void assertWrittenValueEquals(int index) {
+        Assert.assertEquals(expecteds.get(index), (String) writer.getRow().get(KEY));
+    }
+
 }
