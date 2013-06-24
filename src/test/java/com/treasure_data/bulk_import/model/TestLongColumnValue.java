@@ -1,9 +1,15 @@
 package com.treasure_data.bulk_import.model;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class TestLongColumnValue extends ColumnValueTestUtil<Long> {
 
@@ -45,5 +51,11 @@ public class TestLongColumnValue extends ColumnValueTestUtil<Long> {
     @Override
     public void assertWrittenValueEquals(int index) {
         Assert.assertEquals(expecteds.get(index), (Long) writer.getRow().get(KEY));
+    }
+
+    @Override
+    public void prepareMockForWriting() throws Exception {
+        writer = spy(writer);
+        doThrow(new PreparePartsException("")).when(writer).write(any(long.class));
     }
 }

@@ -56,6 +56,10 @@ public class ColumnValueTestUtil<T> {
         return "muga";
     }
 
+    public void prepareMockForWriting() throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
     @Test
     public void returnNormalValues() throws Exception {
         throw new UnsupportedOperationException();
@@ -89,5 +93,17 @@ public class ColumnValueTestUtil<T> {
 
     public void assertWrittenValueEquals(int index) {
         throw new UnsupportedOperationException();
+    }
+
+    @Test
+    public void throwPreparePartErrorWhenItWritesInvalidValues() throws Exception {
+        prepareMockForWriting();
+
+        try {
+            columnValue.write(writer);
+            fail();
+        } catch (Throwable t) {
+            assertTrue(t instanceof PreparePartsException);
+        }
     }
 }

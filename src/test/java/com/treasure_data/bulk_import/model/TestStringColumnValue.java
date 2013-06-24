@@ -1,6 +1,9 @@
 package com.treasure_data.bulk_import.model;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +12,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 
 public class TestStringColumnValue extends ColumnValueTestUtil<String> {
 
@@ -61,4 +66,10 @@ public class TestStringColumnValue extends ColumnValueTestUtil<String> {
         Assert.assertEquals(expecteds.get(index), (String) writer.getRow().get(KEY));
     }
 
+    @Override
+    public void prepareMockForWriting() throws Exception {
+        writer = spy(writer);
+        doThrow(new PreparePartsException("")).when(writer).write(any(String.class));
+        doThrow(new PreparePartsException("")).when(writer).writeNil();
+    }
 }
