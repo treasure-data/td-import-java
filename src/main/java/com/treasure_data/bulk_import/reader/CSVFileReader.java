@@ -43,7 +43,6 @@ public class CSVFileReader extends FileReader {
 
     protected CsvPreference csvPref;
     private Tokenizer reader;
-    private TimeColumnValue timeColumnValue = null;
 
     public CSVFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
         super(conf, writer);
@@ -206,6 +205,7 @@ public class CSVFileReader extends FileReader {
                 w.setColumnNames(getColumnNames());
                 w.setColumnTypes(getColumnTypes());
                 w.setSkipColumns(getSkipColumns());
+                w.setTimeColumnValue(getTimeColumnValue());
 
                 rawRow.addAll(firstRow);
 

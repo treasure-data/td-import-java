@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.DoubleColumnValue;
 import com.treasure_data.bulk_import.model.IntColumnValue;
@@ -30,6 +31,7 @@ import com.treasure_data.bulk_import.model.LongColumnValue;
 import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
+import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
@@ -45,7 +47,11 @@ public abstract class FileWriter implements Closeable {
 
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
+
     protected Set<Integer> skipColumns;
+    protected boolean needAdditionalTimeColumn = false;
+    protected TimeColumnValue timeColumnValue;
+    protected int timeColumnIndex = -1;
 
     protected FileWriter(PrepareConfiguration conf) {
         this.conf = conf;
@@ -63,6 +69,16 @@ public abstract class FileWriter implements Closeable {
         this.skipColumns = skipColumns;
     }
 
+    public void setTimeColumnValue(TimeColumnValue timeColumnValue) {
+        needAdditionalTimeColumn =
+                timeColumnValue instanceof AliasTimeColumnValue ||
+                timeColumnValue instanceof TimeValueTimeColumnValue;
+        if (!needAdditionalTimeColumn) {
+            timeColumnIndex = ((TimeColumnValue) timeColumnValue).getIndex();
+        }
+        this.timeColumnValue = timeColumnValue;
+    }
+
     public void configure(PrepareProcessor.Task task)
             throws PreparePartsException {
         this.task = task;
@@ -72,7 +88,7 @@ public abstract class FileWriter implements Closeable {
         int size = row.getValues().length;
 
         // begin writing
-        if (row.needAdditionalTimeColumn()) {
+        if (needAdditionalTimeColumn) {
             // if the row doesn't have 'time' column, new 'time' column needs
             // to be appended to it.
             writeBeginRow(size - skipColumns.size() - 1);
@@ -87,16 +103,16 @@ public abstract class FileWriter implements Closeable {
             }
 
             write(columnNames[i]);
-            if (i == row.getTimeColumnIndex()) {
-                row.getTimeColumnValue().write(row.getValue(i), this);
+            if (i == timeColumnIndex) {
+                timeColumnValue.write(row.getValue(i), this);
             } else {
                 row.getValue(i).write(this);
             }
         }
 
-        if (row.needAdditionalTimeColumn()) {
+        if (needAdditionalTimeColumn) {
             write(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-            TimeColumnValue tcValue = row.getTimeColumnValue();
+            TimeColumnValue tcValue = timeColumnValue;
             tcValue.write(row.getValue(tcValue.getIndex()), this);
         }
 

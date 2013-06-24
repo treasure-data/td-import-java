@@ -159,6 +159,7 @@ public class PrepareProcessor {
             w.setColumnNames(r.getColumnNames());
             w.setColumnTypes(r.getColumnTypes());
             w.setSkipColumns(r.getSkipColumns());
+            w.setTimeColumnValue(r.getTimeColumnValue());
 
             try {
                 r.resetLineNum();

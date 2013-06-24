@@ -19,22 +19,8 @@ package com.treasure_data.bulk_import.model;
 
 public class Row {
     private ColumnValue[] values;
-    private boolean needAdditionalTimeColumn = false;
-    private TimeColumnValue timeColumnValue;
-    private int timeColumnIndex = -1;
 
-    public Row(ColumnValue[] values, TimeColumnValue timeColumnValue) {
-        this.values = values;
-        needAdditionalTimeColumn =
-                timeColumnValue instanceof AliasTimeColumnValue ||
-                timeColumnValue instanceof TimeValueTimeColumnValue;
-        if (!needAdditionalTimeColumn) {
-            timeColumnIndex = ((TimeColumnValue) timeColumnValue).getIndex();
-        }
-        this.timeColumnValue = timeColumnValue;
-    }
-
-    public void setValues(ColumnValue[] values) {
+    public Row(ColumnValue[] values) {
         this.values = values;
     }
 
@@ -50,15 +36,4 @@ public class Row {
         return values[i];
     }
 
-    public boolean needAdditionalTimeColumn() {
-        return needAdditionalTimeColumn;
-    }
-
-    public int getTimeColumnIndex() {
-        return timeColumnIndex;
-    }
-
-    public TimeColumnValue getTimeColumnValue() {
-        return timeColumnValue;
-    }
 }

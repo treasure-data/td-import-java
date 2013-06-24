@@ -48,6 +48,7 @@ public abstract class FileReader implements Closeable {
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected Set<Integer> skipColumns = new HashSet<Integer>();
+    protected TimeColumnValue timeColumnValue;
 
     protected long lineNum = 0;
     protected long rowNum = 0;
@@ -78,12 +79,16 @@ public abstract class FileReader implements Closeable {
         return skipColumns;
     }
 
+    public TimeColumnValue getTimeColumnValue() {
+        return timeColumnValue;
+    }
+
     public void initializeConvertedRow(TimeColumnValue timeColumnValue) {
         ColumnValue[] values = new ColumnValue[columnTypes.length];
         for (int i = 0; i < columnTypes.length; i++) {
             values[i] = columnTypes[i].createColumnValue();
         }
-        convertedRow = new Row(values, timeColumnValue);
+        convertedRow = new Row(values);
     }
 
     public void resetLineNum() {
