@@ -38,10 +38,6 @@ public class TimeColumnValue {
         return timeFormat;
     }
 
-    public void write(FileWriter with) throws PreparePartsException {
-        throw new PreparePartsException("not implemented method");
-    }
-
     public void write(ColumnValue v, FileWriter with) throws PreparePartsException {
         v.getColumnType().filterAndWrite(v, this, with);
     }
