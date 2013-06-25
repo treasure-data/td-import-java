@@ -124,6 +124,86 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         }
     }
 
+    public static class Context04 implements Context {
+        public String getExcludeColumns() {
+            return "foo,bar,baz";
+        }
+
+        public void createContext(TestCSVFileReader test)
+                throws Exception {
+            test.columnNames = new String[] { "foo", "name", "count", "bar", "time", "baz" };
+            test.columnTypes = new ColumnType[] {
+                    ColumnType.STRING, ColumnType.STRING, ColumnType.LONG,
+                    ColumnType.STRING, ColumnType.LONG, ColumnType.STRING };
+        }
+
+        public String generateCSVText(TestCSVFileReader test) {
+            StringBuilder sbuf = new StringBuilder();
+            sbuf.append(test.columnNames[0]).append(COMMA);
+            sbuf.append(test.columnNames[1]).append(COMMA);
+            sbuf.append(test.columnNames[2]).append(COMMA);
+            sbuf.append(test.columnNames[3]).append(COMMA);
+            sbuf.append(test.columnNames[4]).append(COMMA);
+            sbuf.append(test.columnNames[5]).append(LF);
+            for (int i = 0; i < test.numLine; i++) {
+                sbuf.append("foo" + i).append(COMMA);
+                sbuf.append("muga" + i).append(COMMA);
+                sbuf.append(i).append(COMMA);
+                sbuf.append("bar" + i).append(COMMA);
+                sbuf.append(test.baseTime + 60 * i).append(COMMA); // time
+                sbuf.append("baz" + i).append(LF);
+            }
+            return sbuf.toString();
+        }
+
+        public void assertContextEquals(TestCSVFileReader test) {
+            assertArrayEquals(test.columnNames, test.reader.getColumnNames());
+            assertArrayEquals(test.columnTypes, test.reader.getColumnTypes());
+            assertTrue(test.reader.getTimeColumnValue() instanceof TimeColumnValue);
+            assertEquals(3, test.reader.getSkipColumns().size());
+        }
+    }
+
+    public static class Context05 implements Context {
+        public String getOnlyColumns() {
+            return "time,name,count";
+        }
+
+        public void createContext(TestCSVFileReader test)
+                throws Exception {
+            test.columnNames = new String[] { "foo", "name", "count", "bar", "time", "baz" };
+            test.columnTypes = new ColumnType[] {
+                    ColumnType.STRING, ColumnType.STRING, ColumnType.LONG,
+                    ColumnType.STRING, ColumnType.LONG, ColumnType.STRING };
+        }
+
+        public String generateCSVText(TestCSVFileReader test) {
+            StringBuilder sbuf = new StringBuilder();
+            sbuf.append(test.columnNames[0]).append(COMMA);
+            sbuf.append(test.columnNames[1]).append(COMMA);
+            sbuf.append(test.columnNames[2]).append(COMMA);
+            sbuf.append(test.columnNames[3]).append(COMMA);
+            sbuf.append(test.columnNames[4]).append(COMMA);
+            sbuf.append(test.columnNames[5]).append(LF);
+            for (int i = 0; i < test.numLine; i++) {
+                sbuf.append("foo" + i).append(COMMA);
+                sbuf.append("muga" + i).append(COMMA);
+                sbuf.append(i).append(COMMA);
+                sbuf.append("bar" + i).append(COMMA);
+                sbuf.append(test.baseTime + 60 * i).append(COMMA); // time
+                sbuf.append("baz" + i).append(LF);
+            }
+            return sbuf.toString();
+        }
+
+        public void assertContextEquals(TestCSVFileReader test) {
+            assertArrayEquals(test.columnNames, test.reader.getColumnNames());
+            assertArrayEquals(test.columnTypes, test.reader.getColumnTypes());
+            assertTrue(test.reader.getTimeColumnValue() instanceof TimeColumnValue);
+            assertEquals(3, test.reader.getSkipColumns().size());
+        }
+    }
+
     protected String fileName = "./file.csv";
     protected int numLine;
 
@@ -155,25 +235,13 @@ public class TestCSVFileReader extends FileReaderTestUtil {
     }
 
     @Test
-    public void checkStateWhenReaderConfiguration01() throws Exception {
+    public void checkContextWhenReaderConfiguration01() throws Exception {
         Context01 context = new Context01();
-
-        // create context
-        context.createContext(this);
-
-        // create task
-        task = new PrepareProcessor.Task(fileName);
-        task = spy(task);
-        task.isTest = true;
-        task.testText = context.generateCSVText(this);
-
-        // call configure(task)
-        reader.configure(task);
-        context.assertContextEquals(this);
+        checkContextWhenReaderConfiguration(context);
     }
 
     @Test
-    public void checkStateWhenReaderConfigurationWithTimeValue() throws Exception {
+    public void checkContextWhenReaderConfigurationWithTimeValue() throws Exception {
         Context02 context = new Context02();
 
         // override system properties:-(
@@ -182,22 +250,11 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         createFileWriter();
         createFileReader();
 
-        // create context
-        context.createContext(this);
-
-        // create task
-        task = new PrepareProcessor.Task(fileName);
-        task = spy(task);
-        task.isTest = true;
-        task.testText = context.generateCSVText(this);
-
-        // call configure(task)
-        reader.configure(task);
-        context.assertContextEquals(this);
+        checkContextWhenReaderConfiguration(context);
     }
 
     @Test
-    public void checkStateWhenReaderConfigurationWithAliasTimeColumn() throws Exception {
+    public void checkContextWhenReaderConfigurationWithAliasTimeColumn() throws Exception {
         Context03 context = new Context03();
 
         // override system properties:-(
@@ -206,6 +263,36 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         createFileWriter();
         createFileReader();
 
+        checkContextWhenReaderConfiguration(context);
+    }
+
+    @Test
+    public void checkContextWhenReaderConfigurationWithExcludeColumns() throws Exception {
+        Context04 context = new Context04();
+
+        // override system properties:-(
+        props.setProperty(Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, "" + context.getExcludeColumns());
+        createPrepareConfiguration();
+        createFileWriter();
+        createFileReader();
+
+        checkContextWhenReaderConfiguration(context);
+    }
+
+    @Test
+    public void checkContextWhenReaderConfigurationWithOnlyColumns() throws Exception {
+        Context05 context = new Context05();
+
+        // override system properties:-(
+        props.setProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS, "" + context.getOnlyColumns());
+        createPrepareConfiguration();
+        createFileWriter();
+        createFileReader();
+
+        checkContextWhenReaderConfiguration(context);
+    }
+
+    private void checkContextWhenReaderConfiguration(Context context) throws Exception {
         // create context
         context.createContext(this);
 
