@@ -18,11 +18,11 @@
 package com.treasure_data.bulk_import.model;
 
 public class ColumnSampling {
-    private int sampleRow;
+    private int numRows;
     private int[] scores = new int[] { 0, 0, 0, 0 };
 
-    public ColumnSampling(int sampleRow) {
-        this.sampleRow = sampleRow;
+    public ColumnSampling(int numRows) {
+        this.numRows = numRows;
     }
 
     public void parse(String value) {
@@ -60,10 +60,10 @@ public class ColumnSampling {
     }
 
     public ColumnType getRank() {
-        int max = -sampleRow;
+        int max = -numRows;
         int maxIndex = 0;
         for (int i = 0; i < scores.length; i++) {
-            if (max < scores[i]) {
+            if (max <= scores[i]) {
                 max = scores[i];
                 maxIndex = i;
             }

@@ -61,7 +61,25 @@ public enum ColumnType {
             with.write(filter, (IntColumnValue) v);
         }
     },
-    LONG("long", 2) {
+    DOUBLE("double", 2) {
+        @Override
+        public ColumnValue createColumnValue() {
+            return new DoubleColumnValue(this);
+        }
+
+        @Override
+        public void convertTypeInto(String v, ColumnValue cv)
+                throws PreparePartsException {
+            cv.parse(v);
+        }
+
+        @Override
+        public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
+            with.write(filter, (DoubleColumnValue) v);
+        }
+    },
+    LONG("long", 3) {
         @Override
         public ColumnValue createColumnValue() {
             return new LongColumnValue(this);
@@ -79,24 +97,7 @@ public enum ColumnType {
             with.write(filter, (LongColumnValue) v);
         }
     },
-    DOUBLE("double", 3) {
-        @Override
-        public ColumnValue createColumnValue() {
-            return new DoubleColumnValue(this);
-        }
-
-        @Override
-        public void convertTypeInto(String v, ColumnValue cv)
-                throws PreparePartsException {
-            cv.parse(v);
-        }
-
-        @Override
-        public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
-                throws PreparePartsException {
-            with.write(filter, (DoubleColumnValue) v);
-        }
-    };
+    ;
 
     private String name;
     private int index;
