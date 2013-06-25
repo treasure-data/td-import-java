@@ -53,7 +53,6 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // time-format STRF_FORMAT; default=auto detect
     String BI_PREPARE_PARTS_TIMEFORMAT = "td.bulk_import.prepare_parts.time-format";
-    String BI_PREPARE_PARTS_TIMEFORMAT_DEFAULTVALUE = "auto";
 
     // time-value TIME; use fixed time value
     String BI_PREPARE_PARTS_TIMEVALUE = "td.bulk_import.prepare_parts.time-value";
