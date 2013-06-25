@@ -76,6 +76,7 @@
     <javadoc.encoding>UTF-8</javadoc.encoding>
     <javadoc.locale>en_US</javadoc.locale>
     <surefire.threadCount>1</surefire.threadCount>
+    <mysql-connector-java.version>5.1.18</mysql-connector-java.version>
   </properties>
 
   <repositories>
@@ -114,6 +115,11 @@
       <groupId>com.treasure_data</groupId>
       <artifactId>td-client</artifactId>
       <version>${td-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${mysql-connector-java.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
