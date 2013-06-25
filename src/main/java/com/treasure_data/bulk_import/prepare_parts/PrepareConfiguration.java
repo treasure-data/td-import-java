@@ -40,50 +40,6 @@ import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
 public class PrepareConfiguration extends Configuration {
 
-    public static enum OutputFormat {
-        MSGPACKGZ("msgpackgz") {
-            @Override
-            public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
-                return new MsgpackGZIPFileWriter(conf);
-            }
-        };
-
-        private String outputFormat;
-
-        OutputFormat(String outputFormat) {
-            this.outputFormat = outputFormat;
-        }
-
-        public String outputFormat() {
-            return outputFormat;
-        }
-
-        public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
-            throw new PreparePartsException(
-                    new UnsupportedOperationException("output format: " + this));
-        }
-
-        public static OutputFormat fromString(String outputFormat) {
-            return StringToOutputFormat.get(outputFormat);
-        }
-
-        private static class StringToOutputFormat {
-            private static final Map<String, OutputFormat> REVERSE_DICTIONARY;
-
-            static {
-                Map<String, OutputFormat> map = new HashMap<String, OutputFormat>();
-                for (OutputFormat elem : OutputFormat.values()) {
-                    map.put(elem.outputFormat(), elem);
-                }
-                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
-            }
-
-            static OutputFormat get(String key) {
-                return REVERSE_DICTIONARY.get(key);
-            }
-        }
-    }
-
     public static enum Format {
         // TODO #MN should consider type parameters
         CSV("csv") {
@@ -138,6 +94,50 @@ public class PrepareConfiguration extends Configuration {
             }
 
             static Format get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
+
+    public static enum OutputFormat {
+        MSGPACKGZ("msgpackgz") {
+            @Override
+            public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+                return new MsgpackGZIPFileWriter(conf);
+            }
+        };
+
+        private String outputFormat;
+
+        OutputFormat(String outputFormat) {
+            this.outputFormat = outputFormat;
+        }
+
+        public String outputFormat() {
+            return outputFormat;
+        }
+
+        public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+            throw new PreparePartsException(
+                    new UnsupportedOperationException("output format: " + this));
+        }
+
+        public static OutputFormat fromString(String outputFormat) {
+            return StringToOutputFormat.get(outputFormat);
+        }
+
+        private static class StringToOutputFormat {
+            private static final Map<String, OutputFormat> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, OutputFormat> map = new HashMap<String, OutputFormat>();
+                for (OutputFormat elem : OutputFormat.values()) {
+                    map.put(elem.outputFormat(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static OutputFormat get(String key) {
                 return REVERSE_DICTIONARY.get(key);
             }
         }
