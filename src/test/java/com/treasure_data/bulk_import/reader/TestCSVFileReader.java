@@ -204,6 +204,39 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         }
     }
 
+    public static class Context06 implements Context {
+        public String getSTRFTimeFormat() {
+            return "%Y/%m/%d %k:%M:%S";
+        }
+
+        public void createContext(TestCSVFileReader test)
+                throws Exception {
+            test.columnNames = new String[] { "name", "count", "time" };
+            test.columnTypes = new ColumnType[] {
+                    ColumnType.STRING, ColumnType.LONG, ColumnType.STRING };
+        }
+
+        public String generateCSVText(TestCSVFileReader test) {
+            StringBuilder sbuf = new StringBuilder();
+            sbuf.append(test.columnNames[0]).append(COMMA);
+            sbuf.append(test.columnNames[1]).append(COMMA);
+            sbuf.append(test.columnNames[2]).append(LF);
+            for (int i = 0; i < test.numLine; i++) {
+                sbuf.append("muga" + i).append(COMMA);
+                sbuf.append(i).append(COMMA);
+                sbuf.append("2013/05/05 14:" + ((i % 50) + 10) + ":00").append(LF);
+            }
+            return sbuf.toString();
+        }
+
+        public void assertContextEquals(TestCSVFileReader test) {
+            assertArrayEquals(test.columnNames, test.reader.getColumnNames());
+            assertArrayEquals(test.columnTypes, test.reader.getColumnTypes());
+            assertTrue(test.reader.getTimeColumnValue() instanceof TimeColumnValue);
+            assertTrue(test.reader.getSkipColumns().isEmpty());
+        }
+    }
+
     protected String fileName = "./file.csv";
     protected int numLine;
 
@@ -285,6 +318,19 @@ public class TestCSVFileReader extends FileReaderTestUtil {
 
         // override system properties:-(
         props.setProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS, "" + context.getOnlyColumns());
+        createPrepareConfiguration();
+        createFileWriter();
+        createFileReader();
+
+        checkContextWhenReaderConfiguration(context);
+    }
+
+    @Test
+    public void checkContextWhenReaderConfigurationWithTimeFormat() throws Exception {
+        Context06 context = new Context06();
+
+        // override system properties:-(
+        props.setProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT, "" + context.getSTRFTimeFormat());
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
