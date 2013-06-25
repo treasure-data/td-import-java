@@ -35,6 +35,7 @@ import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.reader.CSVFileReader;
 import com.treasure_data.bulk_import.reader.FileReader;
+import com.treasure_data.bulk_import.reader.MySQLTableReader;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
@@ -56,7 +57,13 @@ public class PrepareConfiguration extends Configuration {
                 return new CSVFileReader(conf, writer);
             }
         },
-        //MYSQL("mysql") {},
+        MYSQL("mysql") {
+            @Override
+            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+                    throws PreparePartsException {
+                return new MySQLTableReader(conf, writer);
+            }
+        },
         JSON("json") {
         },
         MSGPACK("msgpack") {

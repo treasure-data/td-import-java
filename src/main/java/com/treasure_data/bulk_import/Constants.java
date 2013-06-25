@@ -134,4 +134,20 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     String BI_PREPARE_PARTS_SAMPLE_ROWSIZE = "td.bulk_import.prepare_parts.sample.rowsize";
     String BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE = "30";
+
+    ////////////////////////////////////////
+    // MYSQL PREPARE_PARTS_OPTIONS        //
+    ////////////////////////////////////////
+
+    // url
+    String BI_PREPARE_PARTS_JDBC_CONNECTION_URL = "td.bulk_import_prepare_parts.jdbc.connection.url";
+
+    // table
+    String BI_PREPARE_PARTS_JDBC_TABLE = "td.bulk_import_prepare_parts.jdbc.table";
+
+    // user
+    String BI_PREPARE_PARTS_JDBC_USER = "td.bulk_import_prepare_parts.jdbc.user";
+
+    // password
+    String BI_PREPARE_PARTS_JDBC_PASSWORD = "td.bulk_import_prepare_parts.jdbc.password";
 }
