@@ -41,8 +41,9 @@ public class PrepareProcessor {
 
         public String fileName;
 
-        boolean isTest = false;
-        String testText = null;
+        // unit testing
+        public boolean isTest = false;
+        public String testText = null;
 
         public Task(String fileName) {
             this.fileName = fileName;
