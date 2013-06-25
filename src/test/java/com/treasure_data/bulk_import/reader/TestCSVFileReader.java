@@ -21,14 +21,31 @@ public class TestCSVFileReader extends FileReaderTestUtil {
 
     protected String fileName;
     protected int numLine;
-    protected String[] columnNames;
-    protected ColumnType[] columnTypes;
 
-    public static class Context {
+    protected AbstractContext context;
 
-        public void createState(TestCSVFileReader reader) throws Exception {
+    public static class AbstractContext {
+        public void createContext(TestCSVFileReader reader)
+                throws Exception {
+            throw new UnsupportedOperationException();
+        }
+
+        public String generateCSVText(TestCSVFileReader reader) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void assertContextEquals(TestCSVFileReader reader) {
+            assertArrayEquals(reader.columnNames, reader.reader.getColumnNames());
+            assertArrayEquals(reader.columnTypes, reader.reader.getColumnTypes());
+            assertTrue(reader.reader.getTimeColumnValue() instanceof TimeColumnValue);
+            assertTrue(reader.reader.getSkipColumns().isEmpty()); // TODO
+        }
+    }
+
+    public static class Context01 extends AbstractContext {
+        public void createContext(TestCSVFileReader reader)
+                throws Exception {
             reader.fileName = "./file01.csv";
-            reader.numLine = reader.rand.nextInt(10) + 1;
             reader.columnNames = new String[] { "name", "count", "time" };
             reader.columnTypes = new ColumnType[] {
                     ColumnType.STRING, ColumnType.LONG, ColumnType.LONG };
@@ -46,26 +63,19 @@ public class TestCSVFileReader extends FileReaderTestUtil {
             }
             return sbuf.toString();
         }
-
-        public void assertStateEquals(TestCSVFileReader reader) {
-            assertArrayEquals(reader.columnNames, reader.reader.getColumnNames());
-            assertArrayEquals(reader.columnTypes, reader.reader.getColumnTypes());
-            assertTrue(reader.reader.getTimeColumnValue() instanceof TimeColumnValue);
-            assertTrue(reader.reader.getSkipColumns().isEmpty());
-        }
     }
-
-    protected TestCSVFileReader.Context state;
 
     @Before
     public void createResources() throws Exception {
-        state = new TestCSVFileReader.Context();
-        state.createState(this);
         super.createResources();
     }
 
-    protected void createProperties() throws Exception {
+    @Override
+    public void createProperties() throws Exception {
         super.createProperties();
+
+        numLine = rand.nextInt(10) + 1;
+
         props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "" + numLine);
     }
@@ -76,14 +86,6 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         reader = conf.getFormat().createFileReader(conf, writer);
     }
 
-    @Override
-    public void createTask() throws Exception {
-        task = new PrepareProcessor.Task(fileName);
-        task = spy(task);
-        task.isTest = true;
-        task.testText = state.generateCSVText(this);
-    }
-
     @After
     public void destroyResources() throws Exception {
         super.createResources();
@@ -91,8 +93,18 @@ public class TestCSVFileReader extends FileReaderTestUtil {
 
     @Test
     public void checkStateWhenReaderConfiguration() throws Exception {
-        reader.configure(task);
+        // create context
+        context = new TestCSVFileReader.Context01();
+        context.createContext(this);
 
-        state.assertStateEquals(this);
+        // create task
+        task = new PrepareProcessor.Task(fileName);
+        task = spy(task);
+        task.isTest = true;
+        task.testText = ((TestCSVFileReader.Context01)context).generateCSVText(this);
+
+        // call configure(task)
+        reader.configure(task);
+        context.assertContextEquals(this);
     }
 }

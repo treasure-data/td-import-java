@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.writer.FileWriterTestUtil;
@@ -16,7 +17,6 @@ import com.treasure_data.bulk_import.writer.FileWriter;
 
 @Ignore
 public class FileReaderTestUtil {
-
     protected long baseTime;
 
     protected Properties props;
@@ -26,6 +26,8 @@ public class FileReaderTestUtil {
     protected FileWriter writer;
 
     protected PrepareProcessor.Task task;
+    protected String[] columnNames;
+    protected ColumnType[] columnTypes;
 
     protected Random rand = new Random(new Random().nextInt());
 
@@ -33,20 +35,10 @@ public class FileReaderTestUtil {
     public void createResources() throws Exception {
         baseTime = new Date().getTime() / 1000 / 3600 * 3600;
 
-        // create properties
         createProperties();
-
-        // create configuration
         createPrepareConfiguration();
-
-        // create writer
         createFileWriter();
-
-        // create reader
         createFileReader();
-
-        // create prepare task
-        createTask();
     }
 
     protected void createProperties() throws Exception {
@@ -63,10 +55,6 @@ public class FileReaderTestUtil {
     }
 
     protected void createFileReader() throws Exception {
-        // implement it in subclasses
-    }
-
-    protected void createTask() throws Exception {
         // implement it in subclasses
     }
 
@@ -89,5 +77,4 @@ public class FileReaderTestUtil {
             reader.close();
         }
     }
-
 }
