@@ -83,8 +83,7 @@ public class JSONFileWriter extends FileWriter {
         try {
             time = Long.parseLong(timeString);
         } catch (Throwable t) {
-            throw new PreparePartsException(String.format(
-                    "'%s' could not be parsed as long type", timeString));
+            // ignore
         }
 
         if (time == 0 && filter.getTimeFormat() != null) {
