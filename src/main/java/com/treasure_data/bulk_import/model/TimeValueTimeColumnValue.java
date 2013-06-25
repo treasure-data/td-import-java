@@ -28,6 +28,10 @@ public class TimeValueTimeColumnValue extends TimeColumnValue {
         this.timeValue = timeValue;
     }
 
+    public long getTimeValue() {
+        return timeValue;
+    }
+
     public void write(FileWriter with) throws PreparePartsException {
         with.write(timeValue);
     }
