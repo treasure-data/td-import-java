@@ -25,7 +25,7 @@ public class ColumnSampling {
         this.sampleRow = sampleRow;
     }
 
-    public void set(String value) {
+    public void parse(String value) {
         if (value == null) {
             // any score are not changed
             return;
@@ -59,7 +59,7 @@ public class ColumnSampling {
         }
     }
 
-    public ColumnType getColumnType() {
+    public ColumnType getRank() {
         int max = -sampleRow;
         int maxIndex = 0;
         for (int i = 0; i < scores.length; i++) {

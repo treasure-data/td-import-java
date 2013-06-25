@@ -29,7 +29,7 @@ import org.supercsv.prefs.CsvPreference;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
-import com.treasure_data.bulk_import.model.SampleColumnValue;
+import com.treasure_data.bulk_import.model.ColumnSampling;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
@@ -138,9 +138,9 @@ public class CSVFileReader extends FileReader {
             boolean isFirstRow = false;
             List<String> firstRow = new ArrayList<String>();
             final int sampleRowSize = conf.getSampleRowSize();
-            SampleColumnValue[] sampleColumnValues = new SampleColumnValue[columnNames.length];
+            ColumnSampling[] sampleColumnValues = new ColumnSampling[columnNames.length];
             for (int i = 0; i < sampleColumnValues.length; i++) {
-                sampleColumnValues[i] = new SampleColumnValue(sampleRowSize);
+                sampleColumnValues[i] = new ColumnSampling(sampleRowSize);
             }
 
             // read some rows
@@ -167,7 +167,7 @@ public class CSVFileReader extends FileReader {
 
                 // sampling
                 for (int j = 0; j < sampleColumnValues.length; j++) {
-                    sampleColumnValues[j].set(row.get(j));
+                    sampleColumnValues[j].parse(row.get(j));
                 }
             }
 
@@ -175,7 +175,7 @@ public class CSVFileReader extends FileReader {
             if (columnTypes == null || columnTypes.length == 0) {
                 columnTypes = new ColumnType[columnNames.length];
                 for (int i = 0; i < columnTypes.length; i++) {
-                    columnTypes[i] = sampleColumnValues[i].getColumnType();
+                    columnTypes[i] = sampleColumnValues[i].getRank();
                 }
                 conf.setColumnTypes(columnTypes);
             }
