@@ -17,11 +17,11 @@
 //
 package com.treasure_data.bulk_import.model;
 
-public class SampleColumnValue {
+public class ColumnSampling {
     private int sampleRow;
     private int[] scores = new int[] { 0, 0, 0, 0 };
 
-    public SampleColumnValue(int sampleRow) {
+    public ColumnSampling(int sampleRow) {
         this.sampleRow = sampleRow;
     }
 
