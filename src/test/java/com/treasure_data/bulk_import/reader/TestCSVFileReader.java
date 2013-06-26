@@ -15,7 +15,7 @@ import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.Task;
-import com.treasure_data.commands.Config;
+import com.treasure_data.bulk_import.Configuration;
 
 public class TestCSVFileReader extends FileReaderTestUtil {
 
@@ -251,8 +251,8 @@ public class TestCSVFileReader extends FileReaderTestUtil {
 
         numLine = rand.nextInt(10) + 1;
 
-        props.setProperty(Config.BI_PREPARE_PARTS_FORMAT, "csv");
-        props.setProperty(Config.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "" + numLine);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "" + numLine);
 
     }
 
@@ -278,7 +278,7 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         Context02 context = new Context02();
 
         // override system properties:-(
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEVALUE, "" + context.getTimeValue());
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "" + context.getTimeValue());
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -291,7 +291,7 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         Context03 context = new Context03();
 
         // override system properties:-(
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "" + context.getAliasTimeColumn());
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "" + context.getAliasTimeColumn());
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -304,7 +304,7 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         Context04 context = new Context04();
 
         // override system properties:-(
-        props.setProperty(Config.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, "" + context.getExcludeColumns());
+        props.setProperty(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, "" + context.getExcludeColumns());
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -317,7 +317,7 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         Context05 context = new Context05();
 
         // override system properties:-(
-        props.setProperty(Config.BI_PREPARE_PARTS_ONLY_COLUMNS, "" + context.getOnlyColumns());
+        props.setProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS, "" + context.getOnlyColumns());
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -330,7 +330,7 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         Context06 context = new Context06();
 
         // override system properties:-(
-        props.setProperty(Config.BI_PREPARE_PARTS_TIMEFORMAT, "" + context.getSTRFTimeFormat());
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, "" + context.getSTRFTimeFormat());
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
