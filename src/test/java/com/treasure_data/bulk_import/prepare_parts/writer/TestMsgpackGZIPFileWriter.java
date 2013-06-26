@@ -40,8 +40,7 @@ public class TestMsgpackGZIPFileWriter {
     }
 
     @Test
-    public void test() {
+    public void dummy() throws Exception {
         assertTrue(true);
     }
-
 }
