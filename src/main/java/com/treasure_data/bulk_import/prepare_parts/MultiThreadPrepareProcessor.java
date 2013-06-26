@@ -41,7 +41,7 @@ public class MultiThreadPrepareProcessor {
                 Task t = parent.taskQueue.poll();
                 if (t == null) {
                     continue;
-                } else if (Task.endTask(t)) {
+                } else if (t.endTask()) {
                     break;
                 }
 
