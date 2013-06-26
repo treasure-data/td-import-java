@@ -33,6 +33,20 @@ You will get the td-client jar file in td-bulk-import-java/target
 directory.  File name will be td-client-${td-bulk-import.version}-jar-with-dependencies.jar.
 For more detail, see pom.xml.
 
+## Quickstart
+
+### 'prepare_parts' for bulk import
+
+    $ java BulkImportTool prepare_parts ./in/*.csv \
+        -Dtd.bulk_import.prepare_parts.format=csv \
+        -Dtd.bulk_import.prepare_parts.output_dir=./out/
+
+### 'upload_parts' for bulk import
+
+
+
+### 'prepare_parts' and 'upload_parts' for bulk import
+
 ## License
 
 Apache License, Version 2.0
