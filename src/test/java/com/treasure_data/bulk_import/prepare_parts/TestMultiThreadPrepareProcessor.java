@@ -39,7 +39,7 @@ public class TestMultiThreadPrepareProcessor {
             String csvtext = "time,user,age\n" + "1370416181,muga,10\n";
             String fileName = "file" + i;
 
-            PrepareProcessor.Task task = new PrepareProcessor.Task(fileName);
+            Task task = new Task(fileName);
             task.isTest = true;
             task.testBinary = csvtext.getBytes();
 
@@ -117,7 +117,7 @@ public class TestMultiThreadPrepareProcessor {
         proc.joinWorkers();
 
         assertEquals(numTasks, proc.getErrors().size());
-        for (PrepareProcessor.ErrorInfo err : proc.getErrors()) {
+        for (ErrorInfo err : proc.getErrors()) {
             assertTrue(err.error instanceof PreparePartsException);
         }
     }

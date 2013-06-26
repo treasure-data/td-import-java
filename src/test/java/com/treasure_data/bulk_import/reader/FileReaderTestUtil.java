@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.prepare_parts.writer.FileWriterTestUtil;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
@@ -25,7 +25,7 @@ public class FileReaderTestUtil {
     protected FileReader reader;
     protected FileWriter writer;
 
-    protected PrepareProcessor.Task task;
+    protected Task task;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
 

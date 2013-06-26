@@ -33,7 +33,7 @@ import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public abstract class FileReader implements Closeable {
@@ -60,7 +60,7 @@ public abstract class FileReader implements Closeable {
         this.writer = writer;
     }
 
-    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+    public void configure(Task task) throws PreparePartsException {
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
     }

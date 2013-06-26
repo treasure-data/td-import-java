@@ -11,22 +11,22 @@ import org.junit.Ignore;
 @Ignore
 public class PrepareProcessorTestUtil {
 
-    public static PrepareProcessor.Task createTask(int i, int numRows) {
+    public static Task createTask(int i, int numRows) {
         StringBuilder sbuf = new StringBuilder();
         sbuf.append("time,user,age\n");
         for (int j = 0; j < numRows; j++) {
             sbuf.append(String.format("1370416181,muga%d,%d\n", i, i));
         }
 
-        PrepareProcessor.Task t = new PrepareProcessor.Task("file" + i);
+        Task t = new Task("file" + i);
         t.isTest = true;
         t.testBinary = sbuf.toString().getBytes();
         return t;
     }
 
-    public static PrepareProcessor.Task createErrorTask(int i)
+    public static Task createErrorTask(int i)
             throws Exception {
-        PrepareProcessor.Task t = new PrepareProcessor.Task("file" + i);
+        Task t = new Task("file" + i);
         t = spy(t);
         doThrow(new IOException("dummy")).when(t).createInputStream(
                 any(PrepareConfiguration.CompressionType.class));

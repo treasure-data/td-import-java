@@ -34,7 +34,7 @@ import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.JSONFileWriter;
 
@@ -49,7 +49,7 @@ public class CSVFileReader extends FileReader {
     }
 
     @Override
-    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+    public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
         // initialize csv preference
@@ -74,7 +74,7 @@ public class CSVFileReader extends FileReader {
         }
     }
 
-    private void sample(PrepareProcessor.Task task) throws PreparePartsException {
+    private void sample(Task task) throws PreparePartsException {
         Tokenizer sampleTokenizer = null;
 
         int timeColumnIndex = -1;

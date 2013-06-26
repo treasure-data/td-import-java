@@ -22,9 +22,10 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.prepare_parts.ErrorInfo;
 import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.UploadTask;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.Task;
 import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
@@ -85,7 +86,9 @@ public class Main {
             public void run() {
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
-                        PrepareProcessor.Task task = new PrepareProcessor.Task(fileNames[i]);
+                        com.treasure_data.bulk_import.prepare_parts.Task task =
+                                new com.treasure_data.bulk_import.prepare_parts.Task(
+                                        fileNames[i]);
                         MultiThreadPrepareProcessor.addTask(task);
                     } catch (Throwable t) {
                         LOG.severe("Error occurred During 'addTask' method call");
@@ -208,8 +211,8 @@ public class Main {
             public void run() {
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
-                        PrepareProcessor.UploadTask task =
-                                new PrepareProcessor.UploadTask(sessionName, fileNames[i]);
+                        UploadTask task =
+                                new UploadTask(sessionName, fileNames[i]);
                         MultiThreadPrepareProcessor.addTask(task);
                     } catch (Throwable t) {
                         LOG.severe("Error occurred During 'addTask' method call");
@@ -248,7 +251,7 @@ public class Main {
                 "Some errors occurred during %s processing. " +
                 "Please check the following messages.", cmd));
 
-        for (PrepareProcessor.ErrorInfo e : proc.getErrors()) {
+        for (ErrorInfo e : proc.getErrors()) {
             e.error.printStackTrace();
         }
     }
@@ -284,5 +287,4 @@ public class Main {
         }
         return false;
     }
-
 }

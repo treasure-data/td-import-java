@@ -38,14 +38,14 @@ public class MultiThreadPrepareProcessor {
         @Override
         public void run() {
             while (true) {
-                PrepareProcessor.Task t = parent.taskQueue.poll();
+                Task t = parent.taskQueue.poll();
                 if (t == null) {
                     continue;
-                } else if (PrepareProcessor.Task.endTask(t)) {
+                } else if (Task.endTask(t)) {
                     break;
                 }
 
-                PrepareProcessor.ErrorInfo error = proc.execute(t);
+                ErrorInfo error = proc.execute(t);
                 if (error.error != null) {
                     parent.setErrors(error);
                 }
@@ -55,37 +55,37 @@ public class MultiThreadPrepareProcessor {
     }
 
     private static final Logger LOG = Logger.getLogger(MultiThreadPrepareProcessor.class.getName());
-    private static BlockingQueue<PrepareProcessor.Task> taskQueue;
+    private static BlockingQueue<Task> taskQueue;
 
     static {
-        taskQueue = new LinkedBlockingQueue<PrepareProcessor.Task>();
+        taskQueue = new LinkedBlockingQueue<Task>();
     }
 
-    public static synchronized void addTask(PrepareProcessor.Task task) {
+    public static synchronized void addTask(Task task) {
         taskQueue.add(task);
     }
 
     public static synchronized void addFinishTask(PrepareConfiguration conf) {
         for (int i = 0; i < conf.getNumOfPrepareThreads(); i++) {
-            taskQueue.add(PrepareProcessor.Task.FINISH_TASK);
+            taskQueue.add(Task.FINISH_TASK);
         }
     }
 
     private PrepareConfiguration conf;
     private List<Worker> workers;
-    private List<PrepareProcessor.ErrorInfo> errors;
+    private List<ErrorInfo> errors;
 
     public MultiThreadPrepareProcessor(PrepareConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        errors = new ArrayList<PrepareProcessor.ErrorInfo>();
+        errors = new ArrayList<ErrorInfo>();
     }
 
-    protected synchronized void setErrors(PrepareProcessor.ErrorInfo error) {
+    protected synchronized void setErrors(ErrorInfo error) {
         errors.add(error);
     }
 
-    public List<PrepareProcessor.ErrorInfo> getErrors() {
+    public List<ErrorInfo> getErrors() {
         return errors;
     }
 

@@ -36,7 +36,7 @@ import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.Task;
 
 public class MsgpackGZIPFileWriter extends FileWriter {
     static class DataSizeChecker extends FilterOutputStream {
@@ -83,7 +83,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+    public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
         msgpack = new MessagePack();

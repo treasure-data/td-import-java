@@ -37,11 +37,11 @@ public class TestPrepareProcessor {
         String csvtext = "time,user,age\n" + "1370416181,muga,10\n";
         String fileName = "file01";
 
-        PrepareProcessor.Task task = new PrepareProcessor.Task(fileName);
+        Task task = new Task(fileName);
         task.isTest = true;
         task.testBinary = csvtext.getBytes();
 
-        PrepareProcessor.ErrorInfo err = proc.execute(task);
+        ErrorInfo err = proc.execute(task);
     }
 
 
@@ -49,8 +49,8 @@ public class TestPrepareProcessor {
     private PrepareConfiguration conf;
     private PrepareProcessor proc;
 
-    private PrepareProcessor.Task task;
-    private PrepareProcessor.ErrorInfo err;
+    private Task task;
+    private ErrorInfo err;
 
     Random rand = new Random(new Random().nextInt());
     private int numTasks;

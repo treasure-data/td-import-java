@@ -15,7 +15,7 @@ import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 @Ignore
@@ -29,7 +29,7 @@ public class FileWriterTestUtil extends FileWriter {
     }
 
     @Override
-    public void configure(PrepareProcessor.Task task) throws PreparePartsException {
+    public void configure(Task task) throws PreparePartsException {
     }
 
     @Override

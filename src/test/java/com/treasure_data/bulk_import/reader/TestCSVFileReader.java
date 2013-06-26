@@ -14,7 +14,7 @@ import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.commands.Config;
 
 public class TestCSVFileReader extends FileReaderTestUtil {
@@ -343,7 +343,7 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         context.createContext(this);
 
         // create task
-        task = new PrepareProcessor.Task(fileName);
+        task = new Task(fileName);
         task = spy(task);
         task.isTest = true;
         task.testBinary = context.generateCSVText(this).getBytes();
