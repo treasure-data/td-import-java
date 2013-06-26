@@ -24,7 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class Task {
+public class Task implements com.treasure_data.bulk_import.Task {
     private static final String TAG = "__FINISH__";
 
     static final Task FINISH_TASK = new Task(TAG, TAG, 0);
@@ -65,7 +65,7 @@ public class Task {
         return t.sessName.equals(sessName) && t.partName.equals(partName);
     }
 
-    static boolean endTask(Task t) {
-        return t.equals(FINISH_TASK);
+    public boolean endTask() {
+        return equals(FINISH_TASK);
     }
 }
