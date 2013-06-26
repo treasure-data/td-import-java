@@ -256,6 +256,17 @@ public class Main {
         }
     }
 
+    private static boolean includePrepareProcessing(Properties props) {
+        // TODO FIXME #MN this method should be considered more...
+        for (Iterator<Object> keyIter = props.keySet().iterator(); keyIter.hasNext(); ) {
+            String key = (String) keyIter.next();
+            if (key.startsWith("td.bulk_import.prepare_parts.")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
             throw new IllegalArgumentException("Command not specified");
@@ -277,14 +288,4 @@ public class Main {
         }
     }
 
-    private static boolean includePrepareProcessing(Properties props) {
-        // TODO FIXME #MN this method should be considered more...
-        for (Iterator<Object> keyIter = props.keySet().iterator(); keyIter.hasNext(); ) {
-            String key = (String) keyIter.next();
-            if (key.startsWith("td.bulk_import.prepare_parts.")) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
