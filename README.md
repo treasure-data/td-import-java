@@ -26,7 +26,7 @@ Java >= 1.6
 You can get latest source code using git.
 
     $ git clone https://github.com/treasure-data/td-bulk-import-java.git
-    $ cd td-client-java
+    $ cd td-bulk-import-java
     $ mvn package
 
 You will get the td-client jar file in td-bulk-import-java/target 
