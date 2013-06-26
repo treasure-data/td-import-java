@@ -20,7 +20,7 @@ public class PrepareProcessorTestUtil {
 
         PrepareProcessor.Task t = new PrepareProcessor.Task("file" + i);
         t.isTest = true;
-        t.testText = sbuf.toString();
+        t.testBinary = sbuf.toString().getBytes();
         return t;
     }
 

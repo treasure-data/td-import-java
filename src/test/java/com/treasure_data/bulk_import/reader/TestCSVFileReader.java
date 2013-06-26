@@ -346,7 +346,7 @@ public class TestCSVFileReader extends FileReaderTestUtil {
         task = new PrepareProcessor.Task(fileName);
         task = spy(task);
         task.isTest = true;
-        task.testText = context.generateCSVText(this);
+        task.testBinary = context.generateCSVText(this).getBytes();
 
         // call configure(task)
         reader.configure(task);

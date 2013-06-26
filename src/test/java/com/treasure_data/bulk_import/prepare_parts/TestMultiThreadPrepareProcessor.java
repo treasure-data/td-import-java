@@ -41,7 +41,7 @@ public class TestMultiThreadPrepareProcessor {
 
             PrepareProcessor.Task task = new PrepareProcessor.Task(fileName);
             task.isTest = true;
-            task.testText = csvtext;
+            task.testBinary = csvtext.getBytes();
 
             MultiThreadPrepareProcessor.addTask(task);
         }

@@ -39,7 +39,7 @@ public class TestPrepareProcessor {
 
         PrepareProcessor.Task task = new PrepareProcessor.Task(fileName);
         task.isTest = true;
-        task.testText = csvtext;
+        task.testBinary = csvtext.getBytes();
 
         PrepareProcessor.ErrorInfo err = proc.execute(task);
     }

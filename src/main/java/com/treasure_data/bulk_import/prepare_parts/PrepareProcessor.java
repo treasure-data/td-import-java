@@ -43,7 +43,7 @@ public class PrepareProcessor {
 
         // unit testing
         public boolean isTest = false;
-        public String testText = null;
+        public byte[] testBinary = null;
 
         public Task(String fileName) {
             this.fileName = fileName;
@@ -55,7 +55,7 @@ public class PrepareProcessor {
             if (!isTest) {
                 return compressionType.createInputStream(new FileInputStream(fileName));
             } else {
-                return new ByteArrayInputStream(testText.getBytes());
+                return new ByteArrayInputStream(testBinary);
             }
         }
 

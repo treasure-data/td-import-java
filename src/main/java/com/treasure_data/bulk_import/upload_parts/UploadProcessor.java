@@ -18,6 +18,7 @@
 package com.treasure_data.bulk_import.upload_parts;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -121,6 +122,10 @@ public class UploadProcessor {
         String fileName;
         long size;
 
+        // unit testing
+        public boolean isTest = false;
+        public byte[] testBinary = null;
+
         public Task(String sessName, String fileName, long size) {
             this.sessName = sessName;
             int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
@@ -131,7 +136,11 @@ public class UploadProcessor {
         }
 
         protected InputStream createInputStream() throws IOException {
-            return new BufferedInputStream(new FileInputStream(fileName));
+            if (!isTest) {
+                return new BufferedInputStream(new FileInputStream(fileName));
+            } else {
+                return new ByteArrayInputStream(testBinary);
+            }
         }
 
         @Override
