@@ -5,13 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class Task {
+public class Task implements com.treasure_data.bulk_import.Task {
     private static final String TAG = "__PREPARE_FINISH__";
     static final Task FINISH_TASK = new Task(TAG);
-
-    static boolean endTask(Task t) {
-        return t.equals(FINISH_TASK);
-    }
 
     public String fileName;
 
@@ -50,5 +46,10 @@ public class Task {
     @Override
     public String toString() {
         return String.format("prepare_task{file=%s}", fileName);
+    }
+
+    @Override
+    public boolean endTask() {
+        return equals(FINISH_TASK);
     }
 }
