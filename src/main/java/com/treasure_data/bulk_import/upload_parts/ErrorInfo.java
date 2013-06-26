@@ -17,9 +17,8 @@
 //
 package com.treasure_data.bulk_import.upload_parts;
 
-public class ErrorInfo {
+public class ErrorInfo extends com.treasure_data.bulk_import.ErrorInfo {
     public Task task;
-    public Throwable error;
 
     public ErrorInfo() {
     }

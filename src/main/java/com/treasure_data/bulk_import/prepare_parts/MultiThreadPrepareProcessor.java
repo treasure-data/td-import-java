@@ -45,9 +45,9 @@ public class MultiThreadPrepareProcessor {
                     break;
                 }
 
-                ErrorInfo error = proc.execute(t);
-                if (error.error != null) {
-                    parent.setErrors(error);
+                ErrorInfo err = proc.execute(t);
+                if (err.error != null) {
+                    parent.setErrors(err);
                 }
             }
             isFinished.set(true);
@@ -73,19 +73,19 @@ public class MultiThreadPrepareProcessor {
 
     private PrepareConfiguration conf;
     private List<Worker> workers;
-    private List<ErrorInfo> errors;
+    private List<com.treasure_data.bulk_import.ErrorInfo> errors;
 
     public MultiThreadPrepareProcessor(PrepareConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        errors = new ArrayList<ErrorInfo>();
+        errors = new ArrayList<com.treasure_data.bulk_import.ErrorInfo>();
     }
 
-    protected synchronized void setErrors(ErrorInfo error) {
+    protected synchronized void setErrors(com.treasure_data.bulk_import.ErrorInfo error) {
         errors.add(error);
     }
 
-    public List<ErrorInfo> getErrors() {
+    public List<com.treasure_data.bulk_import.ErrorInfo> getErrors() {
         return errors;
     }
 

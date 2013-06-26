@@ -6,7 +6,6 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
 
@@ -117,7 +116,7 @@ public class TestMultiThreadPrepareProcessor {
         proc.joinWorkers();
 
         assertEquals(numTasks, proc.getErrors().size());
-        for (ErrorInfo err : proc.getErrors()) {
+        for (com.treasure_data.bulk_import.ErrorInfo err : proc.getErrors()) {
             assertTrue(err.error instanceof PreparePartsException);
         }
     }

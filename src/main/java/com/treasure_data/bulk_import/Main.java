@@ -19,15 +19,15 @@ package com.treasure_data.bulk_import;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.prepare_parts.ErrorInfo;
+import com.treasure_data.bulk_import.ErrorInfo;
 import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.UploadTask;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
-import com.treasure_data.bulk_import.upload_parts.Task;
 import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
@@ -107,8 +107,8 @@ public class Main {
         }).start();
 
         proc.joinWorkers();
-
-        outputErrors(proc, Configuration.CMD_PREPARE_PARTS);
+        List<ErrorInfo> errs = proc.getErrors();
+        outputErrors(errs, Configuration.CMD_PREPARE_PARTS);
     }
 
     /**
@@ -174,10 +174,13 @@ public class Main {
 
         proc.joinWorkers();
 
-        // TODO need strict error handling
-        MultiThreadUploadProcessor.processAfterUploading(new BulkImportClient(
-                new TreasureDataClient(conf.getProperties())), conf,
-                sessionName);
+        ErrorInfo err = MultiThreadUploadProcessor.processAfterUploading(
+                new BulkImportClient(new TreasureDataClient(conf.getProperties())),
+                conf, sessionName);
+
+        List<ErrorInfo> errs = proc.getErrors();
+        errs.add(err);
+        outputErrors(errs, Configuration.CMD_UPLOAD_PARTS);
     }
 
     public static void prepareAndUploadParts(final String[] args, Properties props)
@@ -235,15 +238,20 @@ public class Main {
         MultiThreadUploadProcessor.addFinishTask(conf);
         uploadProc.joinWorkers();
 
-        // TODO need strict error handling
-        MultiThreadUploadProcessor.processAfterUploading(new BulkImportClient(
-                new TreasureDataClient(conf.getProperties())), conf,
-                sessionName);
+        ErrorInfo err = MultiThreadUploadProcessor.processAfterUploading(
+                new BulkImportClient(new TreasureDataClient(conf.getProperties())),
+                conf, sessionName);
+
+        List<ErrorInfo> errs = prepareProc.getErrors();
+        errs.addAll(uploadProc.getErrors());
+        errs.add(err);
+        outputErrors(errs, Configuration.CMD_PREPARE_PARTS + "+"
+                + Configuration.CMD_UPLOAD_PARTS);
     }
 
 
-    private static void outputErrors(MultiThreadPrepareProcessor proc, String cmd) {
-        if (proc.getErrors().size() == 0) {
+    private static void outputErrors(List<ErrorInfo> errs, String cmd) {
+        if (errs.size() == 0) {
             return;
         }
 
@@ -251,7 +259,7 @@ public class Main {
                 "Some errors occurred during %s processing. " +
                 "Please check the following messages.", cmd));
 
-        for (ErrorInfo e : proc.getErrors()) {
+        for (ErrorInfo e : errs) {
             e.error.printStackTrace();
         }
     }

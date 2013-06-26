@@ -77,19 +77,19 @@ public class MultiThreadUploadProcessor {
 
     private UploadConfiguration conf;
     private List<Worker> workers;
-    private List<ErrorInfo> errors;
+    private List<com.treasure_data.bulk_import.ErrorInfo> errors;
 
     public MultiThreadUploadProcessor(UploadConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        errors = new ArrayList<ErrorInfo>();
+        errors = new ArrayList<com.treasure_data.bulk_import.ErrorInfo>();
     }
 
     protected synchronized void setErrors(ErrorInfo error) {
         errors.add(error);
     }
 
-    public List<ErrorInfo> getErrors() {
+    public List<com.treasure_data.bulk_import.ErrorInfo> getErrors() {
         return errors;
     }
 
@@ -138,24 +138,35 @@ public class MultiThreadUploadProcessor {
     }
 
     // TODO need strict error handling
-    public static void processAfterUploading(BulkImportClient client,
+    public static ErrorInfo processAfterUploading(BulkImportClient client,
             UploadConfiguration conf, String sessName) throws UploadPartsException {
+        ErrorInfo err = null;
+
         if (!conf.autoPerform()) {
-            return;
+            return new ErrorInfo();
         }
 
         // freeze
-        UploadProcessor.freezeSession(client, conf, sessName);
+        err = UploadProcessor.freezeSession(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
 
         // perform
-        UploadProcessor.performSession(client, conf, sessName);
+        err = UploadProcessor.performSession(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
 
         if (!conf.autoCommit()) {
-            return;
+            return new ErrorInfo();
         }
 
         // wait performing
-        UploadProcessor.waitPerform(client, conf, sessName);
+        err = UploadProcessor.waitPerform(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
 
         // check error of perform
         SessionSummary summary = UploadProcessor.showSession(client, conf, sessName);
@@ -176,10 +187,16 @@ public class MultiThreadUploadProcessor {
                     "Check the status of bulk import session %s with 'td bulk_import:show %s'",
                     summary.getName(), summary.getName());
             LOG.severe(msg);
-            throw new UploadPartsException(msg);
+            err.error = new UploadPartsException(msg);
+            return err;
         }
 
         // commit
-        UploadProcessor.commitSession(client, conf, sessName);
+        err = UploadProcessor.commitSession(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
+
+        return new ErrorInfo();
     }
 }

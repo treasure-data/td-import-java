@@ -224,10 +224,11 @@ public class UploadProcessor {
         return err;
     }
 
-    public static void waitPerform(final BulkImportClient client,
+    public static ErrorInfo waitPerform(final BulkImportClient client,
             final UploadConfiguration conf, final String sessName) throws UploadPartsException {
         LOG.info(String.format("Wait session performing '%s'", sessName));
 
+        ErrorInfo err = new ErrorInfo();
         long waitTime = System.currentTimeMillis();
         while (true) {
             try {
@@ -253,9 +254,12 @@ public class UploadProcessor {
                 }
             } catch (IOException e) {
                 LOG.severe(e.getMessage());
-                throw new UploadPartsException(e);
+                err.error = e;
+                break;
             }
         }
+
+        return err;
     }
 
     public static ErrorInfo commitSession(final BulkImportClient client,
