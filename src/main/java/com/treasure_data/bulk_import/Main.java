@@ -39,7 +39,7 @@ public class Main {
      * usage:
      *   $ java BulkImportTool prepare_parts <files...>
      * example:
-     *   $ java BulkImportTool prepareParts logs/*.csv \
+     *   $ java BulkImportTool prepare_parts logs/*.csv \
      *         -Dtd.bulk_import.prepare_parts.format=csv \
      *         -Dtd.bulk_import.prepare_parts.columns=time,uid,price,count \
      *         -Dtd.bulk_import.prepare_parts.columntypes=long,string,long,int \
