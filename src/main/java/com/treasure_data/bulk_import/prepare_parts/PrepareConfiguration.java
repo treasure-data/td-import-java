@@ -247,6 +247,11 @@ public class PrepareConfiguration extends Configuration {
     protected String[] keys;
     protected ColumnType[] valueTypes;
 
+    protected String jdbcConnectionURL;
+    protected String jdbcUser;
+    protected String jdbcPassword;
+    protected String jdbcTable;
+
     public PrepareConfiguration() {
     }
 
@@ -623,5 +628,21 @@ public class PrepareConfiguration extends Configuration {
 
     public int getSampleRowSize() {
         return sampleRowSize;
+    }
+
+    public String getJDBCConnectionURL() {
+        return jdbcConnectionURL;
+    }
+
+    public String getJDBCUser() {
+        return jdbcUser;
+    }
+
+    public String getJDBCPassword() {
+        return jdbcPassword;
+    }
+
+    public String getJDBCTable() {
+        return jdbcTable;
     }
 }
