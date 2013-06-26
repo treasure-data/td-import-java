@@ -39,7 +39,7 @@ public class TestUnploadProcessor {
         String fileName = "file01";
         long size = bytes.length;
 
-        UploadProcessor.Task task = new UploadProcessor.Task(sessName, fileName, size);
+        Task task = new Task(sessName, fileName, size);
         task = spy(task);
         doReturn(new ByteArrayInputStream(bytes)).when(task).createInputStream();
         proc.execute(task);
@@ -49,8 +49,8 @@ public class TestUnploadProcessor {
     private UploadConfiguration conf;
     private UploadProcessor proc;
 
-    private UploadProcessor.Task task;
-    private UploadProcessor.ErrorInfo err;
+    private Task task;
+    private ErrorInfo err;
 
     Random rand = new Random(new Random().nextInt());
     private int numTasks;
@@ -77,7 +77,7 @@ public class TestUnploadProcessor {
     public void returnNonErrorWhenExecuteMethodWorksNormally() throws Exception {
         // configure mock
         proc = spy(proc);
-        doNothing().when(proc).executeUpload(any(UploadProcessor.Task.class));
+        doNothing().when(proc).executeUpload(any(Task.class));
 
         // test
         for (int i = 0; i < numTasks; i++) {
@@ -90,7 +90,7 @@ public class TestUnploadProcessor {
     public void returnIOErrorWhenExecuteMethodThrowsIOError() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new IOException("dummy")).when(proc).executeUpload(any(UploadProcessor.Task.class));
+        doThrow(new IOException("dummy")).when(proc).executeUpload(any(Task.class));
 
         // test
         for (int i = 0; i < numTasks; i++) {
@@ -103,7 +103,7 @@ public class TestUnploadProcessor {
     public void returnIOErrorWhenExecuteMethodThrowsClientError() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new ClientException("dummy")).when(proc).executeUpload(any(UploadProcessor.Task.class));
+        doThrow(new ClientException("dummy")).when(proc).executeUpload(any(Task.class));
 
         // test
         int count = 1;
@@ -115,7 +115,7 @@ public class TestUnploadProcessor {
 
     @Test
     public void equalsFinishTasks() {
-        assertTrue(UploadProcessor.Task.FINISH_TASK.equals(UploadProcessor.Task.FINISH_TASK));
+        assertTrue(Task.FINISH_TASK.equals(Task.FINISH_TASK));
     }
 
 }

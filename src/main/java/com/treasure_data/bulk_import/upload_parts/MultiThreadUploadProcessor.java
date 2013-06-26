@@ -42,14 +42,14 @@ public class MultiThreadUploadProcessor {
         @Override
         public void run() {
             while (true) {
-                UploadProcessor.Task t = parent.taskQueue.poll();
+                Task t = parent.taskQueue.poll();
                 if (t == null) {
                     continue;
-                } else if (UploadProcessor.Task.endTask(t)) {
+                } else if (Task.endTask(t)) {
                     break;
                 }
 
-                UploadProcessor.ErrorInfo err = proc.execute(t);
+                ErrorInfo err = proc.execute(t);
                 if (err.error != null) {
                     parent.setErrors(err);
                 }
@@ -59,37 +59,37 @@ public class MultiThreadUploadProcessor {
     }
 
     private static final Logger LOG = Logger.getLogger(MultiThreadUploadProcessor.class.getName());
-    private static BlockingQueue<UploadProcessor.Task> taskQueue;
+    private static BlockingQueue<Task> taskQueue;
 
     static {
-        taskQueue = new LinkedBlockingQueue<UploadProcessor.Task>();
+        taskQueue = new LinkedBlockingQueue<Task>();
     }
 
-    public static synchronized void addTask(UploadProcessor.Task task) {
+    public static synchronized void addTask(Task task) {
         taskQueue.add(task);
     }
 
     public static synchronized void addFinishTask(UploadConfiguration conf) {
         for (int i = 0; i < conf.getNumOfUploadThreads(); i++) {
-            taskQueue.add(UploadProcessor.Task.FINISH_TASK);
+            taskQueue.add(Task.FINISH_TASK);
         }
     }
 
     private UploadConfiguration conf;
     private List<Worker> workers;
-    private List<UploadProcessor.ErrorInfo> errors;
+    private List<ErrorInfo> errors;
 
     public MultiThreadUploadProcessor(UploadConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        errors = new ArrayList<UploadProcessor.ErrorInfo>();
+        errors = new ArrayList<ErrorInfo>();
     }
 
-    protected synchronized void setErrors(UploadProcessor.ErrorInfo error) {
+    protected synchronized void setErrors(ErrorInfo error) {
         errors.add(error);
     }
 
-    public List<UploadProcessor.ErrorInfo> getErrors() {
+    public List<ErrorInfo> getErrors() {
         return errors;
     }
 

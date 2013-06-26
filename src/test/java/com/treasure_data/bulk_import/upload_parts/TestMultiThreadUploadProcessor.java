@@ -40,7 +40,7 @@ public class TestMultiThreadUploadProcessor {
             String fileName = "file" + i;
             long size = bytes.length;
 
-            UploadProcessor.Task task = new UploadProcessor.Task(sessName, fileName, size);
+            Task task = new Task(sessName, fileName, size);
             task = spy(task);
             doReturn(new ByteArrayInputStream(bytes)).when(task).createInputStream();
             MultiThreadUploadProcessor.addTask(task);
@@ -83,7 +83,7 @@ public class TestMultiThreadUploadProcessor {
     public void dontGetErrorsWhenWorkersWorkNormally() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doNothing().when(child).executeUpload(any(UploadProcessor.Task.class));
+            doNothing().when(child).executeUpload(any(Task.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();
@@ -102,7 +102,7 @@ public class TestMultiThreadUploadProcessor {
     public void getErrorsWhenWorkersThrowIOError() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doThrow(new IOException("dummy")).when(child).executeUpload(any(UploadProcessor.Task.class));
+            doThrow(new IOException("dummy")).when(child).executeUpload(any(Task.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();
@@ -115,7 +115,7 @@ public class TestMultiThreadUploadProcessor {
         proc.joinWorkers();
 
         assertEquals(numTasks, proc.getErrors().size());
-        for (UploadProcessor.ErrorInfo err : proc.getErrors()) {
+        for (ErrorInfo err : proc.getErrors()) {
             assertTrue(err.error instanceof IOException);
         }
     }
@@ -124,7 +124,7 @@ public class TestMultiThreadUploadProcessor {
     public void getErrorsWhenWorkersThrowClientError() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doThrow(new ClientException("dummy")).when(child).executeUpload(any(UploadProcessor.Task.class));
+            doThrow(new ClientException("dummy")).when(child).executeUpload(any(Task.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();
@@ -137,7 +137,7 @@ public class TestMultiThreadUploadProcessor {
         proc.joinWorkers();
 
         assertEquals(numTasks, proc.getErrors().size());
-        for (UploadProcessor.ErrorInfo err : proc.getErrors()) {
+        for (ErrorInfo err : proc.getErrors()) {
             assertTrue(err.error instanceof IOException);
         }
     }

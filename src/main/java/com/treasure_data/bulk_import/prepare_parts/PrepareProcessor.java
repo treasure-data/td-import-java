@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.reader.FileReader;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
-import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
+import com.treasure_data.bulk_import.upload_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class PrepareProcessor {
@@ -92,7 +92,8 @@ public class PrepareProcessor {
             super.finishHook(outputFileName);
 
             long size = new File(outputFileName).length();
-            UploadProcessor.Task task = new UploadProcessor.Task(
+            com.treasure_data.bulk_import.upload_parts.Task task =
+                    new com.treasure_data.bulk_import.upload_parts.Task(
                     sessionName, outputFileName, size);
             MultiThreadUploadProcessor.addTask(task);
         }

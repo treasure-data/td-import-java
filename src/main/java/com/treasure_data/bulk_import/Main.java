@@ -26,8 +26,8 @@ import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareProcessor;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
+import com.treasure_data.bulk_import.upload_parts.Task;
 import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
-import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 
@@ -149,7 +149,8 @@ public class Main {
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
                         long size = new File(fileNames[i]).length();
-                        UploadProcessor.Task task = new UploadProcessor.Task(
+                        com.treasure_data.bulk_import.upload_parts.Task task =
+                                new com.treasure_data.bulk_import.upload_parts.Task(
                                 sessionName, fileNames[i], size);
                         MultiThreadUploadProcessor.addTask(task);
                     } catch (Throwable t) {
