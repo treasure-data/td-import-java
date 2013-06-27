@@ -47,13 +47,13 @@ public class Task implements com.treasure_data.bulk_import.Task {
         this.size = size;
     }
 
-    protected InputStream createInputStream() throws IOException {
-        if (!isTest) {
-            return new BufferedInputStream(new FileInputStream(fileName));
-        } else {
-            return new ByteArrayInputStream(testBinary);
-        }
-    }
+//    protected InputStream createInputStream() throws IOException {
+//        if (!isTest) {
+//            return new BufferedInputStream(new FileInputStream(fileName));
+//        } else {
+//            return new ByteArrayInputStream(testBinary);
+//        }
+//    }
 
     @Override
     public boolean equals(Object obj) {

@@ -17,7 +17,11 @@
 //
 package com.treasure_data.bulk_import.upload_parts;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 import com.treasure_data.client.ClientException;
@@ -155,7 +159,7 @@ public class UploadProcessor {
 
         long time = System.currentTimeMillis();
         Session session = new Session(task.sessName, null, null);
-        client.uploadPart(session, task.partName, task.createInputStream(),
+        client.uploadPart(session, task.partName, createInputStream(task),
                 (int) task.size);
         time = System.currentTimeMillis() - time;
 
@@ -163,6 +167,14 @@ public class UploadProcessor {
                 .format("Uploaded file '%s' (size %d) to session '%s' as part '%s' by thread '%s' (time: %d sec.)",
                         task.fileName, task.size, task.sessName, task.partName,
                         Thread.currentThread().getName(), (time / 1000)));
+    }
+
+    protected InputStream createInputStream(final Task task) throws IOException {
+        if (!task.isTest) {
+            return new BufferedInputStream(new FileInputStream(task.fileName));
+        } else {
+            return new ByteArrayInputStream(task.testBinary);
+        }
     }
 
     public static SessionSummary showSession(final BulkImportClient client,

@@ -3,11 +3,9 @@ package com.treasure_data.bulk_import.upload_parts;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
@@ -41,7 +39,8 @@ public class TestUnploadProcessor {
 
         Task task = new Task(sessName, fileName, size);
         task = spy(task);
-        doReturn(new ByteArrayInputStream(bytes)).when(task).createInputStream();
+        task.isTest = true;
+        task.testBinary = bytes;
         proc.execute(task);
     }
 
