@@ -19,7 +19,7 @@ public class IntegrationTestPreparePartsCSV extends PreparePartsIntegrationTestU
         super.destroyResources();
     }
 
-    @Test @Ignore
+    @Test
     public void writeFromCSVWithTimeColumn() throws Exception {
         props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
@@ -36,7 +36,7 @@ public class IntegrationTestPreparePartsCSV extends PreparePartsIntegrationTestU
         assertDataEquals(srcFileName, dstFileName);
     }
 
-    @Test @Ignore
+    @Test
     public void writeFromCSVWithAlasTimeColumn() throws Exception {
         props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
@@ -53,4 +53,24 @@ public class IntegrationTestPreparePartsCSV extends PreparePartsIntegrationTestU
         String dstFileName = OUTPUT_DIR + "csvfile-with-aliastime_csv_0.msgpack.gz";
         assertDataEquals(srcFileName, dstFileName);
     }
+
+    @Test
+    public void writeFromCSVWithTimeFormat() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "csv");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timeformat");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, "%Y-%m-%d %H:%M:%S %z");
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "csvfile-with-timeformat.csv");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "csvfile-with-timeformat_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
 }
