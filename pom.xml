@@ -75,7 +75,9 @@
     <javac.target>1.6</javac.target>
     <javadoc.encoding>UTF-8</javadoc.encoding>
     <javadoc.locale>en_US</javadoc.locale>
-    <surefire.threadCount>1</surefire.threadCount>
+    <maven-surefire-plugin.threadCount>1</maven-surefire-plugin.threadCount>
+    <maven-surefire-plugin.useSystemCL>false</maven-surefire-plugin.useSystemCL>
+    <maven-surefire-plugin.testFailureIgnore>false</maven-surefire-plugin.testFailureIgnore>
     <mysql-connector-java.version>5.1.18</mysql-connector-java.version>
   </properties>
 
@@ -213,21 +215,47 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
           <!-- the option cannot be used because we use multi-threads
                task queues as static fields. -->
           <!--
           <parallel>methods</parallel>
-          <threadCount>${surefire.threadCount}</threadCount>
+          <threadCount>${maven-surefire-plugin.threadCount}</threadCount>
            -->
+          <useSystemClassLoader>${maven-surefire-plugin.useSystemCL}</useSystemClassLoader>
+          <testFailureIgnore>${maven-surefire-plugin.testFailureIgnore}</testFailureIgnore>
+          <!-- by default, test cases are included. -->
+          <includes>
+            <include>**/Test*.class</include>
+          </includes>
+          <excludes>
+            <!-- by default, integration test cases are not included. -->
+            <exclude>**/integration/**/IntegrationTest*.class</exclude>
+          </excludes>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-junit47</artifactId>
-            <version>${maven-surefire-plugin.version}</version>
-          </dependency>
-        </dependencies>
+        <executions>
+          <execution>
+            <!--
+             This configuration should be NOT used. How to execute integration-test is
+             $ mvn test -Dtest=**/integration/**/IntegrationTest*
+              -->
+            <id>integration-tests</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <testFailureIgnore>${surefire.testFailureIgnore}</testFailureIgnore>
+              <excludes>
+                <exclude>none</exclude>
+              </excludes>
+              <includes>
+                <include>**/integration/**/IntegrationTest*.java</include>
+              </includes>
+              <!-- never skip running the tests when the integration-test phase is invoked -->
+              <skip>false</skip>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- include jars for msgpack -->
