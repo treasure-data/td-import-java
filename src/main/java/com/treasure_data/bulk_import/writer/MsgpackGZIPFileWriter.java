@@ -185,8 +185,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
         try {
             time = Long.parseLong(timeString);
         } catch (Throwable t) {
-            throw new PreparePartsException(String.format(
-                    "'%s' could not be parsed as long type", timeString));
+            ;
         }
 
         if (time == 0 && filter.getTimeFormat() != null) {
