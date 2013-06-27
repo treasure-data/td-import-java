@@ -17,12 +17,7 @@
 //
 package com.treasure_data.bulk_import.upload_parts;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class Task implements com.treasure_data.bulk_import.Task {
     private static final String TAG = "__FINISH__";
@@ -46,14 +41,6 @@ public class Task implements com.treasure_data.bulk_import.Task {
         this.fileName = fileName;
         this.size = size;
     }
-
-//    protected InputStream createInputStream() throws IOException {
-//        if (!isTest) {
-//            return new BufferedInputStream(new FileInputStream(fileName));
-//        } else {
-//            return new ByteArrayInputStream(testBinary);
-//        }
-//    }
 
     @Override
     public boolean equals(Object obj) {
