@@ -1,14 +1,5 @@
 package com.treasure_data.bulk_import.integration;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -40,6 +31,9 @@ public class IntegrationTestPreparePartsCSV extends PreparePartsIntegrationTestU
 
         Main.prepareParts(args.toArray(new String[0]), props);
 
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "csvfile-with-time_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
     }
 
 }

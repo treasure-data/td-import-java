@@ -23,7 +23,10 @@ public class FileGeneratorMain {
         long numRows = 5000;
         long baseTime = 1372305600;
 
-        TrainingDataSet dataset = new TrainingDataSet(numRows, baseTime);
+        String[]  availableHeader = new String[] {
+                "string-value", "int-value", "double-value", "time", "timestamp", "timeformat",
+        };
+        TrainingDataSet dataset = new TrainingDataSet(numRows, baseTime, availableHeader);
         dataset.createDataFiles(gens.toArray(new FileGenerator[0]));
     }
 }
