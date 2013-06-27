@@ -214,7 +214,9 @@
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
-          <!-- 
+          <!-- the option cannot be used because we use multi-threads
+               task queues as static fields. -->
+          <!--
           <parallel>methods</parallel>
           <threadCount>${surefire.threadCount}</threadCount>
            -->
