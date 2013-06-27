@@ -17,8 +17,8 @@ public class TrainingDataSet {
     private static final Object lock = new Object();
 
     static {
-        format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        format.setTimeZone(TimeZone.getTimeZone("JST"));
     }
 
     protected long numRows;
