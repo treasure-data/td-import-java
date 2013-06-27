@@ -91,7 +91,7 @@ public abstract class FileWriter implements Closeable {
         if (needAdditionalTimeColumn) {
             // if the row doesn't have 'time' column, new 'time' column needs
             // to be appended to it.
-            writeBeginRow(size - skipColumns.size() - 1);
+            writeBeginRow(size - skipColumns.size() + 1);
         } else {
             writeBeginRow(size - skipColumns.size());
         }
