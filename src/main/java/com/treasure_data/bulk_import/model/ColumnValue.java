@@ -23,6 +23,8 @@ import com.treasure_data.bulk_import.writer.FileWriter;
 public interface ColumnValue {
     ColumnType getColumnType();
 
+    void set(Object v) throws PreparePartsException;
+
     void parse(String v) throws PreparePartsException;
 
     void write(FileWriter with) throws PreparePartsException;
