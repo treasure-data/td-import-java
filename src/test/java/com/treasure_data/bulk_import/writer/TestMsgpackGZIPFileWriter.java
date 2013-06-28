@@ -1,4 +1,4 @@
-package com.treasure_data.bulk_import.prepare_parts.writer;
+package com.treasure_data.bulk_import.writer;
 
 import static org.junit.Assert.assertTrue;
 
