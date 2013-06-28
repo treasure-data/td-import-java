@@ -251,7 +251,14 @@ public class Main {
 
 
     private static void outputErrors(List<ErrorInfo> errs, String cmd) {
-        if (errs.size() == 0) {
+        int errSize = 0;
+        for (ErrorInfo e : errs) {
+            if (e.error != null) {
+                errSize++;
+            }
+        }
+
+        if (errSize == 0) {
             return;
         }
 
@@ -260,7 +267,9 @@ public class Main {
                 "Please check the following messages.", cmd));
 
         for (ErrorInfo e : errs) {
-            e.error.printStackTrace();
+            if (e.error != null) {
+                e.error.printStackTrace();
+            }
         }
     }
 
