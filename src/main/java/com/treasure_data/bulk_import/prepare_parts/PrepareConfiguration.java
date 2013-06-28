@@ -35,6 +35,7 @@ import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.reader.CSVFileReader;
 import com.treasure_data.bulk_import.reader.FileReader;
+import com.treasure_data.bulk_import.reader.JSONFileReader;
 import com.treasure_data.bulk_import.reader.MySQLTableReader;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
@@ -65,6 +66,11 @@ public class PrepareConfiguration extends Configuration {
             }
         },
         JSON("json") {
+            @Override
+            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+                    throws PreparePartsException {
+                return new JSONFileReader(conf, writer);
+            }
         },
         MSGPACK("msgpack") {
         };
@@ -347,16 +353,14 @@ public class PrepareConfiguration extends Configuration {
                     Configuration.BI_PREPARE_PARTS_DELIMITER,
                     Configuration.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE).charAt(
                     0);
+            LOG.config(String.format("use '%s' as delimiterChar", delimiterChar));
         } else if (format.equals(PrepareConfiguration.Format.TSV)) {
             delimiterChar = props.getProperty(
                     Configuration.BI_PREPARE_PARTS_DELIMITER,
                     Configuration.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
                     0);
-        } else {
-            // fatal error. i mean here might be not executed
-            throw new IllegalArgumentException("unsupported format: " + format);
+            LOG.config(String.format("use '%s' as delimiterChar", delimiterChar));
         }
-        LOG.config(String.format("use '%s' as delimiterChar", delimiterChar));
 
         // newline
         String nLine = props.getProperty(Configuration.BI_PREPARE_PARTS_NEWLINE,
