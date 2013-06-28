@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.writer.FileWriterTestUtil;
+import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
 
 @Ignore
 public class ColumnValueTestUtil<T> {
