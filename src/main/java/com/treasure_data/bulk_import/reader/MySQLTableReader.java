@@ -29,6 +29,7 @@ import java.sql.Types;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
+import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
@@ -212,6 +213,15 @@ public class MySQLTableReader extends FileReader {
             return true;
         } catch (SQLException e) {
             throw new IOException(e);
+        }
+    }
+
+    @Override
+    public void convertTypesOfColumns() throws PreparePartsException {
+        for (int i = 0; i < rawRow.size(); i++) {
+            ColumnValue v = convertedRow.getValue(i);
+            columnTypes[i].convertType(rawRow.get(i), v);
+            convertedRow.setValue(i, v);
         }
     }
 

@@ -125,8 +125,6 @@ public abstract class FileReader implements Closeable {
         }
     }
 
-    public abstract boolean readRow() throws IOException;
-
     public boolean next() throws PreparePartsException {
         incrementLineNum();
         try {
@@ -137,21 +135,12 @@ public abstract class FileReader implements Closeable {
 
             incrementRowNum();
 
-            int rawRowSize = rawRow.size();
-            if (rawRowSize != columnTypes.length) {
-                throw new PreparePartsException(String.format(
-                        "The number of columns to be processed (%d) must " +
-                        "match the number of column types (%d): check that the " +
-                        "number of column types you have defined matches the " +
-                        "expected number of columns being read/written [line: %d]",
-                        rawRowSize, columnTypes.length, getLineNum()));
-            }
-
             // convert each column in row
             convertTypesOfColumns();
 
             // write each column value
             writer.next(convertedRow);
+
             writer.incrementRowNum();
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
@@ -164,13 +153,9 @@ public abstract class FileReader implements Closeable {
         return true;
     }
 
-    public void convertTypesOfColumns() throws PreparePartsException {
-        for (int i = 0; i < rawRow.size(); i++) {
-            ColumnValue v = convertedRow.getValue(i);
-            columnTypes[i].convertType(rawRow.get(i), v);
-            convertedRow.setValue(i, v);
-        }
-    }
+    public abstract boolean readRow() throws IOException, PreparePartsException;
+
+    public abstract void convertTypesOfColumns() throws PreparePartsException;
 
     // Closeable#close()
     public void close() throws IOException {

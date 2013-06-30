@@ -30,6 +30,7 @@ import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnSampling;
+import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
@@ -240,8 +241,31 @@ public class CSVFileReader extends FileReader {
     }
 
     @Override
-    public boolean readRow() throws IOException {
-        return tokenizer.readColumns(rawRow);
+    public boolean readRow() throws IOException, PreparePartsException {
+        if (!tokenizer.readColumns(rawRow)) {
+            return false;
+        }
+
+        int rawRowSize = rawRow.size();
+        if (rawRowSize != columnTypes.length) {
+            throw new PreparePartsException(String.format(
+                    "The number of columns to be processed (%d) must " +
+                    "match the number of column types (%d): check that the " +
+                    "number of column types you have defined matches the " +
+                    "expected number of columns being read/written [line: %d]",
+                    rawRowSize, columnTypes.length, getLineNum()));
+        }
+
+        return true;
+    }
+
+    @Override
+    public void convertTypesOfColumns() throws PreparePartsException {
+        for (int i = 0; i < rawRow.size(); i++) {
+            ColumnValue v = convertedRow.getValue(i);
+            columnTypes[i].convertType(rawRow.get(i), v);
+            convertedRow.setValue(i, v);
+        }
     }
 
     @Override
