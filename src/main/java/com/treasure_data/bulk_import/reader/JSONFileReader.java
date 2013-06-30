@@ -80,8 +80,6 @@ public class JSONFileReader extends FileReader {
                 return false;
             }
 
-            incrementRowNum();
-
             // convert each column in row
             convertTypesOfColumns();
 

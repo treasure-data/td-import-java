@@ -21,13 +21,12 @@ public class ErrorInfo extends com.treasure_data.bulk_import.ErrorInfo {
     public Task task;
 
     public long redLines = 0;
-    public long redRows = 0;
     public long writtenRows = 0;
 
     @Override
     public String toString() {
         return String.format(
-                "prepare_error_info{task=%s, redLines=%d, redRows=%d, writtenRows=%d}",
-                task, redLines, redRows, writtenRows);
+                "prepare_error_info{task=%s, redLines=%d, writtenRows=%d}",
+                task, redLines, writtenRows);
     }
 }

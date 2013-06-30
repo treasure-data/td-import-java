@@ -70,7 +70,6 @@ public class PrepareProcessor {
 
             try {
                 r.resetLineNum();
-                r.resetRowNum();
                 w.resetRowNum();
 
                 while (r.next()) {
@@ -78,7 +77,6 @@ public class PrepareProcessor {
                 }
 
                 err.redLines = r.getLineNum();
-                err.redRows = r.getRowNum();
                 err.writtenRows = w.getRowNum();
             } catch (Exception e) {
                 e.printStackTrace();

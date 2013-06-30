@@ -87,7 +87,6 @@ public class TestPrepareProcessor {
             err = proc.execute(task);
             assertEquals(task, err.task);
             assertEquals(null, err.error);
-            assertEquals(numRows, err.redRows);
             assertEquals(numRows, err.writtenRows);
         }
     }

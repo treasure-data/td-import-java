@@ -51,7 +51,6 @@ public abstract class FileReader implements Closeable {
     protected TimeColumnValue timeColumnValue;
 
     protected long lineNum = 0;
-    protected long rowNum = 0;
 
     private PrintWriter errWriter = null;
 
@@ -101,18 +100,6 @@ public abstract class FileReader implements Closeable {
         return lineNum;
     }
 
-    public void resetRowNum() {
-        rowNum = 0;
-    }
-
-    public void incrementRowNum() {
-        rowNum++;
-    }
-
-    public long getRowNum() {
-        return rowNum;
-    }
-
     public void setErrorRecordWriter(OutputStream errStream) {
         if (errStream != null) {
             errWriter = new PrintWriter(errStream);
@@ -132,8 +119,6 @@ public abstract class FileReader implements Closeable {
             if (!readRow()) {
                 return false;
             }
-
-            incrementRowNum();
 
             // convert each column in row
             convertTypesOfColumns();
