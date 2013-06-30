@@ -265,47 +265,4 @@ public class MySQLTableReader extends FileReader {
             }
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        try {
-            Class.forName("com.mysql.jdbc.Driver"); 
-
-            String url = "jdbc:mysql://localhost/mugadb";
-            String user="root";
-            String pass ="";
-
-            Connection conn = DriverManager.getConnection(url, user, pass);
-            Statement stat = conn.createStatement();
-
-            // create table
-            //stat.execute("CREATE TABLE mugatbl (name char(32), id int, time long)");
-            //System.out.println("create table");
-
-            // insert data from the table
-            /*
-            long baseTime = new java.util.Date().getTime() / 1000 / 3600 * 3600;
-            for (int i = 0; i < 50; i++) {
-                String sql = String.format("INSERT INTO mugatbl (name, id, time) VALUES (\"%s\", %d, %d);", "muga" + i, i, baseTime + (i * 20));
-                System.out.println(sql);
-                stat.execute(sql);
-            }
-             */
-
-            ResultSet rs = stat.executeQuery("SELECT * FROM mugatbl limit 1;");
-            ResultSetMetaData md = rs.getMetaData();
-            int numCols = md.getColumnCount();
-            for (int i = 1; i <= numCols; i++) {
-                System.out.println("col name: " + md.getColumnName(i));
-                System.out.println("col type: " + md.getColumnType(i));
-            }
-            while (rs.next()) {
-                System.out.println(rs.getObject(1));
-            }
-            rs.close();
-
-            conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }   
-    }
 }
