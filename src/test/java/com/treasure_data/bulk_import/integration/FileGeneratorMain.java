@@ -17,6 +17,14 @@ public class FileGeneratorMain {
                 new String[] { "string-value", "int-value", "double-value", "timestamp" }));
         gens.add(new CSVFileGenerator(dirName + "csvfile-with-timeformat.csv",
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
+
+        gens.add(new HeaderlessCSVFileGenerator(dirName + "headerless-csvfile-with-time.csv",
+                new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
+        gens.add(new HeaderlessCSVFileGenerator(dirName + "headerless-csvfile-with-aliastime.csv",
+                new String[] { "string-value", "int-value", "double-value", "timestamp" }));
+        gens.add(new HeaderlessCSVFileGenerator(dirName + "headerless-csvfile-with-timeformat.csv",
+                new String[] { "string-value", "int-value", "double-value", "timeformat" }));
+
         gens.add(new TrainingDataFileGenerator(dirName + "trainingfile-with-time.msgpack.gz",
                 new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
 

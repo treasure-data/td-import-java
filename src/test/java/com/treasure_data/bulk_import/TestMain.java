@@ -69,7 +69,7 @@ public class TestMain {
         Main.uploadParts(args, props);
     }
 
-    @Test @Ignore
+    @Test //@Ignore
     public void testPrepareUploadParts01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader()
@@ -83,12 +83,12 @@ public class TestMain {
         final String[] args = new String[] {
                 "upload_parts",
                 "mugasess",
-                "in/from_SQLServer_to_csv_10000000_v01.csv",
+                //"in/from_SQLServer_to_csv_10000000_v01.csv",
                 //"./in/sample.csv",
                 //"./in/sample2.csv", // for time-value
 //                "./in/TE_JNL_ITM_shiftJIS.csv",
-//                "./in/from_SQLServer_to_csv_10_v01.csv",
-//                "./in/from_SQLServer_to_csv_10_v02.csv",
+                "./in/from_SQLServer_to_csv_10_v01.csv",
+                "./in/from_SQLServer_to_csv_10_v02.csv",
 //                "./in/from_SQLServer_to_csv_10_v03.csv",
 //                "./in/from_SQLServer_to_csv_10_v04.csv",
 //                "./in/from_SQLServer_to_csv_10_v05.csv",
