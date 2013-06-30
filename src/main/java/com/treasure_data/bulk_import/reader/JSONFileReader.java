@@ -129,7 +129,7 @@ public class JSONFileReader extends FileReader {
             ColumnType t = toColumnType(v);
             columnTypes.add(t);
             ColumnValue val = t.createColumnValue();
-            t.convertTypeInto(v, val);
+            t.setColumnValue(v, val);
             columnValues.add(val);
         }
 

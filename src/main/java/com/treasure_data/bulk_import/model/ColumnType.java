@@ -32,13 +32,13 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv)
+        public void convertType(String v, ColumnValue into)
                 throws PreparePartsException {
-            cv.parse(v);
+            into.parse(v);
         }
 
         @Override
-        public void convertTypeInto(Object v, ColumnValue cv)
+        public void setColumnValue(Object v, ColumnValue cv)
                 throws PreparePartsException {
             cv.set(v);
         }
@@ -56,13 +56,13 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv)
+        public void convertType(String v, ColumnValue into)
                 throws PreparePartsException {
-            cv.parse(v);
+            into.parse(v);
         }
 
         @Override
-        public void convertTypeInto(Object v, ColumnValue cv)
+        public void setColumnValue(Object v, ColumnValue cv)
                 throws PreparePartsException {
             cv.set(v);
         }
@@ -80,13 +80,13 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv)
+        public void convertType(String v, ColumnValue into)
                 throws PreparePartsException {
-            cv.parse(v);
+            into.parse(v);
         }
 
         @Override
-        public void convertTypeInto(Object v, ColumnValue cv)
+        public void setColumnValue(Object v, ColumnValue cv)
                 throws PreparePartsException {
             cv.set(v);
         }
@@ -104,13 +104,13 @@ public enum ColumnType {
         }
 
         @Override
-        public void convertTypeInto(String v, ColumnValue cv)
+        public void convertType(String v, ColumnValue into)
                 throws PreparePartsException {
-            cv.parse(v);
+            into.parse(v);
         }
 
         @Override
-        public void convertTypeInto(Object v, ColumnValue cv)
+        public void setColumnValue(Object v, ColumnValue cv)
                 throws PreparePartsException {
             cv.set(v);
         }
@@ -141,10 +141,11 @@ public enum ColumnType {
 
     public abstract ColumnValue createColumnValue();
 
-    public abstract void convertTypeInto(String v, ColumnValue cv)
+    public abstract void convertType(String v, ColumnValue into)
             throws PreparePartsException;
 
-    public abstract void convertTypeInto(Object v, ColumnValue cv)
+    // TODO is it needed??
+    public abstract void setColumnValue(Object v, ColumnValue cv)
             throws PreparePartsException;
 
     public abstract void filterAndWrite(ColumnValue v, TimeColumnValue filter,
