@@ -37,15 +37,21 @@ For more detail, see pom.xml.
 
 ### 'prepare_parts' for bulk import
 
-    $ java BulkImportTool prepare_parts ./in/*.csv \
+    $ java com.treasure_data.bulk_import.Main prepare_parts ./in/*.csv \
         -Dtd.bulk_import.prepare_parts.format=csv \
         -Dtd.bulk_import.prepare_parts.output_dir=./out/
 
 ### 'upload_parts' for bulk import
 
-
+    $ java com.treasure_data.bulk_import.Main upload_parts ./out/*.msgpack.gz \
+        -td.bulk_import.upload_parts.upload-parallel=4
 
 ### 'prepare_parts' and 'upload_parts' for bulk import
+
+    $ java com.treasure_data.bulk_import.Main upload_parts ./in/*.csv \
+        -Dtd.bulk_import.prepare_parts.format=csv \
+        -Dtd.bulk_import.prepare_parts.output_dir=./out/
+        -td.bulk_import.upload_parts.upload-parallel=4
 
 ## License
 
