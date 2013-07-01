@@ -52,6 +52,9 @@ public class JSONFileReader extends FileReader {
     public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
+        // check compression type of the file
+        conf.checkCompressionType(task.fileName);
+
         try {
             reader = new BufferedReader(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType())));
@@ -62,7 +65,10 @@ public class JSONFileReader extends FileReader {
         columnNames = new String[0];
         columnTypes = new ColumnType[0];
         skipColumns = new HashSet<String>();
-        // TODO timeColumnValue
+        timeColumnValue = new TimeColumnValue(-1, null);
+
+        // create parser
+        parser = new JSONParser();
     }
 
     public void setColumnNames() {
@@ -145,7 +151,11 @@ public class JSONFileReader extends FileReader {
     @Override
     public boolean readRow() throws IOException {
         try {
-            row = (Map<String, Object>) parser.parse(reader);
+            String line = reader.readLine();
+            if (line == null) {
+                return false;
+            }
+            row = (Map<String, Object>) parser.parse(line);
             return row != null;
         } catch (ParseException e) {
             throw new IOException(e);
