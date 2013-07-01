@@ -196,7 +196,7 @@ public class CSVFileReader extends FileReader {
                         conf.getTimeValue());
             }
 
-            initializeConvertedRow(timeColumnValue); // FIXME this argument is not needed?
+            initializeConvertedRow();
 
             // check properties of exclude/only columns
             setSkipColumns();

@@ -76,8 +76,7 @@ public abstract class FileReader implements Closeable {
         return timeColumnValue;
     }
 
-    public void initializeConvertedRow(TimeColumnValue timeColumnValue) {
-        // FIXME this parameter 'timeColumnValue' is not needed??
+    public void initializeConvertedRow() {
         ColumnValue[] values = new ColumnValue[columnTypes.length];
         for (int i = 0; i < columnTypes.length; i++) {
             values[i] = columnTypes[i].createColumnValue();
