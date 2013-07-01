@@ -240,42 +240,4 @@ public class MySQLTableReader extends FileReader {
             }
         }
     }
-
-    private void setSkipColumns() {
-        String[] excludeColumns = conf.getExcludeColumns();
-        String[] onlyColumns = conf.getOnlyColumns();
-        for (int i = 0; i < columnNames.length; i++) {
-            // check exclude columns
-            boolean isExcluded = false;
-            for (String excludeColumn : excludeColumns) {
-                if (columnNames[i].equals(excludeColumn)) {
-                    isExcluded = true;
-                    break;
-                }
-            }
-
-            if (isExcluded) {
-                skipColumns.add(columnNames[i]);
-                continue;
-            }
-
-            // check only columns
-            if (onlyColumns.length == 0) {
-                continue;
-            }
-
-            boolean isOnly = false;
-            for (String onlyColumn : onlyColumns) {
-                if (columnNames[i].equals(onlyColumn)) {
-                    isOnly = true;
-                    break;
-                }
-            }
-
-            if (!isOnly) {
-                skipColumns.add(columnNames[i]);
-                continue; // not needed though,..
-            }
-        }
-    }
 }
