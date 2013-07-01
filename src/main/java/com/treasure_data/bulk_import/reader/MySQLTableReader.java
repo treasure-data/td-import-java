@@ -161,7 +161,7 @@ public class MySQLTableReader extends FileReader {
                         conf.getTimeValue());
             }
 
-            initializeConvertedRow(timeColumnValue);
+            initializeConvertedRow(timeColumnValue); // FIXME this argument is not needed?
 
             // check properties of exclude/only columns
             setSkipColumns();
