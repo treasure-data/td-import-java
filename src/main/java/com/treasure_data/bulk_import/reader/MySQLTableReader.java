@@ -25,6 +25,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
@@ -43,6 +45,7 @@ public class MySQLTableReader extends FileReader {
     private static final String QUERY = "SELECT * FROM %s;";
 
     protected Connection conn;
+    protected List<String> rawRow = new ArrayList<String>();
     protected int numColumns;
     protected ResultSet resultSet;
 

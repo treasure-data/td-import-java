@@ -30,7 +30,6 @@ import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnSampling;
-import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
@@ -44,6 +43,7 @@ public class CSVFileReader extends FileReader {
 
     protected CsvPreference csvPref;
     private Tokenizer tokenizer;
+    protected List<String> row = new ArrayList<String>();
 
     public CSVFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
         super(conf, writer);
@@ -210,7 +210,7 @@ public class CSVFileReader extends FileReader {
                 w.setSkipColumns(getSkipColumns());
                 w.setTimeColumnValue(getTimeColumnValue());
 
-                rawRow.addAll(firstRow);
+                this.row.addAll(firstRow);
 
                 // convert each column in row
                 convertTypesOfColumns();
@@ -242,11 +242,11 @@ public class CSVFileReader extends FileReader {
 
     @Override
     public boolean readRow() throws IOException, PreparePartsException {
-        if (!tokenizer.readColumns(rawRow)) {
+        if (!tokenizer.readColumns(this.row)) {
             return false;
         }
 
-        int rawRowSize = rawRow.size();
+        int rawRowSize = this.row.size();
         if (rawRowSize != columnTypes.length) {
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
@@ -261,10 +261,8 @@ public class CSVFileReader extends FileReader {
 
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
-        for (int i = 0; i < rawRow.size(); i++) {
-            ColumnValue v = convertedRow.getValue(i);
-            columnTypes[i].convertType(rawRow.get(i), v);
-            convertedRow.setValue(i, v);
+        for (int i = 0; i < this.row.size(); i++) {
+            columnTypes[i].convertType(this.row.get(i), convertedRow.getValue(i));
         }
     }
 

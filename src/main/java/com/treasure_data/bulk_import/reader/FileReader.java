@@ -41,8 +41,6 @@ public abstract class FileReader implements Closeable {
 
     protected PrepareConfiguration conf;
     protected FileWriter writer;
-
-    protected List<String> rawRow = new ArrayList<String>();
     protected Row convertedRow;
 
     protected String[] columnNames;
