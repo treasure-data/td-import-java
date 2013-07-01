@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.json.simple.parser.JSONParser;
@@ -60,6 +61,53 @@ public class JSONFileReader extends FileReader {
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
+
+        columnNames = new String[0];
+        columnTypes = new ColumnType[0];
+        skipColumns = new HashSet<String>();
+        // TODO timeColumnValue
+    }
+
+    public void setColumnNames() {
+        columnNames = row.keySet().toArray(new String[0]);
+    }
+
+    public void setColumnTypes() {
+        columnTypes = new ColumnType[columnNames.length];
+        for (int i = 0; i < columnNames.length; i++) {
+            Object v = row.get(columnNames[i]);
+            columnTypes[i] = toColumnType(v);
+        }
+    }
+
+    private ColumnType toColumnType(Object value) {
+        if (value instanceof Integer) {
+            return ColumnType.INT;
+        } else if (value instanceof Double) {
+            return ColumnType.DOUBLE;
+        } else if (value instanceof String) {
+            return ColumnType.STRING;
+        } else if (value instanceof Long) {
+            return ColumnType.LONG;
+        } else {
+            throw new UnsupportedOperationException("During toColumnType() execution");
+        }
+    }
+
+    @Override
+    public void setSkipColumns() {
+        // FIXME need refactoring
+        skipColumns.clear();
+        super.setSkipColumns();
+    }
+
+    public void setTimeColumnValue() {
+        // TODO FIXME must implement it
+        for (int i = 0; i < columnNames.length; i++) {
+            if (columnNames[i].equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+                timeColumnValue = new TimeColumnValue(i, null);
+            }
+        }
     }
 
     @Override
@@ -70,16 +118,17 @@ public class JSONFileReader extends FileReader {
                 return false;
             }
 
+            setColumnNames();
+            writer.setColumnNames(getColumnNames());
+            setColumnTypes();
+            writer.setColumnTypes(getColumnTypes());
+            setSkipColumns();
+            writer.setColumnTypes(getColumnTypes());
+            setTimeColumnValue();
+            writer.setTimeColumnValue(getTimeColumnValue());
+
             // convert each column in row
             convertTypesOfColumns();
-
-            // time column
-            checkTimeColumn();
-
-            writer.setColumnNames(columnNames);
-            writer.setColumnTypes(columnTypes);
-            writer.setSkipColumns(new HashSet<String>());
-            writer.setTimeColumnValue(timeColumnValue);
 
             // write each column value
             writer.next(convertedRow);
@@ -106,48 +155,15 @@ public class JSONFileReader extends FileReader {
         }
     }
 
-    private void checkTimeColumn() {
-        TimeColumnValue timeColumnValue;
-        for (int i = 0; i < columnNames.length; i++) {
-            if (columnNames[i].equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                timeColumnValue = new TimeColumnValue(i, null);
-            }
-        }
-    }
-
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
-        int numRow = row.size();
-        List<String> columnNames = new ArrayList<String>(); // TODO reuse?
-        List<ColumnType> columnTypes = new ArrayList<ColumnType>(); // TODO reuse?
-        List<ColumnValue> columnValues = new ArrayList<ColumnValue>(); // TODO reuse?
-        for (Map.Entry<String, Object> e : row.entrySet()) {
-            String k = e.getKey();
-            columnNames.add(k);
-            Object v = e.getValue();
-            ColumnType t = toColumnType(v);
-            columnTypes.add(t);
-            ColumnValue val = t.createColumnValue();
-            t.setColumnValue(v, val);
-            columnValues.add(val);
+        ColumnValue[] columnValues = new ColumnValue[columnNames.length];
+        for (int i = 0; i < columnNames.length; i++) {
+            columnValues[i] = columnTypes[i].createColumnValue();
+            columnTypes[i].setColumnValue(row.get(columnNames[i]), columnValues[i]);
         }
 
-        this.columnNames = columnNames.toArray(new String[0]);
-        this.columnTypes = columnTypes.toArray(new ColumnType[0]);
-        this.convertedRow = new Row(columnValues.toArray(new ColumnValue[0]));
+        convertedRow = new Row(columnValues);
     }
 
-    private ColumnType toColumnType(Object value) {
-        if (value instanceof Integer) {
-            return ColumnType.INT;
-        } else if (value instanceof Double) {
-            return ColumnType.DOUBLE;
-        } else if (value instanceof String) {
-            return ColumnType.STRING;
-        } else if (value instanceof Long) {
-            return ColumnType.LONG;
-        } else {
-            throw new UnsupportedOperationException("During toColumnType() execution");
-        }
-    }
 }
