@@ -48,7 +48,7 @@ public abstract class FileWriter implements Closeable {
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
 
-    protected Set<Integer> skipColumns;
+    protected Set<String> skipColumns;
     protected boolean needAdditionalTimeColumn = false;
     protected TimeColumnValue timeColumnValue;
     protected int timeColumnIndex = -1;
@@ -65,7 +65,7 @@ public abstract class FileWriter implements Closeable {
         this.columnTypes = columnTypes;
     }
 
-    public void setSkipColumns(Set<Integer> skipColumns) {
+    public void setSkipColumns(Set<String> skipColumns) {
         this.skipColumns = skipColumns;
     }
 
@@ -98,7 +98,7 @@ public abstract class FileWriter implements Closeable {
 
         // write columns
         for (int i = 0; i < size; i++) {
-            if (skipColumns.contains(i)) {
+            if (skipColumns.contains(columnNames[i])) {
                 continue;
             }
 

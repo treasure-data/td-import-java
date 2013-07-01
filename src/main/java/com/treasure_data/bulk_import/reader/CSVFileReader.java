@@ -289,7 +289,7 @@ public class CSVFileReader extends FileReader {
             }
 
             if (isExcluded) {
-                skipColumns.add(i);
+                skipColumns.add(columnNames[i]);
                 continue;
             }
 
@@ -307,7 +307,7 @@ public class CSVFileReader extends FileReader {
             }
 
             if (!isOnly) {
-                skipColumns.add(i);
+                skipColumns.add(columnNames[i]);
                 continue; // not needed though,..
             }
         }

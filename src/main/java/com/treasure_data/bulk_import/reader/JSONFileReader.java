@@ -63,16 +63,6 @@ public class JSONFileReader extends FileReader {
     }
 
     @Override
-    public boolean readRow() throws IOException {
-        try {
-            row = (Map<String, Object>) parser.parse(reader);
-            return row != null;
-        } catch (ParseException e) {
-            throw new IOException(e);
-        }
-    }
-
-    @Override
     public boolean next() throws PreparePartsException {
         incrementLineNum();
         try {
@@ -88,11 +78,12 @@ public class JSONFileReader extends FileReader {
 
             writer.setColumnNames(columnNames);
             writer.setColumnTypes(columnTypes);
-            writer.setSkipColumns(new HashSet<Integer>());
+            writer.setSkipColumns(new HashSet<String>());
             writer.setTimeColumnValue(timeColumnValue);
 
             // write each column value
             writer.next(convertedRow);
+
             writer.incrementRowNum();
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
@@ -103,6 +94,16 @@ public class JSONFileReader extends FileReader {
             LOG.warning(e.getMessage());
         }
         return true;
+    }
+
+    @Override
+    public boolean readRow() throws IOException {
+        try {
+            row = (Map<String, Object>) parser.parse(reader);
+            return row != null;
+        } catch (ParseException e) {
+            throw new IOException(e);
+        }
     }
 
     private void checkTimeColumn() {

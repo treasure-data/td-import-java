@@ -255,7 +255,7 @@ public class MySQLTableReader extends FileReader {
             }
 
             if (isExcluded) {
-                skipColumns.add(i);
+                skipColumns.add(columnNames[i]);
                 continue;
             }
 
@@ -273,7 +273,7 @@ public class MySQLTableReader extends FileReader {
             }
 
             if (!isOnly) {
-                skipColumns.add(i);
+                skipColumns.add(columnNames[i]);
                 continue; // not needed though,..
             }
         }

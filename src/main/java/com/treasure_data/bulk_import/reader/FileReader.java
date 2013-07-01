@@ -43,7 +43,7 @@ public abstract class FileReader implements Closeable {
 
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
-    protected Set<Integer> skipColumns = new HashSet<Integer>();
+    protected Set<String> skipColumns = new HashSet<String>();
     protected TimeColumnValue timeColumnValue;
 
     protected long lineNum = 0;
@@ -68,7 +68,7 @@ public abstract class FileReader implements Closeable {
         return columnTypes;
     }
 
-    public Set<Integer> getSkipColumns() {
+    public Set<String> getSkipColumns() {
         return skipColumns;
     }
 
