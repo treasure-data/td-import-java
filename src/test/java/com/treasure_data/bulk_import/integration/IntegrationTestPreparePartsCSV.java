@@ -145,4 +145,21 @@ public class IntegrationTestPreparePartsCSV extends PreparePartsIntegrationTestU
         String dstFileName = OUTPUT_DIR + "jsonfile-with-time_csv_0.msgpack.gz";
         assertDataEquals(srcFileName, dstFileName);
     }
+
+    @Test @Ignore
+    public void writeFromJSONWithAlasTimeColumn() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "json");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "jsonfile-with-aliastime.csv");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "jsonfile-with-aliastime_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
 }
