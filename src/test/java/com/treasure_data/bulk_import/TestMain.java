@@ -69,7 +69,7 @@ public class TestMain {
         Main.uploadParts(args, props);
     }
 
-    @Test //@Ignore
+    @Test @Ignore
     public void testPrepareUploadParts01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader()
