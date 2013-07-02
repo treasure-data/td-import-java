@@ -28,10 +28,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
+import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
@@ -46,6 +48,9 @@ public class JSONFileReader extends FileReader {
     protected JSONParser parser;
     protected Map<String, Object> row;
 
+    protected String aliasTimeColumnName = null;
+    protected long timeValue = -1;
+
     public JSONFileReader(PrepareConfiguration conf, FileWriter writer) {
         super(conf, writer);
     }
@@ -56,6 +61,13 @@ public class JSONFileReader extends FileReader {
 
         // check compression type of the file
         conf.checkCompressionType(task.fileName);
+
+        if (conf.getAliasTimeColumn() != null &&
+                !conf.getAliasTimeColumn().equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+            aliasTimeColumnName = conf.getAliasTimeColumn();
+        }
+
+        timeValue = conf.getTimeValue();
 
         try {
             reader = new BufferedReader(new InputStreamReader(
@@ -106,12 +118,28 @@ public class JSONFileReader extends FileReader {
         super.setSkipColumns();
     }
 
-    public void setTimeColumnValue() {
-        // TODO FIXME must implement it
+    public void setTimeColumnValue() throws PreparePartsException {
+        int timeColumnIndex = -1;
+        int aliasTimeColumnIndex = -1;
         for (int i = 0; i < columnNames.length; i++) {
             if (columnNames[i].equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                timeColumnValue = new TimeColumnValue(i, null);
+                timeColumnIndex = i;
+                break;
             }
+            if (aliasTimeColumnName != null && columnNames[i].equals(aliasTimeColumnName)) {
+                aliasTimeColumnIndex = i;
+            }
+        }
+
+        if (timeColumnIndex >= 0) {
+            timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
+        } else if (aliasTimeColumnIndex >= 0) {
+            timeColumnValue = new AliasTimeColumnValue(timeColumnIndex, null);
+        } else if (timeValue >= 0) {
+            timeColumnValue = new TimeValueTimeColumnValue(timeValue);
+        } else {
+            // TODO should change message more user-friendly
+            throw new PreparePartsException("the row doesn't have time column");
         }
     }
 
