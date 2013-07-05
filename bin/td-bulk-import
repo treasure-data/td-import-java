@@ -20,7 +20,7 @@ def bulk_import_upload_parts2(op)
   jvm_opts << "-Xmx1024m" # TODO
 
   # find java/*.jar and td.jar
-  libjars = Dir.glob("#{HERE}/../target/**/*.jar")
+  libjars = Dir.glob("#{HERE}/../src/test/resources/java/**/*.jar")
   found = libjars.find { |path| File.basename(path) =~ /^td-bulk-import/ }
   if found.nil?
     $stderr.puts "You should build td-bulk-import first. Please type 'mvn package -Dmaven.test.skip=true'"
@@ -59,7 +59,7 @@ def bulk_import_prepare_parts2(op)
   jvm_opts << "-Xmx1024m" # TODO
 
   # find java/*.jar and td.jar
-  libjars = Dir.glob("#{HERE}/../target/**/*.jar")
+  libjars = Dir.glob("#{HERE}/../src/test/resources/java/**/*.jar")
   found = libjars.find { |path| File.basename(path) =~ /^td-bulk-import/ }
   if found.nil?
     $stderr.puts "You should build td-bulk-import first. Please type 'mvn package -Dmaven.test.skip=true'"
