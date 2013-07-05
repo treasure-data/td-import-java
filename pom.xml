@@ -68,6 +68,7 @@
     <wagon-webdav-jackrabbit.version>1.0-beta-7</wagon-webdav-jackrabbit.version>
     <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
     <maven-surefire-report-plugin.version>2.11</maven-surefire-report-plugin.version>
+    <maven-antrun-plugin.version>1.6</maven-antrun-plugin.version>
 
     <!-- other properties -->
     <javac.encoding>UTF-8</javac.encoding>
@@ -254,6 +255,25 @@
               <!-- never skip running the tests when the integration-test phase is invoked -->
               <skip>false</skip>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>${maven-antrun-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>echo</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+                <copy file="target/td-bulk-import-${version}-jar-with-dependencies.jar" todir="src/test/resources/java/"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
