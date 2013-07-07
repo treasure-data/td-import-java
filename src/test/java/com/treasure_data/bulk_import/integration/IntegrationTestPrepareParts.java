@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.Main;
 
-public class IntegrationTestPreparePartsCSV extends PreparePartsIntegrationTestUtil {
+public class IntegrationTestPrepareParts extends PreparePartsIntegrationTestUtil {
     @Before
     public void createResources() throws Exception {
         super.createResources();
