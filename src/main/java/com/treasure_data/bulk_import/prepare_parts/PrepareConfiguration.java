@@ -372,23 +372,9 @@ public class PrepareConfiguration extends Configuration {
         }
         LOG.config(String.format("use '%s' as newline", newline));
 
-        // column header
-        String columnHeader = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_COLUMNHEADER,
-                Configuration.BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE);
-        if (!columnHeader.equals("true")) {
-            // columns
-            String columns = props.getProperty(
-                    Configuration.BI_PREPARE_PARTS_COLUMNS);
-            if (columns != null && !columns.isEmpty()) {
-                columnNames = columns.split(",");
-            } else {
-                throw new IllegalArgumentException("Column names not set");
-            }
-            hasColumnHeader = false;
-        } else {
-            hasColumnHeader = true;
-        }
+        setColumnHeader();
+
+        setColumnNames();
 
         setColumnTypes();
 
@@ -587,6 +573,27 @@ public class PrepareConfiguration extends Configuration {
 
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
+    }
+
+    public void setColumnHeader() {
+        String columnHeader = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_COLUMNHEADER,
+                Configuration.BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE);
+        if (!columnHeader.equals("true")) {
+            hasColumnHeader = false;
+        } else {
+            hasColumnHeader = true;
+        }
+    }
+
+    public void setColumnNames() {
+        String columns = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_COLUMNS);
+        if (columns != null && !columns.isEmpty()) {
+            columnNames = columns.split(",");
+        } else if (!hasColumnHeader()) {
+            throw new IllegalArgumentException("Column names not set");
+        }
     }
 
     public String[] getColumnNames() {
