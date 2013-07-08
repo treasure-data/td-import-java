@@ -1,6 +1,11 @@
 Release 0.2.0 - 20XX/XX/XX
   NEW FEATURES
     Adds new API: supports bulk_import:upload_parts
+    Adds configuration of http proxy to bulk_import:upload_parts2 in bin/td-bulk-import; ENV['HTTP_PROXY']=<proxy_host>:<proxy_port>
+    Adds configuration of quote character to bulk_import:prepare_parts2 http proxy to bulk_import:upload_parts2; --quote 'DOUBLE'
+
+  BUG FIXED
+    Fixes the values of file readers/writers' line counters
 
 Release 0.1.1 - 2013/01/22
   BUG FIXES
