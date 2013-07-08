@@ -134,7 +134,7 @@ public class JSONFileReader extends FileReader {
         if (timeColumnIndex >= 0) {
             timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
         } else if (aliasTimeColumnIndex >= 0) {
-            timeColumnValue = new AliasTimeColumnValue(timeColumnIndex, null);
+            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
         } else if (timeValue >= 0) {
             timeColumnValue = new TimeValueTimeColumnValue(timeValue);
         } else {
