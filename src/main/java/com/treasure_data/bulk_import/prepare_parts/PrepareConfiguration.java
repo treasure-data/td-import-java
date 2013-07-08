@@ -373,7 +373,6 @@ public class PrepareConfiguration extends Configuration {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("unsupported newline char: " + nLine, e);
         }
-        LOG.config(String.format("use '%s' as newline", newline));
 
         setColumnHeader();
 
