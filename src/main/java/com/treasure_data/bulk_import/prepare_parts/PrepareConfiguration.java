@@ -207,6 +207,20 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
+    public static enum Quote {
+        DOUBLE("\""), SINGLE("'");
+
+        private String quote;
+
+        Quote(String quote) {
+            this.quote = quote;
+        }
+
+        public char quote() {
+            return quote.charAt(0);
+        }
+    }
+
     public static enum NewLine {
         CR("\r"), LF("\n"), CRLF("\r\n");
 
@@ -241,7 +255,7 @@ public class PrepareConfiguration extends Configuration {
     protected int splitSize;
 
     protected char delimiterChar;
-    protected char quoteChar;
+    protected Quote quoteChar;
     protected NewLine newline;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
@@ -362,8 +376,13 @@ public class PrepareConfiguration extends Configuration {
         }
 
         // quote
-        quoteChar = props.getProperty(Configuration.BI_PREPARE_PARTS_QUOTE,
-                Configuration.BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE).charAt(0);
+        String quote_char = props.getProperty(Configuration.BI_PREPARE_PARTS_QUOTE,
+                Configuration.BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE);
+        try {
+            quoteChar = Quote.valueOf(quote_char);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("unsupported quote char: " + quote_char, e);
+        }
 
         // newline
         String nLine = props.getProperty(Configuration.BI_PREPARE_PARTS_NEWLINE,
@@ -561,7 +580,7 @@ public class PrepareConfiguration extends Configuration {
         return splitSize;
     }
 
-    public char getQuoteChar() {
+    public Quote getQuoteChar() {
         return quoteChar;
     }
 

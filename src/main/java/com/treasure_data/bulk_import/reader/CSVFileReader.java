@@ -57,7 +57,7 @@ public class CSVFileReader extends FileReader {
         conf.checkCompressionType(task.fileName);
 
         // initialize csv preference
-        csvPref = new CsvPreference.Builder(conf.getQuoteChar(),
+        csvPref = new CsvPreference.Builder(conf.getQuoteChar().quote(),
                 conf.getDelimiterChar(), conf.getNewline().newline()).build();
 
         // if conf object doesn't have column names, types, etc,
