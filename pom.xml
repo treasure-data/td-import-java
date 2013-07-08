@@ -228,35 +228,13 @@
           <includes>
             <include>**/Test*.class</include>
           </includes>
+          <!-- 
           <excludes>
-            <!-- by default, integration test cases are not included. -->
             <exclude>**/integration/**/IntegrationTest*.class</exclude>
           </excludes>
+           -->
         </configuration>
-        <executions>
-          <execution>
-            <!--
-             This configuration should be NOT used. How to execute integration-test is
-             $ mvn test -Dtest=**/integration/**/IntegrationTest*
-              -->
-            <id>integration-tests</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <testFailureIgnore>${surefire.testFailureIgnore}</testFailureIgnore>
-              <excludes>
-                <exclude>none</exclude>
-              </excludes>
-              <includes>
-                <include>**/integration/**/IntegrationTest*.java</include>
-              </includes>
-              <!-- never skip running the tests when the integration-test phase is invoked -->
-              <skip>false</skip>
-            </configuration>
-          </execution>
-        </executions>
+
       </plugin>
 
       <plugin>
