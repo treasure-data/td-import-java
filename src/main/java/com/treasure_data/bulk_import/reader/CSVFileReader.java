@@ -70,8 +70,8 @@ public class CSVFileReader extends FileReader {
                     conf.getCharsetDecoder()), csvPref);
             if (conf.hasColumnHeader()) {
                 // header line is skipped
-                tokenizer.readColumns(new ArrayList<String>());
                 incrementLineNum();
+                tokenizer.readColumns(new ArrayList<String>());
             }
         } catch (IOException e) {
             throw new PreparePartsException(e);
