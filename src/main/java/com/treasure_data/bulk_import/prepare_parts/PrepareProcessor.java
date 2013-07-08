@@ -69,9 +69,6 @@ public class PrepareProcessor {
             w.setTimeColumnValue(r.getTimeColumnValue());
 
             try {
-                r.resetLineNum();
-                w.resetRowNum();
-
                 while (r.next()) {
                     ;
                 }
