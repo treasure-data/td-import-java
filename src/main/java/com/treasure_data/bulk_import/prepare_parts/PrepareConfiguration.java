@@ -353,13 +353,11 @@ public class PrepareConfiguration extends Configuration {
                     Configuration.BI_PREPARE_PARTS_DELIMITER,
                     Configuration.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE).charAt(
                     0);
-            LOG.config(String.format("use '%s' as delimiterChar", delimiterChar));
         } else if (format.equals(PrepareConfiguration.Format.TSV)) {
             delimiterChar = props.getProperty(
                     Configuration.BI_PREPARE_PARTS_DELIMITER,
                     Configuration.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
                     0);
-            LOG.config(String.format("use '%s' as delimiterChar", delimiterChar));
         }
 
         // newline
