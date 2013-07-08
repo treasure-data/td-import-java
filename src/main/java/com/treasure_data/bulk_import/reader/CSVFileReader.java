@@ -242,11 +242,12 @@ public class CSVFileReader extends FileReader {
 
     @Override
     public boolean readRow() throws IOException, PreparePartsException {
-        if (!tokenizer.readColumns(this.row)) {
+        row.clear();
+        if (!tokenizer.readColumns(row)) {
             return false;
         }
 
-        int rawRowSize = this.row.size();
+        int rawRowSize = row.size();
         if (rawRowSize != columnTypes.length) {
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
