@@ -87,8 +87,26 @@ def bulk_import_prepare_parts2(op)
   exec command
 end
 
+def set_http_proxy(sysprops)
+  http_proxy = ENV['HTTP_PROXY']
+  if http_proxy
+    if http_proxy =~ /\Ahttp:\/\/(.*)\z/
+      http_proxy = $~[1]
+    end
+    proxy_host, proxy_port = http_proxy.split(':',2)
+    proxy_port = (proxy_port ? proxy_port.to_i : 80)
+
+    sysprops << "-Dhttp.proxyHost=#{proxy_host}"
+    sysprops << "-Dhttp.proxyPost=#{proxy_port}"
+  end
+end
+
 def prepare_parts2_sysprops(opts)
   sysprops = []
+
+  # set http_proxy
+  set_http_proxy(sysprops)
+
   sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts[0]}"
   sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts[1]}"
   sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts[2]}"
@@ -112,6 +130,10 @@ end
 
 def upload_parts2_sysprops(opts, with_prepare = false)
   sysprops = []
+
+  # set http_proxy
+  set_http_proxy(sysprops)
+
   if with_prepare
     sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts[0]}"
     sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts[1]}"
