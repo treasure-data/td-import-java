@@ -241,6 +241,7 @@ public class PrepareConfiguration extends Configuration {
     protected int splitSize;
 
     protected char delimiterChar;
+    protected char quoteChar;
     protected NewLine newline;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
@@ -359,6 +360,10 @@ public class PrepareConfiguration extends Configuration {
                     Configuration.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
                     0);
         }
+
+        // quote
+        quoteChar = props.getProperty(Configuration.BI_PREPARE_PARTS_QUOTE,
+                Configuration.BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE).charAt(0);
 
         // newline
         String nLine = props.getProperty(Configuration.BI_PREPARE_PARTS_NEWLINE,
@@ -558,7 +563,7 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public char getQuoteChar() {
-        return '"';
+        return quoteChar;
     }
 
     public char getDelimiterChar() {

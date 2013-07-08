@@ -104,6 +104,10 @@ public interface Constants extends com.treasure_data.client.Constants {
     // CSV/TSV PREPARE_PARTS_OPTIONS      //
     ////////////////////////////////////////
 
+    // quote CHAR; default='"'
+    String BI_PREPARE_PARTS_QUOTE = "td.bulk_import.prepare_parts.quote";
+    String BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE = "'";
+
     // delimiter CHAR; default=',' at 'csv', '\t' at 'tsv'
     String BI_PREPARE_PARTS_DELIMITER = "td.bulk_import.prepare_parts.delimiter";
     String BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE = ",";
