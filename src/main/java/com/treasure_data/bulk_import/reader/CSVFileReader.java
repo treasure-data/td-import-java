@@ -139,7 +139,7 @@ public class CSVFileReader extends FileReader {
                 }
             }
 
-            boolean isFirstRow = false;
+            boolean isFirstRow = true;
             List<String> firstRow = new ArrayList<String>();
             final int sampleRowSize = conf.getSampleRowSize();
             ColumnSampling[] sampleColumnValues = new ColumnSampling[columnNames.length];
@@ -155,9 +155,9 @@ public class CSVFileReader extends FileReader {
                     break;
                 }
 
-                if (!isFirstRow) {
+                if (isFirstRow) {
                     firstRow.addAll(row);
-                    isFirstRow = true;
+                    isFirstRow = false;
                 }
 
                 if (sampleColumnValues.length != row.size()) {
@@ -165,8 +165,8 @@ public class CSVFileReader extends FileReader {
                             "The number of columns to be processed (%d) must " +
                             "match the number of column types (%d): check that the " +
                             "number of column types you have defined matches the " +
-                            "expected number of columns being read/written [line: %d]",
-                            row.size(), columnTypes.length, i));
+                            "expected number of columns being read/written [line: %d] %s",
+                            row.size(), columnTypes.length, i, row));
                 }
 
                 // sampling
