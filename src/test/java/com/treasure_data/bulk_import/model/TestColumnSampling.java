@@ -28,37 +28,50 @@ public class TestColumnSampling {
     @Test
     public void workStringValuesNormally() throws Exception {
         expected = ColumnType.STRING;
-        workValuesNormally(expected);
+        workValuesNormally(expected.getName());
     }
 
     @Test
     public void workLongValuesNormally() throws Exception {
         expected = ColumnType.LONG;
-        workValuesNormally(expected);
+        workValuesNormally(expected.getName());
     }
 
     @Test
     public void workDoubleValuesNormally() throws Exception {
         expected = ColumnType.DOUBLE;
-        workValuesNormally(expected);
+        workValuesNormally(expected.getName());
     }
 
-    private void workValuesNormally(ColumnType expected) throws Exception {
+    @Test
+    public void workBigIntValuesNormally() throws Exception {
+        String[] values = getValues(numRows, ColumnType.BIGINT.getName());
+        parse(values);
+        String actual = sampling.getRank().getName();
+        Assert.assertEquals("string", actual);
+    }
+
+    private void workValuesNormally(String expected) throws Exception {
         String[] values = getValues(numRows, expected);
-        for (int i = 0; i < numRows; i++) {
-            sampling.parse(values[i]);
-        }
-        ColumnType actual = sampling.getRank();
+        parse(values);
+        String actual = sampling.getRank().getName();
         Assert.assertEquals(expected, actual);
     }
 
-    private String[] getValues(int num, ColumnType type) {
-        if (type.equals(ColumnType.STRING)) {
+    private void parse(String[] values) {
+        for (int i = 0; i < numRows; i++) {
+            sampling.parse(values[i]);
+        }
+    }
+    private String[] getValues(int num, String typeName) {
+        if (typeName.equals("string")) {
             return getStringValues(num);
-        } else if (type.equals(ColumnType.LONG)) {
+        } else if (typeName.equals("long")) {
             return getLongValues(num);
-        } else if (type.equals(ColumnType.DOUBLE)) {
+        } else if (typeName.equals("double")) {
             return getDoubleValues(num);
+        } else if (typeName.equals("bigint")) {
+            return getBigIntValues(num);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -84,6 +97,14 @@ public class TestColumnSampling {
         String[] values = new String[num];
         for (int i = 0; i < values.length; i++) {
             values[i] = "" + rand.nextDouble();
+        }
+        return values;
+    }
+
+    private String[] getBigIntValues(int num) {
+        String[] values = new String[num];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = "1111111222222222222222222222211111111";
         }
         return values;
     }
