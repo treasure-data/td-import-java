@@ -20,17 +20,11 @@ def bulk_import_upload_parts2(op)
   jvm_opts << "-Xmx1024m" # TODO
 
   # find java/*.jar and td.jar
-  libjars = Dir.glob("#{HERE}/../src/test/resources/java/**/*.jar")
-  found = libjars.find { |path| File.basename(path) =~ /^td-bulk-import/ }
-  if found.nil?
-    $stderr.puts "You should build td-bulk-import first. Please type 'mvn package -Dmaven.test.skip=true'"
-    exit
-  end
-  td_command_jar = libjars.delete(found)
+  td_bulk_import_jar = find_td_bulk_import_jar
 
   # make application options
   app_opts = []
-  app_opts << "-cp \"#{td_command_jar}\""
+  app_opts << "-cp \"#{td_bulk_import_jar}\""
 
   # make system properties
   sysprops = []
@@ -59,17 +53,11 @@ def bulk_import_prepare_parts2(op)
   jvm_opts << "-Xmx1024m" # TODO
 
   # find java/*.jar and td.jar
-  libjars = Dir.glob("#{HERE}/../src/test/resources/java/**/*.jar")
-  found = libjars.find { |path| File.basename(path) =~ /^td-bulk-import/ }
-  if found.nil?
-    $stderr.puts "You should build td-bulk-import first. Please type 'mvn package -Dmaven.test.skip=true'"
-    exit
-  end
-  td_command_jar = libjars.delete(found)
+  td_bulk_import_jar = find_td_bulk_import_jar
 
   # make application options
   app_opts = []
-  app_opts << "-cp \"#{td_command_jar}\""
+  app_opts << "-cp \"#{td_bulk_import_jar}\""
 
   # make system properties
   sysprops = []
@@ -85,6 +73,17 @@ def bulk_import_prepare_parts2(op)
   command = "#{javacmd} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
 
   exec command
+end
+
+def find_td_bulk_import_jar
+  libjars = Dir.glob("#{HERE}/../src/test/resources/java/**/*.jar")
+  found = libjars.find { |path| File.basename(path) =~ /^td-bulk-import/ }
+  if found.nil?
+    $stderr.puts "You should build td-bulk-import first. Please type 'mvn package -Dmaven.test.skip=true'"
+    exit
+  end
+  td_bulk_import_jar = libjars.delete(found)
+  td_bulk_import_jar
 end
 
 def set_http_proxy(sysprops)
