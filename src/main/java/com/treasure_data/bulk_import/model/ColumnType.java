@@ -49,7 +49,7 @@ public enum ColumnType {
             with.write(filter, (StringColumnValue) v);
         }
     },
-    INT("int", 1) {
+    INT("int", 3) {
         @Override
         public ColumnValue createColumnValue() {
             return new IntColumnValue(this);
@@ -73,7 +73,7 @@ public enum ColumnType {
             with.write(filter, (IntColumnValue) v);
         }
     },
-    DOUBLE("double", 2) {
+    DOUBLE("double", 1) {
         @Override
         public ColumnValue createColumnValue() {
             return new DoubleColumnValue(this);
@@ -97,7 +97,7 @@ public enum ColumnType {
             with.write(filter, (DoubleColumnValue) v);
         }
     },
-    LONG("long", 3) {
+    LONG("long", 4) {
         @Override
         public ColumnValue createColumnValue() {
             return new LongColumnValue(this);
@@ -119,6 +119,30 @@ public enum ColumnType {
         public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
                 throws PreparePartsException {
             with.write(filter, (LongColumnValue) v);
+        }
+    },
+    BIGINT("bigint", 2) {
+        @Override
+        public ColumnValue createColumnValue() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setColumnValue(Object v, ColumnValue cv)
+                throws PreparePartsException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
+            throw new UnsupportedOperationException();
         }
     },
     ;
