@@ -17,9 +17,11 @@
 //
 package com.treasure_data.bulk_import.model;
 
+import java.math.BigInteger;
+
 public class ColumnSampling {
     private int numRows;
-    private int[] scores = new int[] { 0, 0, 0, 0 };
+    private int[] scores = new int[] { 0, 0, 0, 0, 0 };
 
     public ColumnSampling(int numRows) {
         this.numRows = numRows;
@@ -38,6 +40,14 @@ public class ColumnSampling {
         try {
             Double.parseDouble((String) value);
             scores[ColumnType.DOUBLE.getIndex()] += 1;
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+
+        // value looks like BigInteger object?
+        try {
+            new BigInteger((String) value);
+            scores[ColumnType.BIGINT.getIndex()] += 1;
         } catch (NumberFormatException e) {
             // ignore
         }
@@ -68,6 +78,11 @@ public class ColumnSampling {
                 maxIndex = i;
             }
         }
-        return ColumnType.fromInt(maxIndex);
+
+        ColumnType ret = ColumnType.fromInt(maxIndex);
+        if (ret.equals(ColumnType.BIGINT)) {
+            return ColumnType.STRING;
+        }
+        return ret;
     }
 }
