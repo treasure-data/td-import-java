@@ -23,8 +23,13 @@
   <scm>
     <connection>scm:git:git://github.com/treasure-data/td-bulk-import-java.git</connection>
     <developerConnection>scm:git:git@github.com:treasure-data/td-bulk-import-java.git</developerConnection>
-    <url>https://github.com/treasure-data/td-bulk-import-java</url>
+    <url>scm:git:git://github.com/treasure-data/td-bulk-import-java.git</url>
   </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/treasure-data/td-bulk-import-java/issues</url>
+  </issueManagement>
 
   <developers>
     <developer>
@@ -69,6 +74,7 @@
     <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
     <maven-surefire-report-plugin.version>2.11</maven-surefire-report-plugin.version>
     <maven-antrun-plugin.version>1.6</maven-antrun-plugin.version>
+    <maven-scm-plugin.version>1.6</maven-scm-plugin.version>
 
     <!-- other properties -->
     <javac.encoding>UTF-8</javac.encoding>
@@ -84,19 +90,13 @@
 
   <repositories>
     <repository>
-      <id>fluentd.org</id>
-      <url>http://fluentd.org/maven2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
       <id>maven.treasure-data.com</id>
       <url>http://maven.treasure-data.com/</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
     </repository>
+
     <repository>
       <id>local-repo</id>
       <url>file://${basedir}/mvn-local</url>
@@ -280,6 +280,15 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <version>${maven-scm-plugin.version}</version>
+        <configuration>
+          <pushChanges>false</pushChanges>
+        </configuration>
       </plugin>
     </plugins>
 
