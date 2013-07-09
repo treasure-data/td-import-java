@@ -111,7 +111,7 @@ def prepare_parts2_sysprops(opts)
   sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts[1]}"
   sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts[2]}"
   sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts[3]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts[4]}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts[4]}" if opts[4]
   sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts[5].to_s}" if opts[5]
   sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts[6]}"
   sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts[7]}"
@@ -127,8 +127,6 @@ def prepare_parts2_sysprops(opts)
   sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts[17]}" if opts[17]
   sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts[18]}" if opts[18]
 
-  p sysprops
-
   sysprops
 end
 
@@ -143,7 +141,7 @@ def upload_parts2_sysprops(opts, with_prepare = false)
     sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts[1]}"
     sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts[2]}"
     sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts[3]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts[4]}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts[4]}" if opts[4]
     sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts[5].to_s}" if opts[5]
     sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts[6]}"
     sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts[7]}"
@@ -166,6 +164,7 @@ def upload_parts2_sysprops(opts, with_prepare = false)
   sysprops << "-Dtd.bulk_import.upload_parts.retrycount=10"
   sysprops << "-Dtd.bulk_import.upload_parts.waitsec=1"
   sysprops << "-Dtd.api.key=#{TreasureData::Config.apikey}"
+
   sysprops
 end
 
@@ -230,7 +229,7 @@ def prepare_parts2_config(op)
   op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
     delimiter = s
   }
-  op.on('--quote', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
+  op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
     quote = s
   }
   op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
@@ -341,7 +340,7 @@ def upload_parts2_config(op)
   op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
     delimiter = s
   }
-  op.on('--quote', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
+  op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
     quote = s
   }
   op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
