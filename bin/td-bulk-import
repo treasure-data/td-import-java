@@ -191,7 +191,7 @@ def prepare_parts2_config(op)
   only_columns = nil
 
   # prepare_parts
-  op.on('-f', '--format NAME', 'source file format [csv, tsv]; default=csv') {|s|
+  op.on('-f', '--format NAME', 'source file format [csv, tsv, json]; default=csv') {|s|
     format = s
   }
   op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
@@ -302,7 +302,7 @@ def upload_parts2_config(op)
   parallel = 2
 
   # prepare_parts
-  op.on('-f', '--format NAME', 'source file format [csv, tsv]; default=csv') {|s|
+  op.on('-f', '--format NAME', 'source file format [csv, tsv, json]; default=csv') {|s|
     format = s
   }
   op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
