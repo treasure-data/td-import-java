@@ -3,6 +3,7 @@ Release 0.2.0 - 20XX/XX/XX
     Adds new API: supports bulk_import:upload_parts
     Adds configuration of http proxy to bulk_import:upload_parts2 in bin/td-bulk-import; ENV['HTTP_PROXY']=<proxy_host>:<proxy_port>
     Adds configuration of quote character to bulk_import:prepare_parts2 http proxy to bulk_import:upload_parts2; --quote 'DOUBLE'
+    Adds JSON file reader for translating JSON files to msgpack.gz files; --format 'json'
 
   BUG FIXED
     Fixes the values of file readers/writers' line counters
