@@ -9,38 +9,12 @@ require 'td/config'
 HERE = File.dirname(__FILE__)
 PART_SPLIT_SIZE = 16*1024*1024
 
-def bulk_import_upload_parts2(op)
-  opts = upload_parts2_config(op)
+JAVA_COMMAND = "java"
+JAVA_MAIN_CLASS = "com.treasure_data.bulk_import.Main"
+JAVA_HEAP_MX_SIZE = "-Xmx1024m" # TODO
 
-  # java command
-  javacmd = 'java'
-
-  # make jvm options
-  jvm_opts = []
-  jvm_opts << "-Xmx1024m" # TODO
-
-  # find java/*.jar and td.jar
-  td_bulk_import_jar = find_td_bulk_import_jar
-
-  # make application options
-  app_opts = []
-  app_opts << "-cp \"#{td_bulk_import_jar}\""
-
-  # make system properties
-  sysprops = []
-  sysprops.concat(upload_parts2_sysprops(opts))
-
-  # make application arguments
-  app_args = []
-  app_args << 'com.treasure_data.bulk_import.Main'
-  app_args << 'upload_parts'
-  app_args << opts[22]
-
-  # TODO consider parameters including spaces; don't use join(' ')
-  command = "#{javacmd} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
-
-  exec command
-end
+APP_OPTION_PREPARE = "prepare_parts"
+APP_OPTION_UPLOAD = "prepare_uploads"
 
 def bulk_import_prepare_parts2(op)
   opts = prepare_parts2_config(op)
@@ -50,7 +24,7 @@ def bulk_import_prepare_parts2(op)
 
   # make jvm options
   jvm_opts = []
-  jvm_opts << "-Xmx1024m" # TODO
+  jvm_opts << JAVA_HEAP_MX_SIZE
 
   # find java/*.jar and td.jar
   td_bulk_import_jar = find_td_bulk_import_jar
@@ -65,12 +39,42 @@ def bulk_import_prepare_parts2(op)
 
   # make application arguments
   app_args = []
-  app_args << 'com.treasure_data.bulk_import.Main'
-  app_args << 'prepare_parts'
-  app_args << opts[19]
+  app_args << JAVA_MAIN_CLASS
+  app_args << APP_OPTION_PREPARE
+  app_args << opts['files']
 
   # TODO consider parameters including spaces; don't use join(' ')
-  command = "#{javacmd} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
+  command = "#{JAVA_COMMAND} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
+
+  exec command
+end
+
+def bulk_import_upload_parts2(op)
+  opts = upload_parts2_config(op)
+
+  # make jvm options
+  jvm_opts = []
+  jvm_opts << JAVA_HEAP_MX_SIZE
+
+  # find java/*.jar and td.jar
+  td_bulk_import_jar = find_td_bulk_import_jar
+
+  # make application options
+  app_opts = []
+  app_opts << "-cp \"#{td_bulk_import_jar}\""
+
+  # make system properties
+  sysprops = []
+  sysprops.concat(upload_parts2_sysprops(opts))
+
+  # make application arguments
+  app_args = []
+  app_args << JAVA_MAIN_CLASS
+  app_args << APP_OPTION_UPLOAD
+  app_args << opts['files']
+
+  # TODO consider parameters including spaces; don't use join(' ')
+  command = "#{JAVA_COMMAND} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
 
   exec command
 end
@@ -106,25 +110,25 @@ def prepare_parts2_sysprops(opts)
   # set http_proxy
   set_http_proxy(sysprops)
 
-  sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts[0]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts[1]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts[2]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts[3]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts[4]}" if opts[4]
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts[5].to_s}" if opts[5]
-  sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts[6]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts[7]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.error-record-output=#{opts[8]}" if opts[8]
-  sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts[9]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts[10]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts[11]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts[12]}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts[13]}" if opts[13]
-  sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts[14]}" if opts[14]
-  sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts[15]}" if opts[15]
-  sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts[16]}" if opts[16]
-  sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts[17]}" if opts[17]
-  sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts[18]}" if opts[18]
+  sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts['time_format']}" if opts['time_format']
+  sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
+  sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.error-record-output=#{opts['error_record_output']}" if opts['error_record_output']
+  sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts['quote']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts['newline']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts['column_header']}" if opts['column_header']
+  sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts['columns']}" if opts['columns']
+  sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts['column_types']}" if opts['column_types']
+  sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts['type_conversion_error']}" if opts['type_conversion_error']
+  sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
+  sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
 
   sysprops
 end
@@ -136,30 +140,30 @@ def upload_parts2_sysprops(opts, with_prepare = false)
   set_http_proxy(sysprops)
 
   if with_prepare
-    sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts[0]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts[1]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts[2]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts[3]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts[4]}" if opts[4]
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts[5].to_s}" if opts[5]
-    sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts[6]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts[7]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.error-record-output=#{opts[8]}" if opts[8]
-    sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts[9]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts[10]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts[11]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts[12]}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts[13]}" if opts[13]
-    sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts[14]}" if opts[14]
-    sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts[15]}" if opts[15]
-    sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts[16]}" if opts[16]
-    sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts[17]}" if opts[17]
-    sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts[18]}" if opts[18]
+    sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts['time_format']}" if opts['time_format']
+    sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
+    sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.error-record-output=#{opts['error_record_output']}" if opts['error_record_output']
+    sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts['quote']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts['newline']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts['column_header']}" if opts['column_header']
+    sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts['columns']}" if opts['columns']
+    sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts['column_types']}" if opts['column_types']
+    sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts['type_conversion_error']}" if opts['type_conversion_error']
+    sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
+    sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
   end
 
-  sysprops << "-Dtd.bulk_import.upload_parts.auto-perform=#{opts[19]}"
-  sysprops << "-Dtd.bulk_import.upload_parts.auto-commit=#{opts[20]}"
-  sysprops << "-Dtd.bulk_import.upload_parts.parallel=#{opts[21]}"
+  sysprops << "-Dtd.bulk_import.upload_parts.auto-perform=#{opts['auto_perform']}"
+  sysprops << "-Dtd.bulk_import.upload_parts.auto-commit=#{opts['auto_commit']}"
+  sysprops << "-Dtd.bulk_import.upload_parts.parallel=#{opts['parallel']}"
   sysprops << "-Dtd.bulk_import.upload_parts.retrycount=10"
   sysprops << "-Dtd.bulk_import.upload_parts.waitsec=1"
   sysprops << "-Dtd.api.key=#{TreasureData::Config.apikey}"
@@ -168,228 +172,214 @@ def upload_parts2_sysprops(opts, with_prepare = false)
 end
 
 def prepare_parts2_config(op)
-  format = 'csv'
-  compress = 'none'
-  encoding = 'utf-8'
-  time_column = 'time'
-  time_format = nil
-  time_value = nil
-  outdir = nil
-  split_size_kb = PART_SPLIT_SIZE / 1024  # kb
-  error_record_output = nil
-  dry_run = false
+  h = {}
 
-  delimiter = ','
-  quote = "DOUBLE"
-  newline = 'CRLF'
-  column_header = nil
-  columns = nil
-  column_types = nil
-  type_conversion_error = 'skip'
-  exclude_columns = nil
-  only_columns = nil
+  h['format'] = 'csv'
+  h['compress'] = 'none'
+  h['encoding'] = 'utf-8'
+  h['time_column'] = 'time'
+  h['time_format'] = nil
+  h['time_value'] = nil
+  h['outdir'] = nil
+  h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
+  h['error_record_output'] = nil
+  h['dry_run'] = false
+
+  h['delimiter'] = ','
+  h['quote'] = "DOUBLE"
+  h['newline'] = 'CRLF'
+  h['column_header'] = nil
+  h['columns'] = nil
+  h['column_types'] = nil
+  h['type_conversion_error'] = 'skip'
+  h['exclude_columns'] = nil
+  h['only_columns'] = nil
+  h['files'] = nil
 
   # prepare_parts
   op.on('-f', '--format NAME', 'source file format [csv, tsv, json]; default=csv') {|s|
-    format = s
+    h['format'] = s
   }
   op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
-    compress = s
+    h['compress'] = s
   }
   op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
-    encoding = s
+    h['encoding'] = s
   }
   op.on('-t', '--time-column NAME', 'name of the time column') {|s|
-    time_column = s
+    h['time_column'] = s
   }
   op.on('-T', '--time-format', 'STRF_FORMAT; default=auto detect') {|s|
-    time_format = s
+    h['time_format'] = s
   }
   op.on('--time-value TIME', 'long value of the time column') {|s|
     if s.to_i.to_s == s
-      time_value = s.to_i
+      h['time_value'] = s.to_i
     else
       require 'time'
-      time_value = Time.parse(s).to_i
+      h['time_value'] = Time.parse(s).to_i
     end
   }
   op.on('-o', '--output DIR', 'output directory') {|s|
-    outdir = s
+    h['outdir'] = s
   }
-  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{split_size_kb})", Integer) {|i|
-    split_size_kb = i
+  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
+    h['split_size_kb'] = i
   }
   op.on('--error-record-output FILE', 'error records output file; default=NULL output stream') {|s|
-    error_record_outdir = s
+    h['error_record_outdir'] = s
   }
   op.on('--dry-run', 'show samples as JSON and exit', FalseClass) {|b|
-    dry_run = b
+    h['dry_run'] = b
   }
   op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
-    delimiter = s
+    h['delimiter'] = s
   }
   op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
-    quote = s
+    h['quote'] = s
   }
   op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
-    newline = s
+    h['newline'] = s
   }
   op.on('-H', '--column-header', 'first line includes column names', TrueClass) {|b|
-    column_header = b
+    h['column_header'] = b
   }
   op.on('-h', '--columns NAME,NAME,...', 'column names (use --column-header instead if the first line has column names)') {|s|
-    columns = s
+    h['columns'] = s
   }
   op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
-    column_types = s
+    h['column_types'] = s
   }
   op.on('--type-conversion-error TYPE', 'type conversion error [skip,null]; default=skip') {|s|
-    type_conversion_error = s
+    h['type_conversion_error'] = s
   }
   op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
-    exclude_columns = s
+    h['exclude_columns'] = s
   }
   op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
-    only_columns = s
+    h['only_columns'] = s
   }
 
   op.parse!(ARGV)
   files = ARGV
   files = [files] unless files.is_a?(Array) # TODO ruby 1.9
+  h['files'] = files
 
-  # options validation
-  #unless column_types
-  #  $stderr.puts "--column-types TYPE,TYPE,... option is required."
-  #  exit 1
-  #end
-  unless outdir
+  unless h['outdir']
     $stderr.puts "-o, --output DIR option is required."
     exit 1
   end
 
-  return [ format, compress, encoding,
-    time_column, time_format, time_value,
-    outdir,  split_size_kb, error_record_output, dry_run,
-    delimiter, quote, newline, column_header, columns, column_types,
-    type_conversion_error, exclude_columns, only_columns, files ]
+  h
 end
 
 def upload_parts2_config(op)
-  format = 'csv'
-  compress = 'none'
-  encoding = 'utf-8'
-  time_column = 'time'
-  time_format = nil
-  time_value = nil
-  outdir = nil
-  split_size_kb = PART_SPLIT_SIZE / 1024  # kb
-  error_record_output = nil
-  dry_run = false
+  h = {}
+  h['format'] = 'csv'
+  h['compress'] = 'none'
+  h['encoding'] = 'utf-8'
+  h['time_column'] = 'time'
+  h['time_format'] = nil
+  h['time_value'] = nil
+  h['outdir'] = nil
+  h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
+  h['error_record_output'] = nil
+  h['dry_run'] = false
 
-  delimiter = ','
-  quote = 'DOUBLE'
-  newline = 'CRLF'
-  column_header = nil
-  columns = nil
-  column_types = nil
-  type_conversion_error = 'skip'
-  exclude_columns = nil
-  only_columns = nil
+  h['delimiter'] = ','
+  h['quote'] = 'DOUBLE'
+  h['newline'] = 'CRLF'
+  h['column_header'] = nil
+  h['columns'] = nil
+  h['column_types'] = nil
+  h['type_conversion_error'] = 'skip'
+  h['exclude_columns'] = nil
+  h['only_columns'] = nil
 
-  auto_perform = false
-  auto_commit = false
-  parallel = 2
+  h['auto_perform'] = false
+  h['auto_commit'] = false
+  h['parallel'] = 2
 
   # prepare_parts
   op.on('-f', '--format NAME', 'source file format [csv, tsv, json]; default=csv') {|s|
-    format = s
+    h['format'] = s
   }
   op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
-    compress = s
+    h['compress'] = s
   }
   op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
-    encoding = s
+    h['encoding'] = s
   }
   op.on('-t', '--time-column NAME', 'name of the time column') {|s|
-    time_column = s
+    h['time_column'] = s
   }
   op.on('-T', '--time-format', 'STRF_FORMAT; default=auto detect') {|s|
-    time_format = s
+    h['time_format'] = s
   }
   op.on('--time-value TIME', 'long value of the time column') {|s|
     if s.to_i.to_s == s
-      time_value = s.to_i
+      h['time_value'] = s.to_i
     else
       require 'time'
-      time_value = Time.parse(s).to_i
+      h['time_value'] = Time.parse(s).to_i
     end
   }
   op.on('-o', '--output [DIR]', 'output directory', "when use fluent upload") {|s|
-    outdir = s
+    h['outdir'] = s
   }
-  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{split_size_kb})", Integer) {|i|
-    split_size_kb = i
+  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
+    h['split_size_kb'] = i
   }
   op.on('--error-record-output FILE', 'error records output file; default=NULL output stream') {|s|
-    error_record_outdir = s
+    h['error_record_outdir'] = s
   }
   op.on('--dry-run', 'show samples as JSON and exit', FalseClass) {|b|
-    dry_run = b
+    h['dry_run'] = b
   }
   op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
-    delimiter = s
+    h['delimiter'] = s
   }
   op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
-    quote = s
+    h['quote'] = s
   }
   op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
-    newline = s
+    h['newline'] = s
   }
   op.on('-H', '--column-header', 'first line includes column names', TrueClass) {|b|
-    column_header = b
+    h['column_header'] = b
   }
   op.on('-h', '--columns NAME,NAME,...', 'column names (use --column-header instead if the first line has column names)') {|s|
-    columns = s
+    h['columns'] = s
   }
   op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
-    column_types = s
+    h['column_types'] = s
   }
   op.on('--type-conversion-error TYPE', 'type conversion error [skip,null]; default=skip') {|s|
-    type_conversion_error = s
+    h['type_conversion_error'] = s
   }
   op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
-    exclude_columns = s
+    h['exclude_columns'] = s
   }
   op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
-    only_columns = s
+    h['only_columns'] = s
   }
   # upload_parts
   op.on('--auto-perform', 'perform bulk import job automatically', TrueClass) {|b|
-    auto_perform = b
+    h['auto_perform'] = b
   }
   op.on('--auto-commit', 'commit bulk import job automatically', FalseClass) {|b|
-    auto_commit = b
+    h['auto_commit'] = b
   }
   op.on('--parallel NUM', 'upload in parallel (default: 2; max 8)', Integer) {|i|
-    parallel = i
+    h['parallel'] = i
   }
 
   op.parse!(ARGV)
   files = ARGV
   files = [files] unless files.is_a?(Array) # TODO ruby 1.9
+  h['files'] = files
 
-  # options validation
-  #unless column_types
-  #  $stderr.puts "--column-types TYPE,TYPE,... option is required."
-  #  exit 1
-  #end
-
-  return [ format, compress, encoding,
-    time_column, time_format, time_value,
-    outdir,  split_size_kb, error_record_output, dry_run,
-    delimiter, quote, newline, column_header, columns, column_types,
-    type_conversion_error, exclude_columns, only_columns,
-    auto_perform, auto_commit, parallel, files ]
+  h
 end
 
 require 'optparse'
