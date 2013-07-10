@@ -58,6 +58,9 @@ public abstract class FileReader implements Closeable {
     public void configure(Task task) throws PreparePartsException {
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
+
+        // check compression type of the file
+        conf.checkCompressionType(task.fileName);
     }
 
     public String[] getColumnNames() {

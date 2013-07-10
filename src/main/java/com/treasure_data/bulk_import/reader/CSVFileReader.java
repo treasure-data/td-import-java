@@ -53,9 +53,6 @@ public class CSVFileReader extends FileReader {
     public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
-        // check compression type of the file
-        conf.checkCompressionType(task.fileName);
-
         // initialize csv preference
         csvPref = new CsvPreference.Builder(conf.getQuoteChar().quote(),
                 conf.getDelimiterChar(), conf.getNewline().newline()).build();

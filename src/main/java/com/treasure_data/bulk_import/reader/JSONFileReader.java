@@ -57,9 +57,6 @@ public class JSONFileReader extends FileReader {
     public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
-        // check compression type of the file
-        conf.checkCompressionType(task.fileName);
-
         if (conf.getAliasTimeColumn() != null &&
                 !conf.getAliasTimeColumn().equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
             aliasTimeColumnName = conf.getAliasTimeColumn();
