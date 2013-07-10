@@ -14,7 +14,7 @@ JAVA_MAIN_CLASS = "com.treasure_data.bulk_import.Main"
 JAVA_HEAP_MX_SIZE = "-Xmx1024m" # TODO
 
 APP_OPTION_PREPARE = "prepare_parts"
-APP_OPTION_UPLOAD = "prepare_uploads"
+APP_OPTION_UPLOAD = "upload_parts"
 
 def bulk_import_prepare_parts2(op)
   opts = prepare_parts2_config(op)
