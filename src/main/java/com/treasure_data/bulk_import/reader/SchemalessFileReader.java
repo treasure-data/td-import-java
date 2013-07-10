@@ -97,9 +97,9 @@ public class SchemalessFileReader extends FileReader {
         }
 
         if (timeColumnIndex >= 0) {
-            timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
+            timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat());
         } else if (aliasTimeColumnIndex >= 0) {
-            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
+            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat());
         } else if (conf.getTimeValue() >= 0) {
             timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
         } else {
