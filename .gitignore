@@ -6,4 +6,5 @@ target
 .classpath
 .settings
 .iml
+src/test/resources/out
 *~
