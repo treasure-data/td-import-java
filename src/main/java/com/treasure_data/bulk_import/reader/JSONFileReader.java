@@ -34,7 +34,7 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class JSONFileReader extends SchemalessFileReader {
+public class JSONFileReader extends NonFixnumColumnsFileReader {
     private static final Logger LOG = Logger.getLogger(JSONFileReader.class.getName());
 
     protected BufferedReader reader;

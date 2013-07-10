@@ -37,7 +37,7 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class MessagePackFileReader extends SchemalessFileReader {
+public class MessagePackFileReader extends NonFixnumColumnsFileReader {
     private static final Logger LOG = Logger.getLogger(MessagePackFileReader.class.getName());
 
     protected MessagePack msgpack;
