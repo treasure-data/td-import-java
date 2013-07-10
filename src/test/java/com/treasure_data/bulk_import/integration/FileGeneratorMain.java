@@ -35,6 +35,11 @@ public class FileGeneratorMain {
         gens.add(new JSONFileGenerator(dirName + "jsonfile-with-timeformat.csv",
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
 
+        // MessagePack files
+        gens.add(new MessagePackFileGenerator(dirName + "msgpackfile-with-time.csv",
+                new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
+
+        // training data file
         gens.add(new TrainingDataFileGenerator(dirName + "trainingfile-with-time.msgpack.gz",
                 new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
 
