@@ -43,12 +43,31 @@ import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
 public class PrepareConfiguration extends Configuration {
 
+    public static class Factory {
+        public PrepareConfiguration newPrepareConfiguration(Properties props) {
+            String formatStr = props.getProperty(
+                    Configuration.BI_PREPARE_PARTS_FORMAT,
+                    Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
+            PrepareConfiguration.Format format = Format.fromString(formatStr);
+            if (format == null) {
+                throw new IllegalArgumentException(String.format(
+                        "unsupported format '%s'", formatStr));
+            }
+            return format.createPrepareConfiguration();
+        }
+    }
+
     public static enum Format {
         CSV("csv") {
             @Override
             public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
                 return new CSVFileReader(conf, writer);
+            }
+
+            @Override
+            public PrepareConfiguration createPrepareConfiguration() {
+                return new PrepareConfiguration();
             }
         },
         TSV("tsv") {
@@ -57,12 +76,22 @@ public class PrepareConfiguration extends Configuration {
                     throws PreparePartsException {
                 return new CSVFileReader(conf, writer);
             }
+
+            @Override
+            public PrepareConfiguration createPrepareConfiguration() {
+                return new PrepareConfiguration();
+            }
         },
         MYSQL("mysql") {
             @Override
             public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
                 return new MySQLTableReader(conf, writer);
+            }
+
+            @Override
+            public PrepareConfiguration createPrepareConfiguration() {
+                return new PrepareConfiguration();
             }
         },
         JSON("json") {
@@ -71,12 +100,22 @@ public class PrepareConfiguration extends Configuration {
                     throws PreparePartsException {
                 return new JSONFileReader(conf, writer);
             }
+
+            @Override
+            public PrepareConfiguration createPrepareConfiguration() {
+                return new PrepareConfiguration();
+            }
         },
         MSGPACK("msgpack") {
             @Override
             public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
                 return new MessagePackFileReader(conf, writer);
+            }
+
+            @Override
+            public PrepareConfiguration createPrepareConfiguration() {
+                return new PrepareConfiguration();
             }
         };
 
@@ -89,6 +128,8 @@ public class PrepareConfiguration extends Configuration {
         public String format() {
             return format;
         }
+
+        public abstract PrepareConfiguration createPrepareConfiguration();
 
         public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
                 throws PreparePartsException {

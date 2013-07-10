@@ -74,7 +74,8 @@ public class Main {
             fileNames[i] = args[i + 1];
         }
 
-        final PrepareConfiguration conf = new PrepareConfiguration();
+        final PrepareConfiguration conf = new PrepareConfiguration.Factory()
+                .newPrepareConfiguration(props);
         conf.configure(props);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
