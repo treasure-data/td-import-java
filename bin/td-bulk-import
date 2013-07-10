@@ -197,7 +197,7 @@ def prepare_parts2_config(op)
   h['files'] = nil
 
   # prepare_parts
-  op.on('-f', '--format NAME', 'source file format [csv, tsv, json]; default=csv') {|s|
+  op.on('-f', '--format NAME', 'source file format [csv, tsv, json, msgpack]; default=csv') {|s|
     h['format'] = s
   }
   op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
