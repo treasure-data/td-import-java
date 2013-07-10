@@ -100,7 +100,7 @@ public class MessagePackFileReader extends SchemalessFileReader {
         // values
         values = new Object[keys.length];
         for (int i = 0; i < values.length; i++) {
-            values[i] = toObject(row.get(keys[i]));
+            values[i] = toObject(row.get(ks[i]));
         }
 
         return true;
