@@ -44,7 +44,6 @@ import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 public class PrepareConfiguration extends Configuration {
 
     public static enum Format {
-        // TODO #MN should consider type parameters
         CSV("csv") {
             @Override
             public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
