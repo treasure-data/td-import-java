@@ -31,12 +31,12 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class SchemalessFileReader extends FileReader {
-    private static final Logger LOG = Logger.getLogger(SchemalessFileReader.class.getName());
+public class NonFixnumColumnsFileReader extends FileReader {
+    private static final Logger LOG = Logger.getLogger(NonFixnumColumnsFileReader.class.getName());
 
     protected String aliasTimeColumnName = null;
 
-    public SchemalessFileReader(PrepareConfiguration conf, FileWriter writer) {
+    public NonFixnumColumnsFileReader(PrepareConfiguration conf, FileWriter writer) {
         super(conf, writer);
     }
 
