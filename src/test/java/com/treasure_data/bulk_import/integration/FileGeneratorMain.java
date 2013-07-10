@@ -28,16 +28,20 @@ public class FileGeneratorMain {
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
 
         // JSON files
-        gens.add(new JSONFileGenerator(dirName + "jsonfile-with-time.csv",
+        gens.add(new JSONFileGenerator(dirName + "jsonfile-with-time.json",
                 new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
-        gens.add(new JSONFileGenerator(dirName + "jsonfile-with-aliastime.csv",
+        gens.add(new JSONFileGenerator(dirName + "jsonfile-with-aliastime.json",
                 new String[] { "string-value", "int-value", "double-value", "timestamp" }));
-        gens.add(new JSONFileGenerator(dirName + "jsonfile-with-timeformat.csv",
+        gens.add(new JSONFileGenerator(dirName + "jsonfile-with-timeformat.json",
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
 
         // MessagePack files
-        gens.add(new MessagePackFileGenerator(dirName + "msgpackfile-with-time.csv",
+        gens.add(new MessagePackFileGenerator(dirName + "msgpackfile-with-time.msgpack",
                 new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
+        gens.add(new MessagePackFileGenerator(dirName + "msgpackfile-with-aliastime.msgpack",
+                new String[] { "string-value", "int-value", "double-value", "timestamp" }));
+        gens.add(new MessagePackFileGenerator(dirName + "msgpackfile-with-timeformat.msgpack",
+                new String[] { "string-value", "int-value", "double-value", "timeformat" }));
 
         // training data file
         gens.add(new TrainingDataFileGenerator(dirName + "trainingfile-with-time.msgpack.gz",

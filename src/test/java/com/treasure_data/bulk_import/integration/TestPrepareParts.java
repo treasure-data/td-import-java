@@ -137,12 +137,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
         props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
 
         args.add(Configuration.CMD_PREPARE_PARTS);
-        args.add(INPUT_DIR + "jsonfile-with-time.csv");
+        args.add(INPUT_DIR + "jsonfile-with-time.json");
 
         Main.prepareParts(args.toArray(new String[0]), props);
 
         String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
-        String dstFileName = OUTPUT_DIR + "jsonfile-with-time_csv_0.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "jsonfile-with-time_json_0.msgpack.gz";
         assertDataEquals(srcFileName, dstFileName);
     }
 
@@ -154,12 +154,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
         props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
 
         args.add(Configuration.CMD_PREPARE_PARTS);
-        args.add(INPUT_DIR + "jsonfile-with-aliastime.csv");
+        args.add(INPUT_DIR + "jsonfile-with-aliastime.json");
 
         Main.prepareParts(args.toArray(new String[0]), props);
 
         String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
-        String dstFileName = OUTPUT_DIR + "jsonfile-with-aliastime_csv_0.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "jsonfile-with-aliastime_json_0.msgpack.gz";
         assertDataEquals(srcFileName, dstFileName);
     }
 
@@ -172,12 +172,63 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
         props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, "%Y-%m-%d %H:%M:%S %z");
 
         args.add(Configuration.CMD_PREPARE_PARTS);
-        args.add(INPUT_DIR + "jsonfile-with-timeformat.csv");
+        args.add(INPUT_DIR + "jsonfile-with-timeformat.json");
 
         Main.prepareParts(args.toArray(new String[0]), props);
 
         String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
-        String dstFileName = OUTPUT_DIR + "headerless-csvfile-with-timeformat_csv_0.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "jsonfile-with-timeformat_json_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    @Test
+    public void writeFromMessagePackWithTimeColumn() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "msgpack");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "msgpackfile-with-time.msgpack");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "msgpackfile-with-time_msgpack_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    @Test
+    public void writeFromMessagePackWithAlasTimeColumn() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "msgpack");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "msgpackfile-with-aliastime.msgpack");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "msgpackfile-with-aliastime_msgpack_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    @Test
+    public void writeFromMessagePackWithTimeFormat() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "msgpack");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timeformat");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, "%Y-%m-%d %H:%M:%S %z");
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "msgpackfile-with-timeformat.msgpack");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "msgpackfile-with-timeformat_msgpack_0.msgpack.gz";
         assertDataEquals(srcFileName, dstFileName);
     }
 }
