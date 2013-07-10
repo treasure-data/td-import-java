@@ -26,6 +26,9 @@ import java.util.logging.Logger;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.treasure_data.bulk_import.model.ColumnType;
+import com.treasure_data.bulk_import.model.ColumnValue;
+import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
@@ -36,6 +39,8 @@ public class JSONFileReader extends SchemalessFileReader {
 
     protected BufferedReader reader;
     protected JSONParser parser;
+
+    protected Map<String, Object> row;
 
     public JSONFileReader(PrepareConfiguration conf, FileWriter writer) {
         super(conf, writer);
@@ -57,6 +62,25 @@ public class JSONFileReader extends SchemalessFileReader {
     }
 
     @Override
+    public void setColumnNames() {
+        columnNames = row.keySet().toArray(new String[0]);
+    }
+
+    @Override
+    public void setColumnTypes() {
+        columnTypes = new ColumnType[columnNames.length];
+        for (int i = 0; i < columnNames.length; i++) {
+            Object v = row.get(columnNames[i]);
+            columnTypes[i] = toColumnType(v);
+        }
+    }
+
+    @Override
+    public void setSkipColumns() {
+        super.setSkipColumns();
+    }
+
+    @Override
     public boolean readRow() throws IOException {
         try {
             String line = reader.readLine();
@@ -67,6 +91,26 @@ public class JSONFileReader extends SchemalessFileReader {
             return row != null;
         } catch (ParseException e) {
             throw new IOException(e);
+        }
+    }
+
+    @Override
+    public void convertTypesOfColumns() throws PreparePartsException {
+        ColumnValue[] columnValues = new ColumnValue[columnNames.length];
+        for (int i = 0; i < columnNames.length; i++) {
+            columnValues[i] = columnTypes[i].createColumnValue();
+            columnTypes[i].setColumnValue(row.get(columnNames[i]), columnValues[i]);
+        }
+
+        convertedRow = new Row(columnValues);
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+
+        if (reader != null) {
+            reader.close();
         }
     }
 }

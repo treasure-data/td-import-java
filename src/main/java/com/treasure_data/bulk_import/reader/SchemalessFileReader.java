@@ -19,14 +19,11 @@ package com.treasure_data.bulk_import.reader;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
-import com.treasure_data.bulk_import.model.ColumnValue;
-import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
@@ -36,8 +33,6 @@ import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class SchemalessFileReader extends FileReader {
     private static final Logger LOG = Logger.getLogger(SchemalessFileReader.class.getName());
-
-    protected Map<String, Object> row;
 
     protected String aliasTimeColumnName = null;
 
@@ -58,22 +53,17 @@ public class SchemalessFileReader extends FileReader {
         columnTypes = new ColumnType[0];
         skipColumns = new HashSet<String>();
         timeColumnValue = new TimeColumnValue(-1, null);
-
     }
 
     public void setColumnNames() {
-        columnNames = row.keySet().toArray(new String[0]);
+        throw new UnsupportedOperationException();
     }
 
     public void setColumnTypes() {
-        columnTypes = new ColumnType[columnNames.length];
-        for (int i = 0; i < columnNames.length; i++) {
-            Object v = row.get(columnNames[i]);
-            columnTypes[i] = toColumnType(v);
-        }
+        throw new UnsupportedOperationException();
     }
 
-    private ColumnType toColumnType(Object value) {
+    public ColumnType toColumnType(Object value) {
         if (value instanceof Integer) {
             return ColumnType.INT;
         } else if (value instanceof Double) {
@@ -160,13 +150,7 @@ public class SchemalessFileReader extends FileReader {
 
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
-        ColumnValue[] columnValues = new ColumnValue[columnNames.length];
-        for (int i = 0; i < columnNames.length; i++) {
-            columnValues[i] = columnTypes[i].createColumnValue();
-            columnTypes[i].setColumnValue(row.get(columnNames[i]), columnValues[i]);
-        }
-
-        convertedRow = new Row(columnValues);
+        throw new UnsupportedOperationException();
     }
 
 }
