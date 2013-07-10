@@ -38,7 +38,7 @@ import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.JSONFileWriter;
 
-public class CSVFileReader extends FileReader {
+public class CSVFileReader extends FixnumColumnsFileReader {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class.getName());
 
     protected CsvPreference csvPref;
