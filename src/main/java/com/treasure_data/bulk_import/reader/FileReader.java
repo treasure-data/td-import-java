@@ -75,18 +75,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         return skipColumns;
     }
 
-    public TimeColumnValue getTimeColumnValue() {
-        return timeColumnValue;
-    }
-
-    public void initializeConvertedRow() {
-        ColumnValue[] values = new ColumnValue[columnTypes.length];
-        for (int i = 0; i < columnTypes.length; i++) {
-            values[i] = columnTypes[i].createColumnValue();
-        }
-        convertedRow = new Row(values);
-    }
-
     public void setSkipColumns() {
         String[] excludeColumns = conf.getExcludeColumns();
         String[] onlyColumns = conf.getOnlyColumns();
@@ -123,6 +111,18 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
                 continue; // not needed though,..
             }
         }
+    }
+
+    public TimeColumnValue getTimeColumnValue() {
+        return timeColumnValue;
+    }
+
+    public void initializeConvertedRow() {
+        ColumnValue[] values = new ColumnValue[columnTypes.length];
+        for (int i = 0; i < columnTypes.length; i++) {
+            values[i] = columnTypes[i].createColumnValue();
+        }
+        convertedRow = new Row(values);
     }
 
     public void resetLineNum() {
