@@ -34,12 +34,12 @@ import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare_parts.MySQLPrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class MySQLTableReader extends FileReader {
+public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
 
     private static final String SAMPLE_QUERY = "SELECT * FROM %s LIMIT 1;";
     private static final String QUERY = "SELECT * FROM %s;";
@@ -49,7 +49,7 @@ public class MySQLTableReader extends FileReader {
     protected int numColumns;
     protected ResultSet resultSet;
 
-    public MySQLTableReader(PrepareConfiguration conf, FileWriter writer) {
+    public MySQLTableReader(MySQLPrepareConfiguration conf, FileWriter writer) {
         super(conf, writer);
     }
 
