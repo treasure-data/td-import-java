@@ -60,21 +60,23 @@ public class PrepareConfiguration extends Configuration {
     public static enum Format {
         CSV("csv") {
             @Override
-            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+            public FileReader<CSVPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
-                return new CSVFileReader(conf, writer);
+                return new CSVFileReader((CSVPrepareConfiguration) conf, writer);
             }
 
             @Override
             public PrepareConfiguration createPrepareConfiguration() {
-                return new PrepareConfiguration();
+                return new CSVPrepareConfiguration();
             }
         },
         TSV("tsv") {
             @Override
-            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+            public FileReader<CSVPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
-                return new CSVFileReader(conf, writer);
+                return new CSVFileReader((CSVPrepareConfiguration) conf, writer);
             }
 
             @Override
@@ -84,38 +86,44 @@ public class PrepareConfiguration extends Configuration {
         },
         MYSQL("mysql") {
             @Override
-            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+            public FileReader<MySQLPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
-                return new MySQLTableReader(conf, writer);
+                return new MySQLTableReader((MySQLPrepareConfiguration) conf,
+                        writer);
             }
 
             @Override
             public PrepareConfiguration createPrepareConfiguration() {
-                return new PrepareConfiguration();
+                return new MySQLPrepareConfiguration();
             }
         },
         JSON("json") {
             @Override
-            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+            public FileReader<JSONPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
-                return new JSONFileReader(conf, writer);
+                return new JSONFileReader((JSONPrepareConfiguration) conf,
+                        writer);
             }
 
             @Override
             public PrepareConfiguration createPrepareConfiguration() {
-                return new PrepareConfiguration();
+                return new JSONPrepareConfiguration();
             }
         },
         MSGPACK("msgpack") {
             @Override
-            public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+            public FileReader<MessagePackPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, FileWriter writer)
                     throws PreparePartsException {
-                return new MessagePackFileReader(conf, writer);
+                return new MessagePackFileReader(
+                        (MessagePackPrepareConfiguration) conf, writer);
             }
 
             @Override
             public PrepareConfiguration createPrepareConfiguration() {
-                return new PrepareConfiguration();
+                return new MessagePackPrepareConfiguration();
             }
         };
 
@@ -131,7 +139,8 @@ public class PrepareConfiguration extends Configuration {
 
         public abstract PrepareConfiguration createPrepareConfiguration();
 
-        public FileReader createFileReader(PrepareConfiguration conf, FileWriter writer)
+        public FileReader<? extends PrepareConfiguration> createFileReader(
+                PrepareConfiguration conf, FileWriter writer)
                 throws PreparePartsException {
             throw new PreparePartsException(
                     new UnsupportedOperationException("format: " + this));
@@ -253,34 +262,6 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
-    public static enum Quote {
-        DOUBLE("\""), SINGLE("'");
-
-        private String quote;
-
-        Quote(String quote) {
-            this.quote = quote;
-        }
-
-        public char quote() {
-            return quote.charAt(0);
-        }
-    }
-
-    public static enum NewLine {
-        CR("\r"), LF("\n"), CRLF("\r\n");
-
-        private String newline;
-
-        NewLine(String newline) {
-            this.newline = newline;
-        }
-
-        public String newline() {
-            return newline;
-        }
-    }
-
     private static final Logger LOG = Logger
             .getLogger(PrepareConfiguration.class.getName());
 
@@ -299,25 +280,13 @@ public class PrepareConfiguration extends Configuration {
     protected boolean dryRun = false;
     protected String outputDirName;
     protected int splitSize;
-
-    protected char delimiterChar;
-    protected Quote quoteChar;
-    protected NewLine newline;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
-    protected boolean hasColumnHeader;
-    protected String typeErrorMode;
     protected String[] excludeColumns;
     protected String[] onlyColumns;
-    protected int sampleRowSize;
 
     protected String[] keys;
     protected ColumnType[] valueTypes;
-
-    protected String jdbcConnectionURL;
-    protected String jdbcUser;
-    protected String jdbcPassword;
-    protected String jdbcTable;
 
     public PrepareConfiguration() {
     }
@@ -386,69 +355,8 @@ public class PrepareConfiguration extends Configuration {
                 Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
 
         // error record output DIR
-        errorRecordOutputDirName = props
-                .getProperty(Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
-
-        // dry-run mode
-        String drun = props.getProperty(Configuration.BI_PREPARE_PARTS_DRYRUN,
-                Configuration.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
-        dryRun = drun != null && drun.equals("true");
-
-        // split size
-        String sSize = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
-                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
-        try {
-            splitSize = Integer.parseInt(sSize);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "split size is required as int type e.g. -D%s=%s",
-                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
-                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
-            throw new IllegalArgumentException(msg, e);
-        }
-
-        // delimiter
-        if (format.equals(PrepareConfiguration.Format.CSV)) {
-            delimiterChar = props.getProperty(
-                    Configuration.BI_PREPARE_PARTS_DELIMITER,
-                    Configuration.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE).charAt(
-                    0);
-        } else if (format.equals(PrepareConfiguration.Format.TSV)) {
-            delimiterChar = props.getProperty(
-                    Configuration.BI_PREPARE_PARTS_DELIMITER,
-                    Configuration.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
-                    0);
-        }
-
-        // quote
-        String quote_char = props.getProperty(Configuration.BI_PREPARE_PARTS_QUOTE,
-                Configuration.BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE);
-        try {
-            quoteChar = Quote.valueOf(quote_char);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("unsupported quote char: " + quote_char, e);
-        }
-
-        // newline
-        String nLine = props.getProperty(Configuration.BI_PREPARE_PARTS_NEWLINE,
-                Configuration.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE);
-        try {
-            newline = NewLine.valueOf(nLine);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("unsupported newline char: " + nLine, e);
-        }
-
-        setColumnHeader();
-
-        setColumnNames();
-
-        setColumnTypes();
-
-        // type-conversion-error
-        typeErrorMode = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR,
-                Configuration.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR_DEFAULTVALUE);
+        errorRecordOutputDirName = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
 
         // exclude-columns
         String excludeColumns = props.getProperty(
@@ -481,17 +389,22 @@ public class PrepareConfiguration extends Configuration {
             this.onlyColumns = new String[0];
         }
 
-        // row size with sample reader
-        String sRowSize = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
+        // dry-run mode
+        String drun = props.getProperty(Configuration.BI_PREPARE_PARTS_DRYRUN,
+                Configuration.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
+        dryRun = drun != null && drun.equals("true");
+
+        // split size
+        String sSize = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
+                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
         try {
-            sampleRowSize = Integer.parseInt(sRowSize);
+            splitSize = Integer.parseInt(sSize);
         } catch (NumberFormatException e) {
             String msg = String.format(
-                    "sample row size is required as int type e.g. -D%s=%s",
-                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
+                    "split size is required as int type e.g. -D%s=%s",
+                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
+                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
             throw new IllegalArgumentException(msg, e);
         }
     }
@@ -626,40 +539,13 @@ public class PrepareConfiguration extends Configuration {
         return splitSize;
     }
 
-    public Quote getQuoteChar() {
-        return quoteChar;
-    }
-
-    public char getDelimiterChar() {
-        return delimiterChar;
-    }
-
-    public NewLine getNewline() {
-        return newline;
-    }
-
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
-    }
-
-    public void setColumnHeader() {
-        String columnHeader = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_COLUMNHEADER,
-                Configuration.BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE);
-        if (!columnHeader.equals("true")) {
-            hasColumnHeader = false;
-        } else {
-            hasColumnHeader = true;
-        }
-    }
-
     public void setColumnNames() {
         String columns = props.getProperty(
                 Configuration.BI_PREPARE_PARTS_COLUMNS);
         if (columns != null && !columns.isEmpty()) {
             columnNames = columns.split(",");
-        } else if (!hasColumnHeader()) {
-            throw new IllegalArgumentException("Column names not set");
+        } else {
+            columnNames = new String[0];
         }
     }
 
@@ -688,14 +574,6 @@ public class PrepareConfiguration extends Configuration {
         return columnTypes;
     }
 
-    public boolean hasColumnHeader() {
-        return hasColumnHeader;
-    }
-
-    public String getTypeErrorMode() {
-        return typeErrorMode;
-    }
-
     public String[] getExcludeColumns() {
         return excludeColumns;
     }
@@ -704,23 +582,4 @@ public class PrepareConfiguration extends Configuration {
         return onlyColumns;
     }
 
-    public int getSampleRowSize() {
-        return sampleRowSize;
-    }
-
-    public String getJDBCConnectionURL() {
-        return jdbcConnectionURL;
-    }
-
-    public String getJDBCUser() {
-        return jdbcUser;
-    }
-
-    public String getJDBCPassword() {
-        return jdbcPassword;
-    }
-
-    public String getJDBCTable() {
-        return jdbcTable;
-    }
 }
