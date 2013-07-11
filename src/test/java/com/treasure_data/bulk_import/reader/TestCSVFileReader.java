@@ -14,10 +14,12 @@ import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
+import com.treasure_data.bulk_import.prepare_parts.CSVPrepareConfiguration;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.Configuration;
 
-public class TestCSVFileReader extends FileReaderTestUtil {
+public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguration> {
 
     private static final String LF = "\n";
     private static final String COMMA = ",";
@@ -257,9 +259,16 @@ public class TestCSVFileReader extends FileReaderTestUtil {
     }
 
     @Override
+    public void createPrepareConfiguration() throws Exception {
+        conf = new CSVPrepareConfiguration();
+        conf.configure(props);
+    }
+
+    @Override
     public void createFileReader() throws Exception {
         super.createFileReader();
-        reader = conf.getFormat().createFileReader(conf, writer);
+        reader = (FileReader<CSVPrepareConfiguration>)
+                conf.getFormat().createFileReader(conf, writer);
     }
 
     @After

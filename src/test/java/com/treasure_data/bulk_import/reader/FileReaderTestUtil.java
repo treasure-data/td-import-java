@@ -16,13 +16,13 @@ import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
 
 @Ignore
-public class FileReaderTestUtil {
+public class FileReaderTestUtil<T extends PrepareConfiguration> {
     protected long baseTime;
 
     protected Properties props;
-    protected PrepareConfiguration conf;
+    protected T conf;
 
-    protected FileReader reader;
+    protected FileReader<T> reader;
     protected FileWriter writer;
 
     protected Task task;
@@ -46,8 +46,8 @@ public class FileReaderTestUtil {
     }
 
     protected void createPrepareConfiguration() throws Exception {
-        conf = new PrepareConfiguration();
-        conf.configure(props);
+        //conf = new PrepareConfiguration();
+        //conf.configure(props);
     }
 
     protected void createFileWriter() throws Exception {

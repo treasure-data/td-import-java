@@ -24,7 +24,7 @@ public class TestMultiThreadPrepareProcessor {
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
         props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "3");
 
-        PrepareConfiguration conf = new PrepareConfiguration();
+        CSVPrepareConfiguration conf = new CSVPrepareConfiguration();
         conf = spy(conf);
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
@@ -50,7 +50,7 @@ public class TestMultiThreadPrepareProcessor {
     }
 
     private Properties props;
-    private PrepareConfiguration conf;
+    private CSVPrepareConfiguration conf;
     private MultiThreadPrepareProcessor proc;
 
     Random rand = new Random(new Random().nextInt());
@@ -69,7 +69,7 @@ public class TestMultiThreadPrepareProcessor {
         props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "" + numWorkers);
 
         // create prepare config
-        conf = new PrepareConfiguration();
+        conf = new CSVPrepareConfiguration();
         conf.configure(props);
 
         // create multi-thread prepare processor

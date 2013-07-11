@@ -27,7 +27,7 @@ public class TestPrepareProcessor {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
 
-        PrepareConfiguration conf = new PrepareConfiguration();
+        CSVPrepareConfiguration conf = new CSVPrepareConfiguration();
         conf = spy(conf);
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
@@ -46,7 +46,7 @@ public class TestPrepareProcessor {
 
 
     private Properties props;
-    private PrepareConfiguration conf;
+    private CSVPrepareConfiguration conf;
     private PrepareProcessor proc;
 
     private Task task;
@@ -61,7 +61,7 @@ public class TestPrepareProcessor {
         props = System.getProperties();
 
         // create prepare conf
-        conf = new PrepareConfiguration();
+        conf = new CSVPrepareConfiguration();
         conf.configure(props);
         conf = spy(conf);
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
