@@ -25,10 +25,10 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class FixnumColumnsFileReader extends FileReader {
+public class FixnumColumnsFileReader<T extends PrepareConfiguration> extends FileReader<T> {
     private static final Logger LOG = Logger.getLogger(FixnumColumnsFileReader.class.getName());
 
-    public FixnumColumnsFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
+    public FixnumColumnsFileReader(T conf, FileWriter writer) throws PreparePartsException {
         super(conf, writer);
     }
 

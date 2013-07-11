@@ -34,10 +34,10 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public abstract class FileReader implements Closeable {
+public abstract class FileReader<T extends PrepareConfiguration> implements Closeable {
     private static final Logger LOG = Logger.getLogger(FileReader.class.getName());
 
-    protected PrepareConfiguration conf;
+    protected T conf;
     protected FileWriter writer;
     protected Row convertedRow;
 
@@ -50,7 +50,7 @@ public abstract class FileReader implements Closeable {
 
     private PrintWriter errWriter = null;
 
-    protected FileReader(PrepareConfiguration conf, FileWriter writer) {
+    protected FileReader(T conf, FileWriter writer) {
         this.conf = conf;
         this.writer = writer;
     }

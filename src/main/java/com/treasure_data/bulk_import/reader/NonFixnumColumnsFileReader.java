@@ -31,12 +31,12 @@ import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class NonFixnumColumnsFileReader extends FileReader {
+public class NonFixnumColumnsFileReader<T extends PrepareConfiguration> extends FileReader<T> {
     private static final Logger LOG = Logger.getLogger(NonFixnumColumnsFileReader.class.getName());
 
     protected String aliasTimeColumnName = null;
 
-    public NonFixnumColumnsFileReader(PrepareConfiguration conf, FileWriter writer) {
+    public NonFixnumColumnsFileReader(T conf, FileWriter writer) {
         super(conf, writer);
     }
 
