@@ -32,12 +32,12 @@ import org.msgpack.unpacker.UnpackerIterator;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.Row;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare_parts.MessagePackPrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class MessagePackFileReader extends NonFixnumColumnsFileReader {
+public class MessagePackFileReader extends NonFixnumColumnsFileReader<MessagePackPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(MessagePackFileReader.class.getName());
 
     protected MessagePack msgpack;
@@ -47,7 +47,7 @@ public class MessagePackFileReader extends NonFixnumColumnsFileReader {
     protected String[] keys;
     protected Object[] values;
 
-    public MessagePackFileReader(PrepareConfiguration conf, FileWriter writer) {
+    public MessagePackFileReader(MessagePackPrepareConfiguration conf, FileWriter writer) {
         super(conf, writer);
         msgpack = new MessagePack();
     }
