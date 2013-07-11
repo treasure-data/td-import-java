@@ -29,12 +29,12 @@ import org.json.simple.parser.ParseException;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.Row;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare_parts.JSONPrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class JSONFileReader extends NonFixnumColumnsFileReader {
+public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(JSONFileReader.class.getName());
 
     protected BufferedReader reader;
@@ -42,7 +42,7 @@ public class JSONFileReader extends NonFixnumColumnsFileReader {
 
     protected Map<String, Object> row;
 
-    public JSONFileReader(PrepareConfiguration conf, FileWriter writer) {
+    public JSONFileReader(JSONPrepareConfiguration conf, FileWriter writer) {
         super(conf, writer);
     }
 
