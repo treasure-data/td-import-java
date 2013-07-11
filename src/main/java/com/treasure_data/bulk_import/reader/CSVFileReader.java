@@ -32,20 +32,22 @@ import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnSampling;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
+import com.treasure_data.bulk_import.prepare_parts.CSVPrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.JSONFileWriter;
 
-public class CSVFileReader extends FixnumColumnsFileReader {
+public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class.getName());
 
     protected CsvPreference csvPref;
     private Tokenizer tokenizer;
     protected List<String> row = new ArrayList<String>();
 
-    public CSVFileReader(PrepareConfiguration conf, FileWriter writer) throws PreparePartsException {
+    public CSVFileReader(CSVPrepareConfiguration conf, FileWriter writer)
+            throws PreparePartsException {
         super(conf, writer);
     }
 
