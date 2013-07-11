@@ -100,7 +100,7 @@ def set_http_proxy(sysprops)
     proxy_port = (proxy_port ? proxy_port.to_i : 80)
 
     sysprops << "-Dhttp.proxyHost=#{proxy_host}"
-    sysprops << "-Dhttp.proxyPost=#{proxy_port}"
+    sysprops << "-Dhttp.proxyPort=#{proxy_port}"
   end
 end
 
