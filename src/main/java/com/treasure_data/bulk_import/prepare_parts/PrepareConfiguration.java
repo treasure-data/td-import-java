@@ -18,6 +18,7 @@
 package com.treasure_data.bulk_import.prepare_parts;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -351,8 +352,12 @@ public class PrepareConfiguration extends Configuration {
         timeFormat = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT);
 
         // output DIR
-        outputDirName = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR,
-                Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
+        outputDirName = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR);
+        if (outputDirName == null || outputDirName.isEmpty()) {
+            File currentDir = new File(".");
+            File outputDir = new File(currentDir, Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
+            outputDirName = outputDir.getName();
+        }
 
         // error record output DIR
         errorRecordOutputDirName = props.getProperty(
