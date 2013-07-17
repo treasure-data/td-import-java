@@ -17,60 +17,44 @@ APP_OPTION_PREPARE = "prepare_parts"
 APP_OPTION_UPLOAD = "upload_parts"
 
 def bulk_import_prepare_parts2(op)
-  opts = prepare_parts2_config(op)
-
-  # java command
-  javacmd = 'java'
-
-  # make jvm options
-  jvm_opts = []
-  jvm_opts << JAVA_HEAP_MX_SIZE
-
-  # find java/*.jar and td.jar
-  td_bulk_import_jar = find_td_bulk_import_jar
-
-  # make application options
-  app_opts = []
-  app_opts << "-cp \"#{td_bulk_import_jar}\""
-
-  # make system properties
-  sysprops = []
-  sysprops.concat(prepare_parts2_sysprops(opts))
-
-  # make application arguments
-  app_args = []
-  app_args << JAVA_MAIN_CLASS
-  app_args << APP_OPTION_PREPARE
-  app_args << opts['files']
-
-  # TODO consider parameters including spaces; don't use join(' ')
-  command = "#{JAVA_COMMAND} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
-
-  exec command
+  bulk_import_parts2(op, true)
 end
 
 def bulk_import_upload_parts2(op)
-  opts = upload_parts2_config(op)
+  bulk_import_parts2(op, false)
+end
+
+def bulk_import_parts2(op, prepare = true)
+  if prepare
+    opts = prepare_parts2_config(op)
+  else
+    opts = upload_parts2_config(op)
+  end
 
   # make jvm options
   jvm_opts = []
   jvm_opts << JAVA_HEAP_MX_SIZE
 
-  # find java/*.jar and td.jar
-  td_bulk_import_jar = find_td_bulk_import_jar
-
   # make application options
   app_opts = []
-  app_opts << "-cp \"#{td_bulk_import_jar}\""
+  app_opts << "-cp \"#{find_td_bulk_import_jar()}\""
 
   # make system properties
   sysprops = []
-  sysprops.concat(upload_parts2_sysprops(opts, true))
+  if prepare
+    sysprops.concat(prepare_parts2_sysprops(opts))
+  else
+    sysprops.concat(upload_parts2_sysprops(opts, true))
+  end
 
   # make application arguments
   app_args = []
   app_args << JAVA_MAIN_CLASS
-  app_args << APP_OPTION_UPLOAD
+  if prepare
+    app_args << APP_OPTION_PREPARE
+  else
+    app_args << APP_OPTION_UPLOAD
+  end
   app_args << opts['files']
 
   # TODO consider parameters including spaces; don't use join(' ')
