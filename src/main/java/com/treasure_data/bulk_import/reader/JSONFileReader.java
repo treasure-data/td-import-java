@@ -40,6 +40,7 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
     protected BufferedReader reader;
     protected JSONParser parser;
 
+    protected String line;
     protected Map<String, Object> row;
 
     public JSONFileReader(JSONPrepareConfiguration conf, FileWriter writer) {
@@ -83,7 +84,7 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
     @Override
     public boolean readRow() throws IOException {
         try {
-            String line = reader.readLine();
+            line = reader.readLine();
             if (line == null) {
                 return false;
             }
@@ -103,6 +104,11 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
         }
 
         convertedRow = new Row(columnValues);
+    }
+
+    @Override
+    public String getCurrentRow() {
+        return line;
     }
 
     @Override

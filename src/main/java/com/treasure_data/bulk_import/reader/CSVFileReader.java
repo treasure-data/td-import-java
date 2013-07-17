@@ -266,6 +266,11 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
     }
 
     @Override
+    public String getCurrentRow() {
+        return row.toString();
+    }
+
+    @Override
     public void close() throws IOException {
         super.close();
 

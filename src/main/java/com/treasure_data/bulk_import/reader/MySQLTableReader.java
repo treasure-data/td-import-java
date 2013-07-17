@@ -229,6 +229,11 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
     }
 
     @Override
+    public String getCurrentRow() {
+        return rawRow.toString();
+    }
+
+    @Override
     public void close() throws IOException {
         super.close();
 

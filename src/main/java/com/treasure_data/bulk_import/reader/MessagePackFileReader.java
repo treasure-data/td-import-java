@@ -130,6 +130,11 @@ public class MessagePackFileReader extends NonFixnumColumnsFileReader<MessagePac
     }
 
     @Override
+    public String getCurrentRow() {
+        return "";
+    }
+
+    @Override
     public void close() throws IOException {
         super.close();
 

@@ -92,6 +92,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     // reason: type conversion error (->int, ->boolean, ->double, etc)
     // reason: ??
     String BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT = "td.bulk_import.prepare_parts.error-record-output";
+    String BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT_FILE = "error-record.txt";
 
     // dry-run; show samples as JSON and exit
     String BI_PREPARE_PARTS_DRYRUN = "td.bulk_import.prepare_parts.dry-run";

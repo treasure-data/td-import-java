@@ -17,14 +17,17 @@
 //
 package com.treasure_data.bulk_import.reader;
 
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.Row;
@@ -41,6 +44,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     protected FileWriter writer;
     protected Row convertedRow;
 
+    protected String name;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected Set<String> skipColumns = new HashSet<String>();
@@ -48,7 +52,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     protected long lineNum = 0;
 
-    private PrintWriter errWriter = null;
+    private OutputStream errRecordStream = null;
 
     protected FileReader(T conf, FileWriter writer) {
         this.conf = conf;
@@ -56,11 +60,25 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     }
 
     public void configure(Task task) throws PreparePartsException {
+        name = task.fileName;
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
 
         // check compression type of the file
-        conf.checkCompressionType(task.fileName);
+        conf.checkCompressionType(name);
+
+        String errorRecordDir = conf.getErrorRecordOutputDirName();
+        if (errorRecordDir == null || errorRecordDir.isEmpty()) {
+            errRecordStream = null;
+        } else {
+            try {
+                File dir = new File(errorRecordDir);
+                File file = new File(dir, Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT_FILE);
+                errRecordStream = new BufferedOutputStream(new FileOutputStream(file));
+            } catch (IOException e) {
+                throw new PreparePartsException(e);
+            }
+        }
     }
 
     public String[] getColumnNames() {
@@ -137,18 +155,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         return lineNum;
     }
 
-    public void setErrorRecordWriter(OutputStream errStream) {
-        if (errStream != null) {
-            errWriter = new PrintWriter(errStream);
-        }
-    }
-
-    public void writeErrorRecord(String msg) {
-        if (errWriter != null) {
-            errWriter.println(msg);
-        }
-    }
-
     public boolean next() throws PreparePartsException {
         incrementLineNum();
         try {
@@ -169,7 +175,8 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             LOG.throwing("CSVFileParser", "parseRow", e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
-            // TODO the row data should be written to error rows file
+            // the row data should be written to error rows file
+            writeErrorRecord();
             LOG.warning(e.getMessage());
         }
         return true;
@@ -179,10 +186,24 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     public abstract void convertTypesOfColumns() throws PreparePartsException;
 
+    public void writeErrorRecord() {
+        if (errRecordStream != null) {
+            String msg = String.format("line %d in %s: %s", lineNum, name, getCurrentRow());
+            try {
+                errRecordStream.write(msg.getBytes());
+            } catch (IOException e) {
+                LOG.warning("Cannot write the following record to error-record.txt: " + msg);
+                LOG.throwing(this.getClass().getName(), "writeErrorRecord", e);
+            }
+        }
+    }
+
+    public abstract String getCurrentRow();
+
     // Closeable#close()
     public void close() throws IOException {
-        if (errWriter != null) {
-            errWriter.close();
+        if (errRecordStream != null) {
+            errRecordStream.close();
         }
     }
 }
