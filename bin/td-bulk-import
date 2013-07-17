@@ -96,7 +96,7 @@ def set_http_proxy(sysprops)
     if http_proxy =~ /\Ahttp:\/\/(.*)\z/
       http_proxy = $~[1]
     end
-    proxy_host, proxy_port = http_proxy.split(':',2)
+    proxy_host, proxy_port = http_proxy.split(':', 2)
     proxy_port = (proxy_port ? proxy_port.to_i : 80)
 
     sysprops << "-Dhttp.proxyHost=#{proxy_host}"
@@ -111,7 +111,7 @@ def prepare_parts2_sysprops(opts)
   set_http_proxy(sysprops)
 
   sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}"
+  sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compression']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.time-format=\"#{opts['time_format']}\"" if opts['time_format']
@@ -141,7 +141,7 @@ def upload_parts2_sysprops(opts, with_prepare = false)
 
   if with_prepare
     sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}" if opts['format']
-    sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}" if opts['compress']
+    sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compression']}" if opts['compression']
     sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}" if opts['encoding']
     sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}" if opts['time_column']
     sysprops << "-Dtd.bulk_import.prepare_parts.time-format=\"#{opts['time_format']}\"" if opts['time_format']
@@ -175,7 +175,7 @@ def prepare_parts2_config(op)
   h = {}
 
   h['format'] = 'csv'
-  h['compress'] = 'none'
+  h['compression'] = 'none'
   h['encoding'] = 'utf-8'
   h['time_column'] = 'time'
   h['time_format'] = nil
@@ -201,7 +201,7 @@ def prepare_parts2_config(op)
     h['format'] = s
   }
   op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
-    h['compress'] = s
+    h['compression'] = s
   }
   op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
     h['encoding'] = s
@@ -271,7 +271,7 @@ end
 def upload_parts2_config(op)
   h = {}
   h['format'] = 'csv'
-  h['compress'] = 'none'
+  h['compression'] = 'none'
   h['encoding'] = 'utf-8'
   h['time_column'] = 'time'
   h['time_format'] = nil
@@ -300,7 +300,7 @@ def upload_parts2_config(op)
     h['format'] = s
   }
   op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
-    h['compress'] = s
+    h['compression'] = s
   }
   op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
     h['encoding'] = s
