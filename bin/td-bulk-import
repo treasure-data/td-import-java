@@ -209,7 +209,7 @@ def prepare_parts2_config(op)
   op.on('-t', '--time-column NAME', 'name of the time column') {|s|
     h['time_column'] = s
   }
-  op.on('-T', '--time-format', 'STRF_FORMAT; default=auto detect') {|s|
+  op.on('-T', '--time-format FORMAT', 'STRF_FORMAT; default=auto detect') {|s|
     h['time_format'] = s
   }
   op.on('--time-value TIME', 'long value of the time column') {|s|
@@ -313,7 +313,7 @@ def upload_parts2_config(op)
   op.on('-t', '--time-column NAME', 'name of the time column') {|s|
     h['time_column'] = s
   }
-  op.on('-T', '--time-format', 'STRF_FORMAT; default=auto detect') {|s|
+  op.on('-T', '--time-format FORMAT', 'STRF_FORMAT; default=auto detect') {|s|
     h['time_format'] = s
   }
   op.on('--time-value TIME', 'long value of the time column') {|s|
