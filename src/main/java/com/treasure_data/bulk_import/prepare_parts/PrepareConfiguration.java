@@ -286,9 +286,6 @@ public class PrepareConfiguration extends Configuration {
     protected String[] excludeColumns;
     protected String[] onlyColumns;
 
-    protected String[] keys;
-    protected ColumnType[] valueTypes;
-
     public PrepareConfiguration() {
     }
 
