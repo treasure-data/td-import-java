@@ -63,9 +63,6 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
     protected String typeErrorMode;
     protected int sampleRowSize;
 
-    protected String[] keys; // TODO unnecessary??
-    protected ColumnType[] valueTypes; // TODO unnecessary??
-
     public CSVPrepareConfiguration() {
         super();
     }
