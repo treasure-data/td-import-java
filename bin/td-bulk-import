@@ -308,7 +308,7 @@ def upload_parts2_config(op)
       h['time_value'] = Time.parse(s).to_i
     end
   }
-  op.on('-o', '--output [DIR]', 'output directory', "when use fluent upload") {|s|
+  op.on('-o', '--output DIR', 'output directory', "when use fluent upload") {|s|
     h['outdir'] = s
   }
   op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
