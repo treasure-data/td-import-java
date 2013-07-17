@@ -52,7 +52,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     protected long lineNum = 0;
 
-    private OutputStream errRecordStream = null;
+    private OutputStream errorRecordsStream = null;
 
     protected FileReader(T conf, FileWriter writer) {
         this.conf = conf;
@@ -67,18 +67,8 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         // check compression type of the file
         conf.checkCompressionType(name);
 
-        String errorRecordDir = conf.getErrorRecordOutputDirName();
-        if (errorRecordDir == null || errorRecordDir.isEmpty()) {
-            errRecordStream = null;
-        } else {
-            try {
-                File dir = new File(errorRecordDir);
-                File file = new File(dir, Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT_FILE);
-                errRecordStream = new BufferedOutputStream(new FileOutputStream(file));
-            } catch (IOException e) {
-                throw new PreparePartsException(e);
-            }
-        }
+        // create output stream for writing error records
+        setErrorRecordsOutputStream();
     }
 
     public String[] getColumnNames() {
@@ -127,6 +117,21 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             if (!isOnly) {
                 skipColumns.add(columnNames[i]);
                 continue; // not needed though,..
+            }
+        }
+    }
+
+    public void setErrorRecordsOutputStream() throws PreparePartsException {
+        String errorRecordDir = conf.getErrorRecordOutputDirName();
+        if (errorRecordDir == null || errorRecordDir.isEmpty()) {
+            errorRecordsStream = null;
+        } else {
+            try {
+                File dir = new File(errorRecordDir);
+                File file = new File(dir, Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT_FILE);
+                errorRecordsStream = new BufferedOutputStream(new FileOutputStream(file));
+            } catch (IOException e) {
+                throw new PreparePartsException(e);
             }
         }
     }
@@ -187,10 +192,10 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     public abstract void convertTypesOfColumns() throws PreparePartsException;
 
     public void writeErrorRecord() {
-        if (errRecordStream != null) {
+        if (errorRecordsStream != null) {
             String msg = String.format("line %d in %s: %s", lineNum, name, getCurrentRow());
             try {
-                errRecordStream.write(msg.getBytes());
+                errorRecordsStream.write(msg.getBytes());
             } catch (IOException e) {
                 LOG.warning("Cannot write the following record to error-record.txt: " + msg);
                 LOG.throwing(this.getClass().getName(), "writeErrorRecord", e);
@@ -202,8 +207,8 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     // Closeable#close()
     public void close() throws IOException {
-        if (errRecordStream != null) {
-            errRecordStream.close();
+        if (errorRecordsStream != null) {
+            errorRecordsStream.close();
         }
     }
 }
