@@ -189,7 +189,7 @@ def prepare_parts2_config(op)
   h['delimiter'] = ','
   h['quote'] = "DOUBLE"
   h['newline'] = 'CRLF'
-  h['column_header'] = nil
+  h['column_header'] = false
   h['columns'] = nil
   h['column_types'] = nil
   h['type_conversion_error'] = 'skip'
