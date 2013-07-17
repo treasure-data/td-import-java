@@ -114,7 +114,7 @@ def prepare_parts2_sysprops(opts)
   sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts['time_format']}" if opts['time_format']
+  sysprops << "-Dtd.bulk_import.prepare_parts.time-format=\"#{opts['time_format']}\"" if opts['time_format']
   sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
   sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}"
@@ -144,7 +144,7 @@ def upload_parts2_sysprops(opts, with_prepare = false)
     sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}"
     sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
     sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-format=#{opts['time_format']}" if opts['time_format']
+    sysprops << "-Dtd.bulk_import.prepare_parts.time-format=\"#{opts['time_format']}\"" if opts['time_format']
     sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
     sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}"
     sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}"
