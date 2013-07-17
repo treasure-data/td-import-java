@@ -18,16 +18,13 @@
 package com.treasure_data.bulk_import.reader;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
-public class FixnumColumnsFileReader<T extends PrepareConfiguration> extends FileReader<T> {
-    private static final Logger LOG = Logger.getLogger(FixnumColumnsFileReader.class.getName());
-
+public abstract class FixnumColumnsFileReader<T extends PrepareConfiguration> extends FileReader<T> {
     public FixnumColumnsFileReader(T conf, FileWriter writer) throws PreparePartsException {
         super(conf, writer);
     }
