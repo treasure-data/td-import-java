@@ -129,6 +129,7 @@ def prepare_parts2_sysprops(opts)
   sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts['type_conversion_error']}" if opts['type_conversion_error']
   sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
   sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
+  sysprops << "-Dtd.bulk_import.prepare_parts.prepare-parallel=#{opts['prepare_parallel']}"
 
   sysprops
 end
@@ -159,6 +160,7 @@ def upload_parts2_sysprops(opts, with_prepare = false)
     sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts['type_conversion_error']}" if opts['type_conversion_error']
     sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
     sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
+    sysprops << "-Dtd.bulk_import.prepare_parts.prepare-parallel=#{opts['prepare_parallel']}" if opts['prepare_parallel']
   end
 
   sysprops << "-Dtd.bulk_import.upload_parts.auto-perform=#{opts['auto_perform']}"
@@ -184,7 +186,6 @@ def prepare_parts2_config(op)
   h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
   h['error_record_output'] = nil
   h['dry_run'] = false
-
   h['delimiter'] = ','
   h['quote'] = "DOUBLE"
   h['newline'] = 'CRLF'
@@ -194,6 +195,7 @@ def prepare_parts2_config(op)
   h['type_conversion_error'] = 'skip'
   h['exclude_columns'] = nil
   h['only_columns'] = nil
+  h['prepare_parallel'] = 2
   h['files'] = nil
 
   # prepare_parts
@@ -259,6 +261,9 @@ def prepare_parts2_config(op)
   op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
     h['only_columns'] = s
   }
+  op.on('--prepare-parallel NUM', 'prepare in parallel (default: 2; max 8)', Integer) {|i|
+    h['prepare_parallel'] = i
+  }
 
   op.parse!(ARGV)
   files = ARGV
@@ -270,26 +275,26 @@ end
 
 def upload_parts2_config(op)
   h = {}
-  h['format'] = 'csv'
-  h['compression'] = 'none'
-  h['encoding'] = 'utf-8'
-  h['time_column'] = 'time'
+  h['format'] = nil
+  h['compression'] = nil
+  h['encoding'] = nil
+  h['time_column'] = nil
   h['time_format'] = nil
   h['time_value'] = nil
-  h['outdir'] = 'out'
-  h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
+  h['outdir'] = nil
+  h['split_size_kb'] = nil
   h['error_record_output'] = nil
   h['dry_run'] = false
-
-  h['delimiter'] = ','
-  h['quote'] = 'DOUBLE'
-  h['newline'] = 'CRLF'
+  h['delimiter'] = nil
+  h['quote'] = nil
+  h['newline'] = nil
   h['column_header'] = nil
   h['columns'] = nil
   h['column_types'] = nil
-  h['type_conversion_error'] = 'skip'
+  h['type_conversion_error'] = nil
   h['exclude_columns'] = nil
   h['only_columns'] = nil
+  h['prepare_parallel'] = nil
 
   h['auto_perform'] = false
   h['auto_commit'] = false
@@ -357,6 +362,9 @@ def upload_parts2_config(op)
   }
   op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
     h['only_columns'] = s
+  }
+  op.on('--prepare-parallel NUM', 'prepare in parallel (default: 2; max 8)', Integer) {|i|
+    h['prepare_parallel'] = i
   }
   # upload_parts
   op.on('--auto-perform', 'perform bulk import job automatically', TrueClass) {|b|
