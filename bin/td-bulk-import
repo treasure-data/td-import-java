@@ -74,20 +74,6 @@ def find_td_bulk_import_jar
   td_bulk_import_jar
 end
 
-def set_http_proxy(sysprops)
-  http_proxy = ENV['HTTP_PROXY']
-  if http_proxy
-    if http_proxy =~ /\Ahttp:\/\/(.*)\z/
-      http_proxy = $~[1]
-    end
-    proxy_host, proxy_port = http_proxy.split(':', 2)
-    proxy_port = (proxy_port ? proxy_port.to_i : 80)
-
-    sysprops << "-Dhttp.proxyHost=#{proxy_host}"
-    sysprops << "-Dhttp.proxyPort=#{proxy_port}"
-  end
-end
-
 def prepare_parts2_sysprops(opts)
   sysprops = []
 
@@ -116,6 +102,20 @@ def prepare_parts2_sysprops(opts)
   sysprops << "-Dtd.bulk_import.prepare_parts.prepare-parallel=#{opts['prepare_parallel']}"
 
   sysprops
+end
+
+def set_http_proxy(sysprops)
+  http_proxy = ENV['HTTP_PROXY']
+  if http_proxy
+    if http_proxy =~ /\Ahttp:\/\/(.*)\z/
+      http_proxy = $~[1]
+    end
+    proxy_host, proxy_port = http_proxy.split(':', 2)
+    proxy_port = (proxy_port ? proxy_port.to_i : 80)
+
+    sysprops << "-Dhttp.proxyHost=#{proxy_host}"
+    sysprops << "-Dhttp.proxyPort=#{proxy_port}"
+  end
 end
 
 def upload_parts2_sysprops(opts, with_prepare = false)
