@@ -522,8 +522,22 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setErrorRecordOutputDirName() {
-        errorRecordOutputDirName = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
+        errorRecordOutputDirName = props
+                .getProperty(Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
+
+        if (errorRecordOutputDirName == null) {
+            return;
+        }
+
+        // validate output dir
+        File errorRecordOutputDir = new File(errorRecordOutputDirName);
+        if (!errorRecordOutputDir.isDirectory()) {
+            if (!errorRecordOutputDir.mkdir()) {
+                throw new IllegalArgumentException(String.format(
+                        "Cannot create error record output directory '%s'",
+                        errorRecordOutputDirName));
+            }
+        }
     }
 
     public String getErrorRecordOutputDirName() {
