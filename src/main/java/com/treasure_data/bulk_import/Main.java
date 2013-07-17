@@ -199,14 +199,18 @@ public class Main {
             fileNames[i] = args[i + 2];
         }
 
-        final UploadConfiguration conf = new UploadConfiguration();
-        conf.configure(props);
+        final PrepareConfiguration prepareConf = new PrepareConfiguration.Factory()
+                .newPrepareConfiguration(props);
+        prepareConf.configure(props);
 
-        MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(conf);
+        MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(prepareConf);
         prepareProc.registerWorkers();
         prepareProc.startWorkers();
 
-        MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(conf);
+        final UploadConfiguration uploadConf = new UploadConfiguration();
+        uploadConf.configure(props);
+
+        MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
         uploadProc.startWorkers();
 
@@ -226,7 +230,7 @@ public class Main {
 
                 // end of file list
                 try {
-                    MultiThreadPrepareProcessor.addFinishTask(conf);
+                    MultiThreadPrepareProcessor.addFinishTask(prepareConf);
                 } catch (Throwable t) {
                     LOG.severe("Error occurred During 'addFinishTask' method call");
                     LOG.throwing("Main", "addFinishTask", t);
@@ -236,12 +240,12 @@ public class Main {
 
         prepareProc.joinWorkers();
 
-        MultiThreadUploadProcessor.addFinishTask(conf);
+        MultiThreadUploadProcessor.addFinishTask(uploadConf);
         uploadProc.joinWorkers();
 
         ErrorInfo err = MultiThreadUploadProcessor.processAfterUploading(
-                new BulkImportClient(new TreasureDataClient(conf.getProperties())),
-                conf, sessionName);
+                new BulkImportClient(new TreasureDataClient(uploadConf.getProperties())),
+                uploadConf, sessionName);
 
         List<ErrorInfo> errs = prepareProc.getErrors();
         errs.addAll(uploadProc.getErrors());
