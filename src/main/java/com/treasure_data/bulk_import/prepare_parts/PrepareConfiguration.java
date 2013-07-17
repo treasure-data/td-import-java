@@ -503,10 +503,21 @@ public class PrepareConfiguration extends Configuration {
 
     public void setOutputDirName() {
         outputDirName = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR);
+
+        File outputDir = null;
         if (outputDirName == null || outputDirName.isEmpty()) {
-            File currentDir = new File(".");
-            File outputDir = new File(currentDir, Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
+            outputDir = new File(new File("."), Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
             outputDirName = outputDir.getName();
+        } else {
+            outputDir = new File(outputDirName);
+        }
+
+        // validate output dir
+        if (!outputDir.isDirectory()) {
+            if (!outputDir.mkdir()) {
+                throw new IllegalArgumentException(String.format(
+                        "Cannot create output directory '%s'", outputDirName));
+            }
         }
     }
 
