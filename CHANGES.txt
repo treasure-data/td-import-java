@@ -8,6 +8,7 @@ Release 0.2.0 - 20XX/XX/XX
 
   BUG FIXED
     Fixes the values of file readers/writers' line counters
+    Fixes Cannot recognize user 'time-format'
 
 Release 0.1.1 - 2013/01/22
   BUG FIXES
