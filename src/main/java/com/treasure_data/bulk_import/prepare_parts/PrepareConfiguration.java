@@ -323,58 +323,19 @@ public class PrepareConfiguration extends Configuration {
         setOutputDirName();
 
         // error record output DIR
-        errorRecordOutputDirName = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
+        setErrorRecordOutputDirName();
 
         // exclude-columns
-        String excludeColumns = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
-        if (excludeColumns != null && !excludeColumns.isEmpty()) {
-            this.excludeColumns = excludeColumns.split(",");
-            for (String c : this.excludeColumns) {
-                if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN)) {
-                    throw new IllegalArgumentException(
-                            "'time' column cannot be included in excluded columns");
-                }
-            }
-        } else {
-            this.excludeColumns = new String[0];
-        }
+        setExcludeColumns();
 
         // only-columns
-        String onlyColumns = props.getProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS);
-        if (onlyColumns != null && !onlyColumns.isEmpty()) {
-            this.onlyColumns = onlyColumns.split(",");
-            for (String oc : this.onlyColumns) {
-                for (String ec : this.excludeColumns) {
-                    if (oc.equals(ec)) {
-                        throw new IllegalArgumentException(
-                                "'exclude' columns include specified 'only' columns");
-                    }
-                }
-            }
-        } else {
-            this.onlyColumns = new String[0];
-        }
+        setOnlyColumns();
 
         // dry-run mode
-        String drun = props.getProperty(Configuration.BI_PREPARE_PARTS_DRYRUN,
-                Configuration.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
-        dryRun = drun != null && drun.equals("true");
+        setDryRun();
 
         // split size
-        String sSize = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
-                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
-        try {
-            splitSize = Integer.parseInt(sSize);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "split size is required as int type e.g. -D%s=%s",
-                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
-                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
-            throw new IllegalArgumentException(msg, e);
-        }
+        setSplitSize();
     }
 
     public void setFormat() {
@@ -552,8 +513,19 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
+    public void setErrorRecordOutputDirName() {
+        errorRecordOutputDirName = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT);
+    }
+
     public String getErrorRecordOutputDirName() {
         return errorRecordOutputDirName;
+    }
+
+    public void setDryRun() {
+        String drun = props.getProperty(Configuration.BI_PREPARE_PARTS_DRYRUN,
+                Configuration.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
+        dryRun = drun != null && drun.equals("true");
     }
 
     public boolean dryRun() {
@@ -562,6 +534,21 @@ public class PrepareConfiguration extends Configuration {
 
     public String getOutputDirName() {
         return outputDirName;
+    }
+
+    public void setSplitSize() {
+        String sSize = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
+                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
+        try {
+            splitSize = Integer.parseInt(sSize);
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "split size is required as int type e.g. -D%s=%s",
+                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
+                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
+            throw new IllegalArgumentException(msg, e);
+        }
     }
 
     public int getSplitSize() {
@@ -603,8 +590,41 @@ public class PrepareConfiguration extends Configuration {
         return columnTypes;
     }
 
+    public void setExcludeColumns() {
+        String excludeColumns = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
+        if (excludeColumns != null && !excludeColumns.isEmpty()) {
+            this.excludeColumns = excludeColumns.split(",");
+            for (String c : this.excludeColumns) {
+                if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN)) {
+                    throw new IllegalArgumentException(
+                            "'time' column cannot be included in excluded columns");
+                }
+            }
+        } else {
+            this.excludeColumns = new String[0];
+        }
+    }
+
     public String[] getExcludeColumns() {
         return excludeColumns;
+    }
+
+    public void setOnlyColumns() {
+        String onlyColumns = props.getProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS);
+        if (onlyColumns != null && !onlyColumns.isEmpty()) {
+            this.onlyColumns = onlyColumns.split(",");
+            for (String oc : this.onlyColumns) {
+                for (String ec : this.excludeColumns) {
+                    if (oc.equals(ec)) {
+                        throw new IllegalArgumentException(
+                                "'exclude' columns include specified 'only' columns");
+                    }
+                }
+            }
+        } else {
+            this.onlyColumns = new String[0];
+        }
     }
 
     public String[] getOnlyColumns() {
