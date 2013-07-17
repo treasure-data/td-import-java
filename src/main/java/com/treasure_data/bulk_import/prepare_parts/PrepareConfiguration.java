@@ -305,59 +305,22 @@ public class PrepareConfiguration extends Configuration {
         setCompressionType();
 
         // parallel
-        String pthreadNum = props.getProperty(BI_PREPARE_PARTS_PARALLEL,
-                BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE);
-        try {
-            int n = Integer.parseInt(pthreadNum);
-            if (n < 0) {
-                numOfPrepareThreads = 2;
-            } else if (n > 9){
-                numOfPrepareThreads = 8;
-            } else {
-                numOfPrepareThreads = n;
-            }
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "'int' value is required as 'parallel' option e.g. -D%s=5",
-                    BI_UPLOAD_PARTS_PARALLEL);
-            throw new IllegalArgumentException(msg, e);
-        }
+        setPrepareThreadNum();
 
         // encoding
-        String encoding = props.getProperty(Configuration.BI_PREPARE_PARTS_ENCODING,
-                Configuration.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
-        try {
-            createCharsetDecoder(encoding);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+        setEncoding();
 
-        // time column
-        aliasTimeColumn = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN);
+        // alias time column
+        setAliasTimeColumn();
 
-        // time column value
-        String tValue = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE);
-        if (tValue != null) {
-            try {
-                timeValue = Long.parseLong(tValue);
-            } catch (NumberFormatException e) {
-                String msg = String.format(
-                        "time value is required as long type (unix timestamp) e.g. -D%s=1360141200",
-                        Configuration.BI_PREPARE_PARTS_TIMEVALUE);
-                throw new IllegalArgumentException(msg, e);
-            }
-        }
+        // time value
+        setTimeValue();
 
         // time format
-        timeFormat = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT);
+        setTimeFormat();
 
         // output DIR
-        outputDirName = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR);
-        if (outputDirName == null || outputDirName.isEmpty()) {
-            File currentDir = new File(".");
-            File outputDir = new File(currentDir, Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
-            outputDirName = outputDir.getName();
-        }
+        setOutputDirName();
 
         // error record output DIR
         errorRecordOutputDirName = props.getProperty(
@@ -502,8 +465,38 @@ public class PrepareConfiguration extends Configuration {
         return compressionType;
     }
 
+    public void setPrepareThreadNum() {
+        String pthreadNum = props.getProperty(BI_PREPARE_PARTS_PARALLEL,
+                BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE);
+        try {
+            int n = Integer.parseInt(pthreadNum);
+            if (n < 0) {
+                numOfPrepareThreads = 2;
+            } else if (n > 9){
+                numOfPrepareThreads = 8;
+            } else {
+                numOfPrepareThreads = n;
+            }
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "'int' value is required as 'parallel' option e.g. -D%s=5",
+                    BI_UPLOAD_PARTS_PARALLEL);
+            throw new IllegalArgumentException(msg, e);
+        }
+    }
+
     public int getNumOfPrepareThreads() {
         return numOfPrepareThreads;
+    }
+
+    public void setEncoding() {
+        String encoding = props.getProperty(Configuration.BI_PREPARE_PARTS_ENCODING,
+                Configuration.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
+        try {
+            createCharsetDecoder(encoding);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     public void createCharsetDecoder(String encoding) throws Exception {
@@ -516,16 +509,47 @@ public class PrepareConfiguration extends Configuration {
         return charsetDecoder;
     }
 
+    public void setAliasTimeColumn() {
+        aliasTimeColumn = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN);
+    }
+
     public String getAliasTimeColumn() {
         return aliasTimeColumn;
+    }
+
+    public void setTimeValue() {
+        String tValue = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE);
+        if (tValue != null) {
+            try {
+                timeValue = Long.parseLong(tValue);
+            } catch (NumberFormatException e) {
+                String msg = String.format(
+                        "time value is required as long type (unix timestamp) e.g. -D%s=1360141200",
+                        Configuration.BI_PREPARE_PARTS_TIMEVALUE);
+                throw new IllegalArgumentException(msg, e);
+            }
+        }
     }
 
     public long getTimeValue() {
         return timeValue;
     }
 
+    public void setTimeFormat() {
+        timeFormat = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT);
+    }
+
     public ExtStrftime getTimeFormat() {
         return timeFormat == null ? null : new ExtStrftime(timeFormat);
+    }
+
+    public void setOutputDirName() {
+        outputDirName = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR);
+        if (outputDirName == null || outputDirName.isEmpty()) {
+            File currentDir = new File(".");
+            File outputDir = new File(currentDir, Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
+            outputDirName = outputDir.getName();
+        }
     }
 
     public String getErrorRecordOutputDirName() {
