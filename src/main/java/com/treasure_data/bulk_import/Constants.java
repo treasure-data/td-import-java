@@ -36,7 +36,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_UPLOAD_PARTS_AUTO_COMMIT = "td.bulk_import.upload_parts.auto-commit";
     String BI_UPLOAD_PARTS_AUTO_COMMIT_DEFAULTVALUE = "false";
 
-    // parallel NUM (deprecated TODO)
+    // parallel NUM
     String BI_UPLOAD_PARTS_PARALLEL = "td.bulk_import.upload_parts.upload-parallel";
     String BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE = "2";
     String BI_UPLOAD_PARTS_PARALLEL_MAX_VALUE = "8";
