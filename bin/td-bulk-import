@@ -180,7 +180,7 @@ def prepare_parts2_config(op)
   h['time_column'] = 'time'
   h['time_format'] = nil
   h['time_value'] = nil
-  h['outdir'] = nil
+  h['outdir'] = 'out'
   h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
   h['error_record_output'] = nil
   h['dry_run'] = false
@@ -265,11 +265,6 @@ def prepare_parts2_config(op)
   files = [files] unless files.is_a?(Array) # TODO ruby 1.9
   h['files'] = files
 
-  unless h['outdir']
-    $stderr.puts "-o, --output DIR option is required."
-    exit 1
-  end
-
   h
 end
 
@@ -281,7 +276,7 @@ def upload_parts2_config(op)
   h['time_column'] = 'time'
   h['time_format'] = nil
   h['time_value'] = nil
-  h['outdir'] = nil
+  h['outdir'] = 'out'
   h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
   h['error_record_output'] = nil
   h['dry_run'] = false
