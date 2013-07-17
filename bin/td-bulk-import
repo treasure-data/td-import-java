@@ -65,7 +65,7 @@ def bulk_import_upload_parts2(op)
 
   # make system properties
   sysprops = []
-  sysprops.concat(upload_parts2_sysprops(opts))
+  sysprops.concat(upload_parts2_sysprops(opts, true))
 
   # make application arguments
   app_args = []
@@ -140,19 +140,19 @@ def upload_parts2_sysprops(opts, with_prepare = false)
   set_http_proxy(sysprops)
 
   if with_prepare
-    sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}" if opts['format']
+    sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compress']}" if opts['compress']
+    sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}" if opts['encoding']
+    sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}" if opts['time_column']
     sysprops << "-Dtd.bulk_import.prepare_parts.time-format=\"#{opts['time_format']}\"" if opts['time_format']
     sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
-    sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}" if opts['outdir']
+    sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}" if opts['split_size_kb']
     sysprops << "-Dtd.bulk_import.prepare_parts.error-record-output=#{opts['error_record_output']}" if opts['error_record_output']
-    sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts['quote']}"
-    sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts['newline']}"
+    sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}" if opts['dry_run']
+    sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}" if opts['delimiter']
+    sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts['quote']}" if opts['quote']
+    sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts['newline']}" if opts['newline']
     sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts['column_header']}" if opts['column_header']
     sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts['columns']}" if opts['columns']
     sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts['column_types']}" if opts['column_types']
