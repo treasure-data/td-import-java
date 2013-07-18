@@ -140,6 +140,8 @@ public class Main {
             fileNames[i] = args[i + 2];
         }
 
+        // TODO #MN validate that the session is live or not.
+
         final UploadConfiguration conf = new UploadConfiguration();
         conf.configure(props);
 
