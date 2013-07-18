@@ -364,7 +364,7 @@ def upload_parts2_config(op)
   op.on('--auto-perform', 'perform bulk import job automatically', TrueClass) {|b|
     h['auto_perform'] = b
   }
-  op.on('--auto-commit', 'commit bulk import job automatically', FalseClass) {|b|
+  op.on('--auto-commit', 'commit bulk import job automatically', TrueClass) {|b|
     h['auto_commit'] = b
   }
   op.on('--parallel NUM', 'upload in parallel (default: 2; max 8)', Integer) {|i|

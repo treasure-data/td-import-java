@@ -30,7 +30,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // auto-perform
     String BI_UPLOAD_PARTS_AUTO_PERFORM = "td.bulk_import.upload_parts.auto-perform";
-    String BI_UPLOAD_PARTS_AUTO_PERFORM_DEFAULTVALUE = "true";
+    String BI_UPLOAD_PARTS_AUTO_PERFORM_DEFAULTVALUE = "false";
 
     // auto-commit
     String BI_UPLOAD_PARTS_AUTO_COMMIT = "td.bulk_import.upload_parts.auto-commit";
