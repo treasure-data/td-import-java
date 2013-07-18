@@ -1,4 +1,4 @@
-Release 0.2.0 - 20XX/XX/XX
+Release 0.2.0 - 2013/07/18
   NEW FEATURES
     Adds new API: supports bulk_import:upload_parts
     Adds configuration of http proxy to bulk_import:upload_parts2 in bin/td-bulk-import; ENV['HTTP_PROXY']=<proxy_host>:<proxy_port>
