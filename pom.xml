@@ -1,14 +1,11 @@
-<project
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.treasure_data</groupId>
   <artifactId>td-bulk-import</artifactId>
   <name>Treasure Data Bulk-Import Tool in Java</name>
   <description>Treasure Data Bulk-Import Tool in Java.</description>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.2.0</version>
   <packaging>jar</packaging>
   <url>https://github.com/treasure-data/td-bulk-import-java</url>
 
@@ -246,7 +243,7 @@
             <phase>package</phase>
             <configuration>
               <tasks>
-                <copy file="target/td-bulk-import-${version}-jar-with-dependencies.jar" todir="src/test/resources/java/"/>
+                <copy file="target/td-bulk-import-${version}-jar-with-dependencies.jar" todir="src/test/resources/java/" />
               </tasks>
             </configuration>
             <goals>
