@@ -272,7 +272,7 @@ def upload_parts2_config(op)
   h['delimiter'] = nil
   h['quote'] = nil
   h['newline'] = nil
-  h['column_header'] = nil
+  h['column_header'] = false
   h['columns'] = nil
   h['column_types'] = nil
   h['type_conversion_error'] = nil

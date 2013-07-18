@@ -124,7 +124,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // column-header; default=true
     String BI_PREPARE_PARTS_COLUMNHEADER = "td.bulk_import.prepare_parts.column-header";
-    String BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE = "true";
+    String BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE = "false";
 
     // columns NAME,NAME,NAME,...; default=use column header
     String BI_PREPARE_PARTS_COLUMNS = "td.bulk_import.prepare_parts.columns";
