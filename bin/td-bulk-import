@@ -97,7 +97,6 @@ def prepare_parts2_sysprops(opts)
   sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts['column_header']}" if opts['column_header']
   sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts['columns']}" if opts['columns']
   sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts['column_types']}" if opts['column_types']
-  sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts['type_conversion_error']}" if opts['type_conversion_error']
   sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
   sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
   sysprops << "-Dtd.bulk_import.prepare_parts.prepare-parallel=#{opts['prepare_parallel']}"
@@ -143,7 +142,6 @@ def upload_parts2_sysprops(opts, with_prepare = false)
     sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts['column_header']}" if opts['column_header']
     sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts['columns']}" if opts['columns']
     sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts['column_types']}" if opts['column_types']
-    sysprops << "-Dtd.bulk_import.prepare_parts.type-conversion-error=#{opts['type_conversion_error']}" if opts['type_conversion_error']
     sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
     sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
     sysprops << "-Dtd.bulk_import.prepare_parts.prepare-parallel=#{opts['prepare_parallel']}" if opts['prepare_parallel']
@@ -179,7 +177,6 @@ def prepare_parts2_config(op)
   h['column_header'] = false
   h['columns'] = nil
   h['column_types'] = nil
-  h['type_conversion_error'] = 'skip'
   h['exclude_columns'] = nil
   h['only_columns'] = nil
   h['prepare_parallel'] = 2
@@ -242,9 +239,6 @@ def prepare_parts2_config(op)
   op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
     h['column_types'] = s
   }
-  op.on('--type-conversion-error TYPE', 'type conversion error [skip,null]; default=skip') {|s|
-    h['type_conversion_error'] = s
-  }
   op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
     h['exclude_columns'] = s
   }
@@ -282,7 +276,6 @@ def upload_parts2_config(op)
   h['column_header'] = false
   h['columns'] = nil
   h['column_types'] = nil
-  h['type_conversion_error'] = nil
   h['exclude_columns'] = nil
   h['only_columns'] = nil
   h['prepare_parallel'] = nil
@@ -347,9 +340,6 @@ def upload_parts2_config(op)
   }
   op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
     h['column_types'] = s
-  }
-  op.on('--type-conversion-error TYPE', 'type conversion error [skip,null]; default=skip') {|s|
-    h['type_conversion_error'] = s
   }
   op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
     h['exclude_columns'] = s
