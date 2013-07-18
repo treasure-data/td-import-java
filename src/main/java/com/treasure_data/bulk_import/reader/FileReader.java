@@ -183,6 +183,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             // the row data should be written to error rows file
             writeErrorRecord();
             LOG.warning(e.getMessage());
+            handleError(e);
         }
         return true;
     }
@@ -204,6 +205,10 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     }
 
     public abstract String getCurrentRow();
+
+    public void handleError(PreparePartsException e) throws PreparePartsException {
+        conf.getErrorHandling().handleError(e);
+    }
 
     // Closeable#close()
     public void close() throws IOException {

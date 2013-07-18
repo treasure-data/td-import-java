@@ -263,6 +263,56 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
+    public static enum ErrorHandling {
+        SKIP(Configuration.BI_PREPARE_PARTS_ERROR_HANDLING_DEFAULTVALUE) {
+            @Override
+            public void handleError(PreparePartsException e)
+                    throws PreparePartsException {
+                // ignore
+            }
+        },
+        ABORT("abort") {
+            @Override
+            public void handleError(PreparePartsException e)
+                    throws PreparePartsException {
+                throw e;
+            }
+        };
+
+        private String mode;
+
+        ErrorHandling(String mode) {
+            this.mode = mode;
+        }
+
+        public String mode() {
+            return mode;
+        }
+
+        public abstract void handleError(PreparePartsException e)
+                throws PreparePartsException;
+
+        public static ErrorHandling fromString(String mode) {
+            return StringToErrorHandling.get(mode);
+        }
+
+        private static class StringToErrorHandling {
+            private static final Map<String, ErrorHandling> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, ErrorHandling> map = new HashMap<String, ErrorHandling>();
+                for (ErrorHandling elem : ErrorHandling.values()) {
+                    map.put(elem.mode(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static ErrorHandling get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
+
     private static final Logger LOG = Logger
             .getLogger(PrepareConfiguration.class.getName());
 
@@ -278,6 +328,7 @@ public class PrepareConfiguration extends Configuration {
     protected long timeValue = -1;
     protected String timeFormat;
     protected String errorRecordOutputDirName;
+    protected ErrorHandling errorHandling;
     protected boolean dryRun = false;
     protected String outputDirName;
     protected int splitSize;
@@ -321,6 +372,9 @@ public class PrepareConfiguration extends Configuration {
 
         // error record output DIR
         setErrorRecordOutputDirName();
+
+        // error handling
+        setErrorHandling();
 
         // exclude-columns
         setExcludeColumns();
@@ -542,6 +596,21 @@ public class PrepareConfiguration extends Configuration {
 
     public String getErrorRecordOutputDirName() {
         return errorRecordOutputDirName;
+    }
+
+    public void setErrorHandling() {
+        String modeStr = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_ERROR_HANDLING,
+                Configuration.BI_PREPARE_PARTS_ERROR_HANDLING_DEFAULTVALUE);
+        errorHandling = ErrorHandling.fromString(modeStr);
+        if (errorHandling == null) {
+            throw new IllegalArgumentException(String.format(
+                    "unsupported errorHandling mode '%s'", modeStr));
+        }
+    }
+
+    public ErrorHandling getErrorHandling() {
+        return errorHandling;
     }
 
     public void setDryRun() {

@@ -94,6 +94,10 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT = "td.bulk_import.prepare_parts.error-record-output";
     String BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT_FILE = "error-record.txt";
 
+    // error handling
+    String BI_PREPARE_PARTS_ERROR_HANDLING = "td.bulk_import.prepare_parts.error-handling";
+    String BI_PREPARE_PARTS_ERROR_HANDLING_DEFAULTVALUE= "skip";
+
     // dry-run; show samples as JSON and exit
     String BI_PREPARE_PARTS_DRYRUN = "td.bulk_import.prepare_parts.dry-run";
     String BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE = "false";
