@@ -67,6 +67,7 @@ public class TestMultiThreadPrepareProcessor {
 
         props = System.getProperties();
         props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "" + numWorkers);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
 
         // create prepare config
         conf = new CSVPrepareConfiguration();

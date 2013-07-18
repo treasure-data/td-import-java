@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 
 public class TestPrepareProcessor {
@@ -59,6 +60,7 @@ public class TestPrepareProcessor {
     @Before
     public void createResources() throws Exception {
         props = System.getProperties();
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
 
         // create prepare conf
         conf = new CSVPrepareConfiguration();

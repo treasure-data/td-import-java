@@ -255,6 +255,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
 
         props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "" + numLine);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
 
     }
 
