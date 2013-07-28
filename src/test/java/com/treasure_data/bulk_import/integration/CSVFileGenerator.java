@@ -8,8 +8,8 @@ import org.junit.Ignore;
 
 @Ignore
 public class CSVFileGenerator extends FileGenerator {
-    private static final String LF = "\n";
-    private static final String COMMA = ",";
+    protected static final String LF = "\n";
+    protected static final String COMMA = ",";
 
     protected Map<String, Integer> headerMap;
 
@@ -26,16 +26,18 @@ public class CSVFileGenerator extends FileGenerator {
         row = new Object[header.length];
     }
 
+    @Override
     public void writeHeader() throws IOException {
         for (int i = 0; i < header.length; i++) {
             out.write(header[i].getBytes());
             if (i != header.length - 1) {
-                out.write(COMMA.getBytes());
+                out.write(getDelimiter().getBytes());
             }
         }
-        out.write(LF.getBytes());
+        out.write(getNewLine().getBytes());
     }
 
+    @Override
     public void write(Map<String, Object> map) throws IOException {
         for (Map.Entry<String, Object> e : map.entrySet()) {
             int i = headerMap.get(e.getKey());
@@ -45,10 +47,18 @@ public class CSVFileGenerator extends FileGenerator {
         for (int i = 0; i < header.length; i++) {
             out.write(row[i].toString().getBytes());
             if (i != header.length - 1) {
-                out.write(COMMA.getBytes());
+                out.write(getDelimiter().getBytes());
             }
         }
-        out.write(LF.getBytes());
+        out.write(getNewLine().getBytes());
+    }
+
+    protected String getDelimiter() {
+        return COMMA;
+    }
+
+    protected String getNewLine() {
+        return LF;
     }
 
     @Override
