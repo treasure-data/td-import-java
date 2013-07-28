@@ -82,7 +82,7 @@ public class PrepareConfiguration extends Configuration {
 
             @Override
             public PrepareConfiguration createPrepareConfiguration() {
-                return new PrepareConfiguration();
+                return new CSVPrepareConfiguration();
             }
         },
         MYSQL("mysql") {
