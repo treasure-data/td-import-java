@@ -27,6 +27,22 @@ public class FileGeneratorMain {
         gens.add(new HeaderlessCSVFileGenerator(dirName + "headerless-csvfile-with-timeformat.csv",
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
 
+        // TSV files
+        gens.add(new TSVFileGenerator(dirName + "tsvfile-with-time.tsv",
+                new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
+        gens.add(new TSVFileGenerator(dirName + "tsvfile-with-aliastime.tsv",
+                new String[] { "string-value", "int-value", "double-value", "timestamp" }));
+        gens.add(new TSVFileGenerator(dirName + "tsvfile-with-timeformat.tsv",
+                new String[] { "string-value", "int-value", "double-value", "timeformat" }));
+
+        // header-less TSV files
+        gens.add(new HeaderlessTSVFileGenerator(dirName + "headerless-tsvfile-with-time.tsv",
+                new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));
+        gens.add(new HeaderlessTSVFileGenerator(dirName + "headerless-tsvfile-with-aliastime.tsv",
+                new String[] { "string-value", "int-value", "double-value", "timestamp" }));
+        gens.add(new HeaderlessTSVFileGenerator(dirName + "headerless-tsvfile-with-timeformat.tsv",
+                new String[] { "string-value", "int-value", "double-value", "timeformat" }));
+
         // JSON files
         gens.add(new JSONFileGenerator(dirName + "jsonfile-with-time.json",
                 new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));

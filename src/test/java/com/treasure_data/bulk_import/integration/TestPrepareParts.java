@@ -131,6 +131,117 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     }
 
     @Test
+    public void writeFromTSVWithTimeColumn() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "tsv");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "tsvfile-with-time.tsv");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "tsvfile-with-time_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+  @Test
+  public void writeFromTSVWithAlasTimeColumn() throws Exception {
+      props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "tsv");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+      props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
+
+      args.add(Configuration.CMD_PREPARE_PARTS);
+      args.add(INPUT_DIR + "tsvfile-with-aliastime.tsv");
+
+      Main.prepareParts(args.toArray(new String[0]), props);
+
+      String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+      String dstFileName = OUTPUT_DIR + "tsvfile-with-aliastime_tsv_0.msgpack.gz";
+      assertDataEquals(srcFileName, dstFileName);
+  }
+
+  @Test
+  public void writeFromTSVWithTimeFormat() throws Exception {
+      props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "tsv");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+      props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timeformat");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, "%Y-%m-%d %H:%M:%S %z");
+
+      args.add(Configuration.CMD_PREPARE_PARTS);
+      args.add(INPUT_DIR + "tsvfile-with-timeformat.tsv");
+
+      Main.prepareParts(args.toArray(new String[0]), props);
+
+      String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+      String dstFileName = OUTPUT_DIR + "tsvfile-with-timeformat_tsv_0.msgpack.gz";
+      assertDataEquals(srcFileName, dstFileName);
+  }
+
+  @Test
+  public void writeFromHeaderlessTSVWithTimeColumn() throws Exception {
+      props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "tsv");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+      props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "false");
+      props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNS, "string-value,int-value,double-value,timestamp,time");
+
+      args.add(Configuration.CMD_PREPARE_PARTS);
+      args.add(INPUT_DIR + "headerless-tsvfile-with-time.tsv");
+
+      Main.prepareParts(args.toArray(new String[0]), props);
+
+      String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+      String dstFileName = OUTPUT_DIR + "headerless-tsvfile-with-time_tsv_0.msgpack.gz";
+      assertDataEquals(srcFileName, dstFileName);
+  }
+
+    @Test
+    public void writeFromHeaderlessTSVWithAlasTimeColumn() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "tsv");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "false");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNS, "string-value,int-value,double-value,timestamp");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timestamp");
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "headerless-tsvfile-with-aliastime.tsv");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-tsvfile-with-aliastime_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    @Test
+    public void writeFromHeaderlessTSVWithTimeFormat() throws Exception {
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "tsv");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "false");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNS, "string-value,int-value,double-value,timeformat");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "timeformat");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, "%Y-%m-%d %H:%M:%S %z");
+
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(INPUT_DIR + "headerless-tsvfile-with-timeformat.tsv");
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-tsvfile-with-timeformat_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    @Test
     public void writeFromJSONWithTimeColumn() throws Exception {
         props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "json");
         props.setProperty(Configuration.BI_PREPARE_PARTS_COMPRESSION, "auto");
