@@ -168,7 +168,6 @@ public enum ColumnType {
     public abstract void convertType(String v, ColumnValue into)
             throws PreparePartsException;
 
-    // TODO is it needed??
     public abstract void setColumnValue(Object v, ColumnValue cv)
             throws PreparePartsException;
 
