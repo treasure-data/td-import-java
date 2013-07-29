@@ -22,6 +22,9 @@ import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.UnpackerIterator;
 
+import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.Main;
+
 @Ignore
 public class PreparePartsIntegrationTestUtil {
     private static Value STRING_VALUE = ValueFactory.createRawValue("string-value");
@@ -45,6 +48,190 @@ public class PreparePartsIntegrationTestUtil {
     public void destroyResources() throws Exception {
     }
 
+    public void setProperties(String format, String columnHeader,
+            String aliasTimeColumn, String timeFormat, String columnNames, String exclude, String only) {
+        // format
+        if (format != null && !format.isEmpty()) {
+            props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, format);
+        }
+
+        // output dir
+        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+
+        // column header
+        if (columnHeader != null && !columnHeader.isEmpty()) {
+            props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, columnHeader);
+        }
+
+        // alias time column
+        if (aliasTimeColumn != null && !aliasTimeColumn.isEmpty()) {
+            props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, aliasTimeColumn);
+        }
+
+        // time format
+        if (timeFormat != null && !timeFormat.isEmpty()) {
+            props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, timeFormat);
+        }
+
+        // column names
+        if (columnNames != null && !columnNames.isEmpty()) {
+            props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNS, columnNames);
+        }
+
+        // exclude columns
+        if (exclude != null && !exclude.isEmpty()) {
+            props.setProperty(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, exclude);
+        }
+
+        // only columns
+        if (only != null && !only.isEmpty()) {
+            props.setProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS, only);
+        }
+    }
+
+    public void prepareParts(String fileName) throws Exception {
+        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(fileName);
+
+        Main.prepareParts(args.toArray(new String[0]), props);
+    }
+
+    public void preparePartsFromCSVWithTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "csvfile-with-time.csv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "csvfile-with-time_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromCSVWithAlasTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "csvfile-with-aliastime.csv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "csvfile-with-aliastime_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromCSVWithTimeFormat() throws Exception {
+        prepareParts(INPUT_DIR + "csvfile-with-timeformat.csv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "csvfile-with-timeformat_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromHeaderlessCSVWithTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "headerless-csvfile-with-time.csv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-csvfile-with-time_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromHeaderlessCSVWithAlasTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "headerless-csvfile-with-aliastime.csv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-csvfile-with-aliastime_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromHeaderlessCSVWithTimeFormat() throws Exception {
+        prepareParts(INPUT_DIR + "headerless-csvfile-with-timeformat.csv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-csvfile-with-timeformat_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromTSVWithTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "tsvfile-with-time.tsv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "tsvfile-with-time_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromTSVWithAlasTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "tsvfile-with-aliastime.tsv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "tsvfile-with-aliastime_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromTSVWithTimeFormat() throws Exception {
+        prepareParts(INPUT_DIR + "tsvfile-with-timeformat.tsv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "tsvfile-with-timeformat_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromHeaderlessTSVWithTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "headerless-tsvfile-with-time.tsv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-tsvfile-with-time_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromHeaderlessTSVWithAlasTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "headerless-tsvfile-with-aliastime.tsv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-tsvfile-with-aliastime_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromHeaderlessTSVWithTimeFormat() throws Exception {   
+        prepareParts(INPUT_DIR + "headerless-tsvfile-with-timeformat.tsv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-tsvfile-with-timeformat_tsv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromJSONWithTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "jsonfile-with-time.json");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "jsonfile-with-time_json_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromJSONWithAlasTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "jsonfile-with-aliastime.json");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "jsonfile-with-aliastime_json_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromJSONWithTimeFormat() throws Exception {
+        prepareParts(INPUT_DIR + "jsonfile-with-timeformat.json");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "jsonfile-with-timeformat_json_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromMessagePackWithTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "msgpackfile-with-time.msgpack");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "msgpackfile-with-time_msgpack_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
+    public void preparePartsFromMessagePackWithAlasTimeColumn() throws Exception {
+        prepareParts(INPUT_DIR + "msgpackfile-with-aliastime.msgpack");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "msgpackfile-with-aliastime_msgpack_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
     public void assertDataEquals(String srcFileName, String dstFileName) throws Exception {
         MessagePack msgpack = new MessagePack();
 
@@ -65,6 +252,14 @@ public class PreparePartsIntegrationTestUtil {
         assertFalse(dstIter.hasNext());
     }
 
+    public void preparePartsFromMessagePackWithTimeFormat() throws Exception {
+        prepareParts(INPUT_DIR + "msgpackfile-with-timeformat.msgpack");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "msgpackfile-with-timeformat_msgpack_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
     private void assertMapValueEquals(MapValue src, MapValue dst) {
         assertTrue(src.containsKey(STRING_VALUE));
         assertEquals(src.get(STRING_VALUE), dst.get(STRING_VALUE));
@@ -78,5 +273,4 @@ public class PreparePartsIntegrationTestUtil {
         assertTrue(src.containsKey(TIME));
         assertEquals(src.get(TIME), dst.get(TIME));
     }
-
 }
