@@ -215,11 +215,14 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                 // write each column value
                 w.next(convertedRow);
                 String ret = w.toJSONString();
+                String msg = null;
                 if (ret != null) {
-                    LOG.info("sample row: " + ret);
+                    msg = "sample row: " + ret;
                 } else  {
-                    LOG.info("cannot get sample row");
+                    msg = "cannot get sample row";
                 }
+                System.out.println(msg);
+                LOG.info(msg);
             } finally {
                 if (w != null) {
                     w.close();

@@ -198,7 +198,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             try {
                 errorRecordsStream.write(msg.getBytes());
             } catch (IOException e) {
-                LOG.warning("Cannot write the following record to error-record.txt: " + msg);
+                LOG.warning("Cannot write the following record to log file: " + msg);
                 LOG.throwing(this.getClass().getName(), "writeErrorRecord", e);
             }
         }

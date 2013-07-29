@@ -44,24 +44,30 @@ public class UploadProcessor {
                 try {
                     r.doTry();
                     if (count > 0) {
-                        LOG.warning(String.format("Retry succeeded. %s",
-                                sessionName));
+                        String msg = String.format("Retry succeeded. %s", sessionName);
+                        System.out.println(msg);
+                        LOG.warning(msg);
                     }
                     break;
                 } catch (ClientException e) {
                     if (firstException == null) {
                         firstException = e;
                     }
-                    LOG.warning(String.format(
-                            "ClientError occurred. the cause is '%s'. %s",
-                            e.getMessage(), sessionName));
+                    String msg = String.format("ClientError occurred. the cause is '%s'. %s",
+                            e.getMessage(), sessionName);
+                    System.out.println(msg);
+                    LOG.warning(msg);
                     if (count >= retryCount) {
-                        LOG.warning(String.format("Retry count exceeded limit. %s",
-                                sessionName));
+                        String msg2 = String.format("Retry count exceeded limit. %s",
+                                sessionName);
+                        System.out.println(msg);
+                        LOG.warning(msg2);
                         throw new IOException("Retry failed", firstException);
                     } else {
                         count++;
-                        LOG.warning(String.format("Retrying. %s", sessionName));
+                        String msg2 = String.format("Retrying. %s", sessionName);
+                        System.out.println(msg2);
+                        LOG.warning(msg2);
                         try {
                             Thread.sleep(waitSec);
                         } catch (InterruptedException ex) { // ignore

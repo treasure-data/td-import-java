@@ -67,7 +67,9 @@ public class Main {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        LOG.info(String.format("Start %s command", Configuration.CMD_PREPARE_PARTS));
+        String msg = String.format("Start %s command", Configuration.CMD_PREPARE_PARTS);
+        System.out.println(msg);
+        LOG.info(msg);
 
         final String[] fileNames = new String[args.length - 1];
         for (int i = 0; i < args.length - 1; i++) {
@@ -132,7 +134,9 @@ public class Main {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        LOG.info(String.format("Start %s command", Configuration.CMD_UPLOAD_PARTS));
+        String msg = String.format("Start %s command", Configuration.CMD_UPLOAD_PARTS);
+        System.out.println(msg);
+        LOG.info(msg);
 
         final String sessionName = args[1];
         final String[] fileNames = new String[args.length - 2];
@@ -192,8 +196,11 @@ public class Main {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        LOG.info(String.format("Start %s and %s commands",
-                Configuration.CMD_UPLOAD_PARTS, Configuration.CMD_PREPARE_PARTS));
+        String msg = String.format("Start %s and %s commands",
+                Configuration.CMD_UPLOAD_PARTS,
+                Configuration.CMD_PREPARE_PARTS);
+        System.out.println(msg);
+        LOG.info(msg);
 
         final String sessionName = args[1];
         final String[] fileNames = new String[args.length - 2];
@@ -269,9 +276,10 @@ public class Main {
             return;
         }
 
-        LOG.warning(String.format(
-                "Some errors occurred during %s processing. " +
-                "Please check the following messages.", cmd));
+        String msg = String.format("Some errors occurred during %s processing. " +
+                "Please check the following messages.", cmd);
+        System.out.println(msg);
+        LOG.warning(msg);
 
         for (ErrorInfo e : errs) {
             if (e.error != null) {
@@ -307,7 +315,7 @@ public class Main {
             }
         } else {
             throw new IllegalArgumentException(
-                    "Not support command: " + commandName);
+                    String.format("Not support command %s", commandName));
         }
     }
 

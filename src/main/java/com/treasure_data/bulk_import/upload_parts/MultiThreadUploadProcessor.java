@@ -170,22 +170,28 @@ public class MultiThreadUploadProcessor {
 
         // check error of perform
         SessionSummary summary = UploadProcessor.showSession(client, conf, sessName);
-        LOG.info(String.format(
-                "Show summary of bulk import session '%s'", summary.getName()));
-        LOG.info("  perform job ID: " + summary.getJobID());
-        LOG.info("  valid parts: " + summary.getValidParts());
-        LOG.info("  error parts: " + summary.getErrorParts());
-        LOG.info("  valid records: " + summary.getValidRecords());
-        LOG.info("  error records: " + summary.getErrorRecords());
+        StringBuilder sbuf = new StringBuilder();
+        sbuf.append(String.format("Show summary of bulk import session '%s'",
+                summary.getName())).append("\n");
+        sbuf.append("  perform job ID: " + summary.getJobID()).append("\n");
+        sbuf.append("  valid parts: " + summary.getValidParts()).append("\n");
+        sbuf.append("  error parts: " + summary.getErrorParts()).append("\n");
+        sbuf.append("  valid records: " + summary.getValidRecords()).append("\n");
+        sbuf.append("  error records: " + summary.getErrorRecords()).append("\n");
+        System.out.println(sbuf.toString());
+        LOG.info(sbuf.toString());
 
         if (summary.getErrorParts() != 0 || summary.getErrorRecords() != 0) {
             String msg = String.format(
                     "Performing failed: error parts = %d, error records = %d",
                     summary.getErrorParts(), summary.getErrorRecords());
+            System.out.println(msg);
             LOG.severe(msg);
+
             msg = String.format(
                     "Check the status of bulk import session %s with 'td bulk_import:show %s'",
                     summary.getName(), summary.getName());
+            System.out.println(msg);
             LOG.severe(msg);
             err.error = new UploadPartsException(msg);
             return err;
