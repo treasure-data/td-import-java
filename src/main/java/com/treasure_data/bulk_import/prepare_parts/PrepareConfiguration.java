@@ -263,8 +263,8 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
-    public static enum ErrorHandling {
-        SKIP(Configuration.BI_PREPARE_PARTS_ERROR_HANDLING_DEFAULTVALUE) {
+    public static enum ErrorRecordsHandling {
+        SKIP(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE) {
             @Override
             public void handleError(PreparePartsException e)
                     throws PreparePartsException {
@@ -281,7 +281,7 @@ public class PrepareConfiguration extends Configuration {
 
         private String mode;
 
-        ErrorHandling(String mode) {
+        ErrorRecordsHandling(String mode) {
             this.mode = mode;
         }
 
@@ -292,22 +292,22 @@ public class PrepareConfiguration extends Configuration {
         public abstract void handleError(PreparePartsException e)
                 throws PreparePartsException;
 
-        public static ErrorHandling fromString(String mode) {
+        public static ErrorRecordsHandling fromString(String mode) {
             return StringToErrorHandling.get(mode);
         }
 
         private static class StringToErrorHandling {
-            private static final Map<String, ErrorHandling> REVERSE_DICTIONARY;
+            private static final Map<String, ErrorRecordsHandling> REVERSE_DICTIONARY;
 
             static {
-                Map<String, ErrorHandling> map = new HashMap<String, ErrorHandling>();
-                for (ErrorHandling elem : ErrorHandling.values()) {
+                Map<String, ErrorRecordsHandling> map = new HashMap<String, ErrorRecordsHandling>();
+                for (ErrorRecordsHandling elem : ErrorRecordsHandling.values()) {
                     map.put(elem.mode(), elem);
                 }
                 REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
             }
 
-            static ErrorHandling get(String key) {
+            static ErrorRecordsHandling get(String key) {
                 return REVERSE_DICTIONARY.get(key);
             }
         }
@@ -328,7 +328,7 @@ public class PrepareConfiguration extends Configuration {
     protected long timeValue = -1;
     protected String timeFormat;
     protected String errorRecordOutputDirName;
-    protected ErrorHandling errorHandling;
+    protected ErrorRecordsHandling errorRecordsHandling;
     protected boolean dryRun = false;
     protected String outputDirName;
     protected int splitSize;
@@ -371,7 +371,7 @@ public class PrepareConfiguration extends Configuration {
         setOutputDirName();
 
         // error handling
-        setErrorHandling();
+        setErrorRecordsHandling();
 
         // exclude-columns
         setExcludeColumns();
@@ -572,19 +572,19 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
-    public void setErrorHandling() {
+    public void setErrorRecordsHandling() {
         String modeStr = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_ERROR_HANDLING,
-                Configuration.BI_PREPARE_PARTS_ERROR_HANDLING_DEFAULTVALUE);
-        errorHandling = ErrorHandling.fromString(modeStr);
-        if (errorHandling == null) {
+                Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING,
+                Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE);
+        errorRecordsHandling = ErrorRecordsHandling.fromString(modeStr);
+        if (errorRecordsHandling == null) {
             throw new IllegalArgumentException(String.format(
                     "unsupported errorHandling mode '%s'", modeStr));
         }
     }
 
-    public ErrorHandling getErrorHandling() {
-        return errorHandling;
+    public ErrorRecordsHandling getErrorRecordsHandling() {
+        return errorRecordsHandling;
     }
 
     public void setDryRun() {

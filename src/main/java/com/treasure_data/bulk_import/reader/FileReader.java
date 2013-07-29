@@ -17,17 +17,12 @@
 //
 package com.treasure_data.bulk_import.reader;
 
-import java.io.BufferedOutputStream;
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.Row;
@@ -176,7 +171,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     public abstract String getCurrentRow();
 
     public void handleError(PreparePartsException e) throws PreparePartsException {
-        conf.getErrorHandling().handleError(e);
+        conf.getErrorRecordsHandling().handleError(e);
     }
 
     // Closeable#close()
