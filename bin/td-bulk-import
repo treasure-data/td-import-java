@@ -80,6 +80,9 @@ def prepare_parts2_sysprops(opts)
   # set http_proxy
   set_http_proxy(sysprops)
 
+  # set configuration file for logging
+  set_logging_conf(sysprops)
+
   sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compression']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
@@ -104,25 +107,14 @@ def prepare_parts2_sysprops(opts)
   sysprops
 end
 
-def set_http_proxy(sysprops)
-  http_proxy = ENV['HTTP_PROXY']
-  if http_proxy
-    if http_proxy =~ /\Ahttp:\/\/(.*)\z/
-      http_proxy = $~[1]
-    end
-    proxy_host, proxy_port = http_proxy.split(':', 2)
-    proxy_port = (proxy_port ? proxy_port.to_i : 80)
-
-    sysprops << "-Dhttp.proxyHost=#{proxy_host}"
-    sysprops << "-Dhttp.proxyPort=#{proxy_port}"
-  end
-end
-
 def upload_parts2_sysprops(opts, with_prepare = false)
   sysprops = []
 
   # set http_proxy
   set_http_proxy(sysprops)
+
+  # set configuration file for logging
+  set_logging_conf(sysprops)
 
   if with_prepare
     sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}" if opts['format']
@@ -155,6 +147,35 @@ def upload_parts2_sysprops(opts, with_prepare = false)
   sysprops << "-Dtd.api.key=#{TreasureData::Config.apikey}"
 
   sysprops
+end
+
+def set_http_proxy(sysprops)
+  http_proxy = ENV['HTTP_PROXY']
+  if http_proxy
+    if http_proxy =~ /\Ahttp:\/\/(.*)\z/
+      http_proxy = $~[1]
+    end
+    proxy_host, proxy_port = http_proxy.split(':', 2)
+    proxy_port = (proxy_port ? proxy_port.to_i : 80)
+
+    sysprops << "-Dhttp.proxyHost=#{proxy_host}"
+    sysprops << "-Dhttp.proxyPort=#{proxy_port}"
+  end
+end
+
+def set_logging_conf(sysprops)
+  conf_file = find_logging_conf_file
+  if conf_file
+    sysprops << "-Djava.util.logging.config.file=#{conf_file}"
+  end
+end
+
+def find_logging_conf_file
+  libjars = Dir.glob("#{HERE}/../src/test/resources/java/**/*.properties")
+  found = libjars.find { |path| File.basename(path) =~ /^logging.properties/ }
+  return nil if found.nil?
+  logging_conf_file = libjars.delete(found)
+  logging_conf_file
 end
 
 def prepare_parts2_config(op)
