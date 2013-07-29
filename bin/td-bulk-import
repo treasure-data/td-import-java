@@ -91,7 +91,6 @@ def prepare_parts2_sysprops(opts)
   sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
   sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.error-record-output=#{opts['error_record_output']}" if opts['error_record_output']
   sysprops << "-Dtd.bulk_import.prepare_parts.error-handling=#{opts['error_handling']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}"
   sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}"
@@ -125,7 +124,6 @@ def upload_parts2_sysprops(opts, with_prepare = false)
     sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
     sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}" if opts['outdir']
     sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}" if opts['split_size_kb']
-    sysprops << "-Dtd.bulk_import.prepare_parts.error-record-output=#{opts['error_record_output']}" if opts['error_record_output']
     sysprops << "-Dtd.bulk_import.prepare_parts.error-handling=#{opts['error_handling']}" if opts['error_handling']
     sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}" if opts['dry_run']
     sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}" if opts['delimiter']
@@ -189,7 +187,6 @@ def prepare_parts2_config(op)
   h['time_value'] = nil
   h['outdir'] = 'out'
   h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
-  h['error_record_output'] = nil
   h['error_handling'] = 'skip'
   h['dry_run'] = false
   h['delimiter'] = ','
@@ -232,9 +229,6 @@ def prepare_parts2_config(op)
   }
   op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
     h['split_size_kb'] = i
-  }
-  op.on('--error-record-output FILE', 'error records output file; default=NULL output stream') {|s|
-    h['error_record_outdir'] = s
   }
   op.on('--error-handling MODE', 'error handling mode; default=skip') {|s|
     h['error_handling'] = s
@@ -288,7 +282,6 @@ def upload_parts2_config(op)
   h['time_value'] = nil
   h['outdir'] = nil
   h['split_size_kb'] = nil
-  h['error_record_output'] = nil
   h['error_handling'] = nil
   h['dry_run'] = false
   h['delimiter'] = nil
@@ -334,9 +327,6 @@ def upload_parts2_config(op)
   }
   op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
     h['split_size_kb'] = i
-  }
-  op.on('--error-record-output FILE', 'error records output file; default=NULL output stream') {|s|
-    h['error_record_outdir'] = s
   }
   op.on('--error-handling MODE', 'error handling mode; default=skip') {|s|
     h['error_handling'] = s
