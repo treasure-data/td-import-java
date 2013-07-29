@@ -52,8 +52,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     protected long lineNum = 0;
 
-    private OutputStream errorRecordsStream = null;
-
     protected FileReader(T conf, FileWriter writer) {
         this.conf = conf;
         this.writer = writer;
@@ -66,9 +64,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
         // check compression type of the file
         conf.checkCompressionType(name);
-
-        // create output stream for writing error records
-        setErrorRecordsOutputStream();
     }
 
     public String[] getColumnNames() {
@@ -121,21 +116,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         }
     }
 
-    public void setErrorRecordsOutputStream() throws PreparePartsException {
-        String errorRecordDir = conf.getErrorRecordOutputDirName();
-        if (errorRecordDir == null || errorRecordDir.isEmpty()) {
-            errorRecordsStream = null;
-        } else {
-            try {
-                File dir = new File(errorRecordDir);
-                File file = new File(dir, Configuration.BI_PREPARE_PARTS_ERROR_RECORD_OUTPUT_FILE);
-                errorRecordsStream = new BufferedOutputStream(new FileOutputStream(file));
-            } catch (IOException e) {
-                throw new PreparePartsException(e);
-            }
-        }
-    }
-
     public TimeColumnValue getTimeColumnValue() {
         return timeColumnValue;
     }
@@ -181,8 +161,9 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
             // the row data should be written to error rows file
-            writeErrorRecord();
+            String msg = String.format("line %d in %s: %s", lineNum, name, getCurrentRow());
             LOG.warning(e.getMessage());
+            LOG.warning(msg);
             handleError(e);
         }
         return true;
@@ -192,18 +173,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     public abstract void convertTypesOfColumns() throws PreparePartsException;
 
-    public void writeErrorRecord() {
-        if (errorRecordsStream != null) {
-            String msg = String.format("line %d in %s: %s", lineNum, name, getCurrentRow());
-            try {
-                errorRecordsStream.write(msg.getBytes());
-            } catch (IOException e) {
-                LOG.warning("Cannot write the following record to log file: " + msg);
-                LOG.throwing(this.getClass().getName(), "writeErrorRecord", e);
-            }
-        }
-    }
-
     public abstract String getCurrentRow();
 
     public void handleError(PreparePartsException e) throws PreparePartsException {
@@ -212,8 +181,5 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     // Closeable#close()
     public void close() throws IOException {
-        if (errorRecordsStream != null) {
-            errorRecordsStream.close();
-        }
     }
 }
