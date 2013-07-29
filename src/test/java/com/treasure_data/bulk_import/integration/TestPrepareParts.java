@@ -5,9 +5,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.Main;
-
 public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     @Before
     public void createResources() throws Exception {
