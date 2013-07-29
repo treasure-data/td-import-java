@@ -1,8 +1,6 @@
 package com.treasure_data.bulk_import.integration;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Ignore;
 
