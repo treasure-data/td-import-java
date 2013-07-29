@@ -7,7 +7,6 @@ import java.util.Random;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
