@@ -40,6 +40,7 @@ import com.treasure_data.bulk_import.reader.FileReader;
 import com.treasure_data.bulk_import.reader.JSONFileReader;
 import com.treasure_data.bulk_import.reader.MessagePackFileReader;
 import com.treasure_data.bulk_import.reader.MySQLTableReader;
+import com.treasure_data.bulk_import.reader.SyslogFileReader;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
@@ -126,6 +127,20 @@ public class PrepareConfiguration extends Configuration {
             @Override
             public PrepareConfiguration createPrepareConfiguration() {
                 return new ApachePrepareConfiguration();
+            }
+        },
+        SYSLOG("syslog") {
+            @Override
+            public FileReader<SyslogPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, FileWriter writer)
+                    throws PreparePartsException {
+                return new SyslogFileReader((SyslogPrepareConfiguration) conf,
+                        writer);
+            }
+
+            @Override
+            public PrepareConfiguration createPrepareConfiguration() {
+                return new SyslogPrepareConfiguration();
             }
         },
         MSGPACK("msgpack") {
