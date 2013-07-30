@@ -136,7 +136,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     }
 
     public boolean next() throws PreparePartsException {
-        incrementLineNum();
         try {
             // if reader got EOF, it returns false.
             if (!readRow()) {

@@ -248,6 +248,8 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             return false;
         }
 
+        incrementLineNum();
+
         int rawRowSize = row.size();
         if (rawRowSize != columnTypes.length) {
             throw new PreparePartsException(String.format(
