@@ -1,0 +1,60 @@
+package com.treasure_data.bulk_import.reader;
+
+import static org.mockito.Mockito.spy;
+
+import java.util.Properties;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
+
+@Ignore
+public class TestSyslogFileReader {
+
+    protected Properties props;
+    protected PrepareConfiguration conf;
+    protected FileWriterTestUtil writer;
+    protected FileReader reader;
+
+    @Test
+    public void sample() throws Exception {
+        props = new Properties();
+        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "1");
+        conf = PrepareConfiguration.Format.APACHE.createPrepareConfiguration();
+        conf.configure(props);
+
+        writer = new FileWriterTestUtil(conf);
+        reader = PrepareConfiguration.Format.SYSLOG.createFileReader(conf, writer);
+
+        Task task = new Task("dummy.txt");
+        task = spy(task);
+        task.isTest = true;
+        task.testBinary =
+        ("Jul 27 09:49:38 itbsv1 su(pam_unix)[8061]: session opened for user root by root(uid=0)\n"
+        + "Jul 27 09:49:38 itbsv1 su(pam_unix)[8061]: session opened for user root by root(uid=0)\n").getBytes();
+
+        reader.configure(task);
+        writer.setColumnNames(reader.getColumnNames());
+        writer.setColumnTypes(reader.getColumnTypes());
+        writer.setSkipColumns(reader.getSkipColumns());
+
+        try {
+            reader.next();
+            writer.clear();
+
+            reader.next();
+            writer.clear();
+
+            reader.next();
+            writer.clear();
+        } finally {
+            reader.close();
+        }
+
+    }
+}
