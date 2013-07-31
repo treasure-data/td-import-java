@@ -20,29 +20,67 @@ package com.treasure_data.bulk_import.reader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.treasure_data.bulk_import.model.ColumnType;
+import com.treasure_data.bulk_import.model.DoubleColumnValue;
+import com.treasure_data.bulk_import.model.IntColumnValue;
+import com.treasure_data.bulk_import.model.LongColumnValue;
+import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
+import com.treasure_data.bulk_import.prepare_parts.ApachePrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.SyslogPrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
+import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 
-public class SyslogFileReader extends
-        FixnumColumnsFileReader<SyslogPrepareConfiguration> {
+public class SyslogFileReader extends RegexFileReader<SyslogPrepareConfiguration> {
 
     private static final Logger LOG = Logger.getLogger(SyslogFileReader.class
             .getName());
 
-    // 127.0.0.1 user-identifier frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
-    private static final String commonLogPatString =
-            "^([^ ]* [^ ]* [^ ]*) ([^ ]*) ([a-zA-Z0-9_\\/\\.\\-]*)(?:\\[([0-9]+)\\])?[^\\:]*\\: *(.*)$";
+    private static final String syslogPatString =
+            "^([^ ]* [^ ]* [^ ]*) ([^ ]*) ([a-zA-Z0-9_\\/\\.\\-]*)(?:\\([a-zA-Z0-9_\\/\\.\\-]*\\))(?:\\[([0-9]+)\\])?[^\\:]*\\: *(.*)$";
+
+    public static class ExtFileWriter extends MsgpackGZIPFileWriter {
+        protected long currentYear;
+
+        public ExtFileWriter(PrepareConfiguration conf) {
+            super(conf);
+            currentYear = getCurrentYear();
+        }
+
+        @Override
+        public void write(TimeColumnValue filter, StringColumnValue v)
+                throws PreparePartsException {
+            long time = filter.getTimeFormat().getTime(v.getString());
+            time += currentYear;
+            write(time);
+        }
+
+        private long getCurrentYear() {
+            try {
+                SimpleDateFormat f = new SimpleDateFormat("yyyy");
+                Calendar cal = Calendar.getInstance();
+                Date d = f.parse("" + cal.get(Calendar.YEAR));
+                return d.getTime() / 1000;
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     protected BufferedReader reader;
     protected Pattern syslogPat;
@@ -52,89 +90,19 @@ public class SyslogFileReader extends
 
     public SyslogFileReader(SyslogPrepareConfiguration conf, FileWriter writer)
             throws PreparePartsException {
-        super(conf, writer);
+        super(conf, writer, syslogPatString);
     }
 
-    @Override
-    public void configure(Task task) throws PreparePartsException {
-        // column names
+    protected void updateColumnNames() {
         columnNames = new String[] { "time", "host", "ident", "pid", "message" };
+    }
 
-        // column types
+    protected void updateColumnTypes() {
         columnTypes = new ColumnType[] { ColumnType.STRING, ColumnType.STRING,
                 ColumnType.STRING, ColumnType.INT, ColumnType.STRING, };
+    }
 
-        // time column
+    protected void updateTimeColumnValue() {
         timeColumnValue = new TimeColumnValue(2, new ExtStrftime("%b %d %H:%M:%S"));
-
-        initializeConvertedRow();
-
-        // check properties of exclude/only columns
-        setSkipColumns();
-
-        try {
-            reader = new BufferedReader(new InputStreamReader(
-                    task.createInputStream(conf.getCompressionType())));
-        } catch (IOException e) {
-            throw new PreparePartsException(e);
-        }
-
-        syslogPat = Pattern.compile(commonLogPatString);
-    }
-
-    @Override
-    public boolean readRow() throws IOException, PreparePartsException {
-        row.clear();
-        if ((line = reader.readLine()) == null) {
-            return false;
-        }
-
-        incrementLineNum();
-
-        Matcher syslogMatcher = syslogPat.matcher(line);
-
-        if (!syslogMatcher.matches()) {
-            throw new PreparePartsException(String.format(
-                    "line is not matched at apache common log format [line: %d]",
-                    getLineNum()));
-        }
-
-        // extract groups
-        for (int i = 1; i < (columnNames.length + 1); i++) {
-            row.add(syslogMatcher.group(i));
-        }
-
-        int rawRowSize = row.size();
-        if (rawRowSize != columnTypes.length) {
-            throw new PreparePartsException(String.format(
-                    "The number of columns to be processed (%d) must " +
-                    "match the number of column types (%d): check that the " +
-                    "number of column types you have defined matches the " +
-                    "expected number of columns being read/written [line: %d]",
-                    rawRowSize, columnTypes.length, getLineNum()));
-        }
-
-        return true;
-    }
-
-    @Override
-    public void convertTypesOfColumns() throws PreparePartsException {
-        for (int i = 0; i < this.row.size(); i++) {
-            columnTypes[i].convertType(this.row.get(i), convertedRow.getValue(i));
-        }
-    }
-
-    @Override
-    public String getCurrentRow() {
-        return line;
-    }
-
-    @Override
-    public void close() throws IOException {
-        super.close();
-
-        if (reader != null) {
-            reader.close();
-        }
     }
 }
