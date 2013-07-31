@@ -204,6 +204,12 @@ public class PrepareConfiguration extends Configuration {
             public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
                 return new MsgpackGZIPFileWriter(conf);
             }
+        },
+        SYSLOGMSGPACKGZ("syslogmsgpackgz") {
+            @Override
+            public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+                return new SyslogFileReader.ExtFileWriter(conf);
+            }
         };
 
         private String outputFormat;
@@ -435,6 +441,11 @@ public class PrepareConfiguration extends Configuration {
         String outputFormatStr = props.getProperty(
                 Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT,
                 Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT_DEFAULTVALUE);
+        if (format.equals(Format.SYSLOG)) {
+            outputFormat = OutputFormat.SYSLOGMSGPACKGZ;
+            return;
+        }
+
         outputFormat = OutputFormat.fromString(outputFormatStr);
         if (outputFormat == null) {
             throw new IllegalArgumentException(String.format(
