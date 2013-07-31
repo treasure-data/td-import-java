@@ -234,6 +234,18 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
         preparePartsFromHeaderlessTSVWithTimeFormat();
     }
 
+//    @Test // TODO
+//    public void writeFromSyslog() throws Exception {
+//        setProperties(Format.SYSLOG.format(), null, null, null, null, null, null);
+//        preparePartsFromSyslog();
+//    }
+
+    @Test
+    public void writeFromApacheLog() throws Exception {
+        setProperties(Format.APACHE.format(), null, null, null, null, null, null);
+        preparePartsFromApacheLog();
+    }
+
     @Test
     public void writeFromJSONWithTimeColumn() throws Exception {
         setProperties(Format.JSON.format(), null, null, null, null, null, null);

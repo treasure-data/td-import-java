@@ -12,7 +12,6 @@ import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
 
-@Ignore
 public class TestSyslogFileReader {
 
     protected Properties props;
@@ -25,7 +24,7 @@ public class TestSyslogFileReader {
         props = new Properties();
         props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "1");
-        conf = PrepareConfiguration.Format.APACHE.createPrepareConfiguration();
+        conf = PrepareConfiguration.Format.SYSLOG.createPrepareConfiguration();
         conf.configure(props);
 
         writer = new FileWriterTestUtil(conf);
@@ -35,8 +34,9 @@ public class TestSyslogFileReader {
         task = spy(task);
         task.isTest = true;
         task.testBinary =
-        ("Jul 27 09:49:38 itbsv1 su(pam_unix)[8061]: session opened for user root by root(uid=0)\n"
-        + "Jul 27 09:49:38 itbsv1 su(pam_unix)[8061]: session opened for user root by root(uid=0)\n").getBytes();
+                ("Jul 01 00:19:00 muga88 muga88(muga88)[1528965344]: muga88\n"
+                        + "Jul 27 09:49:38 itbsv1 su(pam_unix)[8061]: session opened for user root by root(uid=0)\n"
+                        + "Jul 27 09:49:38 itbsv1 su(pam_unix)[8061]: session opened for user root by root(uid=0)\n").getBytes();
 
         reader.configure(task);
         writer.setColumnNames(reader.getColumnNames());

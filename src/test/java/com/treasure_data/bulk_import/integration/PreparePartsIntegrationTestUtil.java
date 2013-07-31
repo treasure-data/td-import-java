@@ -191,6 +191,25 @@ public class PreparePartsIntegrationTestUtil {
         assertDataEquals(srcFileName, dstFileName);
     }
 
+    public void preparePartsFromSyslog() throws Exception {
+        prepareParts(INPUT_DIR + "syslogfile.syslog");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "syslogfile_syslog_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName, "syslog");
+    }
+
+    public void preparePartsFromApacheLog() throws Exception {
+        prepareParts(INPUT_DIR + "apachelogfile.apache");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "apachelogfile_apache_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName, "apache");
+    }
+
+    // TODO
+    // TODO
+
     public void preparePartsFromJSONWithTimeColumn() throws Exception {
         prepareParts(INPUT_DIR + "jsonfile-with-time.json");
 
@@ -231,7 +250,19 @@ public class PreparePartsIntegrationTestUtil {
         assertDataEquals(srcFileName, dstFileName);
     }
 
+    public void preparePartsFromMessagePackWithTimeFormat() throws Exception {
+        prepareParts(INPUT_DIR + "msgpackfile-with-timeformat.msgpack");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "msgpackfile-with-timeformat_msgpack_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
     public void assertDataEquals(String srcFileName, String dstFileName) throws Exception {
+        assertDataEquals(srcFileName, dstFileName, "none");
+    }
+
+    public void assertDataEquals(String srcFileName, String dstFileName, String format) throws Exception {
         MessagePack msgpack = new MessagePack();
 
         InputStream srcIn = new BufferedInputStream(new GZIPInputStream(new FileInputStream(srcFileName)));
@@ -244,32 +275,56 @@ public class PreparePartsIntegrationTestUtil {
             MapValue srcMap = srcIter.next().asMapValue();
             MapValue dstMap = dstIter.next().asMapValue();
 
-            assertMapValueEquals(srcMap, dstMap);
+            assertMapValueEquals(srcMap, dstMap, format);
         }
 
         assertFalse(srcIter.hasNext());
         assertFalse(dstIter.hasNext());
     }
 
-    public void preparePartsFromMessagePackWithTimeFormat() throws Exception {
-        prepareParts(INPUT_DIR + "msgpackfile-with-timeformat.msgpack");
+    private void assertMapValueEquals(MapValue src, MapValue dst, String format) {
+        if (format.equals("none")) {
+            assertTrue(src.containsKey(STRING_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(STRING_VALUE));
 
-        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
-        String dstFileName = OUTPUT_DIR + "msgpackfile-with-timeformat_msgpack_0.msgpack.gz";
-        assertDataEquals(srcFileName, dstFileName);
-    }
+            assertTrue(src.containsKey(INT_VALUE));
+            assertEquals(src.get(INT_VALUE), dst.get(INT_VALUE));
 
-    private void assertMapValueEquals(MapValue src, MapValue dst) {
-        assertTrue(src.containsKey(STRING_VALUE));
-        assertEquals(src.get(STRING_VALUE), dst.get(STRING_VALUE));
+            assertTrue(src.containsKey(DOUBLE_VALUE));
+            assertEquals(src.get(DOUBLE_VALUE), dst.get(DOUBLE_VALUE));
 
-        assertTrue(src.containsKey(INT_VALUE));
-        assertEquals(src.get(INT_VALUE), dst.get(INT_VALUE));
+            assertTrue(src.containsKey(TIME));
+            assertEquals(src.get(TIME), dst.get(TIME));
+        } else if (format.equals("syslog")) {
+            assertTrue(src.containsKey(STRING_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(SyslogFileGenerator.HOST_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(SyslogFileGenerator.IDENT_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(SyslogFileGenerator.MESSAGE_VALUE));
 
-        assertTrue(src.containsKey(DOUBLE_VALUE));
-        assertEquals(src.get(DOUBLE_VALUE), dst.get(DOUBLE_VALUE));
+            assertTrue(src.containsKey(INT_VALUE));
+            assertEquals(src.get(INT_VALUE), dst.get(SyslogFileGenerator.PID_VALUE));
 
-        assertTrue(src.containsKey(TIME));
-        assertEquals(src.get(TIME), dst.get(TIME));
+            assertTrue(src.containsKey(TIME));
+            assertEquals(src.get(TIME), dst.get(TIME));
+        } else if (format.equals("apache")) {
+            try {
+            assertTrue(src.containsKey(STRING_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(ApacheFileGenerator.HOST_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(ApacheFileGenerator.USER_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(ApacheFileGenerator.METHOD_VALUE));
+            assertEquals(src.get(STRING_VALUE), dst.get(ApacheFileGenerator.PATH_VALUE));
+            assertEquals(src.get(INT_VALUE), dst.get(ApacheFileGenerator.CODE_VALUE));
+            assertEquals(src.get(INT_VALUE), dst.get(ApacheFileGenerator.SIZE_VALUE));
+
+            assertTrue(src.containsKey(TIME));
+            assertEquals(src.get(TIME), dst.get(TIME));
+            } catch (Throwable t) {
+                System.out.println("src: " + src);
+                System.out.println("dst: " + dst);
+                throw new RuntimeException(t);
+            }
+        } else {
+            throw new RuntimeException();
+        }
     }
 }

@@ -43,6 +43,14 @@ public class FileGeneratorMain {
         gens.add(new HeaderlessTSVFileGenerator(dirName + "headerless-tsvfile-with-timeformat.tsv",
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
 
+        // syslog files
+        gens.add(new SyslogFileGenerator(dirName + "syslogfile.syslog",
+                new String[] { "string-value", "int-value", "time" }));
+
+        // apache files
+        gens.add(new ApacheFileGenerator(dirName + "apachelogfile.apache",
+                new String[] { "string-value", "int-value", "time" }));
+
         // JSON files
         gens.add(new JSONFileGenerator(dirName + "jsonfile-with-time.json",
                 new String[] { "string-value", "int-value", "double-value", "timestamp", "time" }));

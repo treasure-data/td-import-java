@@ -59,11 +59,11 @@ public class TrainingDataSet {
             if (availableHeader[j].startsWith("string-")) {
                 row.put(availableHeader[j], "muga" + rand.nextInt(100));
             } else if (availableHeader[j].startsWith("int-")) {
-                row.put(availableHeader[j], rand.nextInt());
+                row.put(availableHeader[j], Math.abs(rand.nextInt()));
             } else if (availableHeader[j].startsWith("double-")) {
-                row.put(availableHeader[j], rand.nextDouble());
+                row.put(availableHeader[j], Math.abs(rand.nextDouble()));
             } else if (availableHeader[j].startsWith("long-")) {
-                row.put(availableHeader[j], rand.nextInt());
+                row.put(availableHeader[j], Math.abs(rand.nextInt()));
             } else if (availableHeader[j].equals("time")) {
                 row.put(availableHeader[j], baseTime + 60 * i);
             } else if (availableHeader[j].equals("timestamp")) {
