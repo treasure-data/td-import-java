@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
@@ -38,8 +39,10 @@ import com.treasure_data.bulk_import.prepare_parts.MySQLPrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
+import com.treasure_data.bulk_import.writer.JSONFileWriter;
 
 public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
+    private static final Logger LOG = Logger.getLogger(MySQLTableReader.class.getName());
 
     private static final String QUERY_SAMPLE = "SELECT * FROM %s LIMIT 1;";
     private static final String QUERY = "SELECT * FROM %s;";
@@ -70,10 +73,10 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
 
         // create and test a connection
         try {
-            System.out.println("url: " + url);
-            System.out.println("user: " + user);
-            System.out.println("password: " + password);
             conn = DriverManager.getConnection(url, user, password);
+            String msg = String.format("Connected successfully to %s", url);
+            System.out.println(msg);
+            LOG.info(msg);
         } catch (SQLException e) {
             throw new PreparePartsException(e);
         }
@@ -92,15 +95,15 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
     }
 
     private void sample(String table) throws PreparePartsException {
-        Statement stat = null;
-        ResultSet rs = null;
+        Statement sampleStat = null;
+        ResultSet sampleResultSet = null;
 
         int timeColumnIndex = -1;
         int aliasTimeColumnIndex = -1;
         try {
-            stat = conn.createStatement();
-            rs = stat.executeQuery(String.format(QUERY_SAMPLE, table));
-            ResultSetMetaData metaData = rs.getMetaData();
+            sampleStat = conn.createStatement();
+            sampleResultSet = sampleStat.executeQuery(String.format(QUERY_SAMPLE, table));
+            ResultSetMetaData metaData = sampleResultSet.getMetaData();
 
             numColumns = metaData.getColumnCount();
             if (columnNames == null || columnNames.length == 0) {
@@ -145,6 +148,13 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
                 }
             }
 
+            List<String> firstRow = new ArrayList<String>();
+            if (sampleResultSet.next()) {
+                for (int i = 0; i < numColumns; i++) {
+                    firstRow.add(sampleResultSet.getString(i + 1));
+                }
+            }
+
             // initialize types of all columns
             if (columnTypes == null || columnTypes.length == 0) {
                 columnTypes = new ColumnType[numColumns];
@@ -169,20 +179,51 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
 
             // check properties of exclude/only columns
             setSkipColumns();
+
+            JSONFileWriter w = null;
+            try {
+                w = new JSONFileWriter(conf);
+                w.setColumnNames(getColumnNames());
+                w.setColumnTypes(getColumnTypes());
+                w.setSkipColumns(getSkipColumns());
+                w.setTimeColumnValue(getTimeColumnValue());
+
+                this.row.addAll(firstRow);
+
+                // convert each column in row
+                convertTypesOfColumns();
+                // write each column value
+                w.next(convertedRow);
+                String ret = w.toJSONString();
+                String msg = null;
+                if (ret != null) {
+                    msg = "sample row: " + ret;
+                } else  {
+                    msg = "cannot get sample row";
+                }
+                System.out.println(msg);
+                LOG.info(msg);
+            } finally {
+                if (w != null) {
+                    w.close();
+                }
+            }
+        } catch (IOException e) {
+            throw new PreparePartsException(e);
         } catch (SQLException e) {
             throw new PreparePartsException(e);
         } finally {
-            if (rs != null) {
+            if (sampleResultSet != null) {
                 try {
-                    rs.close();
+                    sampleResultSet.close();
                 } catch (SQLException e) {
                     throw new PreparePartsException(e);
                 }
             }
 
-            if (stat != null) {
+            if (sampleStat != null) {
                 try {
-                    stat.close();
+                    sampleStat.close();
                 } catch (SQLException e) {
                     throw new PreparePartsException(e);
                 }
