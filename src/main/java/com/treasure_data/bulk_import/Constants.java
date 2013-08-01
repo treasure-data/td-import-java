@@ -142,6 +142,8 @@ public interface Constants extends com.treasure_data.client.Constants {
     // MYSQL PREPARE_PARTS_OPTIONS        //
     ////////////////////////////////////////
 
+    String BI_PREPARE_PARTS_MYSQL_JDBCDRIVER_CLASS = "com.mysql.jdbc.Driver";
+
     // url
     String BI_PREPARE_PARTS_JDBC_CONNECTION_URL = "td.bulk_import_prepare_parts.jdbc.connection.url";
 
