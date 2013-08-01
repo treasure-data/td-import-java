@@ -176,66 +176,6 @@ def find_logging_conf_file
   logging_conf_file
 end
 
-def prepare_parts2_config0(h, op)
-  op.on('-f', '--format NAME', 'source file format [csv, tsv, json, msgpack]; default=csv') {|s|
-    h['format'] = s
-  }
-  op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
-    h['compression'] = s
-  }
-  op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
-    h['encoding'] = s
-  }
-  op.on('-t', '--time-column NAME', 'name of the time column') {|s|
-    h['time_column'] = s
-  }
-  op.on('-T', '--time-format FORMAT', 'STRF_FORMAT; default=auto detect') {|s|
-    h['time_format'] = s
-  }
-  op.on('--time-value TIME', 'long value of the time column') {|s|
-    set_time_value_config(h, s)
-  }
-  op.on('-o', '--output DIR', 'output directory') {|s|
-    h['outdir'] = s
-  }
-  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
-    h['split_size_kb'] = i
-  }
-  op.on('--error-records-handling MODE', 'error records handling mode; default=skip') {|s|
-    h['error_records_handling'] = s
-  }
-  op.on('--dry-run', 'show samples as JSON and exit', FalseClass) {|b|
-    h['dry_run'] = b
-  }
-  op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
-    h['delimiter'] = s
-  }
-  op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
-    h['quote'] = s
-  }
-  op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
-    h['newline'] = s
-  }
-  op.on('-H', '--column-header', 'first line includes column names', TrueClass) {|b|
-    h['column_header'] = b
-  }
-  op.on('-h', '--columns NAME,NAME,...', 'column names (use --column-header instead if the first line has column names)') {|s|
-    h['columns'] = s
-  }
-  op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
-    h['column_types'] = s
-  }
-  op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
-    h['exclude_columns'] = s
-  }
-  op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
-    h['only_columns'] = s
-  }
-  op.on('--prepare-parallel NUM', 'prepare in parallel (default: 2; max 8)', Integer) {|i|
-    h['prepare_parallel'] = i
-  }
-end
-
 def prepare_parts2_config(op)
   h = {}
 
@@ -301,15 +241,7 @@ def upload_parts2_config(op)
   prepare_parts2_config0(h, op)
 
   # upload_parts
-  op.on('--auto-perform', 'perform bulk import job automatically', TrueClass) {|b|
-    h['auto_perform'] = b
-  }
-  op.on('--auto-commit', 'commit bulk import job automatically', TrueClass) {|b|
-    h['auto_commit'] = b
-  }
-  op.on('--parallel NUM', 'upload in parallel (default: 2; max 8)', Integer) {|i|
-    h['parallel'] = i
-  }
+  upload_parts2_config0(h, op)
 
   op.parse!(ARGV)
   files = ARGV
@@ -319,6 +251,66 @@ def upload_parts2_config(op)
   h
 end
 
+def prepare_parts2_config0(h, op)
+  op.on('-f', '--format NAME', 'source file format [csv, tsv, json, msgpack]; default=csv') {|s|
+    h['format'] = s
+  }
+  op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
+    h['compression'] = s
+  }
+  op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
+    h['encoding'] = s
+  }
+  op.on('-t', '--time-column NAME', 'name of the time column') {|s|
+    h['time_column'] = s
+  }
+  op.on('-T', '--time-format FORMAT', 'STRF_FORMAT; default=auto detect') {|s|
+    h['time_format'] = s
+  }
+  op.on('--time-value TIME', 'long value of the time column') {|s|
+    set_time_value_config(h, s)
+  }
+  op.on('-o', '--output DIR', 'output directory') {|s|
+    h['outdir'] = s
+  }
+  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
+    h['split_size_kb'] = i
+  }
+  op.on('--error-records-handling MODE', 'error records handling mode; default=skip') {|s|
+    h['error_records_handling'] = s
+  }
+  op.on('--dry-run', 'show samples as JSON and exit', FalseClass) {|b|
+    h['dry_run'] = b
+  }
+  op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
+    h['delimiter'] = s
+  }
+  op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
+    h['quote'] = s
+  }
+  op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
+    h['newline'] = s
+  }
+  op.on('-H', '--column-header', 'first line includes column names', TrueClass) {|b|
+    h['column_header'] = b
+  }
+  op.on('-h', '--columns NAME,NAME,...', 'column names (use --column-header instead if the first line has column names)') {|s|
+    h['columns'] = s
+  }
+  op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
+    h['column_types'] = s
+  }
+  op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
+    h['exclude_columns'] = s
+  }
+  op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
+    h['only_columns'] = s
+  }
+  op.on('--prepare-parallel NUM', 'prepare in parallel (default: 2; max 8)', Integer) {|i|
+    h['prepare_parallel'] = i
+  }
+end
+
 def set_time_value_config(h, s)
   if s.to_i.to_s == s
     h['time_value'] = s.to_i
@@ -326,6 +318,18 @@ def set_time_value_config(h, s)
     require 'time'
     h['time_value'] = Time.parse(s).to_i
   end
+end
+
+def upload_parts2_config0(h, op)
+  op.on('--auto-perform', 'perform bulk import job automatically', TrueClass) {|b|
+    h['auto_perform'] = b
+  }
+  op.on('--auto-commit', 'commit bulk import job automatically', TrueClass) {|b|
+    h['auto_commit'] = b
+  }
+  op.on('--parallel NUM', 'upload in parallel (default: 2; max 8)', Integer) {|i|
+    h['parallel'] = i
+  }
 end
 
 require 'optparse'
