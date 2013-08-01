@@ -32,8 +32,8 @@ import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 
-public class Main {
-    private static final Logger LOG = Logger.getLogger(Main.class.getName());
+public class BulkImportMain {
+    private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
     /**
      * > td bulk_import:prepare_parts2
      * usage:

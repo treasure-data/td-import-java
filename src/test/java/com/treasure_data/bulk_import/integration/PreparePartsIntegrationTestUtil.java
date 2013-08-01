@@ -22,7 +22,7 @@ import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.UnpackerIterator;
 
 import com.treasure_data.bulk_import.Configuration;
-import com.treasure_data.bulk_import.Main;
+import com.treasure_data.bulk_import.BulkImportMain;
 
 @Ignore
 public class PreparePartsIntegrationTestUtil {
@@ -92,7 +92,7 @@ public class PreparePartsIntegrationTestUtil {
         args.add(Configuration.CMD_PREPARE_PARTS);
         args.add(fileName);
 
-        Main.prepareParts(args.toArray(new String[0]), props);
+        BulkImportMain.prepareParts(args.toArray(new String[0]), props);
     }
 
     public void preparePartsFromCSVWithTimeColumn() throws Exception {

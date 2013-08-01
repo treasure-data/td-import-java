@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.treasure_data.bulk_import.Configuration;
 
-public class TestMain {
+public class TestBulkImportMain {
 
     @Test @Ignore
     public void testPrepareParts01() throws Exception {
@@ -36,7 +36,7 @@ public class TestMain {
 //                "./in/from_SQLServer_to_csv_10_v09.csv",
         };
 
-        Main.prepareParts(args, props);
+        BulkImportMain.prepareParts(args, props);
     }
 
     @Test @Ignore
@@ -66,7 +66,7 @@ public class TestMain {
 //                "./in/from_SQLServer_to_csv_10_v09.csv",
         };
 
-        Main.uploadParts(args, props);
+        BulkImportMain.uploadParts(args, props);
     }
 
     @Test @Ignore
@@ -98,6 +98,6 @@ public class TestMain {
 //                "./in/from_SQLServer_to_csv_10_v09.csv",
         };
 
-        Main.prepareAndUploadParts(args, props);
+        BulkImportMain.prepareAndUploadParts(args, props);
     }
 }
