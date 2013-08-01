@@ -134,9 +134,11 @@ public class UploadProcessor {
         ErrorInfo err = new ErrorInfo();
         err.task = task;
         try {
-            LOG.info(String.format(
+            String startMessage = String.format(
                     "Upload file '%s' (size %d) to session '%s' as part '%s'",
-                    task.fileName, task.size, task.sessName, task.partName));
+                    task.fileName, task.size, task.sessName, task.partName);
+            System.out.println(startMessage);
+            LOG.info(startMessage);
 
             long time = System.currentTimeMillis();
             new RetryClient3().retry(new Retryable2() {
@@ -148,9 +150,11 @@ public class UploadProcessor {
                     conf.getWaitSec() * 1000);
             time = System.currentTimeMillis() - time;
 
-            LOG.info(String
-                    .format("Uploaded file '%s' (size %d) to session '%s' as part '%s' (time: %d sec.)",
-                            task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
+            String endMessage = String.format(
+                    "Uploaded file '%s' (size %d) to session '%s' as part '%s' (time: %d sec.)", 
+                    task.fileName, task.size, task.sessName, task.partName, (time / 1000));
+            System.out.println(endMessage);
+            LOG.info(endMessage);
         } catch (IOException e) {
             LOG.severe(e.getMessage());
             err.error = e;
