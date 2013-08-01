@@ -176,31 +176,7 @@ def find_logging_conf_file
   logging_conf_file
 end
 
-def prepare_parts2_config(op)
-  h = {}
-
-  h['format'] = 'csv'
-  h['compression'] = 'none'
-  h['encoding'] = 'utf-8'
-  h['time_column'] = 'time'
-  h['time_format'] = nil
-  h['time_value'] = nil
-  h['outdir'] = 'out'
-  h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
-  h['error_records_handling'] = 'skip'
-  h['dry_run'] = false
-  h['delimiter'] = ','
-  h['quote'] = "DOUBLE"
-  h['newline'] = 'CRLF'
-  h['column_header'] = false
-  h['columns'] = nil
-  h['column_types'] = nil
-  h['exclude_columns'] = nil
-  h['only_columns'] = nil
-  h['prepare_parallel'] = 2
-  h['files'] = nil
-
-  # prepare_parts
+def prepare_parts2_config0(h, op)
   op.on('-f', '--format NAME', 'source file format [csv, tsv, json, msgpack]; default=csv') {|s|
     h['format'] = s
   }
@@ -258,6 +234,34 @@ def prepare_parts2_config(op)
   op.on('--prepare-parallel NUM', 'prepare in parallel (default: 2; max 8)', Integer) {|i|
     h['prepare_parallel'] = i
   }
+end
+
+def prepare_parts2_config(op)
+  h = {}
+
+  h['format'] = 'csv'
+  h['compression'] = 'none'
+  h['encoding'] = 'utf-8'
+  h['time_column'] = 'time'
+  h['time_format'] = nil
+  h['time_value'] = nil
+  h['outdir'] = 'out'
+  h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
+  h['error_records_handling'] = 'skip'
+  h['dry_run'] = false
+  h['delimiter'] = ','
+  h['quote'] = "DOUBLE"
+  h['newline'] = 'CRLF'
+  h['column_header'] = false
+  h['columns'] = nil
+  h['column_types'] = nil
+  h['exclude_columns'] = nil
+  h['only_columns'] = nil
+  h['prepare_parallel'] = 2
+  h['files'] = nil
+
+  # prepare_parts
+  prepare_parts2_config0(h, op)
 
   op.parse!(ARGV)
   files = ARGV
@@ -294,63 +298,8 @@ def upload_parts2_config(op)
   h['parallel'] = 2
 
   # prepare_parts
-  op.on('-f', '--format NAME', 'source file format [csv, tsv, json, msgpack]; default=csv') {|s|
-    h['format'] = s
-  }
-  op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
-    h['compression'] = s
-  }
-  op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
-    h['encoding'] = s
-  }
-  op.on('-t', '--time-column NAME', 'name of the time column') {|s|
-    h['time_column'] = s
-  }
-  op.on('-T', '--time-format FORMAT', 'STRF_FORMAT; default=auto detect') {|s|
-    h['time_format'] = s
-  }
-  op.on('--time-value TIME', 'long value of the time column') {|s|
-    set_time_value_config(h, s)
-  }
-  op.on('-o', '--output DIR', 'output directory', "when use fluent upload") {|s|
-    h['outdir'] = s
-  }
-  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
-    h['split_size_kb'] = i
-  }
-  op.on('--error-records-handling MODE', 'error records handling mode; default=skip') {|s|
-    h['error_records_handling'] = s
-  }
-  op.on('--dry-run', 'show samples as JSON and exit', FalseClass) {|b|
-    h['dry_run'] = b
-  }
-  op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
-    h['delimiter'] = s
-  }
-  op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
-    h['quote'] = s
-  }
-  op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
-    h['newline'] = s
-  }
-  op.on('-H', '--column-header', 'first line includes column names', TrueClass) {|b|
-    h['column_header'] = b
-  }
-  op.on('-h', '--columns NAME,NAME,...', 'column names (use --column-header instead if the first line has column names)') {|s|
-    h['columns'] = s
-  }
-  op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
-    h['column_types'] = s
-  }
-  op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
-    h['exclude_columns'] = s
-  }
-  op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
-    h['only_columns'] = s
-  }
-  op.on('--prepare-parallel NUM', 'prepare in parallel (default: 2; max 8)', Integer) {|i|
-    h['prepare_parallel'] = i
-  }
+  prepare_parts2_config0(h, op)
+
   # upload_parts
   op.on('--auto-perform', 'perform bulk import job automatically', TrueClass) {|b|
     h['auto_perform'] = b
