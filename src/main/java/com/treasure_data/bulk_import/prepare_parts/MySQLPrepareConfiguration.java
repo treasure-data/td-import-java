@@ -19,31 +19,63 @@ package com.treasure_data.bulk_import.prepare_parts;
 
 import java.util.Properties;
 
+import com.treasure_data.bulk_import.Configuration;
+
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
 
-    protected String jdbcConnectionURL;
-    protected String jdbcUser;
-    protected String jdbcPassword;
-    protected String jdbcTable;
+    protected String connectionURL;
+    protected String user;
+    protected String password;
+    protected String table;
 
     @Override
     public void configure(Properties props) {
         super.configure(props);
+
+        setConnectionURL();
+        setUser();
+        setPassword();
+        setTable();
     }
 
-    public String getJDBCConnectionURL() {
-        return jdbcConnectionURL;
+    public void setConnectionURL() {
+        connectionURL = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL);
+        if (connectionURL == null || connectionURL.isEmpty()) {
+            throw new IllegalArgumentException("Not specified connection URL");
+        }
     }
 
-    public String getJDBCUser() {
-        return jdbcUser;
+    public String getConnectionURL() {
+        return connectionURL;
     }
 
-    public String getJDBCPassword() {
-        return jdbcPassword;
+    public void setUser() {
+        user = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_USER);
+        if (user == null || user.isEmpty()) {
+            throw new IllegalArgumentException("Not specified user");
+        }
     }
 
-    public String getJDBCTable() {
-        return jdbcTable;
+    public String getUser() {
+        return user;
+    }
+
+    public void setPassword() {
+        password = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_PASSWORD);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setTable() {
+        table = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_TABLE);
+        if (table == null || table.isEmpty()) {
+            throw new IllegalArgumentException("Not specified table");
+        }
+    }
+
+    public String getTable() {
+        return table;
     }
 }

@@ -41,11 +41,11 @@ import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
 
-    private static final String SAMPLE_QUERY = "SELECT * FROM %s LIMIT 1;";
+    private static final String QUERY_SAMPLE = "SELECT * FROM %s LIMIT 1;";
     private static final String QUERY = "SELECT * FROM %s;";
 
     protected Connection conn;
-    protected List<String> rawRow = new ArrayList<String>();
+    protected List<String> row = new ArrayList<String>();
     protected int numColumns;
     protected ResultSet resultSet;
 
@@ -58,18 +58,21 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
         super.configure(task);
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName(Configuration.BI_PREPARE_PARTS_MYSQL_JDBCDRIVER_CLASS);
         } catch (ClassNotFoundException e) {
             throw new PreparePartsException(e);
         } 
 
-        String url = conf.getJDBCConnectionURL();
-        String user = conf.getJDBCUser();
-        String password = conf.getJDBCPassword();
-        String table = conf.getJDBCTable();
+        String url = conf.getConnectionURL();
+        String user = conf.getUser();
+        String password = conf.getPassword();
+        String table = conf.getTable();
 
         // create and test a connection
         try {
+            System.out.println("url: " + url);
+            System.out.println("user: " + user);
+            System.out.println("password: " + password);
             conn = DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             throw new PreparePartsException(e);
@@ -78,8 +81,9 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
         // sample
         sample(table);
 
+        Statement stat = null;
         try {
-            Statement stat = conn.createStatement();
+            stat = conn.createStatement();
             // TODO optimize the query string
             resultSet = stat.executeQuery(String.format(QUERY, table));
         } catch (SQLException e) {
@@ -95,14 +99,14 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
         int aliasTimeColumnIndex = -1;
         try {
             stat = conn.createStatement();
-            rs = stat.executeQuery(String.format(SAMPLE_QUERY, table));
+            rs = stat.executeQuery(String.format(QUERY_SAMPLE, table));
             ResultSetMetaData metaData = rs.getMetaData();
 
             numColumns = metaData.getColumnCount();
             if (columnNames == null || columnNames.length == 0) {
                 columnNames = new String[numColumns];
                 for (int i = 0; i < numColumns; i++) {
-                    columnNames[i] = metaData.getColumnName(i);
+                    columnNames[i] = metaData.getColumnName(i + 1);
                 }
             }
 
@@ -142,10 +146,10 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
             }
 
             // initialize types of all columns
-            if (columnTypes == null | columnTypes.length == 0) {
+            if (columnTypes == null || columnTypes.length == 0) {
                 columnTypes = new ColumnType[numColumns];
                 for (int i = 0; i < numColumns; i++) {
-                    columnTypes[i] = toColumnType(metaData.getColumnType(i));
+                    columnTypes[i] = toColumnType(metaData.getColumnType(i + 1));
                 }
             }
 
@@ -188,22 +192,28 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
 
     private static ColumnType toColumnType(int jdbcType)
             throws PreparePartsException {
-        // TODO append more types
         switch (jdbcType) {
-            case Types.VARCHAR:
-                return ColumnType.STRING;
-            case Types.INTEGER:
-                return ColumnType.INT;
-            case Types.BIGINT:
-                return ColumnType.LONG;
+        case Types.CHAR:
+        case Types.VARCHAR:
+        case Types.LONGVARCHAR:
+            return ColumnType.STRING;
+        case Types.TINYINT:
+        case Types.SMALLINT:
+        case Types.INTEGER:
+            return ColumnType.INT;
+        case Types.BIGINT:
+            return ColumnType.LONG;
+        case Types.FLOAT:
+        case Types.DOUBLE:
+            return ColumnType.DOUBLE;
         default:
-            throw new PreparePartsException(new UnsupportedOperationException(
-                    "jdbc type: " + jdbcType));
+            throw new PreparePartsException("unsupported jdbc type: " + jdbcType);
         }
     }
 
     @Override
     public boolean readRow() throws IOException {
+        row.clear();
         try {
             boolean hasNext = resultSet.next();
             if (!hasNext) {
@@ -211,31 +221,38 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
             }
 
             for (int i = 0; i < numColumns; i++) {
-                rawRow.add(i, resultSet.getString(i + 1));
+                row.add(i, resultSet.getString(i + 1));
             }
-            return true;
         } catch (SQLException e) {
             throw new IOException(e);
         }
+
+        return true;
     }
 
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
-        for (int i = 0; i < rawRow.size(); i++) {
-            ColumnValue v = convertedRow.getValue(i);
-            columnTypes[i].convertType(rawRow.get(i), v);
-            convertedRow.setValue(i, v);
+        for (int i = 0; i < row.size(); i++) {
+            columnTypes[i].convertType(row.get(i), convertedRow.getValue(i));
         }
     }
 
     @Override
     public String getCurrentRow() {
-        return rawRow.toString();
+        return row.toString();
     }
 
     @Override
     public void close() throws IOException {
         super.close();
+
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                throw new IOException(e);
+            }
+        }
 
         if (conn != null) {
             try {
