@@ -10,7 +10,7 @@ HERE = File.dirname(__FILE__)
 PART_SPLIT_SIZE = 16*1024*1024
 
 JAVA_COMMAND = "java"
-JAVA_MAIN_CLASS = "com.treasure_data.bulk_import.Main"
+JAVA_MAIN_CLASS = "com.treasure_data.bulk_import.BulkImportMain"
 JAVA_HEAP_MX_SIZE = "-Xmx1024m" # TODO
 
 APP_OPTION_PREPARE = "prepare_parts"
