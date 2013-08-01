@@ -40,6 +40,29 @@ public class TestBulkImportMain {
     }
 
     @Test @Ignore
+    public void testPrepareParts02() throws Exception {
+        Properties props = System.getProperties();
+        props.load(this.getClass().getClassLoader()
+                .getResourceAsStream("treasure-data.properties"));
+
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
+        //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "2");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "mysql");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL, props.getProperty("mysql.test.url"));
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_USER, props.getProperty("mysql.test.user"));
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_PASSWORD, props.getProperty("mysql.test.password"));
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_TABLE, props.getProperty("mysql.test.table"));
+        final String[] args = new String[] {
+                "prepare_parts",
+                "mugatbl"
+        };
+
+        BulkImportMain.prepareParts(args, props);
+    }
+
+    @Test @Ignore
     public void testUploadParts01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader()
@@ -96,6 +119,30 @@ public class TestBulkImportMain {
 //                "./in/from_SQLServer_to_csv_10_v07.csv",
 //                "./in/from_SQLServer_to_csv_10_v08.csv",
 //                "./in/from_SQLServer_to_csv_10_v09.csv",
+        };
+
+        BulkImportMain.prepareAndUploadParts(args, props);
+    }
+
+    @Test @Ignore
+    public void testPrepareUploadParts02() throws Exception {
+        Properties props = System.getProperties();
+        props.load(this.getClass().getClassLoader()
+                .getResourceAsStream("treasure-data.properties"));
+
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
+        //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "2");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "mysql");
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL, props.getProperty("mysql.test.url"));
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_USER, props.getProperty("mysql.test.user"));
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_PASSWORD, props.getProperty("mysql.test.password"));
+        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_TABLE, props.getProperty("mysql.test.table"));
+        final String[] args = new String[] {
+                "upload_parts",
+                "mugasess",
+                "mugatbl"
         };
 
         BulkImportMain.prepareAndUploadParts(args, props);
