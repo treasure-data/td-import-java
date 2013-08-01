@@ -217,12 +217,7 @@ def prepare_parts2_config(op)
     h['time_format'] = s
   }
   op.on('--time-value TIME', 'long value of the time column') {|s|
-    if s.to_i.to_s == s
-      h['time_value'] = s.to_i
-    else
-      require 'time'
-      h['time_value'] = Time.parse(s).to_i
-    end
+    set_time_value_config(h, s)
   }
   op.on('-o', '--output DIR', 'output directory') {|s|
     h['outdir'] = s
@@ -315,12 +310,7 @@ def upload_parts2_config(op)
     h['time_format'] = s
   }
   op.on('--time-value TIME', 'long value of the time column') {|s|
-    if s.to_i.to_s == s
-      h['time_value'] = s.to_i
-    else
-      require 'time'
-      h['time_value'] = Time.parse(s).to_i
-    end
+    set_time_value_config(h, s)
   }
   op.on('-o', '--output DIR', 'output directory', "when use fluent upload") {|s|
     h['outdir'] = s
@@ -378,6 +368,15 @@ def upload_parts2_config(op)
   h['files'] = files
 
   h
+end
+
+def set_time_value_config(h, s)
+  if s.to_i.to_s == s
+    h['time_value'] = s.to_i
+  else
+    require 'time'
+    h['time_value'] = Time.parse(s).to_i
+  end
 end
 
 require 'optparse'
