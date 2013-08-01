@@ -1,6 +1,7 @@
 Release 0.2.1 - 2013/XX/XX
   NEW FEATURES
     Adds 'apache' common log format to 'prepare_parts' as 'format' option
+    Adds 'mysql' to 'prepare_parts' as 'format' option. It allows users to import data from MySQL to Treasure Data directly.
 
 Release 0.2.0 - 2013/07/18
   NEW FEATURES
