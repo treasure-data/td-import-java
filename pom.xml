@@ -53,6 +53,7 @@
 
   <properties>
     <!--  version properties for dependencies -->
+    <jopt-simple.version>4.5</jopt-simple.version>
     <msgpack.version>0.6.7</msgpack.version>
     <super-csv.version>2.0.1</super-csv.version>
     <td-client.version>0.2.6</td-client.version>
@@ -101,6 +102,11 @@
   </repositories>
 
   <dependencies>
+    <dependency>
+      <groupId>net.sf.jopt-simple</groupId>
+      <artifactId>jopt-simple</artifactId>
+      <version>${jopt-simple.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.msgpack</groupId>
       <artifactId>msgpack</artifactId>
