@@ -17,6 +17,7 @@
 //
 package com.treasure_data.bulk_import;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -141,7 +142,7 @@ public class BulkImportOptions {
         op = new OptionParser();
     }
 
-    public void initPrepareOptionParser(Properties props) throws Exception {
+    public void initPrepareOptionParser(Properties props) {
         op.formatHelpWith(new SimpleHelpFormatter());
         op.acceptsAll(Arrays.asList("h", "help"),
                 "show this help message");
@@ -241,7 +242,7 @@ public class BulkImportOptions {
 
     }
 
-    public void initUploadOptionParser(Properties props) throws Exception {
+    public void initUploadOptionParser(Properties props) {
         this.initPrepareOptionParser(props);
         op.acceptsAll(Arrays.asList("auto-perform"),
                 "perform bulk import job automatically");
@@ -252,6 +253,11 @@ public class BulkImportOptions {
                 .withRequiredArg()
                 .describedAs("NUM")
                 .ofType(String.class);
+    }
+
+    public void showHelp() throws IOException {
+        // this method should be called after invoking initXXXOptionParser(..)
+        op.printHelpOn(System.out);
     }
 
     public void setOptions(final String[] args) {
