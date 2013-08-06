@@ -11,6 +11,7 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestBulkImportOptions {
@@ -41,6 +42,11 @@ public class TestBulkImportOptions {
     public void createResources() throws Exception {
         props = System.getProperties();
         actualOpts = new BulkImportOptions();
+    }
+
+    @Test @Ignore
+    public void showHelp() throws Exception {
+        actualOpts.showHelp();
     }
 
     @Test
