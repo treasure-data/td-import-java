@@ -19,6 +19,7 @@ package com.treasure_data.bulk_import;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -150,43 +151,44 @@ public class BulkImportOptions {
                 .withRequiredArg()
                 .describedAs("FORMAT")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("C","compress"),
+        op.acceptsAll(Arrays.asList("C", "compress"),
                 "compressed type [gzip, none]; default=auto detect")
                 .withRequiredArg()
                 .describedAs("TYPE")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("e","encoding"),
+        op.acceptsAll(Arrays.asList("e", "encoding"),
                 "encoding type [utf-8]")
                 .withRequiredArg()
                 .describedAs("TYPE")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("t","time-column"),
+        op.acceptsAll(Arrays.asList("t", "time-column"),
                 "name of the time column")
                 .withRequiredArg()
                 .describedAs("NAME")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("T","time-format"),
+        op.acceptsAll(Arrays.asList("T", "time-format"),
                 "STRF_FORMAT; default=auto detect")
                 .withRequiredArg()
+                .withValuesSeparatedBy(",")
                 .describedAs("FORMAT")
                 .ofType(String.class);
         op.acceptsAll(Arrays.asList("time-value"),
                 "long value of the time column")
                 .withRequiredArg()
                 .describedAs("TIME")
-                .ofType(Long.class);
-        op.acceptsAll(Arrays.asList("o","output"),
+                .ofType(String.class);
+        op.acceptsAll(Arrays.asList("o", "output"),
                 "output directory")
                 .withRequiredArg()
                 .describedAs("DIR")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("s","split-size"),
-                "size of each parts (default: #{h['split_size_kb']})") // TODO
+        op.acceptsAll(Arrays.asList("s", "split-size"),
+                "size of each parts (default: 16384)")
                 .withRequiredArg()
                 .describedAs("SIZE_IN_KB")
-                .ofType(Integer.class);
+                .ofType(String.class);
         op.acceptsAll(Arrays.asList("error-records-handling"),
-                "error records handling mode; default=skip")
+                "error records handling mode [skip, abort]; default=skip")
                 .withRequiredArg()
                 .describedAs("MODE")
                 .ofType(String.class);
@@ -205,7 +207,7 @@ public class BulkImportOptions {
                 .withRequiredArg()
                 .describedAs("TYPE")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("column-header"), // TODO
+        op.acceptsAll(Arrays.asList("column-header"),
                 "first line includes column names")
                 .withOptionalArg();
         op.acceptsAll(Arrays.asList("columns"), // TODO
@@ -218,12 +220,12 @@ public class BulkImportOptions {
                 .withRequiredArg()
                 .describedAs("TYPE,TYPE,...")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("exclude-columns"),
+        op.acceptsAll(Arrays.asList("exclude-columns"), // TODO
                 "exclude columns")
                 .withRequiredArg()
                 .describedAs("NAME,NAME,...")
                 .ofType(String.class);
-        op.acceptsAll(Arrays.asList("only-columns"),
+        op.acceptsAll(Arrays.asList("only-columns"), // TODO
                 "only-columns")
                 .withRequiredArg()
                 .describedAs("NAME,NAME,...")
@@ -232,7 +234,7 @@ public class BulkImportOptions {
                 "prepare in parallel (default: 2; max 8)")
                 .withRequiredArg()
                 .describedAs("NUM")
-                .ofType(Integer.class);
+                .ofType(String.class);
 
     }
 
@@ -248,11 +250,14 @@ public class BulkImportOptions {
                 "upload in parallel (default: 2; max 8)")
                 .withRequiredArg()
                 .describedAs("NUM")
-                .ofType(Integer.class);
+                .ofType(String.class);
     }
 
     public void setOptions(final String[] args) {
         options = op.parse(args);
+        // TODO
+        //@SuppressWarnings("unchecked")
+        //List<String> nonOptArgs = (List<String>) options.nonOptionArguments();
     }
 
     public OptionSet getOptions() {
