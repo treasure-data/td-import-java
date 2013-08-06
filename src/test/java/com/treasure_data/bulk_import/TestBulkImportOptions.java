@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.Properties;
 
 import joptsimple.OptionSet;
@@ -43,27 +44,7 @@ public class TestBulkImportOptions {
     @Test
     public void testPrepareOptions() throws Exception {
         actualOpts.initPrepareOptionParser(props);
-        final String[] args = new String[] {
-                "--format", sampleFormat,
-                "--compress", sampleCompress,
-                "--encoding", sampleEncoding,
-                "--time-column", sampleTimeColumn,
-                "--time-format", sampleTimeFormat,
-                "--time-value", sampleTimeValue,
-                "--output", sampleOutput,
-                "--split-size", sampleSplitSize,
-                "--error-records-handling", sampleErrorRecordsHandling,
-                "--delimiter", sampleDelimiter,
-                "--quote", sampleQuote,
-                "--newline", sampleNewline,
-                "--column-header",
-                "--columns", sampleColumns,
-                "--column-types", sampleColumnTypes,
-                "--exclude-columns", sampleExcludeColumns,
-                "--only-columns", sampleOnlyColumns,
-                "--prepare-parallel", samplePrepareParallel,
-        };
-        actualOpts.setOptions(args);
+        actualOpts.setOptions(createPrepareArguments());
 
         assertOptionEquals("f", sampleFormat, actualOpts);
         assertOptionEquals("format", sampleFormat, actualOpts);
@@ -83,11 +64,34 @@ public class TestBulkImportOptions {
         assertOptionEquals("quote", sampleQuote, actualOpts);
         assertOptionEquals("newline", sampleNewline, actualOpts);
         assertOptionEquals("column-header", actualOpts);
-        assertOptionEquals("columns", sampleColumns, actualOpts);
-        assertOptionEquals("column-types", sampleColumnTypes, actualOpts);
-        assertOptionEquals("exclude-columns", sampleExcludeColumns, actualOpts);
-        assertOptionEquals("only-columns", sampleOnlyColumns, actualOpts);
+        assertOptionEquals("columns", sampleColumns.split(","), actualOpts);
+        assertOptionEquals("column-types", sampleColumnTypes.split(","), actualOpts);
+        assertOptionEquals("exclude-columns", sampleExcludeColumns.split(","), actualOpts);
+        assertOptionEquals("only-columns", sampleOnlyColumns.split(","), actualOpts);
         assertOptionEquals("prepare-parallel", samplePrepareParallel, actualOpts);
+    }
+
+    private String[] createPrepareArguments() {
+        return new String[] {
+                "--format", sampleFormat,
+                "--compress", sampleCompress,
+                "--encoding", sampleEncoding,
+                "--time-column", sampleTimeColumn,
+                "--time-format", sampleTimeFormat,
+                "--time-value", sampleTimeValue,
+                "--output", sampleOutput,
+                "--split-size", sampleSplitSize,
+                "--error-records-handling", sampleErrorRecordsHandling,
+                "--delimiter", sampleDelimiter,
+                "--quote", sampleQuote,
+                "--newline", sampleNewline,
+                "--column-header",
+                "--columns", sampleColumns,
+                "--column-types", sampleColumnTypes,
+                "--exclude-columns", sampleExcludeColumns,
+                "--only-columns", sampleOnlyColumns,
+                "--prepare-parallel", samplePrepareParallel,
+        };
     }
 
 //    @Test
@@ -129,6 +133,17 @@ public class TestBulkImportOptions {
             BulkImportOptions actual) throws Exception {
         assertOptionWithRequiredArgEquals(expectedName, actual);
         assertEquals(expectedArg, actual.getOptions().valueOf(expectedName));
+    }
+
+    public void assertOptionEquals(String expectedName, String[] expectedArgs,
+            BulkImportOptions actual) throws Exception {
+        assertOptionWithRequiredArgEquals(expectedName, actual);
+        @SuppressWarnings("unchecked")
+        List<String> args = (List<String>) actual.getOptions().valuesOf(expectedName);
+        assertEquals(expectedArgs.length, args.size());
+        for (int i = 0; i < expectedArgs.length; i++) {
+            assertEquals(expectedArgs[i], args.get(i));
+        }
     }
 
     public void assertOptionWithRequiredArgEquals(String expectedName,

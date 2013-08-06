@@ -210,26 +210,30 @@ public class BulkImportOptions {
         op.acceptsAll(Arrays.asList("column-header"),
                 "first line includes column names")
                 .withOptionalArg();
-        op.acceptsAll(Arrays.asList("columns"), // TODO
+        op.acceptsAll(Arrays.asList("columns"),
                 "column names (use --column-header instead if the first line has column names)")
                 .withRequiredArg()
                 .describedAs("NAME,NAME,...")
-                .ofType(String.class);
-        op.acceptsAll(Arrays.asList("column-types"), // TODO
+                .ofType(String.class)
+                .withValuesSeparatedBy(",");
+        op.acceptsAll(Arrays.asList("column-types"),
                 "column types [string, int, long]")
                 .withRequiredArg()
                 .describedAs("TYPE,TYPE,...")
-                .ofType(String.class);
-        op.acceptsAll(Arrays.asList("exclude-columns"), // TODO
+                .ofType(String.class)
+                .withValuesSeparatedBy(",");
+        op.acceptsAll(Arrays.asList("exclude-columns"),
                 "exclude columns")
                 .withRequiredArg()
                 .describedAs("NAME,NAME,...")
-                .ofType(String.class);
-        op.acceptsAll(Arrays.asList("only-columns"), // TODO
+                .ofType(String.class)
+                .withValuesSeparatedBy(",");
+        op.acceptsAll(Arrays.asList("only-columns"),
                 "only-columns")
                 .withRequiredArg()
                 .describedAs("NAME,NAME,...")
-                .ofType(String.class);
+                .ofType(String.class)
+                .withValuesSeparatedBy(",");
         op.acceptsAll(Arrays.asList("prepare-parallel"),
                 "prepare in parallel (default: 2; max 8)")
                 .withRequiredArg()
