@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,6 +32,7 @@ public class TestBulkImportOptions {
     private final String sampleExcludeColumns = "c0,c1,c2";
     private final String sampleOnlyColumns = "c0,c1,c2";
     private final String samplePrepareParallel = "10";
+    private final String sampleParallel = "10";
 
     protected Properties props;
     protected BulkImportOptions actualOpts;
@@ -45,7 +47,54 @@ public class TestBulkImportOptions {
     public void testPrepareOptions() throws Exception {
         actualOpts.initPrepareOptionParser(props);
         actualOpts.setOptions(createPrepareArguments());
+        assertPrepareOptionEquals(actualOpts);
+    }
 
+    @Test
+    public void testUploadOptions() throws Exception {
+        actualOpts.initUploadOptionParser(props);
+        actualOpts.setOptions(createUploadArguments());
+        assertUploadOptionEquals(actualOpts);
+    }
+
+    private String[] createPrepareArguments() {
+        return new String[] {
+                "--format", sampleFormat,
+                "--compress", sampleCompress,
+                "--encoding", sampleEncoding,
+                "--time-column", sampleTimeColumn,
+                "--time-format", sampleTimeFormat,
+                "--time-value", sampleTimeValue,
+                "--output", sampleOutput,
+                "--split-size", sampleSplitSize,
+                "--error-records-handling", sampleErrorRecordsHandling,
+                "--delimiter", sampleDelimiter,
+                "--quote", sampleQuote,
+                "--newline", sampleNewline,
+                "--column-header",
+                "--columns", sampleColumns,
+                "--column-types", sampleColumnTypes,
+                "--exclude-columns", sampleExcludeColumns,
+                "--only-columns", sampleOnlyColumns,
+                "--prepare-parallel", samplePrepareParallel
+        };
+    }
+
+    private String[] createUploadArguments() {
+        String[] prepareArgs = createPrepareArguments();
+        String[] args = new String[] {
+                "--auto-perform",
+                "--auto-commit",
+                "--parallel", sampleParallel,
+        };
+
+        String[] uploadArgs = new String[prepareArgs.length + args.length];
+        System.arraycopy(prepareArgs, 0, uploadArgs, 0, prepareArgs.length);
+        System.arraycopy(args, 0, uploadArgs, prepareArgs.length, args.length);
+        return uploadArgs;
+    }
+
+    public void assertPrepareOptionEquals(BulkImportOptions actualOpts) throws Exception {
         assertOptionEquals("f", sampleFormat, actualOpts);
         assertOptionEquals("format", sampleFormat, actualOpts);
         assertOptionEquals("C", sampleCompress, actualOpts);
@@ -71,57 +120,12 @@ public class TestBulkImportOptions {
         assertOptionEquals("prepare-parallel", samplePrepareParallel, actualOpts);
     }
 
-    private String[] createPrepareArguments() {
-        return new String[] {
-                "--format", sampleFormat,
-                "--compress", sampleCompress,
-                "--encoding", sampleEncoding,
-                "--time-column", sampleTimeColumn,
-                "--time-format", sampleTimeFormat,
-                "--time-value", sampleTimeValue,
-                "--output", sampleOutput,
-                "--split-size", sampleSplitSize,
-                "--error-records-handling", sampleErrorRecordsHandling,
-                "--delimiter", sampleDelimiter,
-                "--quote", sampleQuote,
-                "--newline", sampleNewline,
-                "--column-header",
-                "--columns", sampleColumns,
-                "--column-types", sampleColumnTypes,
-                "--exclude-columns", sampleExcludeColumns,
-                "--only-columns", sampleOnlyColumns,
-                "--prepare-parallel", samplePrepareParallel,
-        };
+    public void assertUploadOptionEquals(BulkImportOptions actualOpts) throws Exception {
+        assertPrepareOptionEquals(actualOpts);
+        assertOptionEquals("auto-perform", actualOpts);
+        assertOptionEquals("auto-commit", actualOpts);
+        assertOptionEquals("parallel", sampleParallel, actualOpts);
     }
-
-//    @Test
-//    public void testUploadOptions() throws Exception {
-//        actualOpts.initUploadOptionParser(props);
-//        final String[] args = new String[] {
-//                "--format", sampleFormat,
-//                "--compress", sampleCompress,
-//                "--encoding", sampleEncoding,
-//                "--time-column", sampleTimeColumn,
-//                "--time-format", sampleTimeFormat,
-//                "--time-value", sampleTimeValue,
-//                "--output", sampleOutput,
-//                "--split-size", sampleSplitSize,
-//                "--error-records-handling", sampleErrorRecordsHandling,
-//                "--delimiter", sampleDelimiter,
-//                "--quote", sampleQuote,
-//                "--newline", sampleNewline,
-//                "--column-header",
-//                "--columns", sampleColumns,
-//                "--column-types", sampleColumnTypes,
-//                "--exclude-columns", sampleExcludeColumns,
-//                "--only-columns", sampleOnlyColumns,
-//                "--prepare-parallel", samplePrepareParallel,
-//        };
-//        actualOpts.setOptions(args);
-//
-//        // TODO
-//    }
-
     public void assertOptionEquals(String expectedName, BulkImportOptions actual)
             throws Exception {
         OptionSet set = actual.getOptions();

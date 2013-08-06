@@ -244,10 +244,10 @@ public class BulkImportOptions {
 
     public void initUploadOptionParser(Properties props) throws Exception {
         this.initPrepareOptionParser(props);
-        op.acceptsAll(Arrays.asList("auto-perform"), // TODO
+        op.acceptsAll(Arrays.asList("auto-perform"),
                 "perform bulk import job automatically")
                 .withOptionalArg();
-        op.acceptsAll(Arrays.asList("auto-commit"), // TODO
+        op.acceptsAll(Arrays.asList("auto-commit"),
                 "commit bulk import job automatically")
                 .withOptionalArg();
         op.acceptsAll(Arrays.asList("parallel"),
