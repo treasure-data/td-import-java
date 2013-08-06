@@ -208,8 +208,7 @@ public class BulkImportOptions {
                 .describedAs("TYPE")
                 .ofType(String.class);
         op.acceptsAll(Arrays.asList("column-header"),
-                "first line includes column names")
-                .withOptionalArg();
+                "first line includes column names");
         op.acceptsAll(Arrays.asList("columns"),
                 "column names (use --column-header instead if the first line has column names)")
                 .withRequiredArg()
@@ -245,11 +244,9 @@ public class BulkImportOptions {
     public void initUploadOptionParser(Properties props) throws Exception {
         this.initPrepareOptionParser(props);
         op.acceptsAll(Arrays.asList("auto-perform"),
-                "perform bulk import job automatically")
-                .withOptionalArg();
+                "perform bulk import job automatically");
         op.acceptsAll(Arrays.asList("auto-commit"),
-                "commit bulk import job automatically")
-                .withOptionalArg();
+                "commit bulk import job automatically");
         op.acceptsAll(Arrays.asList("parallel"),
                 "upload in parallel (default: 2; max 8)")
                 .withRequiredArg()

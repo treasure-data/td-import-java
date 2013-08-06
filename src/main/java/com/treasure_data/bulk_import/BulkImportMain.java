@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import joptsimple.OptionSet;
+
 import com.treasure_data.bulk_import.ErrorInfo;
 import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
@@ -34,6 +36,29 @@ import com.treasure_data.client.bulkimport.BulkImportClient;
 
 public class BulkImportMain {
     private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
+
+    public static void prepareParts2(final String[] args, Properties props) throws Exception {
+        if (args.length < 2) {
+            throw new IllegalArgumentException("File names not specified");
+        }
+
+        String msg = String.format("Start %s command", Configuration.CMD_PREPARE_PARTS);
+        System.out.println(msg);
+        LOG.info(msg);
+
+        BulkImportOptions opts = new BulkImportOptions();
+        opts.initPrepareOptionParser(props);
+        opts.setOptions(args);
+        OptionSet os = opts.getOptions();
+        System.out.println(os.valueOf("format"));
+
+        final String[] fileNames = new String[args.length - 1];
+        for (int i = 0; i < args.length - 1; i++) {
+            fileNames[i] = args[i + 1];
+        }
+
+    }
+
     /**
      * > td bulk_import:prepare_parts2
      * usage:
