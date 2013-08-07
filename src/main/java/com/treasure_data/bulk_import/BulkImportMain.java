@@ -37,55 +37,6 @@ import com.treasure_data.client.bulkimport.BulkImportClient;
 public class BulkImportMain {
     private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
 
-    public static void prepareParts2(final String[] args, Properties props) throws Exception {
-        if (args.length < 2) {
-            throw new IllegalArgumentException("File names not specified");
-        }
-
-        String msg = String.format("Start %s command", Configuration.CMD_PREPARE_PARTS);
-        System.out.println(msg);
-        LOG.info(msg);
-
-        BulkImportOptions opts = new BulkImportOptions();
-        opts.initPrepareOptionParser(props);
-        opts.setOptions(args);
-        OptionSet os = opts.getOptions();
-        System.out.println(os.valueOf("format"));
-
-        final String[] fileNames = new String[args.length - 1];
-        for (int i = 0; i < args.length - 1; i++) {
-            fileNames[i] = args[i + 1];
-        }
-
-    }
-
-    /**
-     * > td bulk_import:prepare_parts2
-     * usage:
-     *   $ java BulkImportTool prepare_parts <files...>
-     * example:
-     *   $ java BulkImportTool prepare_parts logs/*.csv \
-     *         -Dtd.bulk_import.prepare_parts.format=csv \
-     *         -Dtd.bulk_import.prepare_parts.columns=time,uid,price,count \
-     *         -Dtd.bulk_import.prepare_parts.columntypes=long,string,long,int \
-     *         -Dtd.bulk_import.prepare_parts.time_column=time \
-     *         -Dtd.bulk_import.prepare_parts.output_dir=./parts/
-     * description:
-     *   Convert files into part file format
-     * options:
-     *   -f, --format NAME                source file format [csv]
-     *   -h, --columns NAME,NAME,...      column names (use --column-header instead if the first line has column names)
-     *       --column-types TYPE,TYPE,... column types [string, long, int]
-     *   -H, --column-header              first line includes column names
-     *   -t, --time-column NAME           name of the time column
-     *       --time-value TIME            long value of the time column
-     *   -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)
-     *   -o, --output DIR                 output directory
-     *
-     * @param args
-     * @param props
-     * @throws Exception
-     */
     public static void prepareParts(final String[] args, Properties props)
             throws Exception {
         if (args.length < 2) {
@@ -139,20 +90,6 @@ public class BulkImportMain {
         outputErrors(errs, Configuration.CMD_PREPARE_PARTS);
     }
 
-    /**
-     * > td bulk_import:upoad_parts2
-     * usage:
-     *   $ td bulk_import:upload_parts <name> <files...>
-     * example:
-     *   $ td bulk_import:upload_parts parts/* --parallel 4
-     * description:
-     *   Upload or re-upload files into a bulk import session
-     * options:
-     *   -P, --prefix NAME       add prefix to parts name
-     *   -s, --use-suffix COUNT  use COUNT number of . (dots) in the source file name to the parts name
-     *       --auto-perform      perform bulk import job automatically
-     *       --parallel NUM      perform uploading in parallel (default: 2; max 8)
-     */
     public static void uploadParts(final String[] args, Properties props)
             throws Exception {
         if (args.length < 3) {
