@@ -27,11 +27,15 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import joptsimple.OptionSet;
+
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.reader.ApacheFileReader;
@@ -47,16 +51,41 @@ import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 public class PrepareConfiguration extends Configuration {
 
     public static class Factory {
-        public PrepareConfiguration newPrepareConfiguration(Properties props) {
-            String formatStr = props.getProperty(
-                    Configuration.BI_PREPARE_PARTS_FORMAT,
-                    Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
-            PrepareConfiguration.Format format = Format.fromString(formatStr);
+        protected BulkImportOptions options;
+
+        public Factory(Properties props) {
+            options = new BulkImportOptions();
+            options.initPrepareOptionParser(props);
+        }
+
+        public BulkImportOptions getBulkImportOptions() {
+            return options;
+        }
+
+        public PrepareConfiguration newPrepareConfiguration(String[] args) {
+            options.setOptions(args);
+            OptionSet optionSet = options.getOptions();
+
+            // TODO FIXME when uploadParts is called, default format is "msgpack.gz"
+            // on the other hand, when prepareParts, default format is "csv".
+            String formatStr;
+            if (optionSet.has("format")) {
+                formatStr = (String) optionSet.valueOf("format");
+            } else {
+                formatStr = Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE;
+            }
+
+            // lookup format enum
+            Format format = Format.fromString(formatStr);
             if (format == null) {
                 throw new IllegalArgumentException(String.format(
                         "unsupported format '%s'", formatStr));
             }
             return format.createPrepareConfiguration();
+
+            // TODO
+            //@SuppressWarnings("unchecked")
+            //List<String> nonOptArgs = (List<String>) options.nonOptionArguments();
         }
     }
 
@@ -354,6 +383,8 @@ public class PrepareConfiguration extends Configuration {
 
     // FIXME this field is also declared in td-client.Config.
     protected Properties props;
+    protected BulkImportOptions options;
+    protected OptionSet optionSet;
 
     protected Format format;
     protected OutputFormat outputFormat = OutputFormat.MSGPACKGZ;
@@ -374,10 +405,15 @@ public class PrepareConfiguration extends Configuration {
     protected String[] onlyColumns;
 
     public PrepareConfiguration() {
+        // TODO FIXME #MN should add 'props' to the method parameters
     }
 
-    public void configure(Properties props) {
+    public void configure(Properties props, BulkImportOptions options) {
+        // TODO FIXME #MN should delete 'props' parameter
+
         this.props = props;
+        this.options = options;
+        this.optionSet = options.getOptions();
 
         // format
         setFormat();
@@ -423,9 +459,12 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setFormat() {
-        String formatStr = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_FORMAT,
-                Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE);
+        String formatStr;
+        if (!optionSet.has("format")) {
+            formatStr = Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE;
+        } else {
+            formatStr = (String) optionSet.valueOf("format");
+        }
         format = Format.fromString(formatStr);
         if (format == null) {
             throw new IllegalArgumentException(String.format(
@@ -438,18 +477,16 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setOutputFormat() {
-        String outputFormatStr = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT,
-                Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT_DEFAULTVALUE);
-        if (format.equals(Format.SYSLOG)) {
-            outputFormat = OutputFormat.SYSLOGMSGPACKGZ;
-            return;
+        if (format == null) {
+            throw new IllegalStateException(
+                    "this method MUST be called after invoking the setFormat()");
         }
 
-        outputFormat = OutputFormat.fromString(outputFormatStr);
-        if (outputFormat == null) {
-            throw new IllegalArgumentException(String.format(
-                    "unsupported format '%s'", outputFormatStr));
+        if (format.equals(Format.SYSLOG)) {
+            // if format type is 'syslog', output format 
+            outputFormat = OutputFormat.SYSLOGMSGPACKGZ;
+        } else {
+            outputFormat = OutputFormat.MSGPACKGZ;
         }
     }
 
@@ -458,13 +495,17 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setCompressionType() {
-        String compType = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_COMPRESSION,
-                Configuration.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE);
-        compressionType = CompressionType.fromString(compType);
+        String type;
+        if (!optionSet.has("compress")) {
+            type = Configuration.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE;
+        } else {
+            type = (String) optionSet.valueOf("compress");
+        }
+
+        compressionType = CompressionType.fromString(type);
         if (compressionType == null) {
             throw new IllegalArgumentException(String.format(
-                    "unsupported compression type: %s", compressionType));
+                    "unsupported compression type: %s", type));
         }
     }
 
@@ -516,10 +557,15 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setPrepareThreadNum() {
-        String pthreadNum = props.getProperty(BI_PREPARE_PARTS_PARALLEL,
-                BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE);
+        String num;
+        if (!optionSet.has("prepare-parallel")) {
+            num = Configuration.BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE;
+        } else {
+            num = (String) optionSet.valueOf("prepare-parallel");
+        }
+
         try {
-            int n = Integer.parseInt(pthreadNum);
+            int n = Integer.parseInt(num);
             if (n < 0) {
                 numOfPrepareThreads = 2;
             } else if (n > 9){
@@ -529,8 +575,7 @@ public class PrepareConfiguration extends Configuration {
             }
         } catch (NumberFormatException e) {
             String msg = String.format(
-                    "'int' value is required as 'parallel' option e.g. -D%s=5",
-                    BI_UPLOAD_PARTS_PARALLEL);
+                    "'int' value is required as 'prepare-parallel' option");
             throw new IllegalArgumentException(msg, e);
         }
     }
@@ -540,8 +585,13 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setEncoding() {
-        String encoding = props.getProperty(Configuration.BI_PREPARE_PARTS_ENCODING,
-                Configuration.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE);
+        String encoding;
+        if (!optionSet.has("encoding")) {
+            encoding = Configuration.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE;
+        } else {
+            encoding = (String) optionSet.valueOf("encoding");
+        }
+
         try {
             createCharsetDecoder(encoding);
         } catch (Exception e) {
@@ -560,7 +610,9 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setAliasTimeColumn() {
-        aliasTimeColumn = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN);
+        if (optionSet.has("time-column")) {
+            aliasTimeColumn = (String) optionSet.valueOf("time-column");
+        }
     }
 
     public String getAliasTimeColumn() {
@@ -568,13 +620,17 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setTimeValue() {
-        String tValue = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE);
-        if (tValue != null) {
+        String v = null;
+        if (optionSet.has("time-value")) {
+            v = (String) optionSet.valueOf("time-value");
+        }
+
+        if (v != null) {
             try {
-                timeValue = Long.parseLong(tValue);
+                timeValue = Long.parseLong(v);
             } catch (NumberFormatException e) {
                 String msg = String.format(
-                        "time value is required as long type (unix timestamp) e.g. -D%s=1360141200",
+                        "'time value' is required as long type (unix timestamp)",
                         Configuration.BI_PREPARE_PARTS_TIMEVALUE);
                 throw new IllegalArgumentException(msg, e);
             }
@@ -586,7 +642,9 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setTimeFormat() {
-        timeFormat = props.getProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT);
+        if (optionSet.has("time-format")) {
+            timeFormat = (String) optionSet.valueOf("time-format");
+        }
     }
 
     public ExtStrftime getTimeFormat() {
@@ -594,7 +652,9 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setOutputDirName() {
-        outputDirName = props.getProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR);
+        if (optionSet.has("output")) {
+            outputDirName = (String) optionSet.valueOf("output");
+        }
 
         File outputDir = null;
         if (outputDirName == null || outputDirName.isEmpty()) {
@@ -614,13 +674,17 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setErrorRecordsHandling() {
-        String modeStr = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING,
-                Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE);
-        errorRecordsHandling = ErrorRecordsHandling.fromString(modeStr);
+        String mode;
+        if (!optionSet.has("error-records-handling")) {
+            mode = Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE;
+        } else {
+            mode = (String) optionSet.valueOf("error-records-handling");
+        }
+
+        errorRecordsHandling = ErrorRecordsHandling.fromString(mode);
         if (errorRecordsHandling == null) {
             throw new IllegalArgumentException(String.format(
-                    "unsupported errorHandling mode '%s'", modeStr));
+                    "unsupported errorHandling mode '%s'", mode));
         }
     }
 
@@ -629,9 +693,10 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setDryRun() {
-        String drun = props.getProperty(Configuration.BI_PREPARE_PARTS_DRYRUN,
-                Configuration.BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE);
-        dryRun = drun != null && drun.equals("true");
+        if (optionSet.has("dry-run")) {
+            String drun = (String) optionSet.valueOf("dry-run");
+            dryRun = drun != null && drun.equals("true");    
+        }
     }
 
     public boolean dryRun() {
@@ -643,16 +708,18 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setSplitSize() {
-        String sSize = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
-                Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
+        String size;
+        if (!optionSet.has("split-size")) {
+            size = Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE;
+        } else {
+            size = (String) optionSet.valueOf("split-size");
+        }
+
         try {
-            splitSize = Integer.parseInt(sSize);
+            splitSize = Integer.parseInt(size);
         } catch (NumberFormatException e) {
             String msg = String.format(
-                    "split size is required as int type e.g. -D%s=%s",
-                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE,
-                    Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE);
+                    "'split-size' is required as int type");
             throw new IllegalArgumentException(msg, e);
         }
     }
@@ -662,12 +729,10 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setColumnNames() {
-        String columns = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_COLUMNS);
-        if (columns != null && !columns.isEmpty()) {
-            columnNames = columns.split(",");
-        } else {
+        if (!optionSet.has("columns")) {
             columnNames = new String[0];
+        } else {
+            columnNames = optionSet.valuesOf("columns").toArray(new String[0]);
         }
     }
 
@@ -676,15 +741,14 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setColumnTypes() {
-        String types = props.getProperty(Configuration.BI_PREPARE_PARTS_COLUMNTYPES);
-        if (types != null && !types.isEmpty()) {
-            String[] splited = types.split(",");
-            columnTypes = new ColumnType[splited.length];
-            for (int i = 0; i < columnTypes.length; i++) {
-                columnTypes[i] = ColumnType.fromString(splited[i].toLowerCase());
-            }
-        } else {
+        if (!optionSet.has("column-types")) {
             columnTypes = new ColumnType[0];
+        } else {
+            String[] types = optionSet.valuesOf("column-types").toArray(new String[0]);
+            columnTypes = new ColumnType[types.length];
+            for (int i = 0; i < types.length; i++) {
+                columnTypes[i] = ColumnType.fromString(types[i].toLowerCase());
+            }
         }
     }
 
@@ -697,18 +761,16 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setExcludeColumns() {
-        String excludeColumns = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS);
-        if (excludeColumns != null && !excludeColumns.isEmpty()) {
-            this.excludeColumns = excludeColumns.split(",");
-            for (String c : this.excludeColumns) {
+        if (!optionSet.has("exclude-columns")) {
+            excludeColumns = new String[0];
+        } else {
+            excludeColumns = optionSet.valuesOf("exclude-columns").toArray(new String[0]);
+            for (String c : excludeColumns) {
                 if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN)) {
                     throw new IllegalArgumentException(
-                            "'time' column cannot be included in excluded columns");
+                            "'time' column cannot be included in 'exclud-columns'");
                 }
             }
-        } else {
-            this.excludeColumns = new String[0];
         }
     }
 
@@ -717,19 +779,18 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setOnlyColumns() {
-        String onlyColumns = props.getProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS);
-        if (onlyColumns != null && !onlyColumns.isEmpty()) {
-            this.onlyColumns = onlyColumns.split(",");
-            for (String oc : this.onlyColumns) {
-                for (String ec : this.excludeColumns) {
+        if (!optionSet.has("only-columns")) {
+            onlyColumns = new String[0];
+        } else {
+            onlyColumns = optionSet.valuesOf("only-columns").toArray(new String[0]);
+            for (String oc : onlyColumns) {
+                for (String ec : excludeColumns) {
                     if (oc.equals(ec)) {
                         throw new IllegalArgumentException(
-                                "'exclude' columns include specified 'only' columns");
+                                "don't include 'exclude-columns' in 'only-columns'");
                     }
                 }
             }
-        } else {
-            this.onlyColumns = new String[0];
         }
     }
 
