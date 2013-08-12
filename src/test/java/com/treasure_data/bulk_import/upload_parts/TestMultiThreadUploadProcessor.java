@@ -17,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
-import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.BulkImportOptionsTestUtil;
 import com.treasure_data.client.ClientException;
 
 public class TestMultiThreadUploadProcessor {
@@ -51,6 +51,7 @@ public class TestMultiThreadUploadProcessor {
     }
 
     private Properties props;
+    private String[] args;
     protected BulkImportOptions options;
     private UploadConfiguration conf;
     private MultiThreadUploadProcessor proc;
@@ -68,12 +69,8 @@ public class TestMultiThreadUploadProcessor {
         props = System.getProperties();
 
         // create options
-        options = new BulkImportOptions();
-        options.initUploadOptionParser(props);
-        options.setOptions(new String[] {
-                "--parallel",
-                "" + numWorkers,
-        });
+        args = new String[] { "--parallel", "" + numWorkers };
+        options = BulkImportOptionsTestUtil.createUploadOptions(props, args);
 
         // create upload config
         conf = new UploadConfiguration();
