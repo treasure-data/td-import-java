@@ -19,9 +19,48 @@ package com.treasure_data.bulk_import.upload_parts;
 
 import java.util.Properties;
 
+import joptsimple.OptionSet;
+
+import com.treasure_data.bulk_import.BulkImportOptions;
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.Format;
 
 public class UploadConfiguration extends PrepareConfiguration {
+    public static class Factory {
+        protected BulkImportOptions options;
+
+        public Factory(Properties props) {
+            options = new BulkImportOptions();
+            options.initUploadOptionParser(props);
+        }
+
+        public BulkImportOptions getBulkImportOptions() {
+            return options;
+        }
+
+        public UploadConfiguration newUploadConfiguration(String[] args) {
+            options.setOptions(args);
+            OptionSet optionSet = options.getOptions();
+
+            // TODO FIXME when uploadParts is called, default format is "msgpack.gz"
+            // on the other hand, when prepareParts, default format is "csv".
+            String formatStr;
+            if (optionSet.has("format")) {
+                formatStr = (String) optionSet.valueOf("format");
+            } else {
+                formatStr = Configuration.BI_UPLOAD_PARTS_FORMAT_DEFAULTVALUE;
+            }
+
+            // lookup format enum
+            Format format = Format.fromString(formatStr);
+            if (format == null) {
+                throw new IllegalArgumentException(String.format(
+                        "unsupported format '%s'", formatStr));
+            }
+            return new UploadConfiguration();
+        }
+    }
 
     protected boolean autoPerform;
     protected boolean autoCommit;
@@ -33,8 +72,9 @@ public class UploadConfiguration extends PrepareConfiguration {
         super();
     }
 
-    public void configure(Properties props) {
-        super.configure(props);
+    // TODO FIXME #MN re-implement the method
+    public void configure(Properties props, BulkImportOptions options) {
+        super.configure(props, options);
 
         // auto-perform
         String aperform = props.getProperty(BI_UPLOAD_PARTS_AUTO_PERFORM,
