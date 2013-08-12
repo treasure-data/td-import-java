@@ -13,9 +13,21 @@ public class BulkImportOptionsTestUtil {
         return options;
     }
 
+    public static BulkImportOptions createPrepareOptions(Properties props, String[] args) {
+        BulkImportOptions options = createPrepareOptions(props);
+        options.setOptions(args);
+        return options;
+    }
+
     public static BulkImportOptions createUploadOptions(Properties props) {
         BulkImportOptions options = new BulkImportOptions();
         options.initUploadOptionParser(props);
+        return options;
+    }
+
+    public static BulkImportOptions createUploadOptions(Properties props, String[] args) {
+        BulkImportOptions options = createUploadOptions(props);
+        options.setOptions(args);
         return options;
     }
 }
