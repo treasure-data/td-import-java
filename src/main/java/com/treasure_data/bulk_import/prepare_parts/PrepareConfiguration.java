@@ -82,10 +82,6 @@ public class PrepareConfiguration extends Configuration {
                         "unsupported format '%s'", formatStr));
             }
             return format.createPrepareConfiguration();
-
-            // TODO
-            //@SuppressWarnings("unchecked")
-            //List<String> nonOptArgs = (List<String>) options.nonOptionArguments();
         }
     }
 
@@ -456,6 +452,10 @@ public class PrepareConfiguration extends Configuration {
 
         // split size
         setSplitSize();
+    }
+
+    public List<String> getNonOptionArguments() {
+        return (List<String>) options.getOptions().nonOptionArguments();
     }
 
     public void setFormat() {

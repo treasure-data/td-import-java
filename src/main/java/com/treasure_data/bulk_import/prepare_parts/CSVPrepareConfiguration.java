@@ -20,6 +20,7 @@ package com.treasure_data.bulk_import.prepare_parts;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 
@@ -68,52 +69,109 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
     }
 
     @Override
-    public void configure(Properties props) {
-        super.configure(props);
+    public void configure(Properties props, BulkImportOptions options) {
+        super.configure(props, options);
 
         // delimiter
-        if (format.equals(CSVPrepareConfiguration.Format.CSV)) {
-            delimiterChar = props.getProperty(
-                    Configuration.BI_PREPARE_PARTS_DELIMITER,
-                    Configuration.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE).charAt(
-                    0);
-        } else if (format.equals(CSVPrepareConfiguration.Format.TSV)) {
-            delimiterChar = props.getProperty(
-                    Configuration.BI_PREPARE_PARTS_DELIMITER,
-                    Configuration.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE).charAt(
-                    0);
-        }
+        setDelimiterChar();
 
         // quote
-        String quote_char = props.getProperty(Configuration.BI_PREPARE_PARTS_QUOTE,
-                Configuration.BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE);
-        try {
-            quoteChar = Quote.valueOf(quote_char);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("unsupported quote char: " + quote_char, e);
-        }
+        setQuoteChar();
 
         // newline
-        String nLine = props.getProperty(Configuration.BI_PREPARE_PARTS_NEWLINE,
-                Configuration.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE);
-        try {
-            newline = NewLine.valueOf(nLine);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("unsupported newline char: " + nLine, e);
-        }
+        setNewline();
 
+        // column-header
         setColumnHeader();
 
+        // column-names
         setColumnNames();
 
+        // column-types
         setColumnTypes();
 
-        // type-conversion-error
-        typeErrorMode = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR,
-                Configuration.BI_PREPARE_PARTS_TYPE_CONVERSION_ERROR_DEFAULTVALUE);
-
         // row size with sample reader
+        setSampleReaderRowSize();
+    }
+
+    public void setDelimiterChar() {
+        String delim;
+        if (!optionSet.has("delimiter")) {
+            if (format.equals(Format.CSV)) { // 'csv'
+                delim = Configuration.BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE;
+            } else { // 'tsv'
+                delim = Configuration.BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE;
+            }
+        } else {
+            delim = (String) optionSet.valueOf("delimiter");
+        }
+        delimiterChar = delim.charAt(0);
+    }
+
+    public char getDelimiterChar() {
+        return delimiterChar;
+    }
+
+    public void setQuoteChar() {
+        String quote;
+        if (!optionSet.has("quote")) {
+            quote = Configuration.BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE;
+        } else {
+            quote = (String) optionSet.valueOf("quote");
+        }
+
+        try {
+            quoteChar = Quote.valueOf(quote);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("unsupported quote char: " + quote, e);
+        }
+    }
+
+    public Quote getQuoteChar() {
+        return quoteChar;
+    }
+
+    public void setNewline() {
+        String nline;
+        if (!optionSet.has("newline")) {
+            nline = Configuration.BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE;
+        } else {
+            nline = (String) optionSet.valueOf("newline");
+        }
+
+        try {
+            newline = NewLine.valueOf(nline);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("unsupported newline char: " + nline, e);
+        }
+    }
+
+    public NewLine getNewline() {
+        return newline;
+    }
+
+    public void setColumnNames(String[] columnNames) {
+        this.columnNames = columnNames;
+    }
+
+    public void setColumnHeader() {
+        hasColumnHeader = optionSet.has("column-header");
+    }
+
+    @Override
+    public void setColumnNames() {
+        if (optionSet.has("columns")) {
+            columnNames = optionSet.valuesOf("columns").toArray(new String[0]);
+        } else if (!hasColumnHeader()) {
+            throw new IllegalArgumentException("Column names not set");
+        }
+    }
+
+    public boolean hasColumnHeader() {
+        return hasColumnHeader;
+    }
+
+    public void setSampleReaderRowSize() {
         String sRowSize = props.getProperty(
                 Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
                 Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
@@ -128,53 +186,8 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
         }
     }
 
-    public Quote getQuoteChar() {
-        return quoteChar;
-    }
-
-    public char getDelimiterChar() {
-        return delimiterChar;
-    }
-
-    public NewLine getNewline() {
-        return newline;
-    }
-
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
-    }
-
-    public void setColumnHeader() {
-        String columnHeader = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_COLUMNHEADER,
-                Configuration.BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE);
-        if (!columnHeader.equals("true")) {
-            hasColumnHeader = false;
-        } else {
-            hasColumnHeader = true;
-        }
-    }
-
-    @Override
-    public void setColumnNames() {
-        String columns = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_COLUMNS);
-        if (columns != null && !columns.isEmpty()) {
-            columnNames = columns.split(",");
-        } else if (!hasColumnHeader()) {
-            throw new IllegalArgumentException("Column names not set");
-        }
-    }
-
-    public boolean hasColumnHeader() {
-        return hasColumnHeader;
-    }
-
-    public String getTypeErrorMode() {
-        return typeErrorMode;
-    }
-
     public int getSampleRowSize() {
         return sampleRowSize;
     }
+
 }

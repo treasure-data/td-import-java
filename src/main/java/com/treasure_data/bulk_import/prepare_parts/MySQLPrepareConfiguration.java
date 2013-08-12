@@ -19,6 +19,7 @@ package com.treasure_data.bulk_import.prepare_parts;
 
 import java.util.Properties;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
@@ -29,8 +30,8 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
     protected String table;
 
     @Override
-    public void configure(Properties props) {
-        super.configure(props);
+    public void configure(Properties props, BulkImportOptions options) {
+        super.configure(props, options);
 
         setConnectionURL();
         setUser();

@@ -20,6 +20,8 @@ package com.treasure_data.bulk_import.prepare_parts;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
+
 public class SyslogPrepareConfiguration extends PrepareConfiguration {
     private static final Logger LOG = Logger
             .getLogger(SyslogPrepareConfiguration.class.getName());
@@ -27,9 +29,7 @@ public class SyslogPrepareConfiguration extends PrepareConfiguration {
     public SyslogPrepareConfiguration() {
     }
 
-    public void configure(Properties props) {
-        super.configure(props);
-
-        // TODO
+    public void configure(Properties props, BulkImportOptions options) {
+        super.configure(props, options);
     }
 }

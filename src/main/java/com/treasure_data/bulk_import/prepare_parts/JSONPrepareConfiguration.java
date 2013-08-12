@@ -20,6 +20,8 @@ package com.treasure_data.bulk_import.prepare_parts;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
+
 public class JSONPrepareConfiguration extends PrepareConfiguration {
 
     private static final Logger LOG = Logger
@@ -31,8 +33,8 @@ public class JSONPrepareConfiguration extends PrepareConfiguration {
 
 
     @Override
-    public void configure(Properties props) {
-        super.configure(props);
+    public void configure(Properties props, BulkImportOptions options) {
+        super.configure(props, options);
     }
 
 }
