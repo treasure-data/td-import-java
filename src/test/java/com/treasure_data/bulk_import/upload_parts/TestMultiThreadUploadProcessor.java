@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.client.ClientException;
 
@@ -27,7 +28,7 @@ public class TestMultiThreadUploadProcessor {
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
 
         UploadConfiguration conf = new UploadConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
         MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
         proc.registerWorkers();
         proc.startWorkers();
@@ -50,6 +51,7 @@ public class TestMultiThreadUploadProcessor {
     }
 
     private Properties props;
+    protected BulkImportOptions options;
     private UploadConfiguration conf;
     private MultiThreadUploadProcessor proc;
 
@@ -64,11 +66,18 @@ public class TestMultiThreadUploadProcessor {
         numTasks = rand.nextInt(30) + 1;
 
         props = System.getProperties();
-        props.setProperty(Configuration.BI_UPLOAD_PARTS_PARALLEL, "" + numWorkers);
+
+        // create options
+        options = new BulkImportOptions();
+        options.initUploadOptionParser(props);
+        options.setOptions(new String[] {
+                "--parallel",
+                "" + numWorkers,
+        });
 
         // create upload config
         conf = new UploadConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         // create multi-thread upload processor
         proc = new MultiThreadUploadProcessor(conf);
@@ -76,6 +85,7 @@ public class TestMultiThreadUploadProcessor {
 
     @After
     public void destroyResources() throws Exception {
+        MultiThreadUploadProcessor.clearTasks();
     }
 
     @Test

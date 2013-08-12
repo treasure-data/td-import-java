@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
@@ -21,6 +22,7 @@ import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
 public class ColumnValueTestUtil<T> {
 
     protected Properties props;
+    protected BulkImportOptions options;
     protected PrepareConfiguration conf;
 
     protected ColumnValue columnValue;
@@ -35,8 +37,12 @@ public class ColumnValueTestUtil<T> {
     public void createResources() throws Exception {
         props = System.getProperties();
 
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[0]);
+
         conf = new PrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         writer = new FileWriterTestUtil(conf);
         writer.configure(null);

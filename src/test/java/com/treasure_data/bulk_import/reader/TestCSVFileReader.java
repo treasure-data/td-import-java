@@ -16,6 +16,7 @@ import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.CSVPrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 
 public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguration> {
@@ -252,16 +253,23 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
 
         numLine = rand.nextInt(10) + 1;
 
-        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "csv");
         props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "" + numLine);
-        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+    }
 
+    @Override
+    public void createBulkImportOptions() throws Exception {
+        super.createBulkImportOptions();
+        options.setOptions(new String[] {
+                "--format",
+                "csv",
+                "--column-header",
+        });
     }
 
     @Override
     public void createPrepareConfiguration() throws Exception {
         conf = new CSVPrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
     }
 
     @Override
@@ -287,7 +295,15 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context02 context = new Context02();
 
         // override system properties:-(
-        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "" + context.getTimeValue());
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--format",
+                "csv",
+                "--column-header",
+                "--time-value",
+                "" + context.getTimeValue(),
+        });
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -300,7 +316,15 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context03 context = new Context03();
 
         // override system properties:-(
-        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "" + context.getAliasTimeColumn());
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--format",
+                "csv",
+                "--column-header",
+                "--time-column",
+                context.getAliasTimeColumn(),
+        });
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -313,7 +337,15 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context04 context = new Context04();
 
         // override system properties:-(
-        props.setProperty(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, "" + context.getExcludeColumns());
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--format",
+                "csv",
+                "--column-header",
+                "--exclude-columns",
+                context.getExcludeColumns(),
+        });
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -326,7 +358,15 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context05 context = new Context05();
 
         // override system properties:-(
-        props.setProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS, "" + context.getOnlyColumns());
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--format",
+                "csv",
+                "--column-header",
+                "--only-columns",
+                context.getOnlyColumns(),
+        });
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -339,7 +379,16 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context06 context = new Context06();
 
         // override system properties:-(
-        props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, "" + context.getSTRFTimeFormat());
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--format",
+                "csv",
+                "--column-header",
+                "--time-format",
+                context.getSTRFTimeFormat(),
+        });
+
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();

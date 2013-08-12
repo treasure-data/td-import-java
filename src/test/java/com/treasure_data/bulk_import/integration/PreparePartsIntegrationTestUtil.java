@@ -21,6 +21,7 @@ import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.UnpackerIterator;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.BulkImportMain;
 
@@ -35,11 +36,13 @@ public class PreparePartsIntegrationTestUtil {
     static final String OUTPUT_DIR = "./src/test/resources/out/";
 
     protected Properties props;
+    protected List<String> opts;
     protected List<String> args;
 
     @Before
     public void createResources() throws Exception {
         props = new Properties();
+        opts = new ArrayList<String>();
         args = new ArrayList<String>();
     }
 
@@ -47,50 +50,66 @@ public class PreparePartsIntegrationTestUtil {
     public void destroyResources() throws Exception {
     }
 
-    public void setProperties(String format, String columnHeader,
+    public void setOptions(String format, boolean columnHeader,
             String aliasTimeColumn, String timeFormat, String columnNames, String exclude, String only) {
         // format
         if (format != null && !format.isEmpty()) {
-            props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, format);
+            opts.add("--format");
+            opts.add(format);
+            //props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, format);
         }
 
         // output dir
-        props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
+        opts.add("--output");
+        opts.add(OUTPUT_DIR);
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
 
         // column header
-        if (columnHeader != null && !columnHeader.isEmpty()) {
-            props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, columnHeader);
+        if (columnHeader) {
+            opts.add("--column-header");
+            //props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, columnHeader);
         }
 
         // alias time column
         if (aliasTimeColumn != null && !aliasTimeColumn.isEmpty()) {
-            props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, aliasTimeColumn);
+            opts.add("--time-column");
+            opts.add(aliasTimeColumn);
+            //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, aliasTimeColumn);
         }
 
         // time format
         if (timeFormat != null && !timeFormat.isEmpty()) {
-            props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, timeFormat);
+            opts.add("--time-format");
+            opts.add(timeFormat);
+            //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, timeFormat);
         }
 
         // column names
         if (columnNames != null && !columnNames.isEmpty()) {
-            props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNS, columnNames);
+            opts.add("--columns");
+            opts.add(columnNames);
+            //props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNS, columnNames);
         }
 
         // exclude columns
         if (exclude != null && !exclude.isEmpty()) {
-            props.setProperty(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, exclude);
+            opts.add("--exclude-columns");
+            opts.add(exclude);
+            //props.setProperty(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, exclude);
         }
 
         // only columns
         if (only != null && !only.isEmpty()) {
-            props.setProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS, only);
+            opts.add("--only-columns");
+            opts.add(only);
+            //props.setProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS, only);
         }
     }
 
     public void prepareParts(String fileName) throws Exception {
         args.add(Configuration.CMD_PREPARE_PARTS);
         args.add(fileName);
+        args.addAll(opts);
 
         BulkImportMain.prepareParts(args.toArray(new String[0]), props);
     }

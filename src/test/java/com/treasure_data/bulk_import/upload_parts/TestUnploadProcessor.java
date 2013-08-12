@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.client.ClientException;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
@@ -29,7 +30,7 @@ public class TestUnploadProcessor {
         BulkImportClient client = new BulkImportClient(tdclient);
 
         UploadConfiguration conf = new UploadConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
         UploadProcessor proc = new UploadProcessor(client, conf);
 
         byte[] bytes = "muga".getBytes();
@@ -45,6 +46,7 @@ public class TestUnploadProcessor {
     }
 
     private Properties props;
+    protected BulkImportOptions options;
     private UploadConfiguration conf;
     private UploadProcessor proc;
 
@@ -58,9 +60,13 @@ public class TestUnploadProcessor {
     public void createResources() throws Exception {
         props = System.getProperties();
 
+        options = new BulkImportOptions();
+        options.initUploadOptionParser(props);
+        options.setOptions(new String[0]);
+
         // create upload config
         conf = new UploadConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         // create upload processor
         proc = new UploadProcessor(null, conf);

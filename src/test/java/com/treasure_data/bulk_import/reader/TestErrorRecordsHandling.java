@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
@@ -20,6 +21,7 @@ import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
 public class TestErrorRecordsHandling {
 
     protected Properties props;
+    protected BulkImportOptions options;
     protected PrepareConfiguration conf;
     protected FileWriterTestUtil writer;
     protected FileReader reader;
@@ -35,10 +37,16 @@ public class TestErrorRecordsHandling {
     public void workCSVFileReaderWithNormalCSVFile() throws Exception {
         // create property and configuration
         props = new Properties();
-        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "1");
+
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--column-header",
+        });
+
         conf = PrepareConfiguration.Format.CSV.createPrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         // create reader and writer
         createCSVFileReader(createNormalCSVFileTask());
@@ -53,11 +61,18 @@ public class TestErrorRecordsHandling {
     public void skipCSVFileReaderWithInvalidCSVFile() throws Exception {
         // create property and configuration
         props = new Properties();
-        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING, "skip"); // default value
         props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "1");
+
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--column-header",
+                "--error-records-handling",
+                "skip",
+        });
+
         conf = PrepareConfiguration.Format.CSV.createPrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         // create reader and writer
         createCSVFileReader(createInvalidCSVFileTask());
@@ -72,11 +87,18 @@ public class TestErrorRecordsHandling {
     public void abortCSVFileReaderWithInvalidCSVFile() throws Exception {
         // create property and configuration
         props = new Properties();
-        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
-        props.setProperty(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING, "abort"); // default value
         props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "1");
+
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--column-header",
+                "--error-records-handling",
+                "abort",
+        });
+
         conf = PrepareConfiguration.Format.CSV.createPrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         // create reader and writer
         createCSVFileReader(createInvalidCSVFileTask());

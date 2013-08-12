@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 
 public class TestMultiThreadPrepareProcessor {
@@ -22,13 +23,14 @@ public class TestMultiThreadPrepareProcessor {
     public void test01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
+        // TODO FIXME system properties setting is not effective 
         props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "3");
 
         CSVPrepareConfiguration conf = new CSVPrepareConfiguration();
         conf = spy(conf);
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
-        conf.configure(props);
+        conf.configure(props, options);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -50,6 +52,7 @@ public class TestMultiThreadPrepareProcessor {
     }
 
     private Properties props;
+    protected BulkImportOptions options;
     private CSVPrepareConfiguration conf;
     private MultiThreadPrepareProcessor proc;
 
@@ -66,12 +69,17 @@ public class TestMultiThreadPrepareProcessor {
         numRows = rand.nextInt(100);
 
         props = System.getProperties();
-        props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "" + numWorkers);
-        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--prepare-parallel",
+                "" + numWorkers,
+                "--column-header" });
 
         // create prepare config
         conf = new CSVPrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         // create multi-thread prepare processor
         proc = new MultiThreadPrepareProcessor(conf);
@@ -81,7 +89,7 @@ public class TestMultiThreadPrepareProcessor {
     public void destroyResources() throws Exception {
     }
 
-    @Test @Ignore
+    @Test
     public void dontGetErrorsWhenWorkersWorkNormally() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             PrepareProcessor child = spy(new PrepareProcessor(conf));

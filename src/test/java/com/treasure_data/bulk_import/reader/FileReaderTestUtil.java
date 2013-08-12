@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.Task;
@@ -19,6 +20,7 @@ public class FileReaderTestUtil<T extends PrepareConfiguration> {
     protected long baseTime;
 
     protected Properties props;
+    protected BulkImportOptions options;
     protected T conf;
 
     protected FileReader<T> reader;
@@ -35,6 +37,7 @@ public class FileReaderTestUtil<T extends PrepareConfiguration> {
         baseTime = new Date().getTime() / 1000 / 3600 * 3600;
 
         createProperties();
+        createBulkImportOptions();
         createPrepareConfiguration();
         createFileWriter();
         createFileReader();
@@ -42,6 +45,11 @@ public class FileReaderTestUtil<T extends PrepareConfiguration> {
 
     protected void createProperties() throws Exception {
         props = System.getProperties();
+    }
+
+    protected void createBulkImportOptions() throws Exception {
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
     }
 
     protected void createPrepareConfiguration() throws Exception {

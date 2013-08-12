@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.Task;
@@ -15,6 +16,7 @@ import com.treasure_data.bulk_import.writer.FileWriterTestUtil;
 public class TestSyslogFileReader {
 
     protected Properties props;
+    protected BulkImportOptions options;
     protected PrepareConfiguration conf;
     protected FileWriterTestUtil writer;
     protected FileReader reader;
@@ -22,10 +24,16 @@ public class TestSyslogFileReader {
     @Test
     public void sample() throws Exception {
         props = new Properties();
-        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
         props.setProperty(Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE, "1");
+
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--column-header",
+        });
+
         conf = PrepareConfiguration.Format.SYSLOG.createPrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
 
         writer = new FileWriterTestUtil(conf);
         reader = PrepareConfiguration.Format.SYSLOG.createFileReader(conf, writer);

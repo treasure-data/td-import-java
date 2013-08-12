@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.ColumnType;
 
@@ -32,7 +33,7 @@ public class TestPrepareProcessor {
         conf = spy(conf);
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
-        conf.configure(props);
+        conf.configure(props, options);
         PrepareProcessor proc = new PrepareProcessor(conf);
 
         String csvtext = "time,user,age\n" + "1370416181,muga,10\n";
@@ -47,6 +48,7 @@ public class TestPrepareProcessor {
 
 
     private Properties props;
+    protected BulkImportOptions options;
     private CSVPrepareConfiguration conf;
     private PrepareProcessor proc;
 
@@ -60,11 +62,16 @@ public class TestPrepareProcessor {
     @Before
     public void createResources() throws Exception {
         props = System.getProperties();
-        props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, "true");
+
+        options = new BulkImportOptions();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--column-header"
+        });
 
         // create prepare conf
         conf = new CSVPrepareConfiguration();
-        conf.configure(props);
+        conf.configure(props, options);
         conf = spy(conf);
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
