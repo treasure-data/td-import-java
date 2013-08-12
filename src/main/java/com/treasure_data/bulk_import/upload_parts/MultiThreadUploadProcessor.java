@@ -69,8 +69,13 @@ public class MultiThreadUploadProcessor {
         taskQueue.add(task);
     }
 
+    public static synchronized void clearTasks() {
+        // the method is for tests
+        taskQueue.clear();
+    }
+
     public static synchronized void addFinishTask(UploadConfiguration conf) {
-        for (int i = 0; i < conf.getNumOfUploadThreads(); i++) {
+        for (int i = 0; i < conf.getNumOfUploadThreads() * 2; i++) {
             taskQueue.add(Task.FINISH_TASK);
         }
     }
