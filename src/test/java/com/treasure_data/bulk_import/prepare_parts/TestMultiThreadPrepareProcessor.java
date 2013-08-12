@@ -15,6 +15,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
+import com.treasure_data.bulk_import.BulkImportOptionsTestUtil;
 import com.treasure_data.bulk_import.Configuration;
 
 public class TestMultiThreadPrepareProcessor {
@@ -23,8 +24,9 @@ public class TestMultiThreadPrepareProcessor {
     public void test01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
-        // TODO FIXME system properties setting is not effective 
-        props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "3");
+
+        BulkImportOptions options = BulkImportOptionsTestUtil.createPrepareOptions(props);
+        options.setOptions(new String[] { "--prepare-parallel", "3" });
 
         CSVPrepareConfiguration conf = new CSVPrepareConfiguration();
         conf = spy(conf);
