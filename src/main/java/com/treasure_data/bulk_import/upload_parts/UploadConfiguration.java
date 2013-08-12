@@ -24,7 +24,6 @@ import joptsimple.OptionSet;
 import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.Format;
 
 public class UploadConfiguration extends PrepareConfiguration {
     public static class Factory {
