@@ -630,8 +630,7 @@ public class PrepareConfiguration extends Configuration {
                 timeValue = Long.parseLong(v);
             } catch (NumberFormatException e) {
                 String msg = String.format(
-                        "'time value' is required as long type (unix timestamp)",
-                        Configuration.BI_PREPARE_PARTS_TIMEVALUE);
+                        "'time value' is required as long type (unix timestamp)");
                 throw new IllegalArgumentException(msg, e);
             }
         }
@@ -766,7 +765,7 @@ public class PrepareConfiguration extends Configuration {
         } else {
             excludeColumns = optionSet.valuesOf("exclude-columns").toArray(new String[0]);
             for (String c : excludeColumns) {
-                if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN)) {
+                if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
                     throw new IllegalArgumentException(
                             "'time' column cannot be included in 'exclud-columns'");
                 }
