@@ -77,33 +77,13 @@ public class UploadConfiguration extends PrepareConfiguration {
         super.configure(props, options);
 
         // auto-perform
-        String aperform = props.getProperty(BI_UPLOAD_PARTS_AUTO_PERFORM,
-                BI_UPLOAD_PARTS_AUTO_PERFORM_DEFAULTVALUE);
-        autoPerform = aperform != null && aperform.equals("true");
+        setAutoPerform();
 
         // auto-commit
-        String acommit = props.getProperty(BI_UPLOAD_PARTS_AUTO_COMMIT,
-                BI_UPLOAD_PARTS_AUTO_COMMIT_DEFAULTVALUE);
-        autoCommit = aperform != null && acommit.equals("true");
+        setAutoCommit();
 
         // parallel
-        String uthreadNum = props.getProperty(BI_UPLOAD_PARTS_PARALLEL,
-                BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE);
-        try {
-            int n = Integer.parseInt(uthreadNum);
-            if (n < 0) {
-                numOfUploadThreads = 2;
-            } else if (n > 9){
-                numOfUploadThreads = 8;
-            } else {
-                numOfUploadThreads = n;
-            }
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "'int' value is required as 'parallel' option e.g. -D%s=5",
-                    BI_UPLOAD_PARTS_PARALLEL);
-            throw new IllegalArgumentException(msg, e);
-        }
+        setNumOfUploadThreads();
 
         // retryCount
         String rcount = props.getProperty(BI_UPLOAD_PARTS_RETRYCOUNT,
@@ -134,12 +114,44 @@ public class UploadConfiguration extends PrepareConfiguration {
         return props;
     }
 
+    public void setAutoPerform() {
+        autoPerform = optionSet.has("auto-perform");
+    }
+
     public boolean autoPerform() {
         return autoPerform;
     }
 
+    public void setAutoCommit() {
+        autoCommit = optionSet.has("auto-commit");
+    }
+
     public boolean autoCommit() {
         return autoCommit;
+    }
+
+    public void setNumOfUploadThreads() {
+        String num;
+        if (!optionSet.has("parallel")) {
+            num = Configuration.BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE;
+        } else {
+            num = (String) optionSet.valueOf("parallel");
+        }
+
+        try {
+            int n = Integer.parseInt(num);
+            if (n < 0) {
+                numOfUploadThreads = 2;
+            } else if (n > 9){
+                numOfUploadThreads = 8;
+            } else {
+                numOfUploadThreads = n;
+            }
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "'int' value is required as 'parallel' option");
+            throw new IllegalArgumentException(msg, e);
+        }
     }
 
     public int getNumOfUploadThreads() {
