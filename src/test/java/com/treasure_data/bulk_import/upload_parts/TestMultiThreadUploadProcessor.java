@@ -51,7 +51,6 @@ public class TestMultiThreadUploadProcessor {
     }
 
     private Properties props;
-    private String[] args;
     protected BulkImportOptions options;
     private UploadConfiguration conf;
     private MultiThreadUploadProcessor proc;
@@ -69,8 +68,8 @@ public class TestMultiThreadUploadProcessor {
         props = System.getProperties();
 
         // create options
-        args = new String[] { "--parallel", "" + numWorkers };
-        options = BulkImportOptionsTestUtil.createUploadOptions(props, args);
+        options = BulkImportOptionsTestUtil.createUploadOptions(props,
+                new String[] { "--parallel", "" + numWorkers });
 
         // create upload config
         conf = new UploadConfiguration();
