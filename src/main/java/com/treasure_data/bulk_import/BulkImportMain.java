@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import joptsimple.OptionSet;
-
 import com.treasure_data.bulk_import.ErrorInfo;
 import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
@@ -47,14 +45,13 @@ public class BulkImportMain {
         System.out.println(msg);
         LOG.info(msg);
 
-        final String[] fileNames = new String[args.length - 1];
-        for (int i = 0; i < args.length - 1; i++) {
-            fileNames[i] = args[i + 1];
+        // create configuration for 'prepare' processing
+        final PrepareConfiguration conf = createPrepareConfiguration(props, args);
+        List<String> argList = conf.getNonOptionArguments();
+        final String[] fileNames = new String[argList.size() - 1]; // delete 'prepare_parts'
+        for (int i = 0; i < fileNames.length; i++) {
+            fileNames[i] = argList.get(i + 1);
         }
-
-        final PrepareConfiguration conf = new PrepareConfiguration.Factory()
-                .newPrepareConfiguration(props);
-        conf.configure(props);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -100,16 +97,17 @@ public class BulkImportMain {
         System.out.println(msg);
         LOG.info(msg);
 
-        final String sessionName = args[1];
-        final String[] fileNames = new String[args.length - 2];
-        for (int i = 0; i < args.length - 2; i++) {
-            fileNames[i] = args[i + 2];
-        }
-
         // TODO #MN validate that the session is live or not.
 
-        final UploadConfiguration conf = new UploadConfiguration();
-        conf.configure(props);
+        // create configuration for 'upload' processing
+        final UploadConfiguration conf = createUploadConfiguration(props, args);
+
+        List<String> argList = conf.getNonOptionArguments();
+        final String sessionName = argList.get(1); // get session name
+        final String[] fileNames = new String[argList.size() - 2]; // delete 'upload_parts'
+        for (int i = 0; i < fileNames.length; i++) {
+            fileNames[i] = argList.get(i + 2);
+        }
 
         MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
         proc.registerWorkers();
@@ -164,22 +162,22 @@ public class BulkImportMain {
         System.out.println(msg);
         LOG.info(msg);
 
-        final String sessionName = args[1];
-        final String[] fileNames = new String[args.length - 2];
-        for (int i = 0; i < args.length - 2; i++) {
-            fileNames[i] = args[i + 2];
-        }
+        // create configuration for 'prepare' processing
+        final PrepareConfiguration prepareConf = createPrepareConfiguration(props, args);
 
-        final PrepareConfiguration prepareConf = new PrepareConfiguration.Factory()
-                .newPrepareConfiguration(props);
-        prepareConf.configure(props);
+        List<String> argList = prepareConf.getNonOptionArguments();
+        final String sessionName = argList.get(1); // get session name
+        final String[] fileNames = new String[argList.size() - 2]; // delete command
+        for (int i = 0; i < fileNames.length; i++) {
+            fileNames[i] = argList.get(i + 2);
+        }
 
         MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(prepareConf);
         prepareProc.registerWorkers();
         prepareProc.startWorkers();
 
-        final UploadConfiguration uploadConf = new UploadConfiguration();
-        uploadConf.configure(props);
+        // create configuration for 'upload' processing
+        final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -225,6 +223,19 @@ public class BulkImportMain {
                 + Configuration.CMD_UPLOAD_PARTS);
     }
 
+    private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {
+        PrepareConfiguration.Factory fact = new PrepareConfiguration.Factory(props);
+        PrepareConfiguration conf = fact.newPrepareConfiguration(args);
+        conf.configure(props, fact.getBulkImportOptions());
+        return conf;
+    }
+
+    private static UploadConfiguration createUploadConfiguration(Properties props, String[] args) {
+        UploadConfiguration.Factory fact = new UploadConfiguration.Factory(props);
+        UploadConfiguration conf = fact.newUploadConfiguration(args);
+        conf.configure(props, fact.getBulkImportOptions());
+        return conf;
+    }
 
     private static void outputErrors(List<ErrorInfo> errs, String cmd) {
         int errSize = 0;
