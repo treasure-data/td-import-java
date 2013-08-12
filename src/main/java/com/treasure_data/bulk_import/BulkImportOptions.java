@@ -261,9 +261,6 @@ public class BulkImportOptions {
 
     public void setOptions(final String[] args) {
         options = op.parse(args);
-        // TODO
-        //@SuppressWarnings("unchecked")
-        //List<String> nonOptArgs = (List<String>) options.nonOptionArguments();
     }
 
     public OptionSet getOptions() {
