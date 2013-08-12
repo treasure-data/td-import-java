@@ -28,6 +28,9 @@ public interface Constants extends com.treasure_data.client.Constants {
     // UPLOAD_PARTS_OPTIONS               //
     ////////////////////////////////////////
 
+    // format
+    String BI_UPLOAD_PARTS_FORMAT_DEFAULTVALUE = "msgpack.gz"; // default 'msgpack.gz'
+
     // auto-perform
     String BI_UPLOAD_PARTS_AUTO_PERFORM = "td.bulk_import.upload_parts.auto-perform";
     String BI_UPLOAD_PARTS_AUTO_PERFORM_DEFAULTVALUE = "false";
