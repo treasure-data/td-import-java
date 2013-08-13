@@ -262,6 +262,7 @@ public class BulkImportMain {
     }
 
     private static boolean includePrepareProcessing(Properties props) {
+        // FIXME TODO
         for (Iterator<Object> keyIter = props.keySet().iterator(); keyIter.hasNext(); ) {
             String key = (String) keyIter.next();
             if (key.startsWith("td.bulk_import.prepare_parts.")) {
