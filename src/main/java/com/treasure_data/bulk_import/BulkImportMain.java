@@ -18,6 +18,7 @@
 package com.treasure_data.bulk_import;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -93,121 +94,93 @@ public class BulkImportMain {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        String msg = String.format("Start %s command", Configuration.CMD_UPLOAD_PARTS);
-        System.out.println(msg);
-        LOG.info(msg);
-
-        // TODO #MN validate that the session is live or not.
-
-        // create configuration for 'upload' processing
-        final UploadConfiguration conf = createUploadConfiguration(props, args);
-
-        List<String> argList = conf.getNonOptionArguments();
-        final String sessionName = argList.get(1); // get session name
-        final String[] fileNames = new String[argList.size() - 2]; // delete 'upload_parts'
-        for (int i = 0; i < fileNames.length; i++) {
-            fileNames[i] = argList.get(i + 2);
-        }
-
-        MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
-        proc.registerWorkers();
-        proc.startWorkers();
-
-        // scan files that are uploaded
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < fileNames.length; i++) {
-                    try {
-                        long size = new File(fileNames[i]).length();
-                        com.treasure_data.bulk_import.upload_parts.Task task =
-                                new com.treasure_data.bulk_import.upload_parts.Task(
-                                sessionName, fileNames[i], size);
-                        MultiThreadUploadProcessor.addTask(task);
-                    } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addTask' method call");
-                        LOG.throwing("Main", "addTask", t);
-                    }
-                }
-
-                // end of file list
-                try {
-                    MultiThreadUploadProcessor.addFinishTask(conf);
-                } catch (Throwable t) {
-                    LOG.severe("Error occurred During 'addFinishTask' method call");
-                    LOG.throwing("Main", "addFinishTask", t);
-                }
-            }
-        }).start();
-
-        proc.joinWorkers();
-
-        ErrorInfo err = MultiThreadUploadProcessor.processAfterUploading(
-                new BulkImportClient(new TreasureDataClient(conf.getProperties())),
-                conf, sessionName);
-
-        List<ErrorInfo> errs = proc.getErrors();
-        errs.add(err);
-        outputErrors(errs, Configuration.CMD_UPLOAD_PARTS);
-    }
-
-    public static void prepareAndUploadParts(final String[] args, Properties props)
-            throws Exception {
-        if (args.length < 3) {
-            throw new IllegalArgumentException("File names not specified");
-        }
-
         String msg = String.format("Start %s and %s commands",
                 Configuration.CMD_UPLOAD_PARTS,
                 Configuration.CMD_PREPARE_PARTS);
         System.out.println(msg);
         LOG.info(msg);
 
-        // create configuration for 'prepare' processing
-        final PrepareConfiguration prepareConf = createPrepareConfiguration(props, args);
+        // create configuration for 'upload' processing
+        final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
 
-        List<String> argList = prepareConf.getNonOptionArguments();
+        List<String> argList = uploadConf.getNonOptionArguments();
         final String sessionName = argList.get(1); // get session name
         final String[] fileNames = new String[argList.size() - 2]; // delete command
         for (int i = 0; i < fileNames.length; i++) {
             fileNames[i] = argList.get(i + 2);
         }
 
-        MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(prepareConf);
-        prepareProc.registerWorkers();
-        prepareProc.startWorkers();
-
-        // create configuration for 'upload' processing
-        final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
+        // TODO #MN validate that the session is live or not.
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
         uploadProc.startWorkers();
 
-        // scan files that are uploaded
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < fileNames.length; i++) {
+        List<ErrorInfo> errs = new ArrayList<ErrorInfo>();
+
+        if (!uploadConf.hasPrepareOptions()) {
+            // scan files that are uploaded
+            new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < fileNames.length; i++) {
+                        try {
+                            long size = new File(fileNames[i]).length();
+                            com.treasure_data.bulk_import.upload_parts.Task task =
+                                    new com.treasure_data.bulk_import.upload_parts.Task(
+                                    sessionName, fileNames[i], size);
+                            MultiThreadUploadProcessor.addTask(task);
+                        } catch (Throwable t) {
+                            LOG.severe("Error occurred During 'addTask' method call");
+                            LOG.throwing("Main", "addTask", t);
+                        }
+                    }
+
+                    // end of file list
                     try {
-                        UploadTask task =
-                                new UploadTask(sessionName, fileNames[i]);
-                        MultiThreadPrepareProcessor.addTask(task);
+                        MultiThreadUploadProcessor.addFinishTask(uploadConf);
                     } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addTask' method call");
-                        LOG.throwing("Main", "addTask", t);
+                        LOG.severe("Error occurred During 'addFinishTask' method call");
+                        LOG.throwing("Main", "addFinishTask", t);
                     }
                 }
+            }).start();
 
-                // end of file list
-                try {
-                    MultiThreadPrepareProcessor.addFinishTask(prepareConf);
-                } catch (Throwable t) {
-                    LOG.severe("Error occurred During 'addFinishTask' method call");
-                    LOG.throwing("Main", "addFinishTask", t);
+            uploadProc.joinWorkers();
+        } else {
+            // create configuration for 'prepare' processing
+            final PrepareConfiguration prepareConf = createPrepareConfiguration(props, args);
+
+            MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(prepareConf);
+            prepareProc.registerWorkers();
+            prepareProc.startWorkers();
+
+            // scan files that are uploaded
+            new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < fileNames.length; i++) {
+                        try {
+                            UploadTask task = new UploadTask(sessionName, fileNames[i]);
+                            MultiThreadPrepareProcessor.addTask(task);
+                        } catch (Throwable t) {
+                            LOG.severe("Error occurred During 'addTask' method call");
+                            LOG.throwing("Main", "addTask", t);
+                        }
+                    }
+
+                    // end of file list
+                    try {
+                        MultiThreadPrepareProcessor.addFinishTask(prepareConf);
+                    } catch (Throwable t) {
+                        LOG.severe("Error occurred During 'addFinishTask' method call");
+                        LOG.throwing("Main", "addFinishTask", t);
+                    }
                 }
-            }
-        }).start();
+            }).start();
 
-        prepareProc.joinWorkers();
+            prepareProc.joinWorkers();
+
+            errs.addAll(prepareProc.getErrors());
+        }
 
         MultiThreadUploadProcessor.addFinishTask(uploadConf);
         uploadProc.joinWorkers();
@@ -216,7 +189,6 @@ public class BulkImportMain {
                 new BulkImportClient(new TreasureDataClient(uploadConf.getProperties())),
                 uploadConf, sessionName);
 
-        List<ErrorInfo> errs = prepareProc.getErrors();
         errs.addAll(uploadProc.getErrors());
         errs.add(err);
         outputErrors(errs, Configuration.CMD_PREPARE_PARTS + "+"
@@ -261,17 +233,6 @@ public class BulkImportMain {
         }
     }
 
-    private static boolean includePrepareProcessing(Properties props) {
-        // FIXME TODO
-        for (Iterator<Object> keyIter = props.keySet().iterator(); keyIter.hasNext(); ) {
-            String key = (String) keyIter.next();
-            if (key.startsWith("td.bulk_import.prepare_parts.")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
             throw new IllegalArgumentException("Command not specified");
@@ -282,11 +243,7 @@ public class BulkImportMain {
         if (commandName.equals(Configuration.CMD_PREPARE_PARTS)) {
             prepareParts(args, props);
         } else if (commandName.equals(Configuration.CMD_UPLOAD_PARTS)) {
-            if (!includePrepareProcessing(props)) {
-                uploadParts(args, props);
-            } else {
-                prepareAndUploadParts(args, props);
-            }
+            uploadParts(args, props);
         } else {
             throw new IllegalArgumentException(
                     String.format("Not support command %s", commandName));
