@@ -115,6 +115,24 @@ public class UploadConfiguration extends PrepareConfiguration {
         return props;
     }
 
+    public boolean hasPrepareOptions() {
+        return optionSet.has("format")
+                || optionSet.has("compress")
+                || optionSet.has("prepare-parallel")
+                || optionSet.has("encoding")
+                || optionSet.has("time-column")
+                || optionSet.has("time-value")
+                || optionSet.has("time-format")
+                || optionSet.has("output")
+                || optionSet.has("error-records-handling")
+                || optionSet.has("dry-run")
+                || optionSet.has("split-size")
+                || optionSet.has("columns")
+                || optionSet.has("column-types")
+                || optionSet.has("exclude-columns")
+                || optionSet.has("only-columns");
+    }
+
     public void setAutoPerform() {
         autoPerform = optionSet.has("auto-perform");
     }
