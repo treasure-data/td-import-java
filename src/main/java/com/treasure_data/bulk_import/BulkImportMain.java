@@ -19,7 +19,6 @@ package com.treasure_data.bulk_import;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
