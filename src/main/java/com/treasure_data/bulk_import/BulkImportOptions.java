@@ -261,6 +261,12 @@ public class BulkImportOptions {
     public void initUploadOptionParser(Properties props) {
         this.initPrepareOptionParser(props);
         op.acceptsAll(Arrays.asList(
+                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION),
+                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION_DESC);
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION),
+                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION_DESC);
+        op.acceptsAll(Arrays.asList(
                 Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM),
                 Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM_DESC);
         op.acceptsAll(Arrays.asList(

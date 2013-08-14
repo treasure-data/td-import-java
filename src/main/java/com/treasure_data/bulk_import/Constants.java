@@ -31,6 +31,14 @@ public interface Constants extends com.treasure_data.client.Constants {
     // format
     String BI_UPLOAD_PARTS_FORMAT_DEFAULTVALUE = "msgpack.gz"; // default 'msgpack.gz'
 
+    // auto-craete-session
+    String BI_UPLOAD_PARTS_AUTO_CREATE_SESSION = "auto-create-session";
+    String BI_UPLOAD_PARTS_AUTO_CREATE_SESSION_DESC = "create bulk import session automatically";
+
+    // auto-delete-session
+    String BI_UPLOAD_PARTS_AUTO_DELETE_SESSION = "auto-delete-session";
+    String BI_UPLOAD_PARTS_AUTO_DELETE_SESSION_DESC = "delete bulk import session automatically";
+
     // auto-perform
     String BI_UPLOAD_PARTS_AUTO_PERFORM = "auto-perform";
     String BI_UPLOAD_PARTS_AUTO_PERFORM_DEFAULTVALUE = "false";
