@@ -41,22 +41,6 @@ public class UploadConfiguration extends PrepareConfiguration {
         public UploadConfiguration newUploadConfiguration(String[] args) {
             options.setOptions(args);
             OptionSet optionSet = options.getOptions();
-
-//            // TODO FIXME when uploadParts is called, default format is "msgpack.gz"
-//            // on the other hand, when prepareParts, default format is "csv".
-//            String formatStr;
-//            if (optionSet.has("format")) {
-//                formatStr = (String) optionSet.valueOf("format");
-//            } else {
-//                formatStr = Configuration.BI_UPLOAD_PARTS_FORMAT_DEFAULTVALUE;
-//            }
-//
-//            // lookup format enum
-//            Format format = Format.fromString(formatStr);
-//            if (format == null) {
-//                throw new IllegalArgumentException(String.format(
-//                        "unsupported format '%s'", formatStr));
-//            }
             return new UploadConfiguration();
         }
     }
