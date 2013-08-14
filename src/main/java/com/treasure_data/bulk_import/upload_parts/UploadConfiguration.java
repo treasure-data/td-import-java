@@ -17,13 +17,11 @@
 //
 package com.treasure_data.bulk_import.upload_parts;
 
-import java.util.List;
 import java.util.Properties;
 
 import joptsimple.OptionSet;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
-import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 
 public class UploadConfiguration extends PrepareConfiguration {
