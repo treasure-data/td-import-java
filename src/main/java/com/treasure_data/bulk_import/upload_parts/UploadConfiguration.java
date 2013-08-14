@@ -65,6 +65,8 @@ public class UploadConfiguration extends PrepareConfiguration {
 
     protected boolean autoPerform;
     protected boolean autoCommit;
+    protected boolean autoCreateSession;
+    protected boolean autoDeleteSession;
     protected int numOfUploadThreads;
     protected int retryCount;
     protected long waitSec;
@@ -85,6 +87,12 @@ public class UploadConfiguration extends PrepareConfiguration {
 
         // parallel
         setNumOfUploadThreads();
+
+        // auto-create-session
+        setAutoCreateSession();
+
+        // auto-delete-session
+        setAutoDeleteSession();
 
         // retryCount
         String rcount = props.getProperty(BI_UPLOAD_PARTS_RETRYCOUNT,
@@ -116,25 +124,26 @@ public class UploadConfiguration extends PrepareConfiguration {
     }
 
     public boolean hasPrepareOptions() {
-        return optionSet.has("format")
-                || optionSet.has("compress")
-                || optionSet.has("prepare-parallel")
-                || optionSet.has("encoding")
-                || optionSet.has("time-column")
-                || optionSet.has("time-value")
-                || optionSet.has("time-format")
-                || optionSet.has("output")
-                || optionSet.has("error-records-handling")
+        return optionSet.has(Configuration.BI_PREPARE_PARTS_FORMAT)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_COMPRESSION)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_PARALLEL)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_ENCODING)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_TIMECOLUMN)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_TIMEFORMAT)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_TIMEVALUE)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_OUTPUTDIR)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)
                 || optionSet.has("dry-run")
-                || optionSet.has("split-size")
-                || optionSet.has("columns")
-                || optionSet.has("column-types")
-                || optionSet.has("exclude-columns")
-                || optionSet.has("only-columns");
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_SPLIT_SIZE)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_COLUMNS)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_COLUMNTYPES)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS)
+                || optionSet.has(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS);
     }
 
     public void setAutoPerform() {
-        autoPerform = optionSet.has("auto-perform");
+        autoPerform = optionSet.has(
+                Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM);
     }
 
     public boolean autoPerform() {
@@ -142,11 +151,30 @@ public class UploadConfiguration extends PrepareConfiguration {
     }
 
     public void setAutoCommit() {
-        autoCommit = optionSet.has("auto-commit");
+        autoCommit = optionSet.has(
+                Configuration.BI_UPLOAD_PARTS_AUTO_COMMIT);
     }
 
     public boolean autoCommit() {
         return autoCommit;
+    }
+
+    public void setAutoCreateSession() {
+        autoCreateSession = optionSet.has(
+                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION);
+    }
+
+    public boolean autoCreateSession() {
+        return autoCreateSession;
+    }
+
+    public void setAutoDeleteSession() {
+        autoDeleteSession = optionSet.has(
+                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION);
+    }
+
+    public boolean autoDeleteSession() {
+        return autoDeleteSession;
     }
 
     public void setNumOfUploadThreads() {
@@ -154,7 +182,8 @@ public class UploadConfiguration extends PrepareConfiguration {
         if (!optionSet.has("parallel")) {
             num = Configuration.BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE;
         } else {
-            num = (String) optionSet.valueOf("parallel");
+            num = (String) optionSet.valueOf(
+                    Configuration.BI_UPLOAD_PARTS_PARALLEL);
         }
 
         try {
