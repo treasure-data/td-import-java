@@ -41,7 +41,7 @@ public class TestBulkImportMain {
 
         args.addAll(opts);
 
-        BulkImportMain.prepareParts(args.toArray(new String[0]), props);
+        BulkImportMain.prepare(args.toArray(new String[0]), props);
     }
 
 //    @Test @Ignore
@@ -77,7 +77,7 @@ public class TestBulkImportMain {
         //props.setProperty(Config.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
         //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
         opts.add("--parallel");
-        opts.add("1");
+        opts.add("3");
 
         List<String> args = new ArrayList<String>();
         args.add("upload_parts");
@@ -88,7 +88,7 @@ public class TestBulkImportMain {
 
         args.addAll(opts);
 
-        BulkImportMain.uploadParts(args.toArray(new String[0]), props);
+        BulkImportMain.upload(args.toArray(new String[0]), props);
     }
 
     @Test @Ignore
@@ -114,7 +114,7 @@ public class TestBulkImportMain {
 
         args.addAll(opts);
 
-        BulkImportMain.uploadParts(args.toArray(new String[0]), props);
+        BulkImportMain.upload(args.toArray(new String[0]), props);
     }
 
 //    @Test @Ignore

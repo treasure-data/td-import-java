@@ -111,7 +111,7 @@ public class PreparePartsIntegrationTestUtil {
         args.add(fileName);
         args.addAll(opts);
 
-        BulkImportMain.prepareParts(args.toArray(new String[0]), props);
+        BulkImportMain.prepare(args.toArray(new String[0]), props);
     }
 
     public void preparePartsFromCSVWithTimeColumn() throws Exception {
