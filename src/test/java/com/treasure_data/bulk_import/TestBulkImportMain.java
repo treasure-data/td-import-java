@@ -67,7 +67,7 @@ public class TestBulkImportMain {
 //        BulkImportMain.prepareParts(args, props);
 //    }
 
-    @Test
+    @Test @Ignore
     public void testUploadParts01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader()
