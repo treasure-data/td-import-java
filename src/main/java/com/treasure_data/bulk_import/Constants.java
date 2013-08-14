@@ -19,9 +19,9 @@ package com.treasure_data.bulk_import;
 
 public interface Constants extends com.treasure_data.client.Constants {
 
-    String CMD_PREPARE_PARTS = "prepare_parts";
+    String CMD_PREPARE_PARTS = "prepare";
 
-    String CMD_UPLOAD_PARTS = "upload_parts";
+    String CMD_UPLOAD_PARTS = "upload";
 
 
     ////////////////////////////////////////
