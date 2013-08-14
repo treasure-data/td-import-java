@@ -69,10 +69,10 @@ public class PrepareConfiguration extends Configuration {
             // TODO FIXME when uploadParts is called, default format is "msgpack.gz"
             // on the other hand, when prepareParts, default format is "csv".
             String formatStr;
-            if (optionSet.has("format")) {
-                formatStr = (String) optionSet.valueOf("format");
+            if (optionSet.has(BI_PREPARE_PARTS_FORMAT)) {
+                formatStr = (String) optionSet.valueOf(BI_PREPARE_PARTS_FORMAT);
             } else {
-                formatStr = Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE;
+                formatStr = BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE;
             }
 
             // lookup format enum
@@ -325,7 +325,7 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public static enum ErrorRecordsHandling {
-        SKIP(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE) {
+        SKIP(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE) {
             @Override
             public void handleError(PreparePartsException e)
                     throws PreparePartsException {
@@ -460,10 +460,10 @@ public class PrepareConfiguration extends Configuration {
 
     public void setFormat() {
         String formatStr;
-        if (!optionSet.has("format")) {
+        if (!optionSet.has(BI_PREPARE_PARTS_FORMAT)) {
             formatStr = Configuration.BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE;
         } else {
-            formatStr = (String) optionSet.valueOf("format");
+            formatStr = (String) optionSet.valueOf(BI_PREPARE_PARTS_FORMAT);
         }
         format = Format.fromString(formatStr);
         if (format == null) {
@@ -496,10 +496,10 @@ public class PrepareConfiguration extends Configuration {
 
     public void setCompressionType() {
         String type;
-        if (!optionSet.has("compress")) {
-            type = Configuration.BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE;
+        if (!optionSet.has(BI_PREPARE_PARTS_COMPRESSION)) {
+            type = BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE;
         } else {
-            type = (String) optionSet.valueOf("compress");
+            type = (String) optionSet.valueOf(BI_PREPARE_PARTS_COMPRESSION);
         }
 
         compressionType = CompressionType.fromString(type);
@@ -558,10 +558,10 @@ public class PrepareConfiguration extends Configuration {
 
     public void setPrepareThreadNum() {
         String num;
-        if (!optionSet.has("prepare-parallel")) {
-            num = Configuration.BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE;
+        if (!optionSet.has(BI_PREPARE_PARTS_PARALLEL)) {
+            num = BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE;
         } else {
-            num = (String) optionSet.valueOf("prepare-parallel");
+            num = (String) optionSet.valueOf(BI_PREPARE_PARTS_PARALLEL);
         }
 
         try {
@@ -575,7 +575,7 @@ public class PrepareConfiguration extends Configuration {
             }
         } catch (NumberFormatException e) {
             String msg = String.format(
-                    "'int' value is required as 'prepare-parallel' option");
+                    "'int' value is required as '%s' option", BI_PREPARE_PARTS_PARALLEL);
             throw new IllegalArgumentException(msg, e);
         }
     }
@@ -586,10 +586,10 @@ public class PrepareConfiguration extends Configuration {
 
     public void setEncoding() {
         String encoding;
-        if (!optionSet.has("encoding")) {
-            encoding = Configuration.BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE;
+        if (!optionSet.has(BI_PREPARE_PARTS_ENCODING)) {
+            encoding = BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE;
         } else {
-            encoding = (String) optionSet.valueOf("encoding");
+            encoding = (String) optionSet.valueOf(BI_PREPARE_PARTS_ENCODING);
         }
 
         try {
@@ -610,8 +610,8 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setAliasTimeColumn() {
-        if (optionSet.has("time-column")) {
-            aliasTimeColumn = (String) optionSet.valueOf("time-column");
+        if (optionSet.has(BI_PREPARE_PARTS_TIMECOLUMN)) {
+            aliasTimeColumn = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMECOLUMN);
         }
     }
 
@@ -621,8 +621,8 @@ public class PrepareConfiguration extends Configuration {
 
     public void setTimeValue() {
         String v = null;
-        if (optionSet.has("time-value")) {
-            v = (String) optionSet.valueOf("time-value");
+        if (optionSet.has(BI_PREPARE_PARTS_TIMEVALUE)) {
+            v = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMEVALUE);
         }
 
         if (v != null) {
@@ -630,7 +630,7 @@ public class PrepareConfiguration extends Configuration {
                 timeValue = Long.parseLong(v);
             } catch (NumberFormatException e) {
                 String msg = String.format(
-                        "'time value' is required as long type (unix timestamp)");
+                        "'%s' is required as long type (unix timestamp)", BI_PREPARE_PARTS_TIMEVALUE);
                 throw new IllegalArgumentException(msg, e);
             }
         }
@@ -641,8 +641,8 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setTimeFormat() {
-        if (optionSet.has("time-format")) {
-            timeFormat = (String) optionSet.valueOf("time-format");
+        if (optionSet.has(BI_PREPARE_PARTS_TIMEFORMAT)) {
+            timeFormat = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMEFORMAT);
         }
     }
 
@@ -652,12 +652,12 @@ public class PrepareConfiguration extends Configuration {
 
     public void setOutputDirName() {
         if (optionSet.has("output")) {
-            outputDirName = (String) optionSet.valueOf("output");
+            outputDirName = (String) optionSet.valueOf(BI_PREPARE_PARTS_OUTPUTDIR);
         }
 
         File outputDir = null;
         if (outputDirName == null || outputDirName.isEmpty()) {
-            outputDir = new File(new File("."), Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
+            outputDir = new File(new File("."), BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE);
             outputDirName = outputDir.getName();
         } else {
             outputDir = new File(outputDirName);
@@ -667,23 +667,25 @@ public class PrepareConfiguration extends Configuration {
         if (!outputDir.isDirectory()) {
             if (!outputDir.mkdir()) {
                 throw new IllegalArgumentException(String.format(
-                        "Cannot create output directory '%s'", outputDirName));
+                        "Cannot create '%s' directory '%s'",
+                        BI_PREPARE_PARTS_OUTPUTDIR, outputDirName));
             }
         }
     }
 
     public void setErrorRecordsHandling() {
         String mode;
-        if (!optionSet.has("error-records-handling")) {
-            mode = Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE;
+        if (!optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)) {
+            mode = BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE;
         } else {
-            mode = (String) optionSet.valueOf("error-records-handling");
+            mode = (String) optionSet.valueOf(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING);
         }
 
         errorRecordsHandling = ErrorRecordsHandling.fromString(mode);
         if (errorRecordsHandling == null) {
             throw new IllegalArgumentException(String.format(
-                    "unsupported errorHandling mode '%s'", mode));
+                    "unsupported '%s' mode '%s'",
+                    BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING, mode));
         }
     }
 
@@ -708,17 +710,17 @@ public class PrepareConfiguration extends Configuration {
 
     public void setSplitSize() {
         String size;
-        if (!optionSet.has("split-size")) {
-            size = Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE;
+        if (!optionSet.has(BI_PREPARE_PARTS_SPLIT_SIZE)) {
+            size = BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE;
         } else {
-            size = (String) optionSet.valueOf("split-size");
+            size = (String) optionSet.valueOf(BI_PREPARE_PARTS_SPLIT_SIZE);
         }
 
         try {
             splitSize = Integer.parseInt(size);
         } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "'split-size' is required as int type");
+            String msg = String.format("'%s' is required as int type",
+                    BI_PREPARE_PARTS_SPLIT_SIZE);
             throw new IllegalArgumentException(msg, e);
         }
     }
@@ -728,10 +730,10 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setColumnNames() {
-        if (!optionSet.has("columns")) {
+        if (!optionSet.has(BI_PREPARE_PARTS_COLUMNS)) {
             columnNames = new String[0];
         } else {
-            columnNames = optionSet.valuesOf("columns").toArray(new String[0]);
+            columnNames = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNS).toArray(new String[0]);
         }
     }
 
@@ -740,10 +742,10 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setColumnTypes() {
-        if (!optionSet.has("column-types")) {
+        if (!optionSet.has(BI_PREPARE_PARTS_COLUMNTYPES)) {
             columnTypes = new ColumnType[0];
         } else {
-            String[] types = optionSet.valuesOf("column-types").toArray(new String[0]);
+            String[] types = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNTYPES).toArray(new String[0]);
             columnTypes = new ColumnType[types.length];
             for (int i = 0; i < types.length; i++) {
                 columnTypes[i] = ColumnType.fromString(types[i].toLowerCase());
@@ -760,14 +762,15 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setExcludeColumns() {
-        if (!optionSet.has("exclude-columns")) {
+        if (!optionSet.has(BI_PREPARE_PARTS_EXCLUDE_COLUMNS)) {
             excludeColumns = new String[0];
         } else {
-            excludeColumns = optionSet.valuesOf("exclude-columns").toArray(new String[0]);
+            excludeColumns = optionSet.valuesOf(BI_PREPARE_PARTS_EXCLUDE_COLUMNS).toArray(new String[0]);
             for (String c : excludeColumns) {
                 if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                    throw new IllegalArgumentException(
-                            "'time' column cannot be included in 'exclud-columns'");
+                    throw new IllegalArgumentException(String.format(
+                            "'time' column cannot be included in '%s'",
+                            BI_PREPARE_PARTS_EXCLUDE_COLUMNS));
                 }
             }
         }
@@ -778,15 +781,17 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setOnlyColumns() {
-        if (!optionSet.has("only-columns")) {
+        if (!optionSet.has(BI_PREPARE_PARTS_ONLY_COLUMNS)) {
             onlyColumns = new String[0];
         } else {
-            onlyColumns = optionSet.valuesOf("only-columns").toArray(new String[0]);
+            onlyColumns = optionSet.valuesOf(BI_PREPARE_PARTS_ONLY_COLUMNS).toArray(new String[0]);
             for (String oc : onlyColumns) {
                 for (String ec : excludeColumns) {
                     if (oc.equals(ec)) {
-                        throw new IllegalArgumentException(
-                                "don't include 'exclude-columns' in 'only-columns'");
+                        throw new IllegalArgumentException(String.format(
+                                "don't include '%s' in '%s'",
+                                BI_PREPARE_PARTS_EXCLUDE_COLUMNS,
+                                BI_PREPARE_PARTS_ONLY_COLUMNS));
                     }
                 }
             }

@@ -124,26 +124,25 @@ public class UploadConfiguration extends PrepareConfiguration {
     }
 
     public boolean hasPrepareOptions() {
-        return optionSet.has(Configuration.BI_PREPARE_PARTS_FORMAT)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_COMPRESSION)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_PARALLEL)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_ENCODING)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_TIMECOLUMN)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_TIMEFORMAT)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_TIMEVALUE)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_OUTPUTDIR)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)
+        return optionSet.has(BI_PREPARE_PARTS_FORMAT)
+                || optionSet.has(BI_PREPARE_PARTS_COMPRESSION)
+                || optionSet.has(BI_PREPARE_PARTS_PARALLEL)
+                || optionSet.has(BI_PREPARE_PARTS_ENCODING)
+                || optionSet.has(BI_PREPARE_PARTS_TIMECOLUMN)
+                || optionSet.has(BI_PREPARE_PARTS_TIMEFORMAT)
+                || optionSet.has(BI_PREPARE_PARTS_TIMEVALUE)
+                || optionSet.has(BI_PREPARE_PARTS_OUTPUTDIR)
+                || optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)
                 || optionSet.has("dry-run")
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_SPLIT_SIZE)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_COLUMNS)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_COLUMNTYPES)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS)
-                || optionSet.has(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS);
+                || optionSet.has(BI_PREPARE_PARTS_SPLIT_SIZE)
+                || optionSet.has(BI_PREPARE_PARTS_COLUMNS)
+                || optionSet.has(BI_PREPARE_PARTS_COLUMNTYPES)
+                || optionSet.has(BI_PREPARE_PARTS_EXCLUDE_COLUMNS)
+                || optionSet.has(BI_PREPARE_PARTS_ONLY_COLUMNS);
     }
 
     public void setAutoPerform() {
-        autoPerform = optionSet.has(
-                Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM);
+        autoPerform = optionSet.has(BI_UPLOAD_PARTS_AUTO_PERFORM);
     }
 
     public boolean autoPerform() {
@@ -151,8 +150,7 @@ public class UploadConfiguration extends PrepareConfiguration {
     }
 
     public void setAutoCommit() {
-        autoCommit = optionSet.has(
-                Configuration.BI_UPLOAD_PARTS_AUTO_COMMIT);
+        autoCommit = optionSet.has(BI_UPLOAD_PARTS_AUTO_COMMIT);
     }
 
     public boolean autoCommit() {
@@ -160,8 +158,7 @@ public class UploadConfiguration extends PrepareConfiguration {
     }
 
     public void setAutoCreateSession() {
-        autoCreateSession = optionSet.has(
-                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION);
+        autoCreateSession = optionSet.has(BI_UPLOAD_PARTS_AUTO_CREATE_SESSION);
     }
 
     public boolean autoCreateSession() {
@@ -169,8 +166,7 @@ public class UploadConfiguration extends PrepareConfiguration {
     }
 
     public void setAutoDeleteSession() {
-        autoDeleteSession = optionSet.has(
-                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION);
+        autoDeleteSession = optionSet.has(BI_UPLOAD_PARTS_AUTO_DELETE_SESSION);
     }
 
     public boolean autoDeleteSession() {
@@ -179,11 +175,10 @@ public class UploadConfiguration extends PrepareConfiguration {
 
     public void setNumOfUploadThreads() {
         String num;
-        if (!optionSet.has("parallel")) {
-            num = Configuration.BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE;
+        if (!optionSet.has(BI_UPLOAD_PARTS_PARALLEL)) {
+            num = BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE;
         } else {
-            num = (String) optionSet.valueOf(
-                    Configuration.BI_UPLOAD_PARTS_PARALLEL);
+            num = (String) optionSet.valueOf(BI_UPLOAD_PARTS_PARALLEL);
         }
 
         try {
@@ -197,7 +192,8 @@ public class UploadConfiguration extends PrepareConfiguration {
             }
         } catch (NumberFormatException e) {
             String msg = String.format(
-                    "'int' value is required as 'parallel' option");
+                    "'int' value is required as '%s' option",
+                    BI_UPLOAD_PARTS_PARALLEL);
             throw new IllegalArgumentException(msg, e);
         }
     }
