@@ -36,7 +36,7 @@ import com.treasure_data.client.bulkimport.BulkImportClient;
 public class BulkImportMain {
     private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
 
-    public static void prepareParts(final String[] args, Properties props)
+    public static void prepare(final String[] args, Properties props)
             throws Exception {
         if (args.length < 2) {
             throw new IllegalArgumentException("File names not specified");
@@ -88,7 +88,7 @@ public class BulkImportMain {
         outputErrors(errs, Configuration.CMD_PREPARE_PARTS);
     }
 
-    public static void uploadParts(final String[] args, Properties props)
+    public static void upload(final String[] args, Properties props)
             throws Exception {
         if (args.length < 3) {
             throw new IllegalArgumentException("File names not specified");
@@ -241,9 +241,9 @@ public class BulkImportMain {
         String commandName = args[0];
         Properties props = System.getProperties();
         if (commandName.equals(Configuration.CMD_PREPARE_PARTS)) {
-            prepareParts(args, props);
+            prepare(args, props);
         } else if (commandName.equals(Configuration.CMD_UPLOAD_PARTS)) {
-            uploadParts(args, props);
+            upload(args, props);
         } else {
             throw new IllegalArgumentException(
                     String.format("Not support command %s", commandName));
