@@ -11,56 +11,41 @@ PART_SPLIT_SIZE = 16*1024*1024
 
 JAVA_COMMAND = "java"
 JAVA_MAIN_CLASS = "com.treasure_data.bulk_import.BulkImportMain"
-JAVA_HEAP_MX_SIZE = "-Xmx1024m" # TODO
+JAVA_HEAP_MAX_SIZE = "-Xmx1024m" # TODO
 
-APP_OPTION_PREPARE = "prepare_parts"
-APP_OPTION_UPLOAD = "upload_parts"
+APP_OPTION_PREPARE = "prepare"
+APP_OPTION_UPLOAD = "upload"
 
-def bulk_import_prepare_parts2(op)
-  bulk_import_parts2(op, true)
+def import_prepare()
+  exec_import_command(APP_OPTION_PREPARE)
 end
 
-def bulk_import_upload_parts2(op)
-  bulk_import_parts2(op, false)
+def import_upload()
+  exec_import_command(APP_OPTION_UPLOAD)
 end
 
-def bulk_import_parts2(op, prepare = true)
-  if prepare
-    opts = prepare_parts2_config(op)
-  else
-    opts = upload_parts2_config(op)
-  end
+def exec_import_command(subcmd)
+  puts "import commands require Java version 1.6 or later."
 
   # make jvm options
-  jvm_opts = []
-  jvm_opts << JAVA_HEAP_MX_SIZE
+  jvm_opts = [ JAVA_HEAP_MAX_SIZE ]
 
   # make application options
-  app_opts = []
-  app_opts << "-cp \"#{find_td_bulk_import_jar()}\""
+  app_opts = [ "-cp \"#{find_td_bulk_import_jar()}\"" ]
 
   # make system properties
-  sysprops = []
-  if prepare
-    sysprops.concat(prepare_parts2_sysprops(opts))
-  else
-    sysprops.concat(upload_parts2_sysprops(opts, true))
-  end
+  sysprops = set_sysprops()
 
   # make application arguments
   app_args = []
   app_args << JAVA_MAIN_CLASS
-  if prepare
-    app_args << APP_OPTION_PREPARE
-  else
-    app_args << APP_OPTION_UPLOAD
-  end
-  app_args << opts['files']
+  app_args << subcmd
+  app_args << ARGV
 
   # TODO consider parameters including spaces; don't use join(' ')
-  command = "#{JAVA_COMMAND} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
+  cmd = "#{JAVA_COMMAND} #{jvm_opts.join(' ')} #{app_opts.join(' ')} #{sysprops.join(' ')} #{app_args.join(' ')}"
 
-  exec command
+  exec cmd
 end
 
 def find_td_bulk_import_jar
@@ -74,80 +59,10 @@ def find_td_bulk_import_jar
   td_bulk_import_jar
 end
 
-def prepare_parts2_sysprops(opts)
+def set_sysprops()
   sysprops = []
 
   # set http_proxy
-  set_http_proxy(sysprops)
-
-  # set configuration file for logging
-  set_logging_conf(sysprops)
-
-  sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compression']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-format=\"#{opts['time_format']}\"" if opts['time_format']
-  sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
-  sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.error-records-handling=#{opts['error_records_handling']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts['quote']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts['newline']}"
-  sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts['column_header']}" if opts['column_header']
-  sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts['columns']}" if opts['columns']
-  sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts['column_types']}" if opts['column_types']
-  sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
-  sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
-  sysprops << "-Dtd.bulk_import.prepare_parts.prepare-parallel=#{opts['prepare_parallel']}"
-
-  sysprops
-end
-
-def upload_parts2_sysprops(opts, with_prepare = false)
-  sysprops = []
-
-  # set http_proxy
-  set_http_proxy(sysprops)
-
-  # set configuration file for logging
-  set_logging_conf(sysprops)
-
-  if with_prepare
-    sysprops << "-Dtd.bulk_import.prepare_parts.format=#{opts['format']}" if opts['format']
-    sysprops << "-Dtd.bulk_import.prepare_parts.compression=#{opts['compression']}" if opts['compression']
-    sysprops << "-Dtd.bulk_import.prepare_parts.encoding=#{opts['encoding']}" if opts['encoding']
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-column=#{opts['time_column']}" if opts['time_column']
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-format=\"#{opts['time_format']}\"" if opts['time_format']
-    sysprops << "-Dtd.bulk_import.prepare_parts.time-value=#{opts['time_value'].to_s}" if opts['time_value']
-    sysprops << "-Dtd.bulk_import.prepare_parts.output-dir=#{opts['outdir']}" if opts['outdir']
-    sysprops << "-Dtd.bulk_import.prepare_parts.split-size=#{opts['split_size_kb']}" if opts['split_size_kb']
-    sysprops << "-Dtd.bulk_import.prepare_parts.error-records-handling=#{opts['error_records_handling']}" if opts['error_records_handling']
-    sysprops << "-Dtd.bulk_import.prepare_parts.dry-run=#{opts['dry_run']}" if opts['dry_run']
-    sysprops << "-Dtd.bulk_import.prepare_parts.delimiter=#{opts['delimiter']}" if opts['delimiter']
-    sysprops << "-Dtd.bulk_import.prepare_parts.quote=#{opts['quote']}" if opts['quote']
-    sysprops << "-Dtd.bulk_import.prepare_parts.newline=#{opts['newline']}" if opts['newline']
-    sysprops << "-Dtd.bulk_import.prepare_parts.column-header=#{opts['column_header']}" if opts['column_header']
-    sysprops << "-Dtd.bulk_import.prepare_parts.columns=#{opts['columns']}" if opts['columns']
-    sysprops << "-Dtd.bulk_import.prepare_parts.column-types=#{opts['column_types']}" if opts['column_types']
-    sysprops << "-Dtd.bulk_import.prepare_parts.exclude-columns=#{opts['exclude_columns']}" if opts['exclude_columns']
-    sysprops << "-Dtd.bulk_import.prepare_parts.only-columns=#{opts['only_columns']}" if opts['only_columns']
-    sysprops << "-Dtd.bulk_import.prepare_parts.prepare-parallel=#{opts['prepare_parallel']}" if opts['prepare_parallel']
-  end
-
-  sysprops << "-Dtd.bulk_import.upload_parts.auto-perform=#{opts['auto_perform']}"
-  sysprops << "-Dtd.bulk_import.upload_parts.auto-commit=#{opts['auto_commit']}"
-  sysprops << "-Dtd.bulk_import.upload_parts.parallel=#{opts['parallel']}"
-  sysprops << "-Dtd.bulk_import.upload_parts.retrycount=10"
-  sysprops << "-Dtd.bulk_import.upload_parts.waitsec=1"
-  sysprops << "-Dtd.api.key=#{TreasureData::Config.apikey}"
-
-  sysprops
-end
-
-def set_http_proxy(sysprops)
   http_proxy = ENV['HTTP_PROXY']
   if http_proxy
     if http_proxy =~ /\Ahttp:\/\/(.*)\z/
@@ -159,13 +74,17 @@ def set_http_proxy(sysprops)
     sysprops << "-Dhttp.proxyHost=#{proxy_host}"
     sysprops << "-Dhttp.proxyPort=#{proxy_port}"
   end
-end
 
-def set_logging_conf(sysprops)
+  # set configuration file for logging
   conf_file = find_logging_conf_file
   if conf_file
     sysprops << "-Djava.util.logging.config.file=#{conf_file}"
   end
+
+  # set API key
+  sysprops << "-Dtd.api.key=#{TreasureData::Config.apikey}"
+
+  sysprops
 end
 
 def find_logging_conf_file
@@ -176,177 +95,12 @@ def find_logging_conf_file
   logging_conf_file
 end
 
-def prepare_parts2_config(op)
-  h = {}
-
-  h['format'] = 'csv'
-  h['compression'] = 'none'
-  h['encoding'] = 'utf-8'
-  h['time_column'] = 'time'
-  h['time_format'] = nil
-  h['time_value'] = nil
-  h['outdir'] = 'out'
-  h['split_size_kb'] = PART_SPLIT_SIZE / 1024  # kb
-  h['error_records_handling'] = 'skip'
-  h['dry_run'] = false
-  h['delimiter'] = ','
-  h['quote'] = "DOUBLE"
-  h['newline'] = 'CRLF'
-  h['column_header'] = false
-  h['columns'] = nil
-  h['column_types'] = nil
-  h['exclude_columns'] = nil
-  h['only_columns'] = nil
-  h['prepare_parallel'] = 2
-  h['files'] = nil
-
-  # prepare_parts
-  prepare_parts2_config0(h, op)
-
-  op.parse!(ARGV)
-  files = ARGV
-  files = [files] unless files.is_a?(Array) # TODO ruby 1.9
-  h['files'] = files
-
-  h
-end
-
-def upload_parts2_config(op)
-  h = {}
-  h['format'] = nil
-  h['compression'] = nil
-  h['encoding'] = nil
-  h['time_column'] = nil
-  h['time_format'] = nil
-  h['time_value'] = nil
-  h['outdir'] = nil
-  h['split_size_kb'] = nil
-  h['error_records_handling'] = nil
-  h['dry_run'] = false
-  h['delimiter'] = nil
-  h['quote'] = nil
-  h['newline'] = nil
-  h['column_header'] = false
-  h['columns'] = nil
-  h['column_types'] = nil
-  h['exclude_columns'] = nil
-  h['only_columns'] = nil
-  h['prepare_parallel'] = nil
-
-  h['auto_perform'] = false
-  h['auto_commit'] = false
-  h['parallel'] = 2
-
-  # prepare_parts
-  prepare_parts2_config0(h, op)
-
-  # upload_parts
-  upload_parts2_config0(h, op)
-
-  op.parse!(ARGV)
-  files = ARGV
-  files = [files] unless files.is_a?(Array) # TODO ruby 1.9
-  h['files'] = files
-
-  h
-end
-
-def prepare_parts2_config0(h, op)
-  op.on('-f', '--format NAME', 'source file format [csv, tsv, json, msgpack]; default=csv') {|s|
-    h['format'] = s
-  }
-  op.on('-C', '--compress TYPE', 'compressed type [gzip, none]; default=auto detect') {|s|
-    h['compression'] = s
-  }
-  op.on('-e', '--encoding TYPE', 'encoding type [utf-8]') {|s|
-    h['encoding'] = s
-  }
-  op.on('-t', '--time-column NAME', 'name of the time column') {|s|
-    h['time_column'] = s
-  }
-  op.on('-T', '--time-format FORMAT', 'STRF_FORMAT; default=auto detect') {|s|
-    h['time_format'] = s
-  }
-  op.on('--time-value TIME', 'long value of the time column') {|s|
-    set_time_value_config(h, s)
-  }
-  op.on('-o', '--output DIR', 'output directory') {|s|
-    h['outdir'] = s
-  }
-  op.on('-s', '--split-size SIZE_IN_KB', "size of each parts (default: #{h['split_size_kb']})", Integer) {|i|
-    h['split_size_kb'] = i
-  }
-  op.on('--error-records-handling MODE', 'error records handling mode; default=skip') {|s|
-    h['error_records_handling'] = s
-  }
-  op.on('--dry-run', 'show samples as JSON and exit', FalseClass) {|b|
-    h['dry_run'] = b
-  }
-  op.on('--delimiter CHAR', 'delimiter CHAR; default="," at csv, "\t" at tsv') {|s|
-    h['delimiter'] = s
-  }
-  op.on('--quote CHAR', 'quote [DOUBLE, SINGLE]; default=DOUBLE') {|s|
-    h['quote'] = s
-  }
-  op.on('--newline', 'newline [CRLR, LR, CR];  default=CRLF') {|s|
-    h['newline'] = s
-  }
-  op.on('-H', '--column-header', 'first line includes column names', TrueClass) {|b|
-    h['column_header'] = b
-  }
-  op.on('-h', '--columns NAME,NAME,...', 'column names (use --column-header instead if the first line has column names)') {|s|
-    h['columns'] = s
-  }
-  op.on('--column-types TYPE,TYPE,...', 'column types [string, int, long]') {|s|
-    h['column_types'] = s
-  }
-  op.on('--exclude-columns NAME,NAME,...', 'exclude columns') {|s|
-    h['exclude_columns'] = s
-  }
-  op.on('--only-columns NAME,NAME,...', 'only columns') {|s|
-    h['only_columns'] = s
-  }
-  op.on('--prepare-parallel NUM', 'prepare in parallel (default: 2; max 8)', Integer) {|i|
-    h['prepare_parallel'] = i
-  }
-end
-
-def set_time_value_config(h, s)
-  if s.to_i.to_s == s
-    h['time_value'] = s.to_i
-  else
-    require 'time'
-    h['time_value'] = Time.parse(s).to_i
-  end
-end
-
-def upload_parts2_config0(h, op)
-  op.on('--auto-perform', 'perform bulk import job automatically', TrueClass) {|b|
-    h['auto_perform'] = b
-  }
-  op.on('--auto-commit', 'commit bulk import job automatically', TrueClass) {|b|
-    h['auto_commit'] = b
-  }
-  op.on('--parallel NUM', 'upload in parallel (default: 2; max 8)', Integer) {|i|
-    h['parallel'] = i
-  }
-end
-
-require 'optparse'
-
 command = ARGV.shift
-op = OptionParser.new
-op.banner = <<EOF
-usage: #{File.basename($0)} [prepare_parts2|upload_parts2] [OPTIONS]
-
-OPTIONS are same as td command.
-EOF
-
 case command
-when 'prepare_parts2'
-  bulk_import_prepare_parts2(op)
-when 'upload_parts2'
-  bulk_import_upload_parts2(op)
+when APP_OPTION_PREPARE
+  import_prepare
+when APP_OPTION_UPLOAD
+  import_upload
 else
   $stderr.puts "Unknown command: #{command}"
 end
