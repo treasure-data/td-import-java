@@ -37,7 +37,7 @@ import com.treasure_data.client.bulkimport.BulkImportClient;
 
 public class BulkImportMain {
     private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
-    private static final String TIME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS";
+    private static final String TIME_FORMAT = "yyyy_MM_dd";
 
     public static void prepare(final String[] args, Properties props)
             throws Exception {
@@ -116,8 +116,10 @@ public class BulkImportMain {
         if (uploadConf.autoCreateSession()) { // 'auto-create-session'
             String databaseName = uploadConf.makeSession()[0];
             String tableName = uploadConf.makeSession()[1];
-            String timestamp = new SimpleDateFormat(TIME_FORMAT).format(new Date());
-            sessionName = String.format("%s_%s_%s", databaseName, tableName, timestamp);
+            Date d = new Date();
+            String timestamp = new SimpleDateFormat(TIME_FORMAT).format(d);
+            sessionName = String.format("%s_%s_%s_%d", databaseName, tableName,
+                    timestamp, (d.getTime() / 1000));
 
             // validate that database is live or not
             e = UploadProcessor.checkDatabase(tdClient, uploadConf,
