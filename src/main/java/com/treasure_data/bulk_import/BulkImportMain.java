@@ -18,7 +18,9 @@
 package com.treasure_data.bulk_import;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -29,11 +31,14 @@ import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.UploadTask;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
+import com.treasure_data.bulk_import.upload_parts.UploadPartsException;
+import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 
 public class BulkImportMain {
     private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
+    private static final String TIME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS";
 
     public static void prepare(final String[] args, Properties props)
             throws Exception {
@@ -101,20 +106,57 @@ public class BulkImportMain {
         final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
         List<String> argList = uploadConf.getNonOptionArguments();
 
-        if (uploadConf.createSession()) {
-            
+        // create TreasureDataClient and BulkImportClient objects
+        TreasureDataClient tdClient = new TreasureDataClient(uploadConf.getProperties());
+        BulkImportClient biClient = new BulkImportClient(tdClient);
+
+        // configure session name
+        ErrorInfo e;
+        final String sessionName;
+        int filePos;
+        if (uploadConf.autoCreateSession()) {
+            String databaseName = uploadConf.makeSession()[0];
+            String tableName = uploadConf.makeSession()[1];
+            String timestamp = new SimpleDateFormat(TIME_FORMAT).format(new Date());
+            sessionName = String.format("%s_%s_%s", databaseName, tableName, timestamp);
+
+            // validate that database is live or not
+            e = UploadProcessor.validateDatabase(tdClient, uploadConf,
+                    sessionName, databaseName);
+            if (e.error != null) {
+                throw new IllegalArgumentException(e.error);
+            }
+
+            // validate that table is live or not
+            e = UploadProcessor.validateTable(tdClient, uploadConf,
+                    sessionName, databaseName, tableName);
+            if (e.error != null) {
+                throw new IllegalArgumentException(e.error);
+            }
+
+            // create bulk import session
+            e = UploadProcessor.createSession(biClient, uploadConf, sessionName, databaseName, tableName);
+            if (e.error != null) {
+                throw new IllegalArgumentException(e.error);
+            }
+
+            filePos = 1;
         } else {
-            
-        }
-        final String sessionName = argList.get(1); // get session name
-        final String[] fileNames = new String[argList.size() - 2]; // delete command
-        for (int i = 0; i < fileNames.length; i++) {
-            fileNames[i] = argList.get(i + 2);
+            sessionName = argList.get(1); // get session name from command-line arguments
+            // validate that the session is live or not
+            e = UploadProcessor.validateSession(biClient, uploadConf, sessionName);
+            if (e.error != null) {
+                throw new IllegalArgumentException(e.error);
+            }
+
+            filePos = 2;
         }
 
-        // TODO #MN validate that the database is live or not if we need.
-        // TODO #MN validate that the table is live or not if we need.
-        // TODO #MN validate that the session is live or not if we need.
+        // configure uploaded file list
+        final String[] fileNames = new String[argList.size() - filePos]; // delete command
+        for (int i = 0; i < fileNames.length; i++) {
+            fileNames[i] = argList.get(i + filePos);
+        }
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -152,7 +194,7 @@ public class BulkImportMain {
             uploadProc.joinWorkers();
         } else {
             // create configuration for 'prepare' processing
-            final PrepareConfiguration prepareConf = createPrepareConfiguration(props, args);
+            final PrepareConfiguration prepareConf = createPrepareConfiguration(props, args, true);
 
             MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(prepareConf);
             prepareProc.registerWorkers();
@@ -190,8 +232,9 @@ public class BulkImportMain {
         uploadProc.joinWorkers();
 
         ErrorInfo err = MultiThreadUploadProcessor.processAfterUploading(
-                new BulkImportClient(new TreasureDataClient(uploadConf.getProperties())),
-                uploadConf, sessionName);
+                biClient, uploadConf, sessionName);
+
+        // TODO FIXME #MN delete session
 
         errs.addAll(uploadProc.getErrors());
         errs.add(err);
@@ -199,7 +242,11 @@ public class BulkImportMain {
     }
 
     private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {
-        PrepareConfiguration.Factory fact = new PrepareConfiguration.Factory(props);
+        return createPrepareConfiguration(props, args, false);
+    }
+
+    private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args, boolean isUploaded) {
+        PrepareConfiguration.Factory fact = new PrepareConfiguration.Factory(props, isUploaded);
         PrepareConfiguration conf = fact.newPrepareConfiguration(args);
         conf.configure(props, fact.getBulkImportOptions());
         return conf;

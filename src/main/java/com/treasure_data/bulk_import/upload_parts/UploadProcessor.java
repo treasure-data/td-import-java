@@ -22,10 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.treasure_data.client.ClientException;
+import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
+import com.treasure_data.model.DatabaseSummary;
+import com.treasure_data.model.TableSummary;
 import com.treasure_data.model.bulkimport.Session;
 import com.treasure_data.model.bulkimport.SessionSummary;
 
@@ -303,4 +307,123 @@ public class UploadProcessor {
         }
         return err;
     }
+
+    public static ErrorInfo validateDatabase(final TreasureDataClient client, final UploadConfiguration conf,
+            final String sessionName, final String databaseName) throws UploadPartsException {
+        String m = String.format("Check database '%s'", databaseName);
+        System.out.println(m);
+        LOG.info(m);
+
+        ErrorInfo err = new ErrorInfo();
+        try {
+            retryClient.retry(new Retryable2() {
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    List<DatabaseSummary> dbs = client.listDatabases();
+                    boolean exist = false;
+                    for (DatabaseSummary db : dbs) {
+                        if (db.getName().equals(databaseName)) {
+                            exist = true;
+                            break;
+                        }
+                    }
+
+                    if (!exist) {
+                        throw new IOException(String.format(
+                                "Not found database '%s'", databaseName));
+                    }
+                }
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+        } catch (IOException e) {
+            String msg = String.format("Cannot access database '%s', %s", databaseName, e.getMessage());
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = e;
+        }
+
+        return err;
+    }
+
+    public static ErrorInfo validateTable(final TreasureDataClient client, final UploadConfiguration conf,
+            final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
+        String m = String.format("Check table '%s'", tableName);
+        System.out.println(m);
+        LOG.info(m);
+
+        ErrorInfo err = new ErrorInfo();
+        try {
+            retryClient.retry(new Retryable2() {
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    List<TableSummary> tbls = client.listTables(databaseName);
+                    boolean exist = false;
+                    for (TableSummary tbl : tbls) {
+                        if (tbl.getName().equals(tableName)) {
+                            exist = true;
+                            break;
+                        }
+                    }
+
+                    if (!exist) {
+                        throw new IOException(String.format(
+                                "Not found table '%s'", tableName));
+                    }
+                }
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+        } catch (IOException e) {
+            String msg = String.format("Cannot access table '%s', %s", tableName, e.getMessage());
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = e;
+        }
+        return err;
+    }
+
+    public static ErrorInfo createSession(final BulkImportClient client, final UploadConfiguration conf,
+            final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
+        String m = String.format("Create bulk_import session '%s'", sessionName);
+        System.out.println(m);
+        LOG.info(m);
+
+        ErrorInfo err = new ErrorInfo();
+        try {
+            retryClient.retry(new Retryable2() {
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    client.createSession(sessionName, databaseName, tableName);
+                }
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+        } catch (IOException e) {
+            String msg = String.format("Cannot create bulk_import session '%s' by using '%s:%s', %s",
+                    sessionName, databaseName, tableName, e.getMessage());
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = e;
+        }
+        return err;
+    }
+
+    public static ErrorInfo validateSession(final BulkImportClient client, final UploadConfiguration conf,
+            final String sessionName) throws UploadPartsException {
+        String m = String.format("Check bulk_import session '%s'", sessionName);
+        System.out.println(m);
+        LOG.info(m);
+
+        ErrorInfo err = new ErrorInfo();
+        try {
+            retryClient.retry(new Retryable2() {
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    client.showSession(sessionName);
+                }
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+        } catch (IOException e) {
+            String msg = String.format("Cannot access bulk_import session '%s', %s", sessionName, e.getMessage());
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = e;
+        }
+        return err;
+    }
+
 }

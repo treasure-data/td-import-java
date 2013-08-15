@@ -261,11 +261,12 @@ public class BulkImportOptions {
     public void initUploadOptionParser(Properties props) {
         this.initPrepareOptionParser(props);
         op.acceptsAll(Arrays.asList(
-                Configuration.BI_UPLOAD_PARTS_CREATE_SESSION),
-                Configuration.BI_UPLOAD_PARTS_CREATE_SESSION_DESC);
-        op.acceptsAll(Arrays.asList(
-                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION),
-                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION_DESC);
+                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION),
+                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION_DESC)
+                .withRequiredArg()
+                .describedAs("DATABASE:TABLE")
+                .ofType(String.class)
+                .withValuesSeparatedBy(":");
         op.acceptsAll(Arrays.asList(
                 Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM),
                 Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM_DESC);
@@ -278,6 +279,9 @@ public class BulkImportOptions {
                 .withRequiredArg()
                 .describedAs("NUM")
                 .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION),
+                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION_DESC);
     }
 
     public void showHelp() throws IOException {

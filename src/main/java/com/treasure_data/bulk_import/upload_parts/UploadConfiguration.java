@@ -45,7 +45,8 @@ public class UploadConfiguration extends PrepareConfiguration {
         }
     }
 
-    protected boolean createSession;
+    protected boolean autoCreateSession = false;
+    protected String[] makeSession = null;
     protected boolean autoPerform;
     protected boolean autoCommit;
     protected boolean autoDeleteSession;
@@ -62,7 +63,7 @@ public class UploadConfiguration extends PrepareConfiguration {
         super.configure(props, options);
 
         // auto-create-session
-        setCreateSession();
+        setAutoCreateSession();
 
         // auto-perform
         setAutoPerform();
@@ -139,12 +140,24 @@ public class UploadConfiguration extends PrepareConfiguration {
         return autoCommit;
     }
 
-    public void setCreateSession() {
-        createSession = optionSet.has(BI_UPLOAD_PARTS_CREATE_SESSION);
+    public void setAutoCreateSession() {
+        if (optionSet.has(BI_UPLOAD_PARTS_AUTO_CREATE_SESSION)) {
+            autoCreateSession = true;
+            makeSession = optionSet.valuesOf(BI_UPLOAD_PARTS_AUTO_CREATE_SESSION).toArray(new String[0]);
+            if (makeSession.length != 2) {
+                throw new IllegalArgumentException(String.format(
+                        "'%s' option argument must consists of database and table names e.g. 'testdb:testtbl'",
+                        BI_UPLOAD_PARTS_AUTO_CREATE_SESSION));
+            }
+        }
     }
 
-    public boolean createSession() {
-        return createSession;
+    public boolean autoCreateSession() {
+        return autoCreateSession;
+    }
+
+    public String[] makeSession() {
+        return makeSession;
     }
 
     public void setAutoDeleteSession() {

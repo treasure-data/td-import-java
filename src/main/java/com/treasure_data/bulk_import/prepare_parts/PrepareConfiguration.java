@@ -53,9 +53,13 @@ public class PrepareConfiguration extends Configuration {
     public static class Factory {
         protected BulkImportOptions options;
 
-        public Factory(Properties props) {
+        public Factory(Properties props, boolean isUploaded) {
             options = new BulkImportOptions();
-            options.initPrepareOptionParser(props);
+            if (isUploaded) {
+                options.initUploadOptionParser(props);
+            } else {
+                options.initPrepareOptionParser(props);
+            }
         }
 
         public BulkImportOptions getBulkImportOptions() {
