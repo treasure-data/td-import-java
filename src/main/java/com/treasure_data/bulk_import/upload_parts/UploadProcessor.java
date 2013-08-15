@@ -211,6 +211,30 @@ public class UploadProcessor {
             return err;
         }
 
+        // check session status
+        SessionSummary summary = null;
+        try {
+            summary = showSession(client, conf, sessName);
+
+            StringBuilder sbuf = new StringBuilder();
+            sbuf.append(String.format("Show status of bulk_import session '%s'", summary.getName())).append("\n");
+            sbuf.append("  Performing job ID : " + summary.getJobID()).append("\n");
+            sbuf.append("  Name              : " + summary.getName()).append("\n");
+            sbuf.append("  Status            : " + summary.getStatus()).append("\n");
+
+            System.out.println(sbuf.toString());
+            LOG.info(sbuf.toString());
+        } catch (IOException e) {
+            String m = String.format("Session status checking failed: %s", e.getMessage());
+            System.out.println(m);
+            LOG.severe(m);
+            err.error = e;
+        }
+
+        if (summary == null) {
+            return err;
+        }
+
         // TODO FIXME #MN need log message
 
         if (!conf.autoCommit()) {
@@ -224,17 +248,17 @@ public class UploadProcessor {
         }
 
         // check error of perform
-        SessionSummary summary = null;
+        summary = null;
         try {
             summary = showSession(client, conf, sessName);
 
             StringBuilder sbuf = new StringBuilder();
-            sbuf.append(String.format("Show summary of bulk_import session '%s'", summary.getName())).append("\n");
-            sbuf.append("  perform job ID: " + summary.getJobID()).append("\n");
-            sbuf.append("  valid parts: " + summary.getValidParts()).append("\n");
-            sbuf.append("  error parts: " + summary.getErrorParts()).append("\n");
-            sbuf.append("  valid records: " + summary.getValidRecords()).append("\n");
-            sbuf.append("  error records: " + summary.getErrorRecords()).append("\n");
+            sbuf.append(String.format("Show error records of bulk_import session '%s'", summary.getName())).append("\n");
+            sbuf.append("  Performing job ID : " + summary.getJobID()).append("\n");
+            sbuf.append("  Valid parts       : " + summary.getValidParts()).append("\n");
+            sbuf.append("  Error parts       : " + summary.getErrorParts()).append("\n");
+            sbuf.append("  Valid records     : " + summary.getValidRecords()).append("\n");
+            sbuf.append("  Error records     : " + summary.getErrorRecords()).append("\n");
 
             System.out.println(sbuf.toString());
             LOG.info(sbuf.toString());
