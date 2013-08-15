@@ -58,7 +58,6 @@ public class UploadConfiguration extends PrepareConfiguration {
         super();
     }
 
-    // TODO FIXME #MN re-implement the method
     public void configure(Properties props, BulkImportOptions options) {
         super.configure(props, options);
 
