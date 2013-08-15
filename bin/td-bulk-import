@@ -25,7 +25,7 @@ def import_upload()
 end
 
 def exec_import_command(subcmd)
-  puts "import commands require Java version 1.6 or later."
+  puts "Require Java version 1.6 or later."
 
   # make jvm options
   jvm_opts = [ JAVA_HEAP_MAX_SIZE ]
