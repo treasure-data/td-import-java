@@ -278,6 +278,7 @@
                   <include>com.treasure_data:td-client</include>
                   <include>org.msgpack</include>
                   <include>org.javassist:javassist</include>
+                  <include>net.sf.jopt-simple:jopt-simple</include>
                 </includes>
               </artifactSet>
             </configuration>
