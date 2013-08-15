@@ -195,8 +195,7 @@ public class BulkImportMain {
 
         errs.addAll(uploadProc.getErrors());
         errs.add(err);
-        outputErrors(errs, Configuration.CMD_PREPARE + "+"
-                + Configuration.CMD_UPLOAD);
+        outputErrors(errs, Configuration.CMD_UPLOAD);
     }
 
     private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {
