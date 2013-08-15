@@ -191,7 +191,6 @@ public class UploadProcessor {
         }
     }
 
-    // TODO need strict error handling
     public static ErrorInfo processAfterUploading(BulkImportClient client,
             UploadConfiguration conf, String sessName) throws UploadPartsException {
         ErrorInfo err = null;
@@ -201,39 +200,54 @@ public class UploadProcessor {
         }
 
         // freeze
-        err = UploadProcessor.freezeSession(client, conf, sessName);
+        err = freezeSession(client, conf, sessName);
         if (err.error != null) {
             return err;
         }
 
         // perform
-        err = UploadProcessor.performSession(client, conf, sessName);
+        err = performSession(client, conf, sessName);
         if (err.error != null) {
             return err;
         }
+
+        // TODO FIXME #MN need log message
 
         if (!conf.autoCommit()) {
             return new ErrorInfo();
         }
 
         // wait performing
-        err = UploadProcessor.waitPerform(client, conf, sessName);
+        err = waitPerform(client, conf, sessName);
         if (err.error != null) {
             return err;
         }
 
         // check error of perform
-        SessionSummary summary = UploadProcessor.showSession(client, conf, sessName);
-        StringBuilder sbuf = new StringBuilder();
-        sbuf.append(String.format("Show summary of bulk import session '%s'",
-                summary.getName())).append("\n");
-        sbuf.append("  perform job ID: " + summary.getJobID()).append("\n");
-        sbuf.append("  valid parts: " + summary.getValidParts()).append("\n");
-        sbuf.append("  error parts: " + summary.getErrorParts()).append("\n");
-        sbuf.append("  valid records: " + summary.getValidRecords()).append("\n");
-        sbuf.append("  error records: " + summary.getErrorRecords()).append("\n");
-        System.out.println(sbuf.toString());
-        LOG.info(sbuf.toString());
+        SessionSummary summary = null;
+        try {
+            summary = showSession(client, conf, sessName);
+
+            StringBuilder sbuf = new StringBuilder();
+            sbuf.append(String.format("Show summary of bulk_import session '%s'", summary.getName())).append("\n");
+            sbuf.append("  perform job ID: " + summary.getJobID()).append("\n");
+            sbuf.append("  valid parts: " + summary.getValidParts()).append("\n");
+            sbuf.append("  error parts: " + summary.getErrorParts()).append("\n");
+            sbuf.append("  valid records: " + summary.getValidRecords()).append("\n");
+            sbuf.append("  error records: " + summary.getErrorRecords()).append("\n");
+
+            System.out.println(sbuf.toString());
+            LOG.info(sbuf.toString());
+        } catch (IOException e) {
+            String m = String.format("Error records checking failed: %s", e.getMessage());
+            System.out.println(m);
+            LOG.severe(m);
+            err.error = e;
+        }
+
+        if (summary == null) {
+            return err;
+        }
 
         if (summary.getErrorParts() != 0 || summary.getErrorRecords() != 0) {
             String msg = String.format(
@@ -243,7 +257,7 @@ public class UploadProcessor {
             LOG.severe(msg);
 
             msg = String.format(
-                    "Check the status of bulk import session %s with 'td bulk_import:show %s'",
+                    "Check the status of bulk import session %s with 'td bulk_import:show %s' command",
                     summary.getName(), summary.getName());
             System.out.println(msg);
             LOG.severe(msg);
@@ -252,7 +266,7 @@ public class UploadProcessor {
         }
 
         // commit
-        err = UploadProcessor.commitSession(client, conf, sessName);
+        err = commitSession(client, conf, sessName);
         if (err.error != null) {
             return err;
         }
@@ -261,67 +275,77 @@ public class UploadProcessor {
     }
 
     public static SessionSummary showSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
-        LOG.fine(String.format("Show session '%s'", sessName));
+            final UploadConfiguration conf, final String sessionName) throws IOException {
+        LOG.fine(String.format("Show session '%s'", sessionName));
 
         summary = null;
         try {
             retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
-                    summary = client.showSession(sessName);
+                    summary = client.showSession(sessionName);
                 }
-            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
             LOG.severe(e.getMessage());
-            throw new UploadPartsException(e);
+            throw e;
         }
         return summary;
     }
 
     public static ErrorInfo freezeSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
-        LOG.info(String.format("Freeze session '%s'", sessName));
+            final UploadConfiguration conf, final String sessionName) {
+        String m = String.format("Freeze bulk_import session '%s'", sessionName);
+        System.out.println(m);
+        LOG.info(m);
 
         ErrorInfo err = new ErrorInfo();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
-                    Session session = new Session(sessName, null, null);
+                    Session session = new Session(sessionName, null, null);
                     client.freezeSession(session);
                 }
-            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            LOG.severe(e.getMessage());
+            m = String.format("Cannot freeze session '%s', %s", sessionName, e.getMessage());
+            System.out.println(m);
+            LOG.severe(m);
             err.error = e;
         }
         return err;
     }
 
     public static ErrorInfo performSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
-        LOG.info(String.format("Perform session '%s'", sessName));
+            final UploadConfiguration conf, final String sessionName) {
+        String m = String.format("Perform bulk_import session '%s'", sessionName);
+        System.out.println(m);
+        LOG.info(m);
 
         ErrorInfo err = new ErrorInfo();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
-                    Session session = new Session(sessName, null, null);
+                    Session session = new Session(sessionName, null, null);
                     client.performSession(session);
                 }
-            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            LOG.severe(e.getMessage());
+            m = String.format("Cannot perform session '%s', %s", sessionName, e.getMessage());
+            System.out.println(m);
+            LOG.severe(m);
             err.error = e;
         }
         return err;
     }
 
     public static ErrorInfo waitPerform(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
-        LOG.info(String.format("Wait session performing '%s'", sessName));
+            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+        String m = String.format("Wait '%s' session performing...", sessionName);
+        System.out.println(m);
+        LOG.info(m);
 
         ErrorInfo err = new ErrorInfo();
         long waitTime = System.currentTimeMillis();
@@ -330,25 +354,27 @@ public class UploadProcessor {
                 retryClient.retry(new Retryable2(){
                     @Override
                     public void doTry() throws ClientException, IOException {
-                        summary = client.showSession(sessName);
+                        summary = client.showSession(sessionName);
                     }
-                }, sessName, conf.getRetryCount(), conf.getWaitSec());
+                }, sessionName, conf.getRetryCount(), conf.getWaitSec());
 
-                if (summary.getStatus() == "ready") {
+                if (summary.getStatus().equals("ready")){
                     break;
-                } else if (summary.getStatus() == "uploading") {
+                } else if (summary.getStatus().equals("uploading")) {
                     throw new IOException("performing failed");
                 }
 
                 try {
                     long deltaTime = System.currentTimeMillis() - waitTime;
-                    LOG.fine(String.format("Waiting for %d sec.", (deltaTime / 1000)));
+                    LOG.fine(String.format("Waiting for about %d sec.", (deltaTime / 1000)));
                     Thread.sleep(3 * 1000);
                 } catch (InterruptedException e) {
                     // ignore
                 }
             } catch (IOException e) {
-                LOG.severe(e.getMessage());
+                m = String.format("Give up waiting '%s' session performing, '%s'", sessionName, e.getMessage());
+                System.out.println(m);
+                LOG.severe(m);
                 err.error = e;
                 break;
             }
@@ -358,20 +384,24 @@ public class UploadProcessor {
     }
 
     public static ErrorInfo commitSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessName) throws UploadPartsException {
-        LOG.info(String.format("Commit session '%s'", sessName));
+            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+        String m = String.format("Commit bulk_import session '%s'", sessionName);
+        System.out.println(m);
+        LOG.info(m);
 
         ErrorInfo err = new ErrorInfo();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
                 public void doTry() throws ClientException, IOException {
-                    Session session = new Session(sessName, null, null);
+                    Session session = new Session(sessionName, null, null);
                     client.commitSession(session);
                 }
-            }, sessName, conf.getRetryCount(), conf.getWaitSec());
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            LOG.severe(e.getMessage());
+            String msg = String.format("Cannot commit session '%s', %s", sessionName, e.getMessage());
+            System.out.println(msg);
+            LOG.severe(msg);
             err.error = e;
         }
         return err;
