@@ -308,7 +308,7 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo validateDatabase(final TreasureDataClient client, final UploadConfiguration conf,
+    public static ErrorInfo checkDatabase(final TreasureDataClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName) throws UploadPartsException {
         String m = String.format("Check database '%s'", databaseName);
         System.out.println(m);
@@ -344,7 +344,7 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo validateTable(final TreasureDataClient client, final UploadConfiguration conf,
+    public static ErrorInfo checkTable(final TreasureDataClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
         String m = String.format("Check table '%s'", tableName);
         System.out.println(m);
@@ -403,7 +403,7 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo validateSession(final BulkImportClient client, final UploadConfiguration conf,
+    public static ErrorInfo checkSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName) throws UploadPartsException {
         String m = String.format("Check bulk_import session '%s'", sessionName);
         System.out.println(m);
@@ -419,6 +419,30 @@ public class UploadProcessor {
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
             String msg = String.format("Cannot access bulk_import session '%s', %s", sessionName, e.getMessage());
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = e;
+        }
+        return err;
+    }
+
+    public static ErrorInfo deleteSession(final BulkImportClient client, final UploadConfiguration conf,
+            final String sessionName) throws UploadPartsException {
+        String m = String.format("Delete bulk_import session '%s'", sessionName);
+        System.out.println(m);
+        LOG.info(m);
+
+        ErrorInfo err = new ErrorInfo();
+        try {
+            retryClient.retry(new Retryable2() {
+                @Override
+                public void doTry() throws ClientException, IOException {
+                    client.deleteSession(sessionName);
+                }
+            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+        } catch (IOException e) {
+            String msg = String.format("Cannot delete bulk_import session '%s', %s",
+                    sessionName, e.getMessage());
             System.out.println(msg);
             LOG.severe(msg);
             err.error = e;

@@ -121,14 +121,14 @@ public class BulkImportMain {
             sessionName = String.format("%s_%s_%s", databaseName, tableName, timestamp);
 
             // validate that database is live or not
-            e = UploadProcessor.validateDatabase(tdClient, uploadConf,
+            e = UploadProcessor.checkDatabase(tdClient, uploadConf,
                     sessionName, databaseName);
             if (e.error != null) {
                 throw new IllegalArgumentException(e.error);
             }
 
             // validate that table is live or not
-            e = UploadProcessor.validateTable(tdClient, uploadConf,
+            e = UploadProcessor.checkTable(tdClient, uploadConf,
                     sessionName, databaseName, tableName);
             if (e.error != null) {
                 throw new IllegalArgumentException(e.error);
@@ -144,7 +144,7 @@ public class BulkImportMain {
         } else {
             sessionName = argList.get(1); // get session name from command-line arguments
             // validate that the session is live or not
-            e = UploadProcessor.validateSession(biClient, uploadConf, sessionName);
+            e = UploadProcessor.checkSession(biClient, uploadConf, sessionName);
             if (e.error != null) {
                 throw new IllegalArgumentException(e.error);
             }
@@ -224,20 +224,22 @@ public class BulkImportMain {
             }).start();
 
             prepareProc.joinWorkers();
-
             errs.addAll(prepareProc.getErrors());
         }
 
         MultiThreadUploadProcessor.addFinishTask(uploadConf);
         uploadProc.joinWorkers();
+        errs.addAll(uploadProc.getErrors());
 
         ErrorInfo err = MultiThreadUploadProcessor.processAfterUploading(
                 biClient, uploadConf, sessionName);
-
-        // TODO FIXME #MN delete session
-
-        errs.addAll(uploadProc.getErrors());
         errs.add(err);
+
+        if (uploadConf.autoDeleteSession()) {
+            ErrorInfo deleted = UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
+            errs.add(deleted);
+        }
+
         outputErrors(errs, Configuration.CMD_UPLOAD);
     }
 
