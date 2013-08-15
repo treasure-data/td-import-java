@@ -68,6 +68,9 @@ public interface Constants extends com.treasure_data.client.Constants {
     // PREPARE_PARTS_OPTIONS              //
     ////////////////////////////////////////
 
+    // help
+    String BI_PREPARE_PARTS_HELP = "help";
+
     // format [csv, tsv, json, msgpack, apache, regexp]; default=auto detect
     String BI_PREPARE_PARTS_FORMAT = "format";
     String BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE = "csv"; // default 'csv'
