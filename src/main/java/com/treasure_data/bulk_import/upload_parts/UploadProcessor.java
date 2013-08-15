@@ -458,7 +458,11 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            String msg = String.format("Cannot access database '%s', %s", databaseName, e.getMessage());
+            String msg = String.format(
+                    "Cannot access database '%s', %s. " +
+                    "Please check it with 'td database:list'. " +
+                    "If it doesn't exist, please create it with 'td database:create %s'.",
+                    databaseName, e.getMessage(), databaseName);
             System.out.println(msg);
             LOG.severe(msg);
             err.error = e;
@@ -494,7 +498,11 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            String msg = String.format("Cannot access table '%s', %s", tableName, e.getMessage());
+            String msg = String.format(
+                    "Cannot access table '%s', %s. " +
+                    "Please check it with 'td table:list %s'. " +
+                    "If it doesn't exist, please create it with 'td table:create %s %s'.",
+                    tableName, e.getMessage(), databaseName, databaseName, tableName);
             System.out.println(msg);
             LOG.severe(msg);
             err.error = e;
@@ -517,7 +525,8 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            String msg = String.format("Cannot create bulk_import session '%s' by using '%s:%s', %s",
+            String msg = String.format(
+                    "Cannot create bulk_import session '%s' by using '%s:%s', %s. ",
                     sessionName, databaseName, tableName, e.getMessage());
             System.out.println(msg);
             LOG.severe(msg);
@@ -541,7 +550,11 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            String msg = String.format("Cannot access bulk_import session '%s', %s", sessionName, e.getMessage());
+            String msg = String.format(
+                    "Cannot access bulk_import session '%s', %s. " +
+                    "Please check it with 'td bulk_import:list'. " +
+                    "If it doesn't exist, please create it.",
+                    sessionName, e.getMessage());
             System.out.println(msg);
             LOG.severe(msg);
             err.error = e;
@@ -564,7 +577,9 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            String msg = String.format("Cannot delete bulk_import session '%s', %s",
+            String msg = String.format(
+                    "Cannot delete bulk_import session '%s', %s. " +
+                    "Please check it with 'td bulk_import:list'.",
                     sessionName, e.getMessage());
             System.out.println(msg);
             LOG.severe(msg);
