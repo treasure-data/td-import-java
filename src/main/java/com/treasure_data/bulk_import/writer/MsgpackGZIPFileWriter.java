@@ -233,10 +233,6 @@ public class MsgpackGZIPFileWriter extends FileWriter {
 
     @Override
     public void close() throws IOException {
-        if (task != null && outputFile != null) {
-            task.finishHook(outputFile.getAbsolutePath());
-        }
-
         if (packer != null) {
             packer.flush();
             packer.close();
@@ -246,6 +242,10 @@ public class MsgpackGZIPFileWriter extends FileWriter {
             gzout.close();
             gzout = null;
             dout = null;
+        }
+
+        if (task != null && outputFile != null) {
+            task.finishHook(outputFile.getAbsolutePath());
         }
     }
 
