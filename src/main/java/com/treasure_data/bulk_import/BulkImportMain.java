@@ -31,7 +31,6 @@ import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.UploadTask;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
-import com.treasure_data.bulk_import.upload_parts.UploadPartsException;
 import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
