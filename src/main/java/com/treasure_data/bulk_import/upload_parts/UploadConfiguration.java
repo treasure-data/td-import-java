@@ -61,6 +61,9 @@ public class UploadConfiguration extends PrepareConfiguration {
     public void configure(Properties props, BulkImportOptions options) {
         super.configure(props, options);
 
+        // auto-create-session
+        setAutoCreateSession();
+
         // auto-perform
         setAutoPerform();
 
@@ -69,9 +72,6 @@ public class UploadConfiguration extends PrepareConfiguration {
 
         // parallel
         setNumOfUploadThreads();
-
-        // auto-create-session
-        setAutoCreateSession();
 
         // auto-delete-session
         setAutoDeleteSession();
