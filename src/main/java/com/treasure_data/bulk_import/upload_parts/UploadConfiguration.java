@@ -208,8 +208,10 @@ public class UploadConfiguration extends PrepareConfiguration {
     public Object clone() {
         UploadConfiguration conf = new UploadConfiguration();
         conf.props = props;
+        conf.autoCreateSession = autoCreateSession;
         conf.autoPerform = autoPerform;
         conf.autoCommit = autoCommit;
+        conf.autoDeleteSession = autoDeleteSession;
         conf.numOfUploadThreads = numOfUploadThreads;
         conf.retryCount= retryCount;
         conf.waitSec = waitSec;
