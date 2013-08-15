@@ -41,7 +41,13 @@ public class UploadConfiguration extends PrepareConfiguration {
         public UploadConfiguration newUploadConfiguration(String[] args) {
             options.setOptions(args);
             OptionSet optionSet = options.getOptions();
-            return new UploadConfiguration();
+            UploadConfiguration c = new UploadConfiguration();
+            c.options = options;
+            // TODO FIX #MN need refactoring!!!!
+            // TODO FIX #MN need refactoring!!!!
+            // TODO FIX #MN need refactoring!!!!
+            // TODO FIX #MN need refactoring!!!!
+            return c;
         }
     }
 

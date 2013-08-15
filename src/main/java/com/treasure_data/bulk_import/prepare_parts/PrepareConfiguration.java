@@ -85,7 +85,13 @@ public class PrepareConfiguration extends Configuration {
                 throw new IllegalArgumentException(String.format(
                         "unsupported format '%s'", formatStr));
             }
-            return format.createPrepareConfiguration();
+            PrepareConfiguration c = format.createPrepareConfiguration();
+            // TODO FIX #MN need refactoring!!!!
+            // TODO FIX #MN need refactoring!!!!
+            // TODO FIX #MN need refactoring!!!!
+            // TODO FIX #MN need refactoring!!!!
+            c.options = options;
+            return c;
         }
     }
 
@@ -386,6 +392,8 @@ public class PrepareConfiguration extends Configuration {
     protected BulkImportOptions options;
     protected OptionSet optionSet;
 
+    protected boolean showHelp = false;
+
     protected Format format;
     protected OutputFormat outputFormat = OutputFormat.MSGPACKGZ;
     protected CompressionType compressionType;
@@ -405,15 +413,15 @@ public class PrepareConfiguration extends Configuration {
     protected String[] onlyColumns;
 
     public PrepareConfiguration() {
-        // TODO FIXME #MN should add 'props' to the method parameters
     }
 
     public void configure(Properties props, BulkImportOptions options) {
-        // TODO FIXME #MN should delete 'props' parameter
-
         this.props = props;
         this.options = options;
         this.optionSet = options.getOptions();
+
+        // help
+        setHelp();
 
         // format
         setFormat();
@@ -460,6 +468,18 @@ public class PrepareConfiguration extends Configuration {
 
     public List<String> getNonOptionArguments() {
         return (List<String>) options.getOptions().nonOptionArguments();
+    }
+
+    public void setHelp() {
+        showHelp = optionSet.has(BI_PREPARE_PARTS_HELP);
+    }
+
+    public boolean hasHelpOption() {
+        return showHelp;
+    }
+
+    public void showHelp() throws IOException {
+        options.showHelp();
     }
 
     public void setFormat() {

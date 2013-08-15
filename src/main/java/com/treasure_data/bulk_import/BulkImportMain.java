@@ -41,16 +41,14 @@ public class BulkImportMain {
 
     public static void prepare(final String[] args, Properties props)
             throws Exception {
-        if (args.length < 2) {
-            throw new IllegalArgumentException("File names not specified");
-        }
-
         String msg = String.format("Start %s command", Configuration.CMD_PREPARE);
         System.out.println(msg);
         LOG.info(msg);
 
         // create configuration for 'prepare' processing
         final PrepareConfiguration conf = createPrepareConfiguration(props, args);
+
+        // extract command-line arguments
         List<String> argList = conf.getNonOptionArguments();
         final String[] fileNames = new String[argList.size() - 1]; // delete 'prepare_parts'
         for (int i = 0; i < fileNames.length; i++) {
@@ -93,16 +91,14 @@ public class BulkImportMain {
 
     public static void upload(final String[] args, Properties props)
             throws Exception {
-        if (args.length < 3) {
-            throw new IllegalArgumentException("File names not specified");
-        }
-
         String msg = String.format("Start %s commands", Configuration.CMD_UPLOAD);
         System.out.println(msg);
         LOG.info(msg);
 
         // create configuration for 'upload' processing
         final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
+
+        // extract command-line arguments
         List<String> argList = uploadConf.getNonOptionArguments();
 
         // create TreasureDataClient and BulkImportClient objects
@@ -251,6 +247,11 @@ public class BulkImportMain {
     private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args, boolean isUploaded) {
         PrepareConfiguration.Factory fact = new PrepareConfiguration.Factory(props, isUploaded);
         PrepareConfiguration conf = fact.newPrepareConfiguration(args);
+
+        if (!isUploaded) {
+            showHelp(conf, args);
+        }
+
         conf.configure(props, fact.getBulkImportOptions());
         return conf;
     }
@@ -258,8 +259,27 @@ public class BulkImportMain {
     private static UploadConfiguration createUploadConfiguration(Properties props, String[] args) {
         UploadConfiguration.Factory fact = new UploadConfiguration.Factory(props);
         UploadConfiguration conf = fact.newUploadConfiguration(args);
+
+        showHelp(conf, args);
+
         conf.configure(props, fact.getBulkImportOptions());
         return conf;
+    }
+
+    private static void showHelp(PrepareConfiguration conf, String[] args) {
+        // TODO FIX #MN need refactoring!!!!
+        // TODO FIX #MN need refactoring!!!!
+        // TODO FIX #MN need refactoring!!!!
+        // TODO FIX #MN need refactoring!!!!
+        if (args.length >= 2 && args[1].equals("--help")) {
+            try {
+                conf.showHelp();
+            } catch (Exception e) {
+                e.printStackTrace();
+                // ignore
+            }
+            System.exit(0);
+        }
     }
 
     private static void outputErrors(List<ErrorInfo> errs, String cmd) {
