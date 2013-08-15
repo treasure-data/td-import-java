@@ -47,9 +47,9 @@ public class UploadConfiguration extends PrepareConfiguration {
 
     protected boolean autoCreateSession = false;
     protected String[] makeSession = null;
-    protected boolean autoPerform;
-    protected boolean autoCommit;
-    protected boolean autoDeleteSession;
+    protected boolean autoPerform = false;
+    protected boolean autoCommit = false;
+    protected boolean autoDeleteSession = false;
     protected int numOfUploadThreads;
     protected int retryCount;
     protected long waitSec;
