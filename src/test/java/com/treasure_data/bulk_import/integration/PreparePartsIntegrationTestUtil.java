@@ -107,7 +107,7 @@ public class PreparePartsIntegrationTestUtil {
     }
 
     public void prepareParts(String fileName) throws Exception {
-        args.add(Configuration.CMD_PREPARE_PARTS);
+        args.add(Configuration.CMD_PREPARE);
         args.add(fileName);
         args.addAll(opts);
 

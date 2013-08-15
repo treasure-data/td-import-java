@@ -41,7 +41,7 @@ public class BulkImportMain {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        String msg = String.format("Start %s command", Configuration.CMD_PREPARE_PARTS);
+        String msg = String.format("Start %s command", Configuration.CMD_PREPARE);
         System.out.println(msg);
         LOG.info(msg);
 
@@ -84,7 +84,7 @@ public class BulkImportMain {
 
         proc.joinWorkers();
         List<ErrorInfo> errs = proc.getErrors();
-        outputErrors(errs, Configuration.CMD_PREPARE_PARTS);
+        outputErrors(errs, Configuration.CMD_PREPARE);
     }
 
     public static void upload(final String[] args, Properties props)
@@ -93,23 +93,28 @@ public class BulkImportMain {
             throw new IllegalArgumentException("File names not specified");
         }
 
-        String msg = String.format("Start %s and %s commands",
-                Configuration.CMD_UPLOAD_PARTS,
-                Configuration.CMD_PREPARE_PARTS);
+        String msg = String.format("Start %s commands", Configuration.CMD_UPLOAD);
         System.out.println(msg);
         LOG.info(msg);
 
         // create configuration for 'upload' processing
         final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
-
         List<String> argList = uploadConf.getNonOptionArguments();
+
+        if (uploadConf.createSession()) {
+            
+        } else {
+            
+        }
         final String sessionName = argList.get(1); // get session name
         final String[] fileNames = new String[argList.size() - 2]; // delete command
         for (int i = 0; i < fileNames.length; i++) {
             fileNames[i] = argList.get(i + 2);
         }
 
-        // TODO #MN validate that the session is live or not.
+        // TODO #MN validate that the database is live or not if we need.
+        // TODO #MN validate that the table is live or not if we need.
+        // TODO #MN validate that the session is live or not if we need.
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -190,8 +195,8 @@ public class BulkImportMain {
 
         errs.addAll(uploadProc.getErrors());
         errs.add(err);
-        outputErrors(errs, Configuration.CMD_PREPARE_PARTS + "+"
-                + Configuration.CMD_UPLOAD_PARTS);
+        outputErrors(errs, Configuration.CMD_PREPARE + "+"
+                + Configuration.CMD_UPLOAD);
     }
 
     private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {
@@ -239,9 +244,9 @@ public class BulkImportMain {
 
         String commandName = args[0];
         Properties props = System.getProperties();
-        if (commandName.equals(Configuration.CMD_PREPARE_PARTS)) {
+        if (commandName.equals(Configuration.CMD_PREPARE)) {
             prepare(args, props);
-        } else if (commandName.equals(Configuration.CMD_UPLOAD_PARTS)) {
+        } else if (commandName.equals(Configuration.CMD_UPLOAD)) {
             upload(args, props);
         } else {
             throw new IllegalArgumentException(

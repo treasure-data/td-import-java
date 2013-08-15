@@ -45,9 +45,9 @@ public class UploadConfiguration extends PrepareConfiguration {
         }
     }
 
+    protected boolean createSession;
     protected boolean autoPerform;
     protected boolean autoCommit;
-    protected boolean autoCreateSession;
     protected boolean autoDeleteSession;
     protected int numOfUploadThreads;
     protected int retryCount;
@@ -62,7 +62,7 @@ public class UploadConfiguration extends PrepareConfiguration {
         super.configure(props, options);
 
         // auto-create-session
-        setAutoCreateSession();
+        setCreateSession();
 
         // auto-perform
         setAutoPerform();
@@ -139,12 +139,12 @@ public class UploadConfiguration extends PrepareConfiguration {
         return autoCommit;
     }
 
-    public void setAutoCreateSession() {
-        autoCreateSession = optionSet.has(BI_UPLOAD_PARTS_AUTO_CREATE_SESSION);
+    public void setCreateSession() {
+        createSession = optionSet.has(BI_UPLOAD_PARTS_CREATE_SESSION);
     }
 
-    public boolean autoCreateSession() {
-        return autoCreateSession;
+    public boolean createSession() {
+        return createSession;
     }
 
     public void setAutoDeleteSession() {
