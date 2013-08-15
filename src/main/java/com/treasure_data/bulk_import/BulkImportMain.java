@@ -113,7 +113,7 @@ public class BulkImportMain {
         ErrorInfo e;
         final String sessionName;
         int filePos;
-        if (uploadConf.autoCreateSession()) {
+        if (uploadConf.autoCreateSession()) { // 'auto-create-session'
             String databaseName = uploadConf.makeSession()[0];
             String tableName = uploadConf.makeSession()[1];
             String timestamp = new SimpleDateFormat(TIME_FORMAT).format(new Date());
@@ -230,11 +230,11 @@ public class BulkImportMain {
         uploadProc.joinWorkers();
         errs.addAll(uploadProc.getErrors());
 
-        ErrorInfo err = MultiThreadUploadProcessor.processAfterUploading(
-                biClient, uploadConf, sessionName);
-        errs.add(err);
+        // 'auto-perform' and 'auto-commit'
+        ErrorInfo processed = UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName);
+        errs.add(processed);
 
-        if (uploadConf.autoDeleteSession()) {
+        if (uploadConf.autoDeleteSession()) { // 'auto-delete-session'
             ErrorInfo deleted = UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
             errs.add(deleted);
         }

@@ -191,6 +191,75 @@ public class UploadProcessor {
         }
     }
 
+    // TODO need strict error handling
+    public static ErrorInfo processAfterUploading(BulkImportClient client,
+            UploadConfiguration conf, String sessName) throws UploadPartsException {
+        ErrorInfo err = null;
+
+        if (!conf.autoPerform()) {
+            return new ErrorInfo();
+        }
+
+        // freeze
+        err = UploadProcessor.freezeSession(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
+
+        // perform
+        err = UploadProcessor.performSession(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
+
+        if (!conf.autoCommit()) {
+            return new ErrorInfo();
+        }
+
+        // wait performing
+        err = UploadProcessor.waitPerform(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
+
+        // check error of perform
+        SessionSummary summary = UploadProcessor.showSession(client, conf, sessName);
+        StringBuilder sbuf = new StringBuilder();
+        sbuf.append(String.format("Show summary of bulk import session '%s'",
+                summary.getName())).append("\n");
+        sbuf.append("  perform job ID: " + summary.getJobID()).append("\n");
+        sbuf.append("  valid parts: " + summary.getValidParts()).append("\n");
+        sbuf.append("  error parts: " + summary.getErrorParts()).append("\n");
+        sbuf.append("  valid records: " + summary.getValidRecords()).append("\n");
+        sbuf.append("  error records: " + summary.getErrorRecords()).append("\n");
+        System.out.println(sbuf.toString());
+        LOG.info(sbuf.toString());
+
+        if (summary.getErrorParts() != 0 || summary.getErrorRecords() != 0) {
+            String msg = String.format(
+                    "Performing failed: error parts = %d, error records = %d",
+                    summary.getErrorParts(), summary.getErrorRecords());
+            System.out.println(msg);
+            LOG.severe(msg);
+
+            msg = String.format(
+                    "Check the status of bulk import session %s with 'td bulk_import:show %s'",
+                    summary.getName(), summary.getName());
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = new UploadPartsException(msg);
+            return err;
+        }
+
+        // commit
+        err = UploadProcessor.commitSession(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
+
+        return new ErrorInfo();
+    }
+
     public static SessionSummary showSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessName) throws UploadPartsException {
         LOG.fine(String.format("Show session '%s'", sessName));
