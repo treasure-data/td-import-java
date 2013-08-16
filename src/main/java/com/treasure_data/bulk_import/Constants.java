@@ -70,6 +70,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // help
     String BI_PREPARE_PARTS_HELP = "help";
+    String BI_PREPARE_PARTS_HELP_DESC = "show this help message";
 
     // format [csv, tsv, json, msgpack, apache, regexp]; default=auto detect
     String BI_PREPARE_PARTS_FORMAT = "format";
@@ -118,8 +119,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // time-format STRF_FORMAT; default=auto detect
     String BI_PREPARE_PARTS_TIMEFORMAT = "time-format";
-    String BI_PREPARE_PARTS_TIMEFORMAT_DEFAULTVALUE = "auto";
-    String BI_PREPARE_PARTS_TIMEFORMAT_DESC = "STRF_FORMAT; default=auto detect";
+    String BI_PREPARE_PARTS_TIMEFORMAT_DESC = "STRF_FORMAT; strftime(3) format of the time column";
 
     // output DIR
     String BI_PREPARE_PARTS_OUTPUTDIR = "output";

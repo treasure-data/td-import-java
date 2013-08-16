@@ -143,8 +143,9 @@ public class BulkImportOptions {
 
     public void initPrepareOptionParser(Properties props) {
         op.formatHelpWith(new SimpleHelpFormatter());
-        op.acceptsAll(Arrays.asList("h", "help"),
-                "show this help message");
+        op.acceptsAll(Arrays.asList("h",
+                Configuration.BI_PREPARE_PARTS_HELP),
+                Configuration.BI_PREPARE_PARTS_HELP_DESC);
         op.acceptsAll(Arrays.asList("f",
                 Configuration.BI_PREPARE_PARTS_FORMAT),
                 Configuration.BI_PREPARE_PARTS_FORMAT_DESC)
@@ -264,9 +265,9 @@ public class BulkImportOptions {
                 Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION),
                 Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION_DESC)
                 .withRequiredArg()
-                .describedAs("DATABASE:TABLE")
+                .describedAs("DATABASE.TABLE")
                 .ofType(String.class)
-                .withValuesSeparatedBy(":");
+                .withValuesSeparatedBy(".");
         op.acceptsAll(Arrays.asList(
                 Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM),
                 Configuration.BI_UPLOAD_PARTS_AUTO_PERFORM_DESC);
