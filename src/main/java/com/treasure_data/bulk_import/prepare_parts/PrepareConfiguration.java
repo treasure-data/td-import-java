@@ -392,8 +392,6 @@ public class PrepareConfiguration extends Configuration {
     protected BulkImportOptions options;
     protected OptionSet optionSet;
 
-    protected boolean showHelp = false;
-
     protected Format format;
     protected OutputFormat outputFormat = OutputFormat.MSGPACKGZ;
     protected CompressionType compressionType;
@@ -419,9 +417,6 @@ public class PrepareConfiguration extends Configuration {
         this.props = props;
         this.options = options;
         this.optionSet = options.getOptions();
-
-        // help
-        setHelp();
 
         // format
         setFormat();
@@ -470,12 +465,8 @@ public class PrepareConfiguration extends Configuration {
         return (List<String>) options.getOptions().nonOptionArguments();
     }
 
-    public void setHelp() {
-        showHelp = optionSet.has(BI_PREPARE_PARTS_HELP);
-    }
-
     public boolean hasHelpOption() {
-        return showHelp;
+        return options.getOptions().has(BI_PREPARE_PARTS_HELP);
     }
 
     public void showHelp() throws IOException {

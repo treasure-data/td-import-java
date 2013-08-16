@@ -18,6 +18,7 @@
 package com.treasure_data.bulk_import;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -250,6 +251,7 @@ public class BulkImportMain {
 
         if (!isUploaded) {
             showHelp(conf, args);
+            System.exit(0);
         }
 
         conf.configure(props, fact.getBulkImportOptions());
@@ -267,18 +269,12 @@ public class BulkImportMain {
     }
 
     private static void showHelp(PrepareConfiguration conf, String[] args) {
-        // TODO FIX #MN need refactoring!!!!
-        // TODO FIX #MN need refactoring!!!!
-        // TODO FIX #MN need refactoring!!!!
-        // TODO FIX #MN need refactoring!!!!
-        if (args.length >= 2 && args[1].equals("--help")) {
+        if (conf.hasHelpOption()) {
             try {
                 conf.showHelp();
-            } catch (Exception e) {
-                e.printStackTrace();
-                // ignore
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
             }
-            System.exit(0);
         }
     }
 
