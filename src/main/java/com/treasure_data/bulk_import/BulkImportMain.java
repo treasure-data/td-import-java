@@ -251,7 +251,6 @@ public class BulkImportMain {
 
         if (!isUploaded) {
             showHelp(conf, args);
-            System.exit(0);
         }
 
         conf.configure(props, fact.getBulkImportOptions());
@@ -276,6 +275,7 @@ public class BulkImportMain {
                 throw new IllegalArgumentException(e);
             }
         }
+        System.exit(0);
     }
 
     private static void outputErrors(List<ErrorInfo> errs, String cmd) {
