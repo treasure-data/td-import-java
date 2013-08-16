@@ -86,10 +86,6 @@ public class PrepareConfiguration extends Configuration {
                         "unsupported format '%s'", formatStr));
             }
             PrepareConfiguration c = format.createPrepareConfiguration();
-            // TODO FIX #MN need refactoring!!!!
-            // TODO FIX #MN need refactoring!!!!
-            // TODO FIX #MN need refactoring!!!!
-            // TODO FIX #MN need refactoring!!!!
             c.options = options;
             return c;
         }
