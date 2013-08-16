@@ -274,8 +274,8 @@ public class BulkImportMain {
             } catch (IOException e) {
                 throw new IllegalArgumentException(e);
             }
+            System.exit(0);
         }
-        System.exit(0);
     }
 
     private static void outputErrors(List<ErrorInfo> errs, String cmd) {
