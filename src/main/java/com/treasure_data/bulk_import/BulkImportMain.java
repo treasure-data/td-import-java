@@ -53,11 +53,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + 1);
         }
 
-        System.out.println("Bulk Import Preparing Files");
-        for (String fileName : fileNames) {
-            System.out.println(String.format("  File              : '%s'", fileName));
-        }
-        System.out.println();
+        showBulkImportedFiles(fileNames, true);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -93,7 +89,6 @@ public class BulkImportMain {
         outputErrors(errs, Configuration.CMD_PREPARE);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
-
     }
 
     public static void upload(final String[] args, Properties props)
@@ -143,12 +138,6 @@ public class BulkImportMain {
                 throw new IllegalArgumentException(e.error);
             }
 
-            System.out.println("Bulk Import Session Info.");
-            System.out.println(String.format("  Database         : %s", databaseName));
-            System.out.println(String.format("  Table            : %s", tableName));
-            System.out.println(String.format("  Session          : %s", sessionName));
-            System.out.println();
-
             filePos = 1;
         } else {
             sessionName = argList.get(1); // get session name from command-line arguments
@@ -158,12 +147,10 @@ public class BulkImportMain {
                 throw new IllegalArgumentException(e.error);
             }
 
-            System.out.println("Bulk Import Session Info.");
-            System.out.println(String.format("  Session           : %s", sessionName));
-            System.out.println();
-
             filePos = 2;
         }
+
+        showBulkImportSession(sessionName);
 
         // configure uploaded file list
         final String[] fileNames = new String[argList.size() - filePos]; // delete command
@@ -171,11 +158,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + filePos);
         }
 
-        System.out.println("Bulk Import Uploading Files");
-        for (String fileName : fileNames) {
-            System.out.println(String.format("  File              : '%s'", fileName));
-        }
-        System.out.println();
+        showBulkImportedFiles(fileNames, false);
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -262,6 +245,24 @@ public class BulkImportMain {
         outputErrors(errs, Configuration.CMD_UPLOAD);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
+    }
+
+    private static void showBulkImportedFiles(String[] fileNames, boolean isPrepareCommand) {
+        if (isPrepareCommand) {
+            System.out.println("Show                : Bulk Import Preparing Files");
+        } else {
+            System.out.println("Show                : Bulk Import Uploading Files");
+        }
+        for (String fileName : fileNames) {
+            System.out.println(String.format("  * File            : '%s'", fileName));
+        }
+        System.out.println();
+    }
+
+    private static void showBulkImportSession(String sessionName) {
+        System.out.println("Show                : Bulk Import Session Info.");
+        System.out.println(String.format("  * Session          : %s", sessionName));
+        System.out.println();
     }
 
     private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {
