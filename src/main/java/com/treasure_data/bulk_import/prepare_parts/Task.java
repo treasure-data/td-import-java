@@ -22,17 +22,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.treasure_data.bulk_import.BulkImportStatus;
+
 public class Task implements com.treasure_data.bulk_import.Task {
     private static final String TAG = "__PREPARE_FINISH__";
-    static final Task FINISH_TASK = new Task(TAG);
+    static final Task FINISH_TASK = new Task(TAG, null);
 
+    protected BulkImportStatus status;
     public String fileName;
 
     // unit testing
     public boolean isTest = false;
     public byte[] testBinary = null;
 
-    public Task(String fileName) {
+    public Task(String fileName, BulkImportStatus status) {
+        this.status = status;
         this.fileName = fileName;
     }
 
@@ -46,6 +50,12 @@ public class Task implements com.treasure_data.bulk_import.Task {
         }
     }
 
+    @Override
+    public void startHook() {
+        // do nothing
+    }
+
+    @Override
     public void finishHook(String outputFileName) {
         // do nothing
     }

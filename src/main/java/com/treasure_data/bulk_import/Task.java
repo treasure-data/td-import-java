@@ -20,4 +20,7 @@ package com.treasure_data.bulk_import;
 public interface Task {
 
     boolean endTask();
+
+    void startHook();
+    void finishHook(String outputFileName);
 }
