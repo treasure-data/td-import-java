@@ -53,10 +53,11 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + 1);
         }
 
-        System.out.println("Bulk Import Preparing Files:");
+        System.out.println("Bulk Import Preparing Files");
         for (String fileName : fileNames) {
             System.out.println(String.format("  File              : '%s'", fileName));
         }
+        System.out.println();
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -92,6 +93,7 @@ public class BulkImportMain {
         outputErrors(errs, Configuration.CMD_PREPARE);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
+
     }
 
     public static void upload(final String[] args, Properties props)
@@ -141,10 +143,11 @@ public class BulkImportMain {
                 throw new IllegalArgumentException(e.error);
             }
 
-            System.out.println("Bulk Import Session Info.:");
+            System.out.println("Bulk Import Session Info.");
             System.out.println(String.format("  Database         : %s", databaseName));
             System.out.println(String.format("  Table            : %s", tableName));
             System.out.println(String.format("  Session          : %s", sessionName));
+            System.out.println();
 
             filePos = 1;
         } else {
@@ -157,6 +160,7 @@ public class BulkImportMain {
 
             System.out.println("Bulk Import Session Info.");
             System.out.println(String.format("  Session           : %s", sessionName));
+            System.out.println();
 
             filePos = 2;
         }
@@ -167,10 +171,11 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + filePos);
         }
 
-        System.out.println("Bulk Import Uploading Files:");
+        System.out.println("Bulk Import Uploading Files");
         for (String fileName : fileNames) {
             System.out.println(String.format("  File              : '%s'", fileName));
         }
+        System.out.println();
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();

@@ -503,6 +503,7 @@ public class UploadProcessor {
 
     public static ErrorInfo createSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
+        System.out.println(String.format("Create               : '%s' bulk_import session", sessionName));
         LOG.info(String.format("Create bulk_import session '%s'", sessionName));
 
         ErrorInfo err = new ErrorInfo();
@@ -551,6 +552,7 @@ public class UploadProcessor {
 
     public static ErrorInfo deleteSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName) throws UploadPartsException {
+        System.out.println(String.format("Delete              : '%s' bulk_import session", sessionName));
         LOG.info(String.format("Delete bulk_import session '%s'", sessionName));
 
         ErrorInfo err = new ErrorInfo();
