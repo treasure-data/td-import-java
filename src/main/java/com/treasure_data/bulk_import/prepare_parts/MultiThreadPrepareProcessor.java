@@ -45,10 +45,8 @@ public class MultiThreadPrepareProcessor {
                     break;
                 }
 
-                TaskResult err = proc.execute(t);
-                if (err.error != null) {
-                    parent.setErrors(err);
-                }
+                TaskResult result = proc.execute(t);
+                parent.setResult(result);
             }
             isFinished.set(true);
         }
@@ -73,20 +71,20 @@ public class MultiThreadPrepareProcessor {
 
     private PrepareConfiguration conf;
     private List<Worker> workers;
-    private List<com.treasure_data.bulk_import.TaskResult> errors;
+    private List<com.treasure_data.bulk_import.TaskResult> results;
 
     public MultiThreadPrepareProcessor(PrepareConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        errors = new ArrayList<com.treasure_data.bulk_import.TaskResult>();
+        results = new ArrayList<com.treasure_data.bulk_import.TaskResult>();
     }
 
-    protected synchronized void setErrors(com.treasure_data.bulk_import.TaskResult error) {
-        errors.add(error);
+    protected synchronized void setResult(com.treasure_data.bulk_import.TaskResult result) {
+        results.add(result);
     }
 
-    public List<com.treasure_data.bulk_import.TaskResult> getErrors() {
-        return errors;
+    public List<com.treasure_data.bulk_import.TaskResult> getTaskResults() {
+        return results;
     }
 
     public void registerWorkers() {

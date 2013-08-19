@@ -19,4 +19,5 @@ package com.treasure_data.bulk_import;
 
 public class TaskResult {
     public Throwable error;
+    public String message;
 }

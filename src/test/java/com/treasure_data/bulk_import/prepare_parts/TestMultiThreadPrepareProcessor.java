@@ -107,7 +107,7 @@ public class TestMultiThreadPrepareProcessor {
         MultiThreadPrepareProcessor.addFinishTask(conf);
         proc.joinWorkers();
 
-        assertEquals(0, proc.getErrors().size());
+        assertEquals(numTasks, proc.getTaskResults().size());
     }
 
     @Test
@@ -126,8 +126,8 @@ public class TestMultiThreadPrepareProcessor {
         MultiThreadPrepareProcessor.addFinishTask(conf);
         proc.joinWorkers();
 
-        assertEquals(numTasks, proc.getErrors().size());
-        for (com.treasure_data.bulk_import.TaskResult err : proc.getErrors()) {
+        assertEquals(numTasks, proc.getTaskResults().size());
+        for (com.treasure_data.bulk_import.TaskResult err : proc.getTaskResults()) {
             assertTrue(err.error instanceof PreparePartsException);
         }
     }

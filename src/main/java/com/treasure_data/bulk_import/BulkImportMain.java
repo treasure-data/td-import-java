@@ -85,9 +85,9 @@ public class BulkImportMain {
         }).start();
 
         proc.joinWorkers();
-        List<TaskResult> errs = proc.getErrors();
+        List<TaskResult> results = proc.getTaskResults();
 
-        showPrepareResults(errs);
+        showPrepareResults(results);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
     }
@@ -227,7 +227,7 @@ public class BulkImportMain {
             }).start();
 
             prepareProc.joinWorkers();
-            errs.addAll(prepareProc.getErrors());
+            errs.addAll(prepareProc.getTaskResults());
         }
 
         MultiThreadUploadProcessor.addFinishTask(uploadConf);
@@ -301,7 +301,7 @@ public class BulkImportMain {
 
     private static void showPrepareResults(List<TaskResult> errs) {
         for (TaskResult e : errs) {
-            
+            System.out.println();
         }
         // TODO
     }

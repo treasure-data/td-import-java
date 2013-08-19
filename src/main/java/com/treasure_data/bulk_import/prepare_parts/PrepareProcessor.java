@@ -41,8 +41,8 @@ public class PrepareProcessor {
         LOG.info(msg);
         LOG.fine(String.format("Process task '%s'", task));
 
-        TaskResult err = new TaskResult();
-        err.task = task;
+        TaskResult result = new TaskResult();
+        result.task = task;
 
         // create and initialize file writer
         FileWriter w = null;
@@ -50,8 +50,8 @@ public class PrepareProcessor {
             w = conf.getOutputFormat().createFileWriter(conf);
             w.configure(task);
         } catch (Exception e) {
-            err.error = e;
-            return err;
+            result.error = e;
+            return result;
         }
 
         // create and initialize file reader
@@ -60,8 +60,8 @@ public class PrepareProcessor {
             r = conf.getFormat().createFileReader(conf, w);
             r.configure(task);
         } catch (Exception e) {
-            err.error = e;
-            return err;
+            result.error = e;
+            return result;
         }
 
         if (w != null && r != null) {
@@ -75,11 +75,11 @@ public class PrepareProcessor {
                     ;
                 }
 
-                err.redLines = r.getLineNum();
-                err.writtenRows = w.getRowNum();
+                result.redLines = r.getLineNum();
+                result.writtenRows = w.getRowNum();
             } catch (Exception e) {
                 e.printStackTrace();
-                err.error = e;
+                result.error = e;
             }
         }
 
@@ -87,8 +87,8 @@ public class PrepareProcessor {
             try {
                 r.close();
             } catch (IOException e) {
-                err.error = e;
-                return err;
+                result.error = e;
+                return result;
             }
         }
 
@@ -96,14 +96,14 @@ public class PrepareProcessor {
             try {
                 w.close();
             } catch (IOException e) {
-                err.error = e;
-                return err;
+                result.error = e;
+                return result;
             }
         }
 
-        LOG.info(String.format("Converted '%s', %d entries", task.fileName, err.writtenRows));
+        LOG.info(String.format("Converted '%s', %d entries", task.fileName, result.writtenRows));
 
-        return err;
+        return result;
     }
 
 }
