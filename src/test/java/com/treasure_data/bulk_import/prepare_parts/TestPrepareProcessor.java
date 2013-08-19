@@ -43,7 +43,7 @@ public class TestPrepareProcessor {
         task.isTest = true;
         task.testBinary = csvtext.getBytes();
 
-        ErrorInfo err = proc.execute(task);
+        TaskResult err = proc.execute(task);
     }
 
 
@@ -53,7 +53,7 @@ public class TestPrepareProcessor {
     private PrepareProcessor proc;
 
     private Task task;
-    private ErrorInfo err;
+    private TaskResult err;
 
     Random rand = new Random(new Random().nextInt());
     private int numTasks;

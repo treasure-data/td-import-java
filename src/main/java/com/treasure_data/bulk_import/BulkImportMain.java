@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.treasure_data.bulk_import.ErrorInfo;
+import com.treasure_data.bulk_import.TaskResult;
 import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.UploadTask;
@@ -85,7 +85,7 @@ public class BulkImportMain {
         }).start();
 
         proc.joinWorkers();
-        List<ErrorInfo> errs = proc.getErrors();
+        List<TaskResult> errs = proc.getErrors();
 
         showPrepareResults(errs);
 
@@ -107,7 +107,7 @@ public class BulkImportMain {
         BulkImportClient biClient = new BulkImportClient(tdClient);
 
         // configure session name
-        ErrorInfo e;
+        TaskResult e;
         final String sessionName;
         int filePos;
         if (uploadConf.autoCreateSession()) { // 'auto-create-session'
@@ -165,7 +165,7 @@ public class BulkImportMain {
         uploadProc.registerWorkers();
         uploadProc.startWorkers();
 
-        List<ErrorInfo> errs = new ArrayList<ErrorInfo>();
+        List<TaskResult> errs = new ArrayList<TaskResult>();
 
         if (!uploadConf.hasPrepareOptions()) {
             // scan files that are uploaded
@@ -235,11 +235,11 @@ public class BulkImportMain {
         errs.addAll(uploadProc.getErrors());
 
         // 'auto-perform' and 'auto-commit'
-        ErrorInfo processed = UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName);
+        TaskResult processed = UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName);
         errs.add(processed);
 
         if (uploadConf.autoDeleteSession()) { // 'auto-delete-session'
-            ErrorInfo deleted = UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
+            TaskResult deleted = UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
             errs.add(deleted);
         }
 
@@ -299,20 +299,20 @@ public class BulkImportMain {
         }
     }
 
-    private static void showPrepareResults(List<ErrorInfo> errs) {
-        for (ErrorInfo e : errs) {
+    private static void showPrepareResults(List<TaskResult> errs) {
+        for (TaskResult e : errs) {
             
         }
         // TODO
     }
 
-    private static void showUploadResults(List<ErrorInfo> errs) {
+    private static void showUploadResults(List<TaskResult> errs) {
         // TODO
     }
 
-    private static void outputErrors(List<ErrorInfo> errs, String cmd) {
+    private static void outputErrors(List<TaskResult> errs, String cmd) {
         int errSize = 0;
-        for (ErrorInfo e : errs) {
+        for (TaskResult e : errs) {
             if (e.error != null) {
                 errSize++;
             }
@@ -327,7 +327,7 @@ public class BulkImportMain {
         System.out.println(msg);
         LOG.warning(msg);
 
-        for (ErrorInfo e : errs) {
+        for (TaskResult e : errs) {
             if (e.error != null) {
                 e.error.printStackTrace();
             }

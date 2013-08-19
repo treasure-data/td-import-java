@@ -15,13 +15,13 @@ public class UploadProcessorTestUtil {
     }
 
     public static void executeTaskNormally(UploadProcessor proc,
-            Task task, ErrorInfo err) {
+            Task task, TaskResult err) {
         assertEquals(task, err.task);
         assertEquals(null, err.error);
     }
 
     public static void failTask(UploadProcessor proc,
-            Task task, ErrorInfo err) {
+            Task task, TaskResult err) {
         assertEquals(task, err.task);
         assertTrue(err.error instanceof IOException);
     }

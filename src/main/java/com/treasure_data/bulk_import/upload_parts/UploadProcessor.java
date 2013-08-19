@@ -134,8 +134,8 @@ public class UploadProcessor {
         this.client = client;
     }
 
-    public ErrorInfo execute(final Task task) {
-        ErrorInfo err = new ErrorInfo();
+    public TaskResult execute(final Task task) {
+        TaskResult err = new TaskResult();
         err.task = task;
         try {
             System.out.println(String.format("Upload              : '%s' (size %d)",
@@ -188,12 +188,12 @@ public class UploadProcessor {
         }
     }
 
-    public static ErrorInfo processAfterUploading(BulkImportClient client,
+    public static TaskResult processAfterUploading(BulkImportClient client,
             UploadConfiguration conf, String sessName) throws UploadPartsException {
-        ErrorInfo err = null;
+        TaskResult err = null;
 
         if (!conf.autoPerform()) {
-            return new ErrorInfo();
+            return new TaskResult();
         }
 
         // freeze
@@ -235,7 +235,7 @@ public class UploadProcessor {
         // TODO FIXME #MN need log message
 
         if (!conf.autoCommit()) {
-            return new ErrorInfo();
+            return new TaskResult();
         }
 
         // wait performing
@@ -292,7 +292,7 @@ public class UploadProcessor {
             return err;
         }
 
-        return new ErrorInfo();
+        return new TaskResult();
     }
 
     public static SessionSummary showSession(final BulkImportClient client,
@@ -314,13 +314,13 @@ public class UploadProcessor {
         return summary;
     }
 
-    public static ErrorInfo freezeSession(final BulkImportClient client,
+    public static TaskResult freezeSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) {
         String m = String.format("Freeze bulk_import session '%s'", sessionName);
         System.out.println(m);
         LOG.info(m);
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
@@ -338,13 +338,13 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo performSession(final BulkImportClient client,
+    public static TaskResult performSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) {
         String m = String.format("Perform bulk_import session '%s'", sessionName);
         System.out.println(m);
         LOG.info(m);
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
@@ -362,13 +362,13 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo waitPerform(final BulkImportClient client,
+    public static TaskResult waitPerform(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
         String m = String.format("Wait                : '%s' session performing...", sessionName);
         System.out.println(m);
         LOG.info(m);
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         long waitTime = System.currentTimeMillis();
         while (true) {
             try {
@@ -404,12 +404,12 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo commitSession(final BulkImportClient client,
+    public static TaskResult commitSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
         System.out.println(String.format("Commit              : '%s' bulk_import session", sessionName));
         LOG.info(String.format("Commit '%s' bulk_import session", sessionName));
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2(){
                 @Override
@@ -426,11 +426,11 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo checkDatabase(final TreasureDataClient client, final UploadConfiguration conf,
+    public static TaskResult checkDatabase(final TreasureDataClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName) throws UploadPartsException {
         LOG.info(String.format("Check database '%s'", databaseName));
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2() {
                 @Override
@@ -464,11 +464,11 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo checkTable(final TreasureDataClient client, final UploadConfiguration conf,
+    public static TaskResult checkTable(final TreasureDataClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
         LOG.info(String.format("Check table '%s'", tableName));
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2() {
                 @Override
@@ -501,12 +501,12 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo createSession(final BulkImportClient client, final UploadConfiguration conf,
+    public static TaskResult createSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
         System.out.println(String.format("Create               : '%s' bulk_import session", sessionName));
         LOG.info(String.format("Create bulk_import session '%s'", sessionName));
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2() {
                 @Override
@@ -525,11 +525,11 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo checkSession(final BulkImportClient client, final UploadConfiguration conf,
+    public static TaskResult checkSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName) throws UploadPartsException {
         LOG.info(String.format("Check bulk_import session '%s'", sessionName));
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2() {
                 @Override
@@ -550,12 +550,12 @@ public class UploadProcessor {
         return err;
     }
 
-    public static ErrorInfo deleteSession(final BulkImportClient client, final UploadConfiguration conf,
+    public static TaskResult deleteSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName) throws UploadPartsException {
         System.out.println(String.format("Delete              : '%s' bulk_import session", sessionName));
         LOG.info(String.format("Delete bulk_import session '%s'", sessionName));
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         try {
             retryClient.retry(new Retryable2() {
                 @Override

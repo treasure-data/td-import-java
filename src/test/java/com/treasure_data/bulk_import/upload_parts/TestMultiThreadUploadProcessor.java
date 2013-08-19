@@ -120,7 +120,7 @@ public class TestMultiThreadUploadProcessor {
         proc.joinWorkers();
 
         assertEquals(numTasks, proc.getErrors().size());
-        for (com.treasure_data.bulk_import.ErrorInfo err : proc.getErrors()) {
+        for (com.treasure_data.bulk_import.TaskResult err : proc.getErrors()) {
             assertTrue(err.error instanceof IOException);
         }
     }
@@ -142,7 +142,7 @@ public class TestMultiThreadUploadProcessor {
         proc.joinWorkers();
 
         assertEquals(numTasks, proc.getErrors().size());
-        for (com.treasure_data.bulk_import.ErrorInfo err : proc.getErrors()) {
+        for (com.treasure_data.bulk_import.TaskResult err : proc.getErrors()) {
             assertTrue(err.error instanceof IOException);
         }
     }

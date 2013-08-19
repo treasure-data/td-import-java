@@ -49,7 +49,7 @@ public class MultiThreadUploadProcessor {
                     break;
                 }
 
-                ErrorInfo err = proc.execute(t);
+                TaskResult err = proc.execute(t);
                 if (err.error != null) {
                     parent.setErrors(err);
                 }
@@ -82,19 +82,19 @@ public class MultiThreadUploadProcessor {
 
     private UploadConfiguration conf;
     private List<Worker> workers;
-    private List<com.treasure_data.bulk_import.ErrorInfo> errors;
+    private List<com.treasure_data.bulk_import.TaskResult> errors;
 
     public MultiThreadUploadProcessor(UploadConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        errors = new ArrayList<com.treasure_data.bulk_import.ErrorInfo>();
+        errors = new ArrayList<com.treasure_data.bulk_import.TaskResult>();
     }
 
-    protected synchronized void setErrors(ErrorInfo error) {
+    protected synchronized void setErrors(TaskResult error) {
         errors.add(error);
     }
 
-    public List<com.treasure_data.bulk_import.ErrorInfo> getErrors() {
+    public List<com.treasure_data.bulk_import.TaskResult> getErrors() {
         return errors;
     }
 

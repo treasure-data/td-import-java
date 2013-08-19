@@ -15,18 +15,8 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import;
 
-public class ErrorInfo extends com.treasure_data.bulk_import.ErrorInfo {
-    public Task task;
-
-    public long redLines = 0;
-    public long writtenRows = 0;
-
-    @Override
-    public String toString() {
-        return String.format(
-                "prepare_error_info{task=%s, redLines=%d, writtenRows=%d}",
-                task, redLines, writtenRows);
-    }
+public class TaskResult {
+    public Throwable error;
 }

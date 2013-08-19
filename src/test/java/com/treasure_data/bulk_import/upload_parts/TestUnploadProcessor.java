@@ -51,7 +51,7 @@ public class TestUnploadProcessor {
     private UploadProcessor proc;
 
     private Task task;
-    private ErrorInfo err;
+    private TaskResult err;
 
     Random rand = new Random(new Random().nextInt());
     private int numTasks;

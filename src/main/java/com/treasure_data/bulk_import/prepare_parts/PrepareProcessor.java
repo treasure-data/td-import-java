@@ -35,13 +35,13 @@ public class PrepareProcessor {
         this.conf = conf;
     }
 
-    public ErrorInfo execute(final Task task) {
+    public TaskResult execute(final Task task) {
         String msg = String.format("Convert             : '%s'", task.fileName);
         System.out.println(msg);
         LOG.info(msg);
         LOG.fine(String.format("Process task '%s'", task));
 
-        ErrorInfo err = new ErrorInfo();
+        TaskResult err = new TaskResult();
         err.task = task;
 
         // create and initialize file writer
