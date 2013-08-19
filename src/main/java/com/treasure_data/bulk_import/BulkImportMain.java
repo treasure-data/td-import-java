@@ -53,7 +53,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + 1);
         }
 
-        showBulkImportedFiles(fileNames, true);
+        showFiles(fileNames);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -86,7 +86,8 @@ public class BulkImportMain {
 
         proc.joinWorkers();
         List<ErrorInfo> errs = proc.getErrors();
-        outputErrors(errs, Configuration.CMD_PREPARE);
+
+        showPrepareResults(errs);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
     }
@@ -150,7 +151,7 @@ public class BulkImportMain {
             filePos = 2;
         }
 
-        showBulkImportSession(sessionName);
+        showSession(sessionName);
 
         // configure uploaded file list
         final String[] fileNames = new String[argList.size() - filePos]; // delete command
@@ -158,7 +159,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + filePos);
         }
 
-        showBulkImportedFiles(fileNames, false);
+        showFiles(fileNames);
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -247,19 +248,15 @@ public class BulkImportMain {
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
     }
 
-    private static void showBulkImportedFiles(String[] fileNames, boolean isPrepareCommand) {
-        if (isPrepareCommand) {
-            System.out.println("Show                : Bulk Import Preparing Files");
-        } else {
-            System.out.println("Show                : Bulk Import Uploading Files");
-        }
+    private static void showFiles(String[] fileNames) {
+        System.out.println("Show                : Bulk Imported Files");
         for (String fileName : fileNames) {
             System.out.println(String.format("  * File            : '%s'", fileName));
         }
         System.out.println();
     }
 
-    private static void showBulkImportSession(String sessionName) {
+    private static void showSession(String sessionName) {
         System.out.println("Show                : Bulk Import Session Info.");
         System.out.println(String.format("  * Session          : %s", sessionName));
         System.out.println();
@@ -300,6 +297,17 @@ public class BulkImportMain {
             }
             System.exit(0);
         }
+    }
+
+    private static void showPrepareResults(List<ErrorInfo> errs) {
+        for (ErrorInfo e : errs) {
+            
+        }
+        // TODO
+    }
+
+    private static void showUploadResults(List<ErrorInfo> errs) {
+        // TODO
     }
 
     private static void outputErrors(List<ErrorInfo> errs, String cmd) {
