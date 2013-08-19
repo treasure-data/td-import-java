@@ -26,7 +26,7 @@ public class TaskResult extends com.treasure_data.bulk_import.TaskResult {
     @Override
     public String toString() {
         return String.format(
-                "prepare_error_info{task=%s, redLines=%d, writtenRows=%d}",
+                "prepare_task_result{task=%s, redLines=%d, writtenRows=%d}",
                 task, redLines, writtenRows);
     }
 }
