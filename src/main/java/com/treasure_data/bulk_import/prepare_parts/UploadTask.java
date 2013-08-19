@@ -19,15 +19,14 @@ package com.treasure_data.bulk_import.prepare_parts;
 
 import java.io.File;
 
-import com.treasure_data.bulk_import.BulkImportStatus;
 import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.prepare_parts.Task;
 
 public class UploadTask extends Task {
     public String sessionName;
 
-    public UploadTask(String sessionName, String fileName, BulkImportStatus status) {
-        super(fileName, status);
+    public UploadTask(String sessionName, String fileName) {
+        super(fileName);
         this.sessionName = sessionName;
     }
 
@@ -38,7 +37,7 @@ public class UploadTask extends Task {
         long size = new File(outputFileName).length();
         com.treasure_data.bulk_import.upload_parts.Task task =
                 new com.treasure_data.bulk_import.upload_parts.Task(
-                sessionName, outputFileName, size, status);
+                sessionName, outputFileName, size);
         MultiThreadUploadProcessor.addTask(task);
     }
 

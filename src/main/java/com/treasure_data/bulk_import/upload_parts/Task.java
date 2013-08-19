@@ -19,14 +19,11 @@ package com.treasure_data.bulk_import.upload_parts;
 
 import java.io.File;
 
-import com.treasure_data.bulk_import.BulkImportStatus;
-
 public class Task implements com.treasure_data.bulk_import.Task {
     private static final String TAG = "__FINISH__";
 
-    static final Task FINISH_TASK = new Task(TAG, TAG, 0, null);
+    static final Task FINISH_TASK = new Task(TAG, TAG, 0);
 
-    protected BulkImportStatus status;
     String sessName;
     String partName;
     String fileName;
@@ -36,8 +33,7 @@ public class Task implements com.treasure_data.bulk_import.Task {
     public boolean isTest = false;
     public byte[] testBinary = null;
 
-    public Task(String sessName, String fileName, long size, BulkImportStatus status) {
-        this.status = status;
+    public Task(String sessName, String fileName, long size) {
         this.sessName = sessName;
         int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
         this.partName = fileName.substring(lastSepIndex + 1,
