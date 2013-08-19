@@ -138,11 +138,10 @@ public class UploadProcessor {
         ErrorInfo err = new ErrorInfo();
         err.task = task;
         try {
-            String startMessage = String.format(
-                    "Upload file '%s' (size %d) to session '%s' as part '%s'",
-                    task.fileName, task.size, task.sessName, task.partName);
-            System.out.println(startMessage);
-            LOG.info(startMessage);
+            System.out.println(String.format("Upload              : '%s' (size %d)",
+                    task.fileName, task.size));
+            LOG.info(String.format("Upload '%s' (size %d) to session '%s' as part '%s'",
+                    task.fileName, task.size, task.sessName, task.partName));
 
             long time = System.currentTimeMillis();
             new RetryClient3().retry(new Retryable2() {
@@ -154,11 +153,9 @@ public class UploadProcessor {
                     conf.getWaitSec() * 1000);
             time = System.currentTimeMillis() - time;
 
-            String endMessage = String.format(
+            LOG.info(String.format(
                     "Uploaded file '%s' (size %d) to session '%s' as part '%s' (time: %d sec.)", 
-                    task.fileName, task.size, task.sessName, task.partName, (time / 1000));
-            System.out.println(endMessage);
-            LOG.info(endMessage);
+                    task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
         } catch (IOException e) {
             LOG.severe(e.getMessage());
             err.error = e;
@@ -367,7 +364,7 @@ public class UploadProcessor {
 
     public static ErrorInfo waitPerform(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
-        String m = String.format("Wait '%s' session performing...", sessionName);
+        String m = String.format("Wait                : '%s' session performing...", sessionName);
         System.out.println(m);
         LOG.info(m);
 
@@ -396,7 +393,7 @@ public class UploadProcessor {
                     // ignore
                 }
             } catch (IOException e) {
-                m = String.format("Give up waiting '%s' session performing, '%s'", sessionName, e.getMessage());
+                m = String.format("Give up waiting     : '%s' session performing, '%s'", sessionName, e.getMessage());
                 System.out.println(m);
                 LOG.severe(m);
                 err.error = e;
@@ -409,9 +406,8 @@ public class UploadProcessor {
 
     public static ErrorInfo commitSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
-        String m = String.format("Commit bulk_import session '%s'", sessionName);
-        System.out.println(m);
-        LOG.info(m);
+        System.out.println(String.format("Commit              : '%s' bulk_import session", sessionName));
+        LOG.info(String.format("Commit '%s' bulk_import session", sessionName));
 
         ErrorInfo err = new ErrorInfo();
         try {
@@ -423,9 +419,8 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            String msg = String.format("Cannot commit session '%s', %s", sessionName, e.getMessage());
-            System.out.println(msg);
-            LOG.severe(msg);
+            System.out.println(String.format("Cannot commit       : '%s' bulk_import session, %s", sessionName, e.getMessage()));
+            LOG.severe(String.format("Cannot commit '%s' bulk_import session, %s", sessionName, e.getMessage()));
             err.error = e;
         }
         return err;
@@ -433,9 +428,7 @@ public class UploadProcessor {
 
     public static ErrorInfo checkDatabase(final TreasureDataClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName) throws UploadPartsException {
-        String m = String.format("Check database '%s'", databaseName);
-        System.out.println(m);
-        LOG.info(m);
+        LOG.info(String.format("Check database '%s'", databaseName));
 
         ErrorInfo err = new ErrorInfo();
         try {
@@ -473,9 +466,7 @@ public class UploadProcessor {
 
     public static ErrorInfo checkTable(final TreasureDataClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
-        String m = String.format("Check table '%s'", tableName);
-        System.out.println(m);
-        LOG.info(m);
+        LOG.info(String.format("Check table '%s'", tableName));
 
         ErrorInfo err = new ErrorInfo();
         try {
@@ -512,9 +503,7 @@ public class UploadProcessor {
 
     public static ErrorInfo createSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
-        String m = String.format("Create bulk_import session '%s'", sessionName);
-        System.out.println(m);
-        LOG.info(m);
+        LOG.info(String.format("Create bulk_import session '%s'", sessionName));
 
         ErrorInfo err = new ErrorInfo();
         try {
@@ -537,9 +526,7 @@ public class UploadProcessor {
 
     public static ErrorInfo checkSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName) throws UploadPartsException {
-        String m = String.format("Check bulk_import session '%s'", sessionName);
-        System.out.println(m);
-        LOG.info(m);
+        LOG.info(String.format("Check bulk_import session '%s'", sessionName));
 
         ErrorInfo err = new ErrorInfo();
         try {
@@ -564,9 +551,7 @@ public class UploadProcessor {
 
     public static ErrorInfo deleteSession(final BulkImportClient client, final UploadConfiguration conf,
             final String sessionName) throws UploadPartsException {
-        String m = String.format("Delete bulk_import session '%s'", sessionName);
-        System.out.println(m);
-        LOG.info(m);
+        LOG.info(String.format("Delete bulk_import session '%s'", sessionName));
 
         ErrorInfo err = new ErrorInfo();
         try {

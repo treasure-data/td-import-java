@@ -38,13 +38,10 @@ import com.treasure_data.client.bulkimport.BulkImportClient;
 
 public class BulkImportMain {
     private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
-    private static final String TIME_FORMAT = "yyyy_MM_dd";
 
     public static void prepare(final String[] args, Properties props)
             throws Exception {
-        String msg = String.format("Start %s command", Configuration.CMD_PREPARE);
-        System.out.println(msg);
-        LOG.info(msg);
+        LOG.info(String.format("Start '%s' command", Configuration.CMD_PREPARE));
 
         // create configuration for 'prepare' processing
         final PrepareConfiguration conf = createPrepareConfiguration(props, args);
@@ -54,6 +51,11 @@ public class BulkImportMain {
         final String[] fileNames = new String[argList.size() - 1]; // delete 'prepare_parts'
         for (int i = 0; i < fileNames.length; i++) {
             fileNames[i] = argList.get(i + 1);
+        }
+
+        System.out.println("Bulk Import Preparing Files:");
+        for (String fileName : fileNames) {
+            System.out.println(String.format("  File              : '%s'", fileName));
         }
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
@@ -88,13 +90,13 @@ public class BulkImportMain {
         proc.joinWorkers();
         List<ErrorInfo> errs = proc.getErrors();
         outputErrors(errs, Configuration.CMD_PREPARE);
+
+        LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
     }
 
     public static void upload(final String[] args, Properties props)
             throws Exception {
-        String msg = String.format("Start %s commands", Configuration.CMD_UPLOAD);
-        System.out.println(msg);
-        LOG.info(msg);
+        LOG.info(String.format("Start '%s' command", Configuration.CMD_UPLOAD));
 
         // create configuration for 'upload' processing
         final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
@@ -114,7 +116,8 @@ public class BulkImportMain {
             String databaseName = uploadConf.makeSession()[0];
             String tableName = uploadConf.makeSession()[1];
             Date d = new Date();
-            String timestamp = new SimpleDateFormat(TIME_FORMAT).format(d);
+            String format = "yyyy_MM_dd";
+            String timestamp = new SimpleDateFormat(format).format(d);
             sessionName = String.format("%s_%s_%s_%d", databaseName, tableName,
                     timestamp, (d.getTime() / 1000));
 
@@ -138,6 +141,11 @@ public class BulkImportMain {
                 throw new IllegalArgumentException(e.error);
             }
 
+            System.out.println("Bulk Import Session Info.:");
+            System.out.println(String.format("  Database         : %s", databaseName));
+            System.out.println(String.format("  Table            : %s", tableName));
+            System.out.println(String.format("  Session          : %s", sessionName));
+
             filePos = 1;
         } else {
             sessionName = argList.get(1); // get session name from command-line arguments
@@ -147,6 +155,9 @@ public class BulkImportMain {
                 throw new IllegalArgumentException(e.error);
             }
 
+            System.out.println("Bulk Import Session Info.");
+            System.out.println(String.format("  Session           : %s", sessionName));
+
             filePos = 2;
         }
 
@@ -154,6 +165,11 @@ public class BulkImportMain {
         final String[] fileNames = new String[argList.size() - filePos]; // delete command
         for (int i = 0; i < fileNames.length; i++) {
             fileNames[i] = argList.get(i + filePos);
+        }
+
+        System.out.println("Bulk Import Uploading Files:");
+        for (String fileName : fileNames) {
+            System.out.println(String.format("  File              : '%s'", fileName));
         }
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
@@ -239,6 +255,8 @@ public class BulkImportMain {
         }
 
         outputErrors(errs, Configuration.CMD_UPLOAD);
+
+        LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
     }
 
     private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {

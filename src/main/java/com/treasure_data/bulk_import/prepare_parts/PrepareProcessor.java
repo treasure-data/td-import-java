@@ -36,7 +36,7 @@ public class PrepareProcessor {
     }
 
     public ErrorInfo execute(final Task task) {
-        String msg = String.format("Convert file '%s'", task.fileName);
+        String msg = String.format("Convert             : '%s'", task.fileName);
         System.out.println(msg);
         LOG.info(msg);
         LOG.fine(String.format("Process task '%s'", task));
@@ -101,10 +101,7 @@ public class PrepareProcessor {
             }
         }
 
-        String msg2 = String.format("Converted file '%s', %d entries",
-                task.fileName, err.writtenRows);
-        System.out.println(msg2);
-        LOG.info(msg2);
+        LOG.info(String.format("Converted '%s', %d entries", task.fileName, err.writtenRows));
 
         return err;
     }
