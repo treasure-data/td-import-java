@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
-import com.treasure_data.model.bulkimport.SessionSummary;
 
 public class MultiThreadUploadProcessor {
     static class Worker extends Thread {
