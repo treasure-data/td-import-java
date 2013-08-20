@@ -24,10 +24,10 @@ public class Task implements com.treasure_data.bulk_import.Task {
 
     static final Task FINISH_TASK = new Task(TAG, TAG, 0);
 
-    String sessName;
-    String partName;
-    String fileName;
-    long size;
+    public String sessName;
+    public String partName;
+    public String fileName;
+    public long size;
 
     // unit testing
     public boolean isTest = false;

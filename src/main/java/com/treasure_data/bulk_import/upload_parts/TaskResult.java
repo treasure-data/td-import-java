@@ -18,6 +18,14 @@
 package com.treasure_data.bulk_import.upload_parts;
 
 public class TaskResult extends com.treasure_data.bulk_import.TaskResult<Task> {
+    public int retryCount = 0;
+
     public TaskResult() {
+    }
+
+    @Override
+    public String toString() {
+        return String.format("upload_task_result{task=%s, retryCount=%d}",
+                task, retryCount);
     }
 }
