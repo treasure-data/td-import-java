@@ -351,16 +351,10 @@ public class BulkImportMain {
         System.out.println();
         System.out.println("Show Upload Process Status");
         for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
-//            System.out.println(String.format("  File            : %s", result.task.fileName));
-//            System.out.println(String.format("    Prepare Proc  : %s", status));
-//            System.out.println(String.format("    Read Lines    : %d", result.readLines));
-//            System.out.println(String.format("    Converted Rows: %d", result.convertedRows));
-//            System.out.println(String.format("    Invalid Rows  : %d", result.invalidRows));
-//            int len = result.outFileNames.size();
-//            for (int i = 0; i < len; i++) {
-//                System.out.println(String.format("    => %s (size %d)",
-//                        result.outFileNames.get(i), result.outFileSizes.get(i)));
-//            }
+            System.out.println(String.format("  File              : %s", result.task.fileName));
+            System.out.println(String.format("    Upload Proc     : %s", status));
+            System.out.println(String.format("    Part            : %s (size %d)", result.task.partName, result.task.size));
+            System.out.println(String.format("    Retry Count     : %d", 0)); // TODO FIXME #MN
         }
         System.out.println();
     }
