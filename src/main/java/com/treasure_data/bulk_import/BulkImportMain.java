@@ -194,8 +194,6 @@ public class BulkImportMain {
                     }
                 }
             }).start();
-
-            uploadProc.joinWorkers();
         } else {
             // create configuration for 'prepare' processing
             final PrepareConfiguration prepareConf = createPrepareConfiguration(props, args, true);
@@ -230,11 +228,23 @@ public class BulkImportMain {
             prepareProc.joinWorkers();
             List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = prepareProc
                     .getTaskResults();
+            showPrepareResults(prepareResults);
+
+            // end of file list
+            try {
+                MultiThreadUploadProcessor.addFinishTask(uploadConf);
+            } catch (Throwable t) {
+                LOG.severe("Error occurred During 'addFinishTask' method call");
+                LOG.throwing("Main", "addFinishTask", t);
+            }
         }
 
-        MultiThreadUploadProcessor.addFinishTask(uploadConf);
         uploadProc.joinWorkers();
-        errs.addAll(uploadProc.getErrors());
+        List<com.treasure_data.bulk_import.upload_parts.TaskResult> uploadResults = uploadProc
+                .getTaskResults();
+        showUploadResults(uploadResults);
+
+        errs.addAll(uploadProc.getTaskResults());
 
         // 'auto-perform' and 'auto-commit'
         TaskResult processed = UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName);
@@ -304,10 +314,10 @@ public class BulkImportMain {
     }
 
     private static void showPrepareResults(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
-        String status = "SUCCESS";
+        String status = Configuration.STAT_SUCCESS;
         for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
             if (result.error != null) {
-                status = "ERROR";
+                status = Configuration.STAT_ERROR;
                 break;
             }
         }
@@ -315,11 +325,11 @@ public class BulkImportMain {
         System.out.println();
         System.out.println("Show Prepare Process Status");
         for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
-            System.out.println(String.format("  File            : %s", result.task.fileName));
-            System.out.println(String.format("    Prepare Proc  : %s", status));
-            System.out.println(String.format("    Read Lines    : %d", result.readLines));
-            System.out.println(String.format("    Converted Rows: %d", result.convertedRows));
-            System.out.println(String.format("    Invalid Rows  : %d", result.invalidRows));
+            System.out.println(String.format("  File              : %s", result.task.fileName));
+            System.out.println(String.format("    Prepare Proc    : %s", status));
+            System.out.println(String.format("    Read Lines      : %d", result.readLines));
+            System.out.println(String.format("    Converted Rows  : %d", result.convertedRows));
+            System.out.println(String.format("    Invalid Rows    : %d", result.invalidRows));
             int len = result.outFileNames.size();
             for (int i = 0; i < len; i++) {
                 System.out.println(String.format("    => %s (size %d)",
@@ -329,8 +339,30 @@ public class BulkImportMain {
         System.out.println();
     }
 
-    private static void showUploadResults(List<TaskResult> results) {
-        // TODO FIXME #MN should implement the method
+    private static void showUploadResults(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results) {
+        String status = Configuration.STAT_SUCCESS;
+        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+            if (result.error != null) {
+                status = Configuration.STAT_ERROR;
+                break;
+            }
+        }
+
+        System.out.println();
+        System.out.println("Show Upload Process Status");
+        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+//            System.out.println(String.format("  File            : %s", result.task.fileName));
+//            System.out.println(String.format("    Prepare Proc  : %s", status));
+//            System.out.println(String.format("    Read Lines    : %d", result.readLines));
+//            System.out.println(String.format("    Converted Rows: %d", result.convertedRows));
+//            System.out.println(String.format("    Invalid Rows  : %d", result.invalidRows));
+//            int len = result.outFileNames.size();
+//            for (int i = 0; i < len; i++) {
+//                System.out.println(String.format("    => %s (size %d)",
+//                        result.outFileNames.get(i), result.outFileSizes.get(i)));
+//            }
+        }
+        System.out.println();
     }
 
     private static void outputErrors(List<TaskResult> errs, String cmd) {
