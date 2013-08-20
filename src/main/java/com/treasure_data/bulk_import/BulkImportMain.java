@@ -168,6 +168,7 @@ public class BulkImportMain {
         uploadProc.startWorkers();
 
         List<TaskResult> errs = new ArrayList<TaskResult>();
+        List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = null;
 
         if (!uploadConf.hasPrepareOptions()) {
             // scan files that are uploaded
@@ -227,8 +228,7 @@ public class BulkImportMain {
             }).start();
 
             prepareProc.joinWorkers();
-            List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = prepareProc
-                    .getTaskResults();
+            prepareResults = prepareProc.getTaskResults();
             showPrepareResults(prepareResults);
             listNextStepOfPrepareProc(prepareResults);
 
@@ -245,20 +245,44 @@ public class BulkImportMain {
         List<com.treasure_data.bulk_import.upload_parts.TaskResult> uploadResults = uploadProc
                 .getTaskResults();
         showUploadResults(uploadResults);
-        listNextStepOfUploadProc(uploadResults);
+        listNextStepOfUploadProc(uploadResults, sessionName);
 
-        errs.addAll(uploadProc.getTaskResults());
+        if (!hasNoUploadError(uploadResults)
+                || (prepareResults != null && !hasNoPrepareError(prepareResults))) {
+            return;
+        }
 
         // 'auto-perform' and 'auto-commit'
-        TaskResult processed = UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName);
-        errs.add(processed);
+        UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName);
 
-        if (uploadConf.autoDeleteSession()) { // 'auto-delete-session'
-            TaskResult deleted = UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
-            errs.add(deleted);
+        if (uploadConf.autoDeleteSession()) {
+            // 'auto-delete-session'
+            UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
         }
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
+    }
+
+    private static boolean hasNoPrepareError(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
+        boolean hasNoError = true;
+        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+            if (result.error != null) {
+                hasNoError = false;
+                break;
+            }
+        }
+        return hasNoError;
+    }
+
+    private static boolean hasNoUploadError(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results) {
+        boolean hasNoError = true;
+        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+            if (result.error != null) {
+                hasNoError = false;
+                break;
+            }
+        }
+        return hasNoError;
     }
 
     private static void listFiles(String[] fileNames) {
@@ -349,24 +373,20 @@ public class BulkImportMain {
         System.out.println();
         System.out.println("List Next Step Of Prepare Process");
         for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
-            boolean first = true;
             if (result.error == null) {
                 int len = result.outFileNames.size();
                 // success
                 for (int i = 0; i < len; i++) {
-                    if (first) {
-                        System.out.println(String.format(
-                                "                   => execute 'td import:upload <your session> %s'",
-                                result.outFileNames.get(i)));
-                    } else {
-                        System.out.println(String.format(
-                                "                   => execute 'td import:upload <your session> %s'",
-                                result.outFileNames.get(i)));
-                    }
+                    System.out.println(String.format(
+                            "                   => execute 'td import:upload <your session> %s'. "
+                            + "if your bulk_import session is not created yet, please create it "
+                            + "with 'td import:create' command",
+                            result.outFileNames.get(i)));
                 }
             } else {
                 // error
-                System.out.println(String.format("                   => check td-bulk-import.log and original %s: %s",
+                System.out.println(String.format(
+                        "                   => check td-bulk-import.log and original %s: %s.",
                         result.task.fileName, result.error.getMessage()));
             }
         }
@@ -391,14 +411,16 @@ public class BulkImportMain {
         System.out.println();
     }
 
-    private static void listNextStepOfUploadProc(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results) {
+    private static void listNextStepOfUploadProc(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results,
+            String sessionName) {
         System.out.println();
         System.out.println("List Next Step Of Upload Process");
         boolean hasErrors = false;
         for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
             if (result.error != null) {
                 // error
-                System.out.println(String.format("                   => check td-bulk-import.log and re-upload %s: %s",
+                System.out.println(String.format(
+                        "                   => check td-bulk-import.log and re-upload %s: %s.",
                         result.task.fileName, result.error.getMessage()));
                 hasErrors = true;
             }
@@ -406,7 +428,9 @@ public class BulkImportMain {
 
         if (!hasErrors) {
             // success
-            System.out.println(String.format("                   => execute 'td import:perform <your session>'"));
+            System.out.println(String.format(
+                    "                   => execute 'td import:perform %s'.",
+                    sessionName));
         }
 
         System.out.println();
