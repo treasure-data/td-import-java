@@ -36,10 +36,9 @@ public class PrepareProcessor {
     }
 
     public TaskResult execute(final Task task) {
-        String msg = String.format("Convert             : '%s'", task.fileName);
+        String msg = String.format("Convert '%s'", task.fileName);
         System.out.println(msg);
         LOG.info(msg);
-        LOG.fine(String.format("Process task '%s'", task));
 
         TaskResult result = new TaskResult();
         result.task = task;
@@ -102,7 +101,7 @@ public class PrepareProcessor {
             }
         }
 
-        LOG.info(String.format("Converted '%s', %d entries", task.fileName, result.convertedRows));
+        LOG.info(String.format("Converted %s, result: %s", task.fileName, result));
 
         return result;
     }

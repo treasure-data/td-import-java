@@ -53,7 +53,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + 1);
         }
 
-        showFiles(fileNames);
+        listFiles(fileNames);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -160,7 +160,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + filePos);
         }
 
-        showFiles(fileNames);
+        listFiles(fileNames);
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -258,9 +258,9 @@ public class BulkImportMain {
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
     }
 
-    private static void showFiles(String[] fileNames) {
+    private static void listFiles(String[] fileNames) {
         System.out.println();
-        System.out.println("Show Bulk Imported Files");
+        System.out.println("List Bulk Imported Files");
         for (String fileName : fileNames) {
             System.out.println(String.format("  File              : %s", fileName));
         }
