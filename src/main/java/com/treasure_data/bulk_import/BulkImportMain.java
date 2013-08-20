@@ -264,7 +264,7 @@ public class BulkImportMain {
         System.out.println();
         System.out.println("Show Bulk Imported Files");
         for (String fileName : fileNames) {
-            System.out.println(String.format("  File            : %s", fileName));
+            System.out.println(String.format("  File              : %s", fileName));
         }
         System.out.println();
     }
@@ -272,7 +272,7 @@ public class BulkImportMain {
     private static void showSession(String sessionName) {
         System.out.println();
         System.out.println("Show Bulk Import Session Info.");
-        System.out.println(String.format("    Session          : %s", sessionName));
+        System.out.println(String.format("  Session           : %s", sessionName));
         System.out.println();
     }
 
