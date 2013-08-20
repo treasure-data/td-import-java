@@ -83,40 +83,44 @@ public class UploadProcessor {
     }
 
     static class RetryClient3 {
-        public void retry(Retryable2 r, String sessionName, String partID,
+        public void retry(TaskResult result, Retryable2 r, String sessionName, String partID,
                 int retryCount, long waitSec) throws IOException {
             ClientException firstException = null;
             int count = 0;
-            while (true) {
-                try {
-                    r.doTry();
-                    if (count > 0) {
-                        LOG.warning(String.format("Retry succeeded. %s.'%s'",
-                                sessionName, partID));
-                    }
-                    break;
-                } catch (ClientException e) {
-                    if (firstException == null) {
-                        firstException = e;
-                    }
-                    LOG.warning(String.format(
-                            "ClientError occurred. the cause is '%s'. %s.'%s'",
-                            e.getMessage(), sessionName, partID));
-                    if (count >= retryCount) {
+            try {
+                while (true) {
+                    try {
+                        r.doTry();
+                        if (count > 0) {
+                            LOG.warning(String.format("Retry succeeded. %s.'%s'",
+                                    sessionName, partID));
+                        }
+                        break;
+                    } catch (ClientException e) {
+                        if (firstException == null) {
+                            firstException = e;
+                        }
                         LOG.warning(String.format(
-                                "Retry count exceeded limit. %s.'%s'",
-                                sessionName, partID));
-                        throw new IOException("Retry failed", firstException);
-                    } else {
-                        count++;
-                        LOG.warning(String.format("Retrying. %s.'%s'",
-                                sessionName, partID));
-                        try {
-                            Thread.sleep(waitSec);
-                        } catch (InterruptedException ex) { // ignore
+                                "ClientError occurred. the cause is '%s'. %s.'%s'",
+                                e.getMessage(), sessionName, partID));
+                        if (count >= retryCount) {
+                            LOG.warning(String.format(
+                                    "Retry count exceeded limit. %s.'%s'",
+                                    sessionName, partID));
+                            throw new IOException("Retry failed", firstException);
+                        } else {
+                            count++;
+                            LOG.warning(String.format("Retrying. %s.'%s'",
+                                    sessionName, partID));
+                            try {
+                                Thread.sleep(waitSec);
+                            } catch (InterruptedException ex) { // ignore
+                            }
                         }
                     }
                 }
+            } finally {
+                result.retryCount = count;
             }
         }
     }
@@ -135,8 +139,8 @@ public class UploadProcessor {
     }
 
     public TaskResult execute(final Task task) {
-        TaskResult err = new TaskResult();
-        err.task = task;
+        TaskResult result = new TaskResult();
+        result.task = task;
 
         try {
             System.out.println(String.format("Upload              : '%s' (size %d)",
@@ -145,7 +149,7 @@ public class UploadProcessor {
                     task.fileName, task.size, task.sessName, task.partName));
 
             long time = System.currentTimeMillis();
-            new RetryClient3().retry(new Retryable2() {
+            new RetryClient3().retry(result, new Retryable2() {
                 @Override
                 public void doTry() throws ClientException, IOException {
                     executeUpload(task);
@@ -159,9 +163,9 @@ public class UploadProcessor {
                     task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
         } catch (IOException e) {
             LOG.severe(e.getMessage());
-            err.error = e;
+            result.error = e;
         }
-        return err;
+        return result;
     }
 
     protected void executeUpload(final Task task) throws ClientException, IOException {
