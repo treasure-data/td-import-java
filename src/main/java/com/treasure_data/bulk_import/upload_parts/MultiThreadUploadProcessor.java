@@ -49,10 +49,8 @@ public class MultiThreadUploadProcessor {
                     break;
                 }
 
-                TaskResult err = proc.execute(t);
-                if (err.error != null) {
-                    parent.setErrors(err);
-                }
+                TaskResult result = proc.execute(t);
+                parent.setTaskResult(result);
             }
             isFinished.set(true);
         }
@@ -82,20 +80,20 @@ public class MultiThreadUploadProcessor {
 
     private UploadConfiguration conf;
     private List<Worker> workers;
-    private List<com.treasure_data.bulk_import.TaskResult> errors;
+    private List<TaskResult> results;
 
     public MultiThreadUploadProcessor(UploadConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        errors = new ArrayList<com.treasure_data.bulk_import.TaskResult>();
+        results = new ArrayList<TaskResult>();
     }
 
-    protected synchronized void setErrors(TaskResult error) {
-        errors.add(error);
+    protected synchronized void setTaskResult(TaskResult error) {
+        results.add(error);
     }
 
-    public List<com.treasure_data.bulk_import.TaskResult> getErrors() {
-        return errors;
+    public List<TaskResult> getTaskResults() {
+        return results;
     }
 
     public void registerWorkers() {
