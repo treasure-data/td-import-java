@@ -85,9 +85,10 @@ public class BulkImportMain {
         }).start();
 
         proc.joinWorkers();
-        List<TaskResult> results = proc.getTaskResults();
+        List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = proc
+                .getTaskResults();
 
-        showPrepareResults(results);
+        showPrepareResults(prepareResults);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
     }
@@ -227,7 +228,8 @@ public class BulkImportMain {
             }).start();
 
             prepareProc.joinWorkers();
-            errs.addAll(prepareProc.getTaskResults());
+            List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = prepareProc
+                    .getTaskResults();
         }
 
         MultiThreadUploadProcessor.addFinishTask(uploadConf);
@@ -243,22 +245,24 @@ public class BulkImportMain {
             errs.add(deleted);
         }
 
-        outputErrors(errs, Configuration.CMD_UPLOAD);
+        outputErrors(errs, Configuration.CMD_UPLOAD); // TODO FIXME #MN should delete the call
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
     }
 
     private static void showFiles(String[] fileNames) {
-        System.out.println("Show                : Bulk Imported Files");
+        System.out.println();
+        System.out.println("Show Bulk Imported Files");
         for (String fileName : fileNames) {
-            System.out.println(String.format("  * File            : '%s'", fileName));
+            System.out.println(String.format("  File            : %s", fileName));
         }
         System.out.println();
     }
 
     private static void showSession(String sessionName) {
-        System.out.println("Show                : Bulk Import Session Info.");
-        System.out.println(String.format("  * Session          : %s", sessionName));
+        System.out.println();
+        System.out.println("Show Bulk Import Session Info.");
+        System.out.println(String.format("    Session          : %s", sessionName));
         System.out.println();
     }
 
@@ -299,15 +303,34 @@ public class BulkImportMain {
         }
     }
 
-    private static void showPrepareResults(List<TaskResult> errs) {
-        for (TaskResult e : errs) {
-            System.out.println();
+    private static void showPrepareResults(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
+        String status = "SUCCESS";
+        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+            if (result.error != null) {
+                status = "ERROR";
+                break;
+            }
         }
-        // TODO
+
+        System.out.println();
+        System.out.println("Show Prepare Process Status");
+        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+            System.out.println(String.format("  File            : %s", result.task.fileName));
+            System.out.println(String.format("    Prepare Proc  : %s", status));
+            System.out.println(String.format("    Read Lines    : %d", result.readLines));
+            System.out.println(String.format("    Converted Rows: %d", result.convertedRows));
+            System.out.println(String.format("    Invalid Rows  : %d", result.invalidRows));
+            int len = result.outFileNames.size();
+            for (int i = 0; i < len; i++) {
+                System.out.println(String.format("    => %s (size %d)",
+                        result.outFileNames.get(i), result.outFileSizes.get(i)));
+            }
+        }
+        System.out.println();
     }
 
-    private static void showUploadResults(List<TaskResult> errs) {
-        // TODO
+    private static void showUploadResults(List<TaskResult> results) {
+        // TODO FIXME #MN should implement the method
     }
 
     private static void outputErrors(List<TaskResult> errs, String cmd) {

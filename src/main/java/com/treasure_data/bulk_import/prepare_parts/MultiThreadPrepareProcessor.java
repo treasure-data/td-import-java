@@ -71,19 +71,19 @@ public class MultiThreadPrepareProcessor {
 
     private PrepareConfiguration conf;
     private List<Worker> workers;
-    private List<com.treasure_data.bulk_import.TaskResult> results;
+    private List<TaskResult> results;
 
     public MultiThreadPrepareProcessor(PrepareConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
-        results = new ArrayList<com.treasure_data.bulk_import.TaskResult>();
+        results = new ArrayList<TaskResult>();
     }
 
-    protected synchronized void setResult(com.treasure_data.bulk_import.TaskResult result) {
+    protected synchronized void setResult(TaskResult result) {
         results.add(result);
     }
 
-    public List<com.treasure_data.bulk_import.TaskResult> getTaskResults() {
+    public List<TaskResult> getTaskResults() {
         return results;
     }
 

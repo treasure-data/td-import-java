@@ -137,6 +137,7 @@ public class UploadProcessor {
     public TaskResult execute(final Task task) {
         TaskResult err = new TaskResult();
         err.task = task;
+
         try {
             System.out.println(String.format("Upload              : '%s' (size %d)",
                     task.fileName, task.size));
