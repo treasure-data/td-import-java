@@ -255,8 +255,6 @@ public class BulkImportMain {
             errs.add(deleted);
         }
 
-        outputErrors(errs, Configuration.CMD_UPLOAD); // TODO FIXME #MN should delete the call
-
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
     }
 
@@ -314,73 +312,54 @@ public class BulkImportMain {
     }
 
     private static void showPrepareResults(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
-        String status = Configuration.STAT_SUCCESS;
-        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
-            if (result.error != null) {
-                status = Configuration.STAT_ERROR;
-                break;
-            }
-        }
-
         System.out.println();
         System.out.println("Show Prepare Process Status");
         for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+            String status = Configuration.STAT_SUCCESS;
+            if (result.error != null) {
+                status = Configuration.STAT_ERROR;
+            }
             System.out.println(String.format("  File              : %s", result.task.fileName));
             System.out.println(String.format("    Prepare Proc    : %s", status));
             System.out.println(String.format("    Read Lines      : %d", result.readLines));
             System.out.println(String.format("    Converted Rows  : %d", result.convertedRows));
             System.out.println(String.format("    Invalid Rows    : %d", result.invalidRows));
             int len = result.outFileNames.size();
+            boolean first = true;
             for (int i = 0; i < len; i++) {
-                System.out.println(String.format("    => %s (size %d)",
-                        result.outFileNames.get(i), result.outFileSizes.get(i)));
+                if (first) {
+                    System.out.println(String.format("    Converted Files : %s (size %d)",
+                            result.outFileNames.get(i), result.outFileSizes.get(i)));
+                    first = false;
+                } else {
+                    System.out.println(String.format("                      %s (size %d)",
+                            result.outFileNames.get(i), result.outFileSizes.get(i)));
+                }
             }
+
+            // advice for next phase
+            // TODO FIXME #MN
         }
         System.out.println();
     }
 
     private static void showUploadResults(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results) {
-        String status = Configuration.STAT_SUCCESS;
-        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
-            if (result.error != null) {
-                status = Configuration.STAT_ERROR;
-                break;
-            }
-        }
-
         System.out.println();
         System.out.println("Show Upload Process Status");
         for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+            String status = Configuration.STAT_SUCCESS;
+            if (result.error != null) {
+                status = Configuration.STAT_ERROR;
+            }
             System.out.println(String.format("  File              : %s", result.task.fileName));
             System.out.println(String.format("    Upload Proc     : %s", status));
             System.out.println(String.format("    Part            : %s (size %d)", result.task.partName, result.task.size));
             System.out.println(String.format("    Retry Count     : %d", 0)); // TODO FIXME #MN
+
+            // advice for next phase
+            // TODO FIXME #MN
         }
         System.out.println();
-    }
-
-    private static void outputErrors(List<TaskResult> errs, String cmd) {
-        int errSize = 0;
-        for (TaskResult e : errs) {
-            if (e.error != null) {
-                errSize++;
-            }
-        }
-
-        if (errSize == 0) {
-            return;
-        }
-
-        String msg = String.format("Some errors occurred during %s processing. " +
-                "Please check the following messages.", cmd);
-        System.out.println(msg);
-        LOG.warning(msg);
-
-        for (TaskResult e : errs) {
-            if (e.error != null) {
-                e.error.printStackTrace();
-            }
-        }
     }
 
     public static void main(final String[] args) throws Exception {
