@@ -17,7 +17,9 @@
 //
 package com.treasure_data.bulk_import;
 
-public class TaskResult {
+public class TaskResult<TASK extends Task> {
+    public TASK task;
+
     public Throwable error;
     public String message;
 }

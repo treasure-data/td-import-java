@@ -17,9 +17,7 @@
 //
 package com.treasure_data.bulk_import.upload_parts;
 
-public class TaskResult extends com.treasure_data.bulk_import.TaskResult {
-    public Task task;
-
+public class TaskResult extends com.treasure_data.bulk_import.TaskResult<Task> {
     public TaskResult() {
     }
 }

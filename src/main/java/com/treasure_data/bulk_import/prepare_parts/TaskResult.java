@@ -17,16 +17,22 @@
 //
 package com.treasure_data.bulk_import.prepare_parts;
 
-public class TaskResult extends com.treasure_data.bulk_import.TaskResult {
-    public Task task;
+import java.util.ArrayList;
+import java.util.List;
 
-    public long redLines = 0;
-    public long writtenRows = 0;
+public class TaskResult extends com.treasure_data.bulk_import.TaskResult<Task> {
+    public long readLines = 0;
+    public long skippedLines = 0;
+    public long convertedRows = 0;
+    public long invalidRows = 0;
+
+    public List<String> outFileNames = new ArrayList<String>();
+    public List<Long> outFileSizes = new ArrayList<Long>();
 
     @Override
     public String toString() {
         return String.format(
-                "prepare_task_result{task=%s, redLines=%d, writtenRows=%d}",
-                task, redLines, writtenRows);
+                "prepare_task_result{task=%s, readLines=%d, convertedRows=%d, invalidRows=%d}",
+                task, readLines, skippedLines, convertedRows, invalidRows);
     }
 }
