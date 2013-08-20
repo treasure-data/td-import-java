@@ -154,6 +154,8 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             LOG.throwing("CSVFileParser", "parseRow", e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
+            writer.incrementErrorRowNum();
+
             // the row data should be written to error rows file
             String msg = String.format("line %d in %s: %s", lineNum, name, getCurrentRow());
             LOG.warning(e.getMessage());

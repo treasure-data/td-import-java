@@ -101,6 +101,7 @@ public class RegexFileReader<T extends PrepareConfiguration> extends FixnumColum
         Matcher commonLogMatcher = pat.matcher(line);
 
         if (!commonLogMatcher.matches()) {
+            writer.incrementErrorRowNum();
             throw new PreparePartsException(String.format(
                     "line is not matched at apache common log format [line: %d]",
                     getLineNum()));
@@ -113,6 +114,7 @@ public class RegexFileReader<T extends PrepareConfiguration> extends FixnumColum
 
         int rawRowSize = row.size();
         if (rawRowSize != columnTypes.length) {
+            writer.incrementErrorRowNum();
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
                     "match the number of column types (%d): check that the " +

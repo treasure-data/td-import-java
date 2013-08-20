@@ -137,6 +137,8 @@ public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration>
             LOG.throwing("SchemalessFileParser", "parseRow", e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
+            writer.incrementErrorRowNum();
+
             // TODO the row data should be written to error rows file
             LOG.warning(e.getMessage());
         }

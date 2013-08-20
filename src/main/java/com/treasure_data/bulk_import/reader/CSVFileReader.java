@@ -252,6 +252,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
 
         int rawRowSize = row.size();
         if (rawRowSize != columnTypes.length) {
+            writer.incrementErrorRowNum();
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
                     "match the number of column types (%d): check that the " +

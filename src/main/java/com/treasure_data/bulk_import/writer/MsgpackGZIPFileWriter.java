@@ -37,6 +37,7 @@ import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare_parts.TaskResult;
 
 public class MsgpackGZIPFileWriter extends FileWriter {
     static class DataSizeChecker extends FilterOutputStream {
@@ -83,8 +84,8 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
-    public void configure(Task task) throws PreparePartsException {
-        super.configure(task);
+    public void configure(Task task, TaskResult result) throws PreparePartsException {
+        super.configure(task, result);
 
         msgpack = new MessagePack();
 
@@ -244,8 +245,13 @@ public class MsgpackGZIPFileWriter extends FileWriter {
             dout = null;
         }
 
+        result.outFileNames.add(outputFile.getPath());
+        result.outFileSizes.add(outputFile.length());
+
         if (task != null && outputFile != null) {
-            task.finishHook(outputFile.getAbsolutePath());
+            // TODO FIXME #MN change getAbsolutePath() -> getPath() ??
+            //task.finishHook(outputFile.getAbsolutePath());
+            task.finishHook(outputFile.getPath());
         }
     }
 

@@ -48,7 +48,7 @@ public class PrepareProcessor {
         FileWriter w = null;
         try {
             w = conf.getOutputFormat().createFileWriter(conf);
-            w.configure(task);
+            w.configure(task, result);
         } catch (Exception e) {
             result.error = e;
             return result;
@@ -75,8 +75,9 @@ public class PrepareProcessor {
                     ;
                 }
 
-                result.redLines = r.getLineNum();
-                result.writtenRows = w.getRowNum();
+                result.readLines = r.getLineNum();
+                result.convertedRows = w.getRowNum();
+                result.invalidRows = w.getErrorRowNum();
             } catch (Exception e) {
                 e.printStackTrace();
                 result.error = e;
@@ -101,7 +102,7 @@ public class PrepareProcessor {
             }
         }
 
-        LOG.info(String.format("Converted '%s', %d entries", task.fileName, result.writtenRows));
+        LOG.info(String.format("Converted '%s', %d entries", task.fileName, result.convertedRows));
 
         return result;
     }

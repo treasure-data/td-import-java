@@ -35,6 +35,7 @@ import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
 import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare_parts.TaskResult;
 
 public abstract class FileWriter implements Closeable {
 
@@ -43,7 +44,9 @@ public abstract class FileWriter implements Closeable {
 
     protected PrepareConfiguration conf;
     protected Task task;
+    protected TaskResult result;
     protected long rowNum = 0;
+    protected long errorNum = 0;
 
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
@@ -79,9 +82,10 @@ public abstract class FileWriter implements Closeable {
         this.timeColumnValue = timeColumnValue;
     }
 
-    public void configure(Task task)
+    public void configure(Task task, TaskResult result)
             throws PreparePartsException {
         this.task = task;
+        this.result = result;
     }
 
     public void next(Row row) throws PreparePartsException {
@@ -142,6 +146,18 @@ public abstract class FileWriter implements Closeable {
 
     public long getRowNum() {
         return rowNum;
+    }
+
+    public void resetErrorRowNum() {
+        errorNum = 0;
+    }
+
+    public void incrementErrorRowNum() {
+        errorNum++;
+    }
+
+    public long getErrorRowNum() {
+        return errorNum;
     }
 
     // Closeable#close()
