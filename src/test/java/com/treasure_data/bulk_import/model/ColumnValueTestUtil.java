@@ -45,7 +45,7 @@ public class ColumnValueTestUtil<T> {
         conf.configure(props, options);
 
         writer = new FileWriterTestUtil(conf);
-        writer.configure(null);
+        writer.configure(null, null);
 
         createExpecteds();
     }
