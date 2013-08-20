@@ -89,6 +89,7 @@ public class BulkImportMain {
                 .getTaskResults();
 
         showPrepareResults(prepareResults);
+        listNextStepOfPrepareProc(prepareResults);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
     }
@@ -229,6 +230,7 @@ public class BulkImportMain {
             List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = prepareProc
                     .getTaskResults();
             showPrepareResults(prepareResults);
+            listNextStepOfPrepareProc(prepareResults);
 
             // end of file list
             try {
@@ -243,6 +245,7 @@ public class BulkImportMain {
         List<com.treasure_data.bulk_import.upload_parts.TaskResult> uploadResults = uploadProc
                 .getTaskResults();
         showUploadResults(uploadResults);
+        listNextStepOfUploadProc(uploadResults);
 
         errs.addAll(uploadProc.getTaskResults());
 
@@ -315,8 +318,10 @@ public class BulkImportMain {
         System.out.println();
         System.out.println("Show Prepare Process Status");
         for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
-            String status = Configuration.STAT_SUCCESS;
-            if (result.error != null) {
+            String status;
+            if (result.error == null) {
+                status = Configuration.STAT_SUCCESS;
+            } else {
                 status = Configuration.STAT_ERROR;
             }
             System.out.println(String.format("  File              : %s", result.task.fileName));
@@ -336,9 +341,34 @@ public class BulkImportMain {
                             result.outFileNames.get(i), result.outFileSizes.get(i)));
                 }
             }
+        }
+        System.out.println();
+    }
 
-            // advice for next phase
-            // TODO FIXME #MN
+    private static void listNextStepOfPrepareProc(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
+        System.out.println();
+        System.out.println("List Next Step Of Prepare Process");
+        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+            boolean first = true;
+            if (result.error == null) {
+                int len = result.outFileNames.size();
+                // success
+                for (int i = 0; i < len; i++) {
+                    if (first) {
+                        System.out.println(String.format(
+                                "                   => execute 'td import:upload <your session> %s'",
+                                result.outFileNames.get(i)));
+                    } else {
+                        System.out.println(String.format(
+                                "                   => execute 'td import:upload <your session> %s'",
+                                result.outFileNames.get(i)));
+                    }
+                }
+            } else {
+                // error
+                System.out.println(String.format("                   => check td-bulk-import.log and original %s: %s",
+                        result.task.fileName, result.error.getMessage()));
+            }
         }
         System.out.println();
     }
@@ -347,18 +377,38 @@ public class BulkImportMain {
         System.out.println();
         System.out.println("Show Upload Process Status");
         for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
-            String status = Configuration.STAT_SUCCESS;
-            if (result.error != null) {
+            String status;
+            if (result.error == null) {
+                status = Configuration.STAT_SUCCESS;
+            } else {
                 status = Configuration.STAT_ERROR;
             }
             System.out.println(String.format("  File              : %s", result.task.fileName));
             System.out.println(String.format("    Upload Proc     : %s", status));
             System.out.println(String.format("    Part            : %s (size %d)", result.task.partName, result.task.size));
-            System.out.println(String.format("    Retry Count     : %d", 0)); // TODO FIXME #MN
-
-            // advice for next phase
-            // TODO FIXME #MN
+            System.out.println(String.format("    Retry Count     : %d", result.retryCount));
         }
+        System.out.println();
+    }
+
+    private static void listNextStepOfUploadProc(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results) {
+        System.out.println();
+        System.out.println("List Next Step Of Upload Process");
+        boolean hasErrors = false;
+        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+            if (result.error != null) {
+                // error
+                System.out.println(String.format("                   => check td-bulk-import.log and re-upload %s: %s",
+                        result.task.fileName, result.error.getMessage()));
+                hasErrors = true;
+            }
+        }
+
+        if (!hasErrors) {
+            // success
+            System.out.println(String.format("                   => execute 'td import:perform <your session>'"));
+        }
+
         System.out.println();
     }
 
