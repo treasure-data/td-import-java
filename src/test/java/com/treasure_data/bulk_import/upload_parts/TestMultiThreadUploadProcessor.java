@@ -62,8 +62,8 @@ public class TestMultiThreadUploadProcessor {
 
     @Before
     public void createResources() throws Exception {
-        numWorkers = (rand.nextInt(30) % 8) + 1;
-        numTasks = rand.nextInt(30) + 1;
+        numWorkers = (rand.nextInt(10) % 8) + 1;
+        numTasks = rand.nextInt(10) + 1;
 
         props = System.getProperties();
 
