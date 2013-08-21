@@ -38,99 +38,139 @@ public class BulkImportOptions {
         private int DESCRIPTION_INDENT = 37;
         private int DESCRIPTION_LIMIT = 60;
 
+        private boolean isPrepare(Map<String, ? extends OptionDescriptor> options) {
+            for (OptionDescriptor desc : options.values()) {
+                if (desc.options().contains("parallel")) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public String format(Map<String, ? extends OptionDescriptor> options) {
-            StringBuilder sb = new StringBuilder();
+            boolean isPrepare = isPrepare(options);
+            System.out.println("command: " + isPrepare);
 
+            StringBuilder sbuf = new StringBuilder();
+
+            // usage
+            sbuf.append("usage:\n");
+            if (isPrepare) {
+                sbuf.append(Configuration.CMD_PREPARE_USAGE);
+            } else {
+                sbuf.append(Configuration.CMD_UPLOAD_USAGE);
+            }
+            sbuf.append("\n\n");
+
+            // example
+            sbuf.append("example:\n");
+            if (isPrepare) {
+                sbuf.append(Configuration.CMD_PREPARE_EXAMPLE);
+            } else {
+                sbuf.append(Configuration.CMD_UPLOAD_EXAMPLE);
+            }
+            sbuf.append("\n\n");
+
+            // description
+            sbuf.append("description:\n");
+            if (isPrepare) {
+                sbuf.append(Configuration.CMD_PREPARE_DESC);
+            } else {
+                sbuf.append(Configuration.CMD_UPLOAD_DESC);
+            }
+            sbuf.append("\n\n");
+
+            // options
+            sbuf.append("options:\n");
             Set<OptionDescriptor> used = new HashSet<OptionDescriptor>();
-
-            for(OptionDescriptor desc : options.values()) {
-                if(desc.representsNonOptions()) {
+            for (OptionDescriptor desc : options.values()) {
+                if (desc.representsNonOptions()) {
                     continue;
                 }
 
-                if(used.contains(desc)) {
+                if (used.contains(desc)) {
                     continue;
                 }
                 used.add(desc);
 
-                if(desc.options().contains("help")) {
+                if (desc.options().contains("help")) {
                     // hide --help
                     continue;
                 }
 
-                int blen = sb.length();
+                int blen = sbuf.length();
 
-                sb.append("    ");
+                sbuf.append("    ");
 
                 int n = 0;
-                for(String s : desc.options()) {
-                    if(n != 0) {
-                        sb.append(", ");
+                for (String s : desc.options()) {
+                    if (n != 0) {
+                        sbuf.append(", ");
                     }
-                    if(s.length() > 1) {
-                        sb.append("--");
+                    if (s.length() > 1) {
+                        sbuf.append("--");
                     } else {
-                        sb.append("-");
+                        sbuf.append("-");
                     }
-                    sb.append(s);
+                    sbuf.append(s);
                     n++;
                 }
 
-                if(desc.acceptsArguments()) {
-                    sb.append(" ");
-                    if(!desc.requiresArgument()) {
-                        sb.append("[");
+                if (desc.acceptsArguments()) {
+                    sbuf.append(" ");
+                    if (!desc.requiresArgument()) {
+                        sbuf.append("[");
                     }
 
                     String arg = desc.argumentDescription();
-                    if(arg == null && arg.isEmpty()) {
+                    if (arg == null && arg.isEmpty()) {
                         arg = desc.argumentTypeIndicator();
-                        if(arg == null && arg.isEmpty()) {
+                        if (arg == null && arg.isEmpty()) {
                             arg = "string";
                         }
                     }
-                    sb.append(arg);
+                    sbuf.append(arg);
 
-                    if(!desc.requiresArgument()) {
-                        sb.append("]");
+                    if (!desc.requiresArgument()) {
+                        sbuf.append("]");
                     }
                 }
 
-                int length = sb.length() - blen;
+                int length = sbuf.length() - blen;
 
-                if(length >= DESCRIPTION_INDENT-2) {
-                    sb.append("\n");
-                    for(int i=0; i < DESCRIPTION_INDENT-1; i++) {
-                        sb.append(" ");
+                if (length >= DESCRIPTION_INDENT - 2) {
+                    sbuf.append("\n");
+                    for (int i = 0; i < DESCRIPTION_INDENT - 1; i++) {
+                        sbuf.append(" ");
                     }
                 } else {
-                    for(int i=length; i < DESCRIPTION_INDENT-1; i++) {
-                        sb.append(" ");
+                    for (int i = length; i < DESCRIPTION_INDENT - 1; i++) {
+                        sbuf.append(" ");
                     }
                 }
 
                 String line = desc.description();
                 String[] words = line.split(" ");
 
-                blen = sb.length();
-                for(String word : words) {
-                    if(sb.length() - blen + word.length() > DESCRIPTION_LIMIT) {
-                        sb.append("\n");
-                        for(int i=0; i < DESCRIPTION_INDENT; i++) {
-                            sb.append(" ");
+                blen = sbuf.length();
+                for (String word : words) {
+                    if (sbuf.length() - blen + word.length() > DESCRIPTION_LIMIT) {
+                        sbuf.append("\n");
+                        for (int i = 0; i < DESCRIPTION_INDENT; i++) {
+                            sbuf.append(" ");
                         }
-                        blen = sb.length();
-                        sb.append("  ");
+                        blen = sbuf.length();
+                        sbuf.append("  ");
                     } else {
-                        sb.append(" ");
+                        sbuf.append(" ");
                     }
-                    sb.append(word);
+                    sbuf.append(word);
                 }
 
-                sb.append("\n");
+                sbuf.append("\n");
             }
 
-            return sb.toString();
+            return sbuf.toString();
         }
     }
 
@@ -262,8 +302,8 @@ public class BulkImportOptions {
     public void initUploadOptionParser(Properties props) {
         this.initPrepareOptionParser(props);
         op.acceptsAll(Arrays.asList(
-                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION),
-                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_SESSION_DESC)
+                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE),
+                Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_DESC)
                 .withRequiredArg()
                 .describedAs("DATABASE.TABLE")
                 .ofType(String.class)
@@ -281,8 +321,8 @@ public class BulkImportOptions {
                 .describedAs("NUM")
                 .ofType(String.class);
         op.acceptsAll(Arrays.asList(
-                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION),
-                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_SESSION_DESC);
+                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE),
+                Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_DESC);
     }
 
     public void showHelp() throws IOException {

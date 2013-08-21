@@ -46,11 +46,11 @@ public class UploadConfiguration extends PrepareConfiguration {
         }
     }
 
-    protected boolean autoCreateSession = false;
-    protected String[] makeSession = null;
+    protected boolean autoCreate = false;
+    protected String[] enableMake = null;
     protected boolean autoPerform = false;
     protected boolean autoCommit = false;
-    protected boolean autoDeleteSession = false;
+    protected boolean autoDelete = false;
     protected int numOfUploadThreads;
     protected int retryCount;
     protected long waitSec;
@@ -63,7 +63,7 @@ public class UploadConfiguration extends PrepareConfiguration {
         super.configure(props, options);
 
         // auto-create-session
-        setAutoCreateSession();
+        setAutoCreate();
 
         // auto-perform
         setAutoPerform();
@@ -75,7 +75,7 @@ public class UploadConfiguration extends PrepareConfiguration {
         setNumOfUploadThreads();
 
         // auto-delete-session
-        setAutoDeleteSession();
+        setAutoDelete();
 
         // retryCount
         String rcount = props.getProperty(BI_UPLOAD_PARTS_RETRYCOUNT,
@@ -140,32 +140,32 @@ public class UploadConfiguration extends PrepareConfiguration {
         return autoCommit;
     }
 
-    public void setAutoCreateSession() {
-        if (optionSet.has(BI_UPLOAD_PARTS_AUTO_CREATE_SESSION)) {
-            autoCreateSession = true;
-            makeSession = optionSet.valuesOf(BI_UPLOAD_PARTS_AUTO_CREATE_SESSION).toArray(new String[0]);
-            if (makeSession.length != 2) {
+    public void setAutoCreate() {
+        if (optionSet.has(BI_UPLOAD_PARTS_AUTO_CREATE)) {
+            autoCreate = true;
+            enableMake = optionSet.valuesOf(BI_UPLOAD_PARTS_AUTO_CREATE).toArray(new String[0]);
+            if (enableMake.length != 2) {
                 throw new IllegalArgumentException(String.format(
                         "'%s' option argument must consists of database and table names e.g. 'testdb:testtbl'",
-                        BI_UPLOAD_PARTS_AUTO_CREATE_SESSION));
+                        BI_UPLOAD_PARTS_AUTO_CREATE));
             }
         }
     }
 
-    public boolean autoCreateSession() {
-        return autoCreateSession;
+    public boolean autoCreate() {
+        return autoCreate;
     }
 
-    public String[] makeSession() {
-        return makeSession;
+    public String[] enableMake() {
+        return enableMake;
     }
 
-    public void setAutoDeleteSession() {
-        autoDeleteSession = optionSet.has(BI_UPLOAD_PARTS_AUTO_DELETE_SESSION);
+    public void setAutoDelete() {
+        autoDelete = optionSet.has(BI_UPLOAD_PARTS_AUTO_DELETE);
     }
 
-    public boolean autoDeleteSession() {
-        return autoDeleteSession;
+    public boolean autoDelete() {
+        return autoDelete;
     }
 
     public void setNumOfUploadThreads() {
@@ -208,10 +208,10 @@ public class UploadConfiguration extends PrepareConfiguration {
     public Object clone() {
         UploadConfiguration conf = new UploadConfiguration();
         conf.props = props;
-        conf.autoCreateSession = autoCreateSession;
+        conf.autoCreate = autoCreate;
         conf.autoPerform = autoPerform;
         conf.autoCommit = autoCommit;
-        conf.autoDeleteSession = autoDeleteSession;
+        conf.autoDelete = autoDelete;
         conf.numOfUploadThreads = numOfUploadThreads;
         conf.retryCount= retryCount;
         conf.waitSec = waitSec;

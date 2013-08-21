@@ -112,9 +112,9 @@ public class BulkImportMain {
         TaskResult e;
         final String sessionName;
         int filePos;
-        if (uploadConf.autoCreateSession()) { // 'auto-create-session'
-            String databaseName = uploadConf.makeSession()[0];
-            String tableName = uploadConf.makeSession()[1];
+        if (uploadConf.autoCreate()) { // 'auto-create-session'
+            String databaseName = uploadConf.enableMake()[0];
+            String tableName = uploadConf.enableMake()[1];
             Date d = new Date();
             String format = "yyyy_MM_dd";
             String timestamp = new SimpleDateFormat(format).format(d);
@@ -255,7 +255,7 @@ public class BulkImportMain {
         // 'auto-perform' and 'auto-commit'
         UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName);
 
-        if (uploadConf.autoDeleteSession()) {
+        if (uploadConf.autoDelete()) {
             // 'auto-delete-session'
             UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
         }

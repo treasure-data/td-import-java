@@ -20,7 +20,13 @@ package com.treasure_data.bulk_import;
 public interface Constants extends com.treasure_data.client.Constants {
 
     String CMD_PREPARE = "prepare";
+    String CMD_PREPARE_USAGE = "Convert files into part file format";
+    String CMD_PREPARE_EXAMPLE = "Convert files into part file format";
+    String CMD_PREPARE_DESC = "Convert files into part file format";
     String CMD_UPLOAD = "upload";
+    String CMD_UPLOAD_USAGE = "Upload or re-upload files into a bulk import session";
+    String CMD_UPLOAD_EXAMPLE = "Upload or re-upload files into a bulk import session";
+    String CMD_UPLOAD_DESC = "Upload or re-upload files into a bulk import session";
 
     String STAT_SUCCESS = "SUCCESS";
     String STAT_ERROR = "ERROR";
@@ -32,14 +38,14 @@ public interface Constants extends com.treasure_data.client.Constants {
     // format
     String BI_UPLOAD_PARTS_FORMAT_DEFAULTVALUE = "msgpack.gz"; // default 'msgpack.gz'
 
-    // auto-craete-session
-    String BI_UPLOAD_PARTS_AUTO_CREATE_SESSION = "auto-create-session";
-    String BI_UPLOAD_PARTS_AUTO_CREATE_SESSION_DESC =
+    // auto-craete
+    String BI_UPLOAD_PARTS_AUTO_CREATE = "auto-create";
+    String BI_UPLOAD_PARTS_AUTO_CREATE_DESC =
             "create automatically bulk import session by specified database and table names";
 
-    // auto-delete-session
-    String BI_UPLOAD_PARTS_AUTO_DELETE_SESSION = "auto-delete-session";
-    String BI_UPLOAD_PARTS_AUTO_DELETE_SESSION_DESC = "delete bulk import session automatically";
+    // auto-delete
+    String BI_UPLOAD_PARTS_AUTO_DELETE = "auto-delete";
+    String BI_UPLOAD_PARTS_AUTO_DELETE_DESC = "delete bulk import session automatically";
 
     // auto-perform
     String BI_UPLOAD_PARTS_AUTO_PERFORM = "auto-perform";
