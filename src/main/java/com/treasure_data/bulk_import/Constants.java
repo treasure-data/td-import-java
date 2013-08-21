@@ -20,13 +20,19 @@ package com.treasure_data.bulk_import;
 public interface Constants extends com.treasure_data.client.Constants {
 
     String CMD_PREPARE = "prepare";
-    String CMD_PREPARE_USAGE = "Convert files into part file format";
-    String CMD_PREPARE_EXAMPLE = "Convert files into part file format";
-    String CMD_PREPARE_DESC = "Convert files into part file format";
+    String CMD_PREPARE_USAGE =
+            "  $ td bulk_import:prepare_parts <files...>";
+    String CMD_PREPARE_EXAMPLE =
+            "  $ td bulk_import:prepare_parts logs/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/";
+    String CMD_PREPARE_DESC =
+            "Convert files into part file format";
     String CMD_UPLOAD = "upload";
-    String CMD_UPLOAD_USAGE = "Upload or re-upload files into a bulk import session";
-    String CMD_UPLOAD_EXAMPLE = "Upload or re-upload files into a bulk import session";
-    String CMD_UPLOAD_DESC = "Upload or re-upload files into a bulk import session";
+    String CMD_UPLOAD_USAGE =
+            "  $ td bulk_import:upload_parts <name> <files...>";
+    String CMD_UPLOAD_EXAMPLE =
+            "  $ td bulk_import:upload_parts parts/* --parallel 4";
+    String CMD_UPLOAD_DESC =
+            "Upload or re-upload files into a bulk import session";
 
     String STAT_SUCCESS = "SUCCESS";
     String STAT_ERROR = "ERROR";
