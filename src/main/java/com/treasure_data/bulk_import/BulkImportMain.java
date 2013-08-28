@@ -379,7 +379,7 @@ public class BulkImportMain {
                 for (int i = 0; i < len; i++) {
                     System.out.println(String.format(
                             "                   => execute 'td import:upload <your session> %s'. "
-                            + "if your bulk_import session is not created yet, please create it "
+                            + "if your bulk import session is not created yet, please create it "
                             + "with 'td import:create' command",
                             result.outFileNames.get(i)));
                 }
