@@ -372,16 +372,15 @@ public class BulkImportMain {
     private static void listNextStepOfPrepareProc(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
         System.out.println();
         System.out.println("Next steps:");
+
+        List<String> readyToUploadFiles = new ArrayList<String>();
+
         for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
             if (result.error == null) {
                 int len = result.outFileNames.size();
                 // success
                 for (int i = 0; i < len; i++) {
-                    System.out.println(String.format(
-                            "  => execute 'td import:upload <your session> %s'. "
-                            + "if your bulk import session is not created yet, please create it "
-                            + "with 'td import:create' command",
-                            result.outFileNames.get(i)));
+                    readyToUploadFiles.add(result.outFileNames.get(i));
                 }
             } else {
                 // error
@@ -389,6 +388,21 @@ public class BulkImportMain {
                         "  => check td-bulk-import.log and original %s: %s.",
                         result.task.fileName, result.error.getMessage()));
             }
+        }
+
+        if(!readyToUploadFiles.isEmpty()) {
+            System.out.println(String.format(
+                        "  => execute following 'td import:upload' command. "
+                        + "if the bulk import session is not created yet, please create it "
+                        + "with 'td import:create <session> <database> <table>' command."));
+            StringBuilder sb = new StringBuilder();
+            sb.append("     $ td import:upload <session>");
+            for(String file : readyToUploadFiles) {
+                sb.append(" '");
+                sb.append(file);
+                sb.append("'");
+            }
+            System.out.println(sb);
         }
         System.out.println();
     }
