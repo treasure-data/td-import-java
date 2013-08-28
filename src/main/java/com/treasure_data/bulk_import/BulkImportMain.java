@@ -53,7 +53,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + 1);
         }
 
-        showFiles("Preparing files", fileNames);
+        showPrepare(fileNames, conf.getOutputDirName());
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -153,15 +153,13 @@ public class BulkImportMain {
             filePos = 2;
         }
 
-        showSession(sessionName);
-
         // configure uploaded file list
         final String[] fileNames = new String[argList.size() - filePos]; // delete command
         for (int i = 0; i < fileNames.length; i++) {
             fileNames[i] = argList.get(i + filePos);
         }
 
-        showFiles("Uploading files", fileNames);
+        showUpload(fileNames, sessionName);
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -285,20 +283,26 @@ public class BulkImportMain {
         return hasNoError;
     }
 
-    private static void showFiles(String message, String[] fileNames) {
+    private static void showPrepare(String[] fileNames, String outputDirName) {
         System.out.println();
-        System.out.println(message);
-        for (String fileName : fileNames) {
-            System.out.println(String.format("  File    : %s", fileName));
-        }
+        System.out.println("Preparing files");
+        System.out.println(String.format("  Output dir   : %s", outputDirName));
+        showFiles(fileNames);
         System.out.println();
     }
 
-    private static void showSession(String sessionName) {
+    private static void showUpload(String[] fileNames, String sessionName) {
         System.out.println();
-        System.out.println("Bulk Import Session");
-        System.out.println(String.format("  Session           : %s", sessionName));
+        System.out.println("Uploading prepared files");
+        System.out.println(String.format("  Session name : %s", sessionName));
+        showFiles(fileNames);
         System.out.println();
+    }
+
+    private static void showFiles(String[] fileNames) {
+        for (String fileName : fileNames) {
+            System.out.println(String.format("  File       : %s (%d bytes)", fileName, new File(fileName).length()));
+        }
     }
 
     private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {
@@ -357,11 +361,11 @@ public class BulkImportMain {
             boolean first = true;
             for (int i = 0; i < len; i++) {
                 if (first) {
-                    System.out.println(String.format("    Converted Files : %s (size %d)",
+                    System.out.println(String.format("    Converted Files : %s (%d bytes)",
                             result.outFileNames.get(i), result.outFileSizes.get(i)));
                     first = false;
                 } else {
-                    System.out.println(String.format("                      %s (size %d)",
+                    System.out.println(String.format("                      %s (%d bytes)",
                             result.outFileNames.get(i), result.outFileSizes.get(i)));
                 }
             }

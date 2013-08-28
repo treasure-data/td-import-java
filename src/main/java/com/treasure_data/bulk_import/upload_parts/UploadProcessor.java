@@ -143,8 +143,8 @@ public class UploadProcessor {
         result.task = task;
 
         try {
-            System.out.println(String.format("Upload %s (size %d)", task.fileName, task.size));
-            LOG.info(String.format("Upload %s (size %d) to session %s as part %s",
+            System.out.println(String.format("Uploading %s (%d bytes)...", task.fileName, task.size));
+            LOG.info(String.format("Uploading %s (%d bytes) to session %s as part %s",
                     task.fileName, task.size, task.sessName, task.partName));
 
             long time = System.currentTimeMillis();
@@ -158,7 +158,7 @@ public class UploadProcessor {
             time = System.currentTimeMillis() - time;
 
             LOG.info(String.format(
-                    "Uploaded file %s (size %d) to session %s as part %s (time: %d sec.)", 
+                    "Uploaded file %s (%d bytes) to session %s as part %s (time: %d sec.)", 
                     task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
         } catch (IOException e) {
             LOG.severe(e.getMessage());
@@ -168,7 +168,7 @@ public class UploadProcessor {
     }
 
     protected void executeUpload(final Task task) throws ClientException, IOException {
-        LOG.fine(String.format("Upload file %s (size %d) to session %s as part %s by thread %s",
+        LOG.fine(String.format("Uploading file %s (%d bytes) to session %s as part %s by thread %s",
                 task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
 
         long time = System.currentTimeMillis();
@@ -177,7 +177,7 @@ public class UploadProcessor {
                 (int) task.size);
         time = System.currentTimeMillis() - time;
 
-        LOG.fine(String.format("Uploaded file %s (size %d) to session %s as part %s by thread %s (time: %d sec.)",
+        LOG.fine(String.format("Uploaded file %s (%d bytes) to session %s as part %s by thread %s (time: %d sec.)",
                 task.fileName, task.size, task.sessName, task.partName,
                 Thread.currentThread().getName(), (time / 1000)));
     }
