@@ -53,7 +53,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + 1);
         }
 
-        listFiles(fileNames);
+        showFiles("Preparing files", fileNames);
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -161,7 +161,7 @@ public class BulkImportMain {
             fileNames[i] = argList.get(i + filePos);
         }
 
-        listFiles(fileNames);
+        showFiles("Uploading files", fileNames);
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -285,9 +285,9 @@ public class BulkImportMain {
         return hasNoError;
     }
 
-    private static void listFiles(String[] fileNames) {
+    private static void showFiles(String message, String[] fileNames) {
         System.out.println();
-        System.out.println("List Bulk Imported Files");
+        System.out.println(message);
         for (String fileName : fileNames) {
             System.out.println(String.format("  File              : %s", fileName));
         }
@@ -296,7 +296,7 @@ public class BulkImportMain {
 
     private static void showSession(String sessionName) {
         System.out.println();
-        System.out.println("Show Bulk Import Session Info.");
+        System.out.println("Bulk Import Session");
         System.out.println(String.format("  Session           : %s", sessionName));
         System.out.println();
     }
