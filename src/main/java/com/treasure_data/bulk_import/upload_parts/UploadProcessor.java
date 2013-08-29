@@ -143,8 +143,8 @@ public class UploadProcessor {
         result.task = task;
 
         try {
-            System.out.println(String.format("Upload %s (size %d)", task.fileName, task.size));
-            LOG.info(String.format("Upload %s (size %d) to session %s as part %s",
+            System.out.println(String.format("Uploading %s (%d bytes)...", task.fileName, task.size));
+            LOG.info(String.format("Uploading %s (%d bytes) to session %s as part %s",
                     task.fileName, task.size, task.sessName, task.partName));
 
             long time = System.currentTimeMillis();
@@ -158,7 +158,7 @@ public class UploadProcessor {
             time = System.currentTimeMillis() - time;
 
             LOG.info(String.format(
-                    "Uploaded file %s (size %d) to session %s as part %s (time: %d sec.)", 
+                    "Uploaded file %s (%d bytes) to session %s as part %s (time: %d sec.)", 
                     task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
         } catch (IOException e) {
             LOG.severe(e.getMessage());
@@ -168,7 +168,7 @@ public class UploadProcessor {
     }
 
     protected void executeUpload(final Task task) throws ClientException, IOException {
-        LOG.fine(String.format("Upload file %s (size %d) to session %s as part %s by thread %s",
+        LOG.fine(String.format("Uploading file %s (%d bytes) to session %s as part %s by thread %s",
                 task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
 
         long time = System.currentTimeMillis();
@@ -177,7 +177,7 @@ public class UploadProcessor {
                 (int) task.size);
         time = System.currentTimeMillis() - time;
 
-        LOG.fine(String.format("Uploaded file %s (size %d) to session %s as part %s by thread %s (time: %d sec.)",
+        LOG.fine(String.format("Uploaded file %s (%d bytes) to session %s as part %s by thread %s (time: %d sec.)",
                 task.fileName, task.size, task.sessName, task.partName,
                 Thread.currentThread().getName(), (time / 1000)));
     }
@@ -216,7 +216,7 @@ public class UploadProcessor {
             summary = showSession(client, conf, sessName);
 
             StringBuilder sbuf = new StringBuilder();
-            sbuf.append(String.format("Show status of bulk_import session %s", summary.getName())).append("\n");
+            sbuf.append(String.format("Show status of bulk import session %s", summary.getName())).append("\n");
             sbuf.append("  Performing job ID : " + summary.getJobID()).append("\n");
             sbuf.append("  Name              : " + summary.getName()).append("\n");
             sbuf.append("  Status            : " + summary.getStatus()).append("\n");
@@ -252,7 +252,7 @@ public class UploadProcessor {
             summary = showSession(client, conf, sessName);
 
             StringBuilder sbuf = new StringBuilder();
-            sbuf.append(String.format("Show error records of bulk_import session %s", summary.getName())).append("\n");
+            sbuf.append(String.format("Show error records of bulk import session %s", summary.getName())).append("\n");
             sbuf.append("  Performing job ID : " + summary.getJobID()).append("\n");
             sbuf.append("  Valid parts       : " + summary.getValidParts()).append("\n");
             sbuf.append("  Error parts       : " + summary.getErrorParts()).append("\n");
@@ -280,7 +280,7 @@ public class UploadProcessor {
             LOG.severe(msg);
 
             msg = String.format(
-                    "Check the status of bulk import session %s with 'td bulk_import:show %s' command",
+                    "Check the status of bulk import session %s with 'td import:show %s' command",
                     summary.getName(), summary.getName());
             System.out.println(msg);
             LOG.severe(msg);
@@ -299,7 +299,7 @@ public class UploadProcessor {
 
     public static SessionSummary showSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) throws IOException {
-        LOG.fine(String.format("Show bulk_import session %s", sessionName));
+        LOG.fine(String.format("Show bulk import session %s", sessionName));
 
         summary = null;
         try {
@@ -318,7 +318,7 @@ public class UploadProcessor {
 
     public static TaskResult freezeSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) {
-        String m = String.format("Freeze bulk_import session %s", sessionName);
+        String m = String.format("Freeze bulk import session %s", sessionName);
         System.out.println(m);
         LOG.info(m);
 
@@ -342,7 +342,7 @@ public class UploadProcessor {
 
     public static TaskResult performSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) {
-        String m = String.format("Perform bulk_import session %s", sessionName);
+        String m = String.format("Perform bulk import session %s", sessionName);
         System.out.println(m);
         LOG.info(m);
 
@@ -356,7 +356,7 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            m = String.format("Cannot perform bulk_import session %s, %s", sessionName, e.getMessage());
+            m = String.format("Cannot perform bulk import session %s, %s", sessionName, e.getMessage());
             System.out.println(m);
             LOG.severe(m);
             err.error = e;
@@ -366,7 +366,7 @@ public class UploadProcessor {
 
     public static TaskResult waitPerform(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
-        String m = String.format("Wait %s bulk_import session performing...", sessionName);
+        String m = String.format("Wait %s bulk import session performing...", sessionName);
         System.out.println(m);
         LOG.info(m);
 
@@ -395,7 +395,7 @@ public class UploadProcessor {
                     // ignore
                 }
             } catch (IOException e) {
-                m = String.format("Give up waiting %s bulk_import session performing, %s", sessionName, e.getMessage());
+                m = String.format("Give up waiting %s bulk import session performing, %s", sessionName, e.getMessage());
                 System.out.println(m);
                 LOG.severe(m);
                 err.error = e;
@@ -408,7 +408,7 @@ public class UploadProcessor {
 
     public static TaskResult commitSession(final BulkImportClient client,
             final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
-        String msg = String.format("Commit %s bulk_import session", sessionName);
+        String msg = String.format("Commit %s bulk import session", sessionName);
         System.out.println(msg);
         LOG.info(msg);
 
@@ -422,7 +422,7 @@ public class UploadProcessor {
                 }
             }, sessionName, conf.getRetryCount(), conf.getWaitSec());
         } catch (IOException e) {
-            String emsg = String.format("Cannot commit '%s' bulk_import session, %s", sessionName, e.getMessage());
+            String emsg = String.format("Cannot commit '%s' bulk import session, %s", sessionName, e.getMessage());
             System.out.println(emsg);
             LOG.severe(emsg);
             err.error = e;

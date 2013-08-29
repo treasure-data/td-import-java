@@ -36,7 +36,7 @@ public class PrepareProcessor {
     }
 
     public TaskResult execute(final Task task) {
-        String msg = String.format("Convert '%s'", task.fileName);
+        String msg = String.format("Converting '%s'...", task.fileName);
         System.out.println(msg);
         LOG.info(msg);
 
