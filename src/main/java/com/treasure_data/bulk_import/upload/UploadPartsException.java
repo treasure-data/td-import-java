@@ -15,17 +15,17 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.upload_parts;
+package com.treasure_data.bulk_import.upload;
 
-public class TaskResult extends com.treasure_data.bulk_import.TaskResult<Task> {
-    public int retryCount = 0;
+@SuppressWarnings("serial")
+public class UploadPartsException extends Exception {
 
-    public TaskResult() {
+    public UploadPartsException(Throwable t) {
+        super(t);
     }
 
-    @Override
-    public String toString() {
-        return String.format("upload_task_result{task=%s, retryCount=%d}",
-                task, retryCount);
+    public UploadPartsException(String cause) {
+        super(cause);
     }
+
 }

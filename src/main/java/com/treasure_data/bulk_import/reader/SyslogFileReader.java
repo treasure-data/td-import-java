@@ -37,12 +37,12 @@ import com.treasure_data.bulk_import.model.IntColumnValue;
 import com.treasure_data.bulk_import.model.LongColumnValue;
 import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
-import com.treasure_data.bulk_import.prepare_parts.ApachePrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.SyslogPrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare.ApachePrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.ExtStrftime;
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.SyslogPrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.MsgpackGZIPFileWriter;
 

@@ -9,7 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
 
 public class TestIntColumnValue extends ColumnValueTestUtil<Integer> {
 

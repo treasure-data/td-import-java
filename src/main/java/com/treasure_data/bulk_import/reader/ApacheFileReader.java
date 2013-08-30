@@ -28,10 +28,10 @@ import java.util.regex.Pattern;
 
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
-import com.treasure_data.bulk_import.prepare_parts.ApachePrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare.ApachePrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.ExtStrftime;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class ApacheFileReader extends RegexFileReader<ApachePrepareConfiguration> {

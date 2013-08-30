@@ -1,4 +1,4 @@
-package com.treasure_data.bulk_import.upload_parts;
+package com.treasure_data.bulk_import.upload;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,6 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import org.junit.Ignore;
+
+import com.treasure_data.bulk_import.upload.Task;
+import com.treasure_data.bulk_import.upload.TaskResult;
+import com.treasure_data.bulk_import.upload.UploadProcessor;
 
 @Ignore
 public class UploadProcessorTestUtil {

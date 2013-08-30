@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration.Format;
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration.Format;
 
 public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     @Before

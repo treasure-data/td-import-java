@@ -26,9 +26,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class RegexFileReader<T extends PrepareConfiguration> extends FixnumColumnsFileReader<T> {

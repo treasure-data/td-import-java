@@ -15,26 +15,21 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare;
 
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
 
-public class MessagePackPrepareConfiguration extends PrepareConfiguration {
-
+public class ApachePrepareConfiguration extends PrepareConfiguration {
     private static final Logger LOG = Logger
-            .getLogger(MessagePackPrepareConfiguration.class.getName());
+            .getLogger(ApachePrepareConfiguration.class.getName());
 
-    public MessagePackPrepareConfiguration() {
-        super();
+    public ApachePrepareConfiguration() {
     }
 
-
-    @Override
     public void configure(Properties props, BulkImportOptions options) {
         super.configure(props, options);
     }
-
 }

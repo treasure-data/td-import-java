@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public enum ColumnType {

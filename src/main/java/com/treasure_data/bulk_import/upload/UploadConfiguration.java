@@ -15,14 +15,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.upload_parts;
+package com.treasure_data.bulk_import.upload;
 
 import java.util.Properties;
 
 import joptsimple.OptionSet;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
 
 public class UploadConfiguration extends PrepareConfiguration {
 

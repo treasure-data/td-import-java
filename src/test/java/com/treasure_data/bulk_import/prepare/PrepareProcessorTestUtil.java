@@ -1,4 +1,4 @@
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -7,6 +7,9 @@ import static org.mockito.Mockito.spy;
 import java.io.IOException;
 
 import org.junit.Ignore;
+
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.Task;
 
 @Ignore
 public class PrepareProcessorTestUtil {

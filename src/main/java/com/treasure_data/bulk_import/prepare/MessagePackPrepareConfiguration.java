@@ -15,23 +15,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare;
 
-import java.text.ParseException;
+import java.util.Properties;
+import java.util.logging.Logger;
 
-import org.apache.catalina.util.Strftime;
+import com.treasure_data.bulk_import.BulkImportOptions;
 
-public class ExtStrftime extends Strftime {
+public class MessagePackPrepareConfiguration extends PrepareConfiguration {
 
-    public ExtStrftime(String format) {
-        super(format);
+    private static final Logger LOG = Logger
+            .getLogger(MessagePackPrepareConfiguration.class.getName());
+
+    public MessagePackPrepareConfiguration() {
+        super();
     }
 
-    public synchronized long getTime(String t) {
-        try {
-            return simpleDateFormat.parse(t).getTime() / 1000;
-        } catch (ParseException e) {
-            return 0;
-        }
+
+    @Override
+    public void configure(Properties props, BulkImportOptions options) {
+        super.configure(props, options);
     }
+
 }

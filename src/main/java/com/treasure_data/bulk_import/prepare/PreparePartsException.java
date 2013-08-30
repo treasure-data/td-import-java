@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare;
 
 @SuppressWarnings("serial")
 public class PreparePartsException extends Exception {

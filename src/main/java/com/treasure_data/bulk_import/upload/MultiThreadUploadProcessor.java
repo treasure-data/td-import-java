@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.upload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +24,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-public class MultiThreadPrepareProcessor {
-    public static class Worker extends Thread {
-        private MultiThreadPrepareProcessor parent;
-        private PrepareProcessor proc;
+import com.treasure_data.client.TreasureDataClient;
+import com.treasure_data.client.bulkimport.BulkImportClient;
+
+public class MultiThreadUploadProcessor {
+    static class Worker extends Thread {
+        private MultiThreadUploadProcessor parent;
+        private UploadProcessor proc;
         AtomicBoolean isFinished = new AtomicBoolean(false);
 
-        public Worker(MultiThreadPrepareProcessor parent, PrepareProcessor proc) {
+        public Worker(MultiThreadUploadProcessor parent, UploadProcessor proc) {
             this.parent = parent;
             this.proc = proc;
         }
@@ -46,13 +49,13 @@ public class MultiThreadPrepareProcessor {
                 }
 
                 TaskResult result = proc.execute(t);
-                parent.setResult(result);
+                parent.setTaskResult(result);
             }
             isFinished.set(true);
         }
     }
 
-    private static final Logger LOG = Logger.getLogger(MultiThreadPrepareProcessor.class.getName());
+    private static final Logger LOG = Logger.getLogger(MultiThreadUploadProcessor.class.getName());
     private static BlockingQueue<Task> taskQueue;
 
     static {
@@ -63,24 +66,29 @@ public class MultiThreadPrepareProcessor {
         taskQueue.add(task);
     }
 
-    public static synchronized void addFinishTask(PrepareConfiguration conf) {
-        for (int i = 0; i < conf.getNumOfPrepareThreads(); i++) {
+    public static synchronized void clearTasks() {
+        // the method is for tests
+        taskQueue.clear();
+    }
+
+    public static synchronized void addFinishTask(UploadConfiguration conf) {
+        for (int i = 0; i < conf.getNumOfUploadThreads() * 2; i++) {
             taskQueue.add(Task.FINISH_TASK);
         }
     }
 
-    private PrepareConfiguration conf;
+    private UploadConfiguration conf;
     private List<Worker> workers;
     private List<TaskResult> results;
 
-    public MultiThreadPrepareProcessor(PrepareConfiguration conf) {
+    public MultiThreadUploadProcessor(UploadConfiguration conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
         results = new ArrayList<TaskResult>();
     }
 
-    protected synchronized void setResult(TaskResult result) {
-        results.add(result);
+    protected synchronized void setTaskResult(TaskResult error) {
+        results.add(error);
     }
 
     public List<TaskResult> getTaskResults() {
@@ -88,27 +96,25 @@ public class MultiThreadPrepareProcessor {
     }
 
     public void registerWorkers() {
-        for (int i = 0; i < conf.getNumOfPrepareThreads(); i++) {
+        for (int i = 0; i < conf.getNumOfUploadThreads(); i++) {
             addWorker(createWorker(conf));
         }
     }
 
-    public void registerWorkers(Worker[] ws) {
-        for (Worker w : ws) {
-            workers.add(w);
-        }
-    }
-
-    protected Worker createWorker(PrepareConfiguration conf) {
-        return new Worker(this, createPrepareProcessor(conf));
+    protected Worker createWorker(UploadConfiguration conf) {
+        return new Worker(this, createUploadProcessor(conf));
     }
 
     protected void addWorker(Worker w) {
         workers.add(w);
     }
 
-    protected PrepareProcessor createPrepareProcessor(PrepareConfiguration conf) {
-        return new PrepareProcessor(conf);
+    protected UploadProcessor createUploadProcessor(UploadConfiguration conf) {
+        return new UploadProcessor(createBulkImportClient(conf), conf);
+    }
+
+    protected BulkImportClient createBulkImportClient(UploadConfiguration conf) {
+        return new BulkImportClient(new TreasureDataClient(conf.getProperties()));
     }
 
     public void startWorkers() {

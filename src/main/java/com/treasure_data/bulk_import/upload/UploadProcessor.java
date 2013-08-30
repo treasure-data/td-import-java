@@ -15,7 +15,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.upload_parts;
+package com.treasure_data.bulk_import.upload;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

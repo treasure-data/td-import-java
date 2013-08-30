@@ -1,4 +1,4 @@
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,6 +17,12 @@ import org.junit.Test;
 import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.BulkImportOptionsTestUtil;
 import com.treasure_data.bulk_import.Configuration;
+import com.treasure_data.bulk_import.prepare.CSVPrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.MultiThreadPrepareProcessor;
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.PrepareProcessor;
+import com.treasure_data.bulk_import.prepare.Task;
 
 public class TestMultiThreadPrepareProcessor {
 

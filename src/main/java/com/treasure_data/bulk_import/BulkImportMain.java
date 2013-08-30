@@ -27,12 +27,12 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.TaskResult;
-import com.treasure_data.bulk_import.prepare_parts.MultiThreadPrepareProcessor;
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.UploadTask;
-import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
-import com.treasure_data.bulk_import.upload_parts.UploadConfiguration;
-import com.treasure_data.bulk_import.upload_parts.UploadProcessor;
+import com.treasure_data.bulk_import.prepare.MultiThreadPrepareProcessor;
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.UploadTask;
+import com.treasure_data.bulk_import.upload.MultiThreadUploadProcessor;
+import com.treasure_data.bulk_import.upload.UploadConfiguration;
+import com.treasure_data.bulk_import.upload.UploadProcessor;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 
@@ -64,8 +64,8 @@ public class BulkImportMain {
             public void run() {
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
-                        com.treasure_data.bulk_import.prepare_parts.Task task =
-                                new com.treasure_data.bulk_import.prepare_parts.Task(
+                        com.treasure_data.bulk_import.prepare.Task task =
+                                new com.treasure_data.bulk_import.prepare.Task(
                                         fileNames[i]);
                         MultiThreadPrepareProcessor.addTask(task);
                     } catch (Throwable t) {
@@ -85,7 +85,7 @@ public class BulkImportMain {
         }).start();
 
         proc.joinWorkers();
-        List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = proc
+        List<com.treasure_data.bulk_import.prepare.TaskResult> prepareResults = proc
                 .getTaskResults();
 
         showPrepareResults(prepareResults);
@@ -166,7 +166,7 @@ public class BulkImportMain {
         uploadProc.startWorkers();
 
         List<TaskResult> errs = new ArrayList<TaskResult>();
-        List<com.treasure_data.bulk_import.prepare_parts.TaskResult> prepareResults = null;
+        List<com.treasure_data.bulk_import.prepare.TaskResult> prepareResults = null;
 
         if (!uploadConf.hasPrepareOptions()) {
             // scan files that are uploaded
@@ -175,8 +175,8 @@ public class BulkImportMain {
                     for (int i = 0; i < fileNames.length; i++) {
                         try {
                             long size = new File(fileNames[i]).length();
-                            com.treasure_data.bulk_import.upload_parts.Task task =
-                                    new com.treasure_data.bulk_import.upload_parts.Task(
+                            com.treasure_data.bulk_import.upload.Task task =
+                                    new com.treasure_data.bulk_import.upload.Task(
                                     sessionName, fileNames[i], size);
                             MultiThreadUploadProcessor.addTask(task);
                         } catch (Throwable t) {
@@ -240,7 +240,7 @@ public class BulkImportMain {
         }
 
         uploadProc.joinWorkers();
-        List<com.treasure_data.bulk_import.upload_parts.TaskResult> uploadResults = uploadProc
+        List<com.treasure_data.bulk_import.upload.TaskResult> uploadResults = uploadProc
                 .getTaskResults();
         showUploadResults(uploadResults);
         listNextStepOfUploadProc(uploadResults, sessionName);
@@ -261,9 +261,9 @@ public class BulkImportMain {
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
     }
 
-    private static boolean hasNoPrepareError(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
+    private static boolean hasNoPrepareError(List<com.treasure_data.bulk_import.prepare.TaskResult> results) {
         boolean hasNoError = true;
-        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+        for (com.treasure_data.bulk_import.prepare.TaskResult result : results) {
             if (result.error != null) {
                 hasNoError = false;
                 break;
@@ -272,9 +272,9 @@ public class BulkImportMain {
         return hasNoError;
     }
 
-    private static boolean hasNoUploadError(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results) {
+    private static boolean hasNoUploadError(List<com.treasure_data.bulk_import.upload.TaskResult> results) {
         boolean hasNoError = true;
-        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+        for (com.treasure_data.bulk_import.upload.TaskResult result : results) {
             if (result.error != null) {
                 hasNoError = false;
                 break;
@@ -342,10 +342,10 @@ public class BulkImportMain {
         }
     }
 
-    private static void showPrepareResults(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
+    private static void showPrepareResults(List<com.treasure_data.bulk_import.prepare.TaskResult> results) {
         System.out.println();
         System.out.println("Prepare status:");
-        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+        for (com.treasure_data.bulk_import.prepare.TaskResult result : results) {
             String status;
             if (result.error == null) {
                 status = Configuration.STAT_SUCCESS;
@@ -373,13 +373,13 @@ public class BulkImportMain {
         System.out.println();
     }
 
-    private static void listNextStepOfPrepareProc(List<com.treasure_data.bulk_import.prepare_parts.TaskResult> results) {
+    private static void listNextStepOfPrepareProc(List<com.treasure_data.bulk_import.prepare.TaskResult> results) {
         System.out.println();
         System.out.println("Next steps:");
 
         List<String> readyToUploadFiles = new ArrayList<String>();
 
-        for (com.treasure_data.bulk_import.prepare_parts.TaskResult result : results) {
+        for (com.treasure_data.bulk_import.prepare.TaskResult result : results) {
             if (result.error == null) {
                 int len = result.outFileNames.size();
                 // success
@@ -411,10 +411,10 @@ public class BulkImportMain {
         System.out.println();
     }
 
-    private static void showUploadResults(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results) {
+    private static void showUploadResults(List<com.treasure_data.bulk_import.upload.TaskResult> results) {
         System.out.println();
         System.out.println("Upload status:");
-        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+        for (com.treasure_data.bulk_import.upload.TaskResult result : results) {
             String status;
             if (result.error == null) {
                 status = Configuration.STAT_SUCCESS;
@@ -430,12 +430,12 @@ public class BulkImportMain {
         System.out.println();
     }
 
-    private static void listNextStepOfUploadProc(List<com.treasure_data.bulk_import.upload_parts.TaskResult> results,
+    private static void listNextStepOfUploadProc(List<com.treasure_data.bulk_import.upload.TaskResult> results,
             String sessionName) {
         System.out.println();
         System.out.println("Next Steps:");
         boolean hasErrors = false;
-        for (com.treasure_data.bulk_import.upload_parts.TaskResult result : results) {
+        for (com.treasure_data.bulk_import.upload.TaskResult result : results) {
             if (result.error != null) {
                 // error
                 System.out.println(String.format(

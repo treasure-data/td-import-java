@@ -17,7 +17,7 @@
 //
 package com.treasure_data.bulk_import.model;
 
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class DoubleColumnValue extends AbstractColumnValue {

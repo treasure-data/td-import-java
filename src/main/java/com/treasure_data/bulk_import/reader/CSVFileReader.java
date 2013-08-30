@@ -32,9 +32,9 @@ import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnSampling;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.bulk_import.prepare_parts.CSVPrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare.CSVPrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 import com.treasure_data.bulk_import.writer.JSONFileWriter;
 

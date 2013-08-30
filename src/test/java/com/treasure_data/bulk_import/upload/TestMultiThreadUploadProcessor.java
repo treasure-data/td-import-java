@@ -1,4 +1,4 @@
-package com.treasure_data.bulk_import.upload_parts;
+package com.treasure_data.bulk_import.upload;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +18,11 @@ import org.junit.Test;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.BulkImportOptionsTestUtil;
+import com.treasure_data.bulk_import.upload.MultiThreadUploadProcessor;
+import com.treasure_data.bulk_import.upload.Task;
+import com.treasure_data.bulk_import.upload.TaskResult;
+import com.treasure_data.bulk_import.upload.UploadConfiguration;
+import com.treasure_data.bulk_import.upload.UploadProcessor;
 import com.treasure_data.client.ClientException;
 
 public class TestMultiThreadUploadProcessor {

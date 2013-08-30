@@ -17,7 +17,7 @@
 //
 package com.treasure_data.bulk_import.model;
 
-import com.treasure_data.bulk_import.prepare_parts.ExtStrftime;
+import com.treasure_data.bulk_import.prepare.ExtStrftime;
 
 public class AliasTimeColumnValue extends TimeColumnValue {
     public AliasTimeColumnValue(int index, ExtStrftime timeFormat) {

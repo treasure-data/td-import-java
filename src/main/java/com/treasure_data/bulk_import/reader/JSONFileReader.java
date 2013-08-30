@@ -29,9 +29,9 @@ import org.json.simple.parser.ParseException;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnValue;
 import com.treasure_data.bulk_import.model.Row;
-import com.treasure_data.bulk_import.prepare_parts.JSONPrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare.JSONPrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfiguration> {

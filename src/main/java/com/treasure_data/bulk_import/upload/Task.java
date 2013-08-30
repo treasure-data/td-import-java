@@ -15,35 +15,45 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.upload;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
 
 public class Task implements com.treasure_data.bulk_import.Task {
-    private static final String TAG = "__PREPARE_FINISH__";
-    static final Task FINISH_TASK = new Task(TAG);
+    private static final String TAG = "__FINISH__";
 
+    static final Task FINISH_TASK = new Task(TAG, TAG, 0);
+
+    public String sessName;
+    public String partName;
     public String fileName;
+    public long size;
 
     // unit testing
     public boolean isTest = false;
     public byte[] testBinary = null;
 
-    public Task(String fileName) {
+    public Task(String sessName, String fileName, long size) {
+        this.sessName = sessName;
+        int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
+        this.partName = fileName.substring(lastSepIndex + 1,
+                fileName.length()).replace('.', '_');
         this.fileName = fileName;
+        this.size = size;
     }
 
-    public InputStream createInputStream(
-            PrepareConfiguration.CompressionType compressionType)
-            throws IOException {
-        if (!isTest) {
-            return compressionType.createInputStream(new FileInputStream(fileName));
-        } else {
-            return new ByteArrayInputStream(testBinary);
+    @Override
+    public boolean equals(Object obj) {
+        if (! (obj instanceof Task)) {
+            return false;
         }
+
+        Task t = (Task) obj;
+        return t.sessName.equals(sessName) && t.partName.equals(partName);
+    }
+
+    public boolean endTask() {
+        return equals(FINISH_TASK);
     }
 
     @Override
@@ -54,25 +64,5 @@ public class Task implements com.treasure_data.bulk_import.Task {
     @Override
     public void finishHook(String outputFileName) {
         // do nothing
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (! (obj instanceof Task)) {
-            return false;
-        }
-
-        Task t = (Task) obj;
-        return t.fileName.equals(fileName);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("prepare_task{file=%s}", fileName);
-    }
-
-    @Override
-    public boolean endTask() {
-        return equals(FINISH_TASK);
     }
 }

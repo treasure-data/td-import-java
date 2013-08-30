@@ -19,9 +19,9 @@ package com.treasure_data.bulk_import.reader;
 
 import java.io.IOException;
 
-import com.treasure_data.bulk_import.prepare_parts.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare_parts.PreparePartsException;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
+import com.treasure_data.bulk_import.prepare.PreparePartsException;
+import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public abstract class FixnumColumnsFileReader<T extends PrepareConfiguration> extends FileReader<T> {

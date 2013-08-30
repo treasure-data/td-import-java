@@ -15,12 +15,12 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare;
 
 import java.io.File;
 
-import com.treasure_data.bulk_import.upload_parts.MultiThreadUploadProcessor;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.upload.MultiThreadUploadProcessor;
+import com.treasure_data.bulk_import.prepare.Task;
 
 public class UploadTask extends Task {
     public String sessionName;
@@ -35,8 +35,8 @@ public class UploadTask extends Task {
         super.finishHook(outputFileName);
 
         long size = new File(outputFileName).length();
-        com.treasure_data.bulk_import.upload_parts.Task task =
-                new com.treasure_data.bulk_import.upload_parts.Task(
+        com.treasure_data.bulk_import.upload.Task task =
+                new com.treasure_data.bulk_import.upload.Task(
                 sessionName, outputFileName, size);
         MultiThreadUploadProcessor.addTask(task);
     }

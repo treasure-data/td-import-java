@@ -15,13 +15,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-package com.treasure_data.bulk_import.prepare_parts;
+package com.treasure_data.bulk_import.prepare;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.reader.FileReader;
-import com.treasure_data.bulk_import.prepare_parts.Task;
+import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class PrepareProcessor {

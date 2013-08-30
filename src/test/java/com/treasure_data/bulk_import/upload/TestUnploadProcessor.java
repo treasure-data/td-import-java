@@ -1,4 +1,4 @@
-package com.treasure_data.bulk_import.upload_parts;
+package com.treasure_data.bulk_import.upload;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
@@ -16,6 +16,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
+import com.treasure_data.bulk_import.upload.Task;
+import com.treasure_data.bulk_import.upload.TaskResult;
+import com.treasure_data.bulk_import.upload.UploadConfiguration;
+import com.treasure_data.bulk_import.upload.UploadProcessor;
 import com.treasure_data.client.ClientException;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
