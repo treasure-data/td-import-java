@@ -206,6 +206,12 @@ public class BulkImportOptions {
                 .describedAs("NAME,NAME,...")
                 .ofType(String.class)
                 .withValuesSeparatedBy(",");
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_PARALLEL),
+                Configuration.BI_PREPARE_PARTS_PARALLEL_DESC)
+                .withRequiredArg()
+                .describedAs("NUM")
+                .ofType(String.class);
 
         // mysql
         op.acceptsAll(Arrays.asList(
