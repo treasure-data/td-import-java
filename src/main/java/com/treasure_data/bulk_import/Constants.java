@@ -20,19 +20,62 @@ package com.treasure_data.bulk_import;
 public interface Constants extends com.treasure_data.client.Constants {
 
     String CMD_PREPARE = "prepare";
-    String CMD_PREPARE_USAGE =
-            "  $ td import:prepare <files...>";
+
+    String CMD_PREPARE_USAGE = "  $ td import:prepare <files...>\n";
+
     String CMD_PREPARE_EXAMPLE =
-            "  $ td import:prepare logs/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/";
-    String CMD_PREPARE_DESC =
-            "  Convert files into part file format";
+            "  $ td import:prepare logs/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:prepare mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
+
+    String CMD_PREPARE_DESC = "  Convert files into part file format\n";
+
     String CMD_UPLOAD = "upload";
+
     String CMD_UPLOAD_USAGE =
-            "  $ td import:upload <name> <files...>";
+            "  $ td import:upload <session name> <files...>\n";
+
     String CMD_UPLOAD_EXAMPLE =
-            "  $ td import:upload parts/* --parallel 4";
-    String CMD_UPLOAD_DESC =
-            "  Upload or re-upload files into a bulk import session";
+            "  $ td import:upload mysess parts/* --parallel 4\n" +
+            "  $ td import:upload mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:upload mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
+
+    String CMD_UPLOAD_DESC = "  Upload or re-upload files into a bulk import session";
+
+    String CMD_PREPARE_OPTIONS =
+            "    -f, --format FORMAT              source file format [csv, tsv, json, msgpack, mysql]; default=csv\n" +
+            "    -C, --compress TYPE              compressed type [gzip, none, auto]; default=auto detect\n" +
+            "    -T, --time-format FORMAT         STRF_FORMAT; strftime(3) format of the time column\n" +
+            "    -e, --encoding TYPE              encoding type [utf-8]\n" +
+            "    -o, --output DIR                 output directory\n" +
+            "    -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)\n" +
+            "    -t, --time-column NAME           name of the time column\n" +
+            "    --time-value TIME                long value of the time column\n" +
+            "    --prepare-parallel NUM           prepare in parallel (default: 2; max 8)\n" +
+            "    --only-columns NAME,NAME,...     only columns\n" +
+            "    --exclude-columns NAME,NAME,...  exclude columns\n" +
+            "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
+            "    --columns NAME,NAME,...          column names (use --column-header instead if the first line has column names)\n" +
+            "    --column-types TYPE,TYPE,...     column types [string, int, long]\n" +
+            "\n" +
+            "    CSV/TSV specific options:\n" +
+            "    --column-header                  first line includes column names\n" +
+            "    --delimiter CHAR                 delimiter CHAR; default=\",\" at csv, \"\\t\" at tsv\n" +
+            "    --newline TYPE                   newline [CRLR, LR, CR];  default=CRLF\n" +
+            "    --quote CHAR                     quote [DOUBLE, SINGLE]; default=DOUBLE\n" +
+            "\n" +
+            "    MySQL specific options:\n" +
+            "    --db-url URL                     JDBC connection URL\n" +
+            "    --db-user NAME                   user name for MySQL account\n" +
+            "    --db-password PASSWORD           password for MySQL account\n";
+
+    String CMD_UPLOAD_OPTIONS =
+            "    --auto-create DATABASE.TABLE     create automatically bulk import session by specified database and table names\n" +
+            "    --auto-perform                   perform bulk import job automatically\n" +
+            "    --auto-commit                    commit bulk import job automatically\n" +
+            "    --auto-delete                    delete bulk import session automatically\n" +
+            "    --parallel NUM                   upload in parallel (default: 2; max 8)\n" +
+            "\n" +
+            CMD_PREPARE_OPTIONS;
 
     String STAT_SUCCESS = "SUCCESS";
     String STAT_ERROR = "ERROR";

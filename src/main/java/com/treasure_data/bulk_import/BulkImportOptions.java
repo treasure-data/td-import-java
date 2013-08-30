@@ -60,7 +60,7 @@ public class BulkImportOptions {
             } else {
                 sbuf.append(Configuration.CMD_UPLOAD_USAGE);
             }
-            sbuf.append("\n\n");
+            sbuf.append("\n");
 
             // example
             sbuf.append("example:\n");
@@ -69,7 +69,7 @@ public class BulkImportOptions {
             } else {
                 sbuf.append(Configuration.CMD_UPLOAD_EXAMPLE);
             }
-            sbuf.append("\n\n");
+            sbuf.append("\n");
 
             // description
             sbuf.append("description:\n");
@@ -78,97 +78,16 @@ public class BulkImportOptions {
             } else {
                 sbuf.append(Configuration.CMD_UPLOAD_DESC);
             }
-            sbuf.append("\n\n");
+            sbuf.append("\n");
 
             // options
             sbuf.append("options:\n");
-            Set<OptionDescriptor> used = new HashSet<OptionDescriptor>();
-            for (OptionDescriptor desc : options.values()) {
-                if (desc.representsNonOptions()) {
-                    continue;
-                }
-
-                if (used.contains(desc)) {
-                    continue;
-                }
-                used.add(desc);
-
-                if (desc.options().contains("help")) {
-                    // hide --help
-                    continue;
-                }
-
-                int blen = sbuf.length();
-
-                sbuf.append("    ");
-
-                int n = 0;
-                for (String s : desc.options()) {
-                    if (n != 0) {
-                        sbuf.append(", ");
-                    }
-                    if (s.length() > 1) {
-                        sbuf.append("--");
-                    } else {
-                        sbuf.append("-");
-                    }
-                    sbuf.append(s);
-                    n++;
-                }
-
-                if (desc.acceptsArguments()) {
-                    sbuf.append(" ");
-                    if (!desc.requiresArgument()) {
-                        sbuf.append("[");
-                    }
-
-                    String arg = desc.argumentDescription();
-                    if (arg == null && arg.isEmpty()) {
-                        arg = desc.argumentTypeIndicator();
-                        if (arg == null && arg.isEmpty()) {
-                            arg = "string";
-                        }
-                    }
-                    sbuf.append(arg);
-
-                    if (!desc.requiresArgument()) {
-                        sbuf.append("]");
-                    }
-                }
-
-                int length = sbuf.length() - blen;
-
-                if (length >= DESCRIPTION_INDENT - 2) {
-                    sbuf.append("\n");
-                    for (int i = 0; i < DESCRIPTION_INDENT - 1; i++) {
-                        sbuf.append(" ");
-                    }
-                } else {
-                    for (int i = length; i < DESCRIPTION_INDENT - 1; i++) {
-                        sbuf.append(" ");
-                    }
-                }
-
-                String line = desc.description();
-                String[] words = line.split(" ");
-
-                blen = sbuf.length();
-                for (String word : words) {
-                    if (sbuf.length() - blen + word.length() > DESCRIPTION_LIMIT) {
-                        sbuf.append("\n");
-                        for (int i = 0; i < DESCRIPTION_INDENT; i++) {
-                            sbuf.append(" ");
-                        }
-                        blen = sbuf.length();
-                        sbuf.append("  ");
-                    } else {
-                        sbuf.append(" ");
-                    }
-                    sbuf.append(word);
-                }
-
-                sbuf.append("\n");
+            if (isPrepare) {
+                sbuf.append(Configuration.CMD_PREPARE_OPTIONS);
+            } else {
+                sbuf.append(Configuration.CMD_UPLOAD_OPTIONS);
             }
+            sbuf.append("\n");
 
             return sbuf.toString();
         }
