@@ -101,6 +101,8 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
         int timeColumnIndex = -1;
         int aliasTimeColumnIndex = -1;
         try {
+            // TODO FIXME
+            // here, we should use conn.getMetaData().getColumns(..).
             sampleStat = conn.createStatement();
             sampleResultSet = sampleStat.executeQuery(String.format(QUERY_SAMPLE, table));
             ResultSetMetaData metaData = sampleResultSet.getMetaData();
