@@ -17,6 +17,7 @@
 //
 package com.treasure_data.bulk_import.prepare;
 
+import java.util.List;
 import java.util.Properties;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
@@ -24,7 +25,7 @@ import com.treasure_data.bulk_import.Configuration;
 
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
 
-    protected String connectionURL;
+    protected String jdbcUrl;
     protected String user;
     protected String password;
     protected String table;
@@ -33,28 +34,27 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
     public void configure(Properties props, BulkImportOptions options) {
         super.configure(props, options);
 
-        setConnectionURL();
+        setJdbcUrl();
         setUser();
         setPassword();
-        setTable();
     }
 
-    public void setConnectionURL() {
-        connectionURL = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL);
-        if (connectionURL == null || connectionURL.isEmpty()) {
+    public void setJdbcUrl() {
+        if (!optionSet.has(BI_PREPARE_PARTS_JDBC_CONNECTION_URL)) {
             throw new IllegalArgumentException("Not specified connection URL");
         }
+        jdbcUrl = (String) optionSet.valueOf(BI_PREPARE_PARTS_JDBC_CONNECTION_URL);
     }
 
-    public String getConnectionURL() {
-        return connectionURL;
+    public String getJdbcUrl() {
+        return jdbcUrl;
     }
 
     public void setUser() {
-        user = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_USER);
-        if (user == null || user.isEmpty()) {
+        if (!optionSet.has(BI_PREPARE_PARTS_JDBC_USER)) {
             throw new IllegalArgumentException("Not specified user");
         }
+        user = (String) optionSet.valueOf(BI_PREPARE_PARTS_JDBC_USER);
     }
 
     public String getUser() {
@@ -62,21 +62,21 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
     }
 
     public void setPassword() {
-        password = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_PASSWORD);
+        if (optionSet.has(BI_PREPARE_PARTS_JDBC_PASSWORD)) {
+            password = (String) optionSet.valueOf(BI_PREPARE_PARTS_JDBC_PASSWORD);
+        }
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setTable() {
-        table = props.getProperty(Configuration.BI_PREPARE_PARTS_JDBC_TABLE);
-        if (table == null || table.isEmpty()) {
-            throw new IllegalArgumentException("Not specified table");
+    @Override
+    public List<String> getNonOptionArguments() {
+        List<String> argList = super.getNonOptionArguments();
+        if (argList.size() > 2) {
+            throw new IllegalArgumentException("Must not specified more than one table name at a time");
         }
-    }
-
-    public String getTable() {
-        return table;
+        return argList;
     }
 }

@@ -233,14 +233,14 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_MYSQL_JDBCDRIVER_CLASS = "com.mysql.jdbc.Driver";
 
     // url
-    String BI_PREPARE_PARTS_JDBC_CONNECTION_URL = "td.bulk_import_prepare_parts.jdbc.connection.url";
-
-    // table
-    String BI_PREPARE_PARTS_JDBC_TABLE = "td.bulk_import_prepare_parts.jdbc.table";
+    String BI_PREPARE_PARTS_JDBC_CONNECTION_URL = "db-url";
+    String BI_PREPARE_PARTS_JDBC_CONNECTION_URL_DESC = "JDBC connection URL";
 
     // user
-    String BI_PREPARE_PARTS_JDBC_USER = "td.bulk_import_prepare_parts.jdbc.user";
+    String BI_PREPARE_PARTS_JDBC_USER = "db-user";
+    String BI_PREPARE_PARTS_JDBC_USER_DESC = "user name for MySQL account";
 
     // password
-    String BI_PREPARE_PARTS_JDBC_PASSWORD = "td.bulk_import_prepare_parts.jdbc.password";
+    String BI_PREPARE_PARTS_JDBC_PASSWORD = "db-password";
+    String BI_PREPARE_PARTS_JDBC_PASSWORD_DESC = "password for MySQL account";
 }
