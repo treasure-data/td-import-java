@@ -206,6 +206,8 @@ public class BulkImportOptions {
                 .describedAs("NAME,NAME,...")
                 .ofType(String.class)
                 .withValuesSeparatedBy(",");
+
+        // mysql
         op.acceptsAll(Arrays.asList(
                 Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL),
                 Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL_DESC)
