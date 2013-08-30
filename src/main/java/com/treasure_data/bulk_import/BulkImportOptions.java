@@ -35,9 +35,6 @@ public class BulkImportOptions {
     private static final Logger LOG = Logger.getLogger(BulkImportOptions.class.getName());
 
     private static class SimpleHelpFormatter implements HelpFormatter {
-        private int DESCRIPTION_INDENT = 37;
-        private int DESCRIPTION_LIMIT = 60;
-
         private boolean isPrepare(Map<String, ? extends OptionDescriptor> options) {
             for (OptionDescriptor desc : options.values()) {
                 if (desc.options().contains("parallel")) {
@@ -210,12 +207,23 @@ public class BulkImportOptions {
                 .ofType(String.class)
                 .withValuesSeparatedBy(",");
         op.acceptsAll(Arrays.asList(
-                Configuration.BI_PREPARE_PARTS_PARALLEL),
-                Configuration.BI_PREPARE_PARTS_PARALLEL_DESC)
+                Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL),
+                Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL_DESC)
                 .withRequiredArg()
-                .describedAs("NUM")
+                .describedAs("URL")
                 .ofType(String.class);
-
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_JDBC_USER),
+                Configuration.BI_PREPARE_PARTS_JDBC_USER_DESC)
+                .withRequiredArg()
+                .describedAs("NAME")
+                .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_JDBC_PASSWORD),
+                Configuration.BI_PREPARE_PARTS_JDBC_PASSWORD_DESC)
+                .withRequiredArg()
+                .describedAs("NAME")
+                .ofType(String.class);
     }
 
     public void initUploadOptionParser(Properties props) {
