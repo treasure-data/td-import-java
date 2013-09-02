@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Properties;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
-import com.treasure_data.bulk_import.Configuration;
 
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
 

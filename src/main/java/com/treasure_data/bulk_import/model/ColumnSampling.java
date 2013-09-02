@@ -20,8 +20,8 @@ package com.treasure_data.bulk_import.model;
 import java.math.BigInteger;
 
 public class ColumnSampling {
-    private int numRows;
-    private int[] scores = new int[] { 0, 0, 0, 0, 0 };
+    protected int numRows;
+    protected int[] scores = new int[] { 0, 0, 0, 0, 0 };
 
     public ColumnSampling(int numRows) {
         this.numRows = numRows;
