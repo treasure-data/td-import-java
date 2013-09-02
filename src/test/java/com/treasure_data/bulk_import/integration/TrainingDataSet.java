@@ -20,7 +20,7 @@ public class TrainingDataSet {
     static {
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
         format.setTimeZone(TimeZone.getTimeZone("JST"));
-        suggestedFormat = new SimpleDateFormat("yyyyMMdd$1HHmmss");
+        suggestedFormat = new SimpleDateFormat("yyyyMMdd$1HHmmss Z");
         suggestedFormat.setTimeZone(TimeZone.getTimeZone("JST"));
     }
 
