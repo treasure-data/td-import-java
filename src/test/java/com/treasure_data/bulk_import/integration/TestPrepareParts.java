@@ -133,6 +133,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     }
 
     @Test
+    public void writeFromHeaderlessCSVWithSuggestedTimeFormat() throws Exception {
+        setOptions(Format.CSV.format(), false, "suggested-timeformat", null, "string-value,int-value,double-value,suggested-timeformat", null, null);
+        preparePartsFromHeaderlessCSVWithSuggestedTimeFormat();
+    }
+
+    @Test
     public void writeFromTSVWithTimeColumn() throws Exception {
         setOptions(Format.TSV.format(), true, null, null, null, null, null);
         preparePartsFromTSVWithTimeColumn();

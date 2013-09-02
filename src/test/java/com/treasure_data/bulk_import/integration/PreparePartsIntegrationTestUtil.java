@@ -170,6 +170,14 @@ public class PreparePartsIntegrationTestUtil {
         assertDataEquals(srcFileName, dstFileName);
     }
 
+    public void preparePartsFromHeaderlessCSVWithSuggestedTimeFormat() throws Exception {
+        prepareParts(INPUT_DIR + "headerless-csvfile-with-suggested-timeformat.csv");
+
+        String srcFileName = INPUT_DIR + "trainingfile-with-time.msgpack.gz";
+        String dstFileName = OUTPUT_DIR + "headerless-csvfile-with-suggested-timeformat_csv_0.msgpack.gz";
+        assertDataEquals(srcFileName, dstFileName);
+    }
+
     public void preparePartsFromTSVWithTimeColumn() throws Exception {
         prepareParts(INPUT_DIR + "tsvfile-with-time.tsv");
 

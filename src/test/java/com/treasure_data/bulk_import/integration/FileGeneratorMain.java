@@ -28,6 +28,8 @@ public class FileGeneratorMain {
                 new String[] { "string-value", "int-value", "double-value", "timestamp" }));
         gens.add(new HeaderlessCSVFileGenerator(dirName + "headerless-csvfile-with-timeformat.csv",
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
+        gens.add(new HeaderlessCSVFileGenerator(dirName + "headerless-csvfile-with-suggested-timeformat.csv",
+                new String[] { "string-value", "int-value", "double-value", "suggested-timeformat" }));
 
         // TSV files
         gens.add(new TSVFileGenerator(dirName + "tsvfile-with-time.tsv",
