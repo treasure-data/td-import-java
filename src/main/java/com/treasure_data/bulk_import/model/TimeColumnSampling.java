@@ -24,12 +24,17 @@ import java.util.Date;
 public class TimeColumnSampling extends ColumnSampling {
     private static final SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
     private static final SimpleDateFormat yyyyMMdd$1HHmmss = new SimpleDateFormat("yyyyMMdd$1HHmmss");
+    private static final SimpleDateFormat yyyyMMdd$1HHmmssZ = new SimpleDateFormat("yyyyMMdd$1HHmmss Z");
+    private static final SimpleDateFormat[] SDF_LIST = new SimpleDateFormat[] {
+        yyyyMMdd, yyyyMMdd$1HHmmss, yyyyMMdd$1HHmmssZ };
 
     private static final String yyyyMMdd_STRF = "%Y%m%d";
     private static final String yyyyMMdd$1HHmmss_STRF = "%Y%m%d$1%H%M%S";
-    private static final String[] STRF_LIST = new String[] { yyyyMMdd_STRF, yyyyMMdd$1HHmmss_STRF };
+    private static final String yyyyMMdd$1HHmmssZ_STRF = "%Y%m%d$1%H%M%S %Z";
+    private static final String[] STRF_LIST = new String[] {
+        yyyyMMdd_STRF, yyyyMMdd$1HHmmss_STRF, yyyyMMdd$1HHmmssZ_STRF };
 
-    protected int[] timeScores = new int[] { 0, 0 };
+    protected int[] timeScores = new int[] { 0, 0, 0 };
 
     public TimeColumnSampling(int numRows) {
         super(numRows);
@@ -39,19 +44,11 @@ public class TimeColumnSampling extends ColumnSampling {
     public void parse(String value) {
         super.parse(value);
 
-        {
+        for (int i = 0; i < timeScores.length; i++) {
             ParsePosition pp = new ParsePosition(0);
-            Date d = yyyyMMdd.parse(value, pp);
+            Date d = SDF_LIST[i].parse(value, pp);
             if (d != null && pp.getErrorIndex() == -1) {
-                timeScores[0] += 1;
-            }
-        }
-
-        {
-            ParsePosition pp = new ParsePosition(0);
-            Date d = yyyyMMdd$1HHmmss.parse(value, pp);
-            if (d != null && pp.getErrorIndex() == -1) {
-                timeScores[1] += 1;
+                timeScores[i] += 1;
             }
         }
     }
