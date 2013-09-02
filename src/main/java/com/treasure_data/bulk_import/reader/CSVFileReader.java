@@ -30,6 +30,7 @@ import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.ColumnSampling;
+import com.treasure_data.bulk_import.model.TimeColumnSampling;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.bulk_import.prepare.CSVPrepareConfiguration;
@@ -140,13 +141,17 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             boolean isFirstRow = true;
             List<String> firstRow = new ArrayList<String>();
             final int sampleRowSize = conf.getSampleRowSize();
-            ColumnSampling[] sampleColumnValues = new ColumnSampling[columnNames.length];
+            TimeColumnSampling[] sampleColumnValues = new TimeColumnSampling[columnNames.length];
             for (int i = 0; i < sampleColumnValues.length; i++) {
-                sampleColumnValues[i] = new ColumnSampling(sampleRowSize);
+                sampleColumnValues[i] = new TimeColumnSampling(sampleRowSize);
             }
 
             // read some rows
             for (int i = 0; i < sampleRowSize; i++) {
+                if (!isFirstRow && (columnTypes == null || columnTypes.length == 0)) {
+                    break;
+                }
+
                 sampleTokenizer.readColumns(row);
 
                 if (row == null || row.isEmpty()) {
@@ -177,18 +182,30 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             if (columnTypes == null || columnTypes.length == 0) {
                 columnTypes = new ColumnType[columnNames.length];
                 for (int i = 0; i < columnTypes.length; i++) {
-                    columnTypes[i] = sampleColumnValues[i].getRank();
+                    columnTypes[i] = sampleColumnValues[i].getColumnTypeRank();
                 }
                 conf.setColumnTypes(columnTypes);
             }
 
             // initialize time column value
             if (timeColumnIndex >= 0) {
-                timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                        conf.getTimeFormat());
+                if (conf.getTimeFormat() != null) {
+                    timeColumnValue = new TimeColumnValue(timeColumnIndex,
+                            conf.getTimeFormat());
+                } else {
+                    timeColumnValue = new TimeColumnValue(timeColumnIndex,
+                            conf.getTimeFormat(sampleColumnValues[timeColumnIndex]
+                                    .getSTRFTimeFormatRank()));
+                }
             } else if (aliasTimeColumnIndex >= 0) {
-                timeColumnValue = new AliasTimeColumnValue(
-                        aliasTimeColumnIndex, conf.getTimeFormat());
+                if (conf.getTimeFormat() != null) {
+                    timeColumnValue = new AliasTimeColumnValue(
+                            aliasTimeColumnIndex, conf.getTimeFormat());
+                } else {
+                    timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
+                            conf.getTimeFormat(sampleColumnValues[aliasTimeColumnIndex]
+                                    .getSTRFTimeFormatRank()));
+                }
             } else {
                 timeColumnValue = new TimeValueTimeColumnValue(
                         conf.getTimeValue());

@@ -661,6 +661,10 @@ public class PrepareConfiguration extends Configuration {
         return timeFormat == null ? null : new ExtStrftime(timeFormat);
     }
 
+    public ExtStrftime getTimeFormat(String strfString) {
+        return strfString == null ? null : new ExtStrftime(strfString);
+    }
+
     public void setOutputDirName() {
         if (optionSet.has("output")) {
             outputDirName = (String) optionSet.valueOf(BI_PREPARE_PARTS_OUTPUTDIR);
