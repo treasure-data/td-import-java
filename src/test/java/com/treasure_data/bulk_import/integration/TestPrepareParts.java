@@ -67,6 +67,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     }
 
     @Test
+    public void writeFromCSVWithSuggestedTimeFormat() throws Exception {
+        setOptions(Format.CSV.format(), true, "suggested-timeformat", null, null, null, null);
+        preparePartsFromCSVWithSuggestedTimeFormat();
+    }
+
+    @Test
     public void writeFromCSVWithTimeFormatAndOnlyColumns() throws Exception {
         setOptions(Format.CSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
         preparePartsFromCSVWithTimeFormat();

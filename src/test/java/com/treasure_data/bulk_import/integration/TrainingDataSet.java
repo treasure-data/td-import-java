@@ -14,11 +14,14 @@ import org.junit.Ignore;
 public class TrainingDataSet {
 
     private static final SimpleDateFormat format;
+    private static final SimpleDateFormat suggestedFormat;
     private static final Object lock = new Object();
 
     static {
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
         format.setTimeZone(TimeZone.getTimeZone("JST"));
+        suggestedFormat = new SimpleDateFormat("yyyyMMdd$1HHmmss");
+        suggestedFormat.setTimeZone(TimeZone.getTimeZone("JST"));
     }
 
     protected long numRows;
@@ -73,6 +76,13 @@ public class TrainingDataSet {
                 String s = null;
                 synchronized (lock) {
                     s = format.format(new Date(t));
+                }
+                row.put(availableHeader[j], s);
+            } else if (availableHeader[j].equals("suggested-timeformat")) {
+                long t = (long)((baseTime + 60 * i) * 1000);
+                String s = null;
+                synchronized (lock) {
+                    s = suggestedFormat.format(new Date(t));
                 }
                 row.put(availableHeader[j], s);
             } else {

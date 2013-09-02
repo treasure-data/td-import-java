@@ -18,6 +18,8 @@ public class FileGeneratorMain {
                 new String[] { "string-value", "int-value", "double-value", "timestamp" }));
         gens.add(new CSVFileGenerator(dirName + "csvfile-with-timeformat.csv",
                 new String[] { "string-value", "int-value", "double-value", "timeformat" }));
+        gens.add(new CSVFileGenerator(dirName + "csvfile-with-suggested-timeformat.csv",
+                new String[] { "string-value", "int-value", "double-value", "suggested-timeformat" }));
 
         // header-less CSV files
         gens.add(new HeaderlessCSVFileGenerator(dirName + "headerless-csvfile-with-time.csv",
@@ -75,7 +77,7 @@ public class FileGeneratorMain {
         long baseTime = 1372305600;
 
         String[]  availableHeader = new String[] {
-                "string-value", "int-value", "double-value", "time", "timestamp", "timeformat",
+                "string-value", "int-value", "double-value", "time", "timestamp", "timeformat", "suggested-timeformat",
         };
         TrainingDataSet dataset = new TrainingDataSet(numRows, baseTime, availableHeader);
         dataset.createDataFiles(gens.toArray(new FileGenerator[0]));
