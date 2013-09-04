@@ -1,4 +1,4 @@
-Release 0.2.2 - 20XX/XX/XX
+Release 0.2.2 - 2013/09/04
   NEW FEATURES
     Adds feature for auto-suggesting 'time-format' of time column.
 
