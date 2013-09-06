@@ -37,6 +37,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     String CMD_UPLOAD_EXAMPLE =
             "  $ td import:upload mysess parts/* --parallel 4\n" +
             "  $ td import:upload mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:upload parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
             "  $ td import:upload mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
 
     String CMD_UPLOAD_DESC = "  Upload or re-upload files into a bulk import session";
@@ -70,6 +71,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     String CMD_UPLOAD_OPTIONS =
             "    --auto-create DATABASE.TABLE     create automatically bulk import session by specified database and table names\n" +
+            "                                     If you use 'auto-create' option, you MUST not specify any session name as first argument.\n" +
             "    --auto-perform                   perform bulk import job automatically\n" +
             "    --auto-commit                    commit bulk import job automatically\n" +
             "    --auto-delete                    delete bulk import session automatically\n" +
