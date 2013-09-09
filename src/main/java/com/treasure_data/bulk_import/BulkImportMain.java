@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.swing.event.ListSelectionEvent;
+
 import com.treasure_data.bulk_import.TaskResult;
 import com.treasure_data.bulk_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
@@ -465,6 +467,13 @@ public class BulkImportMain {
         if (commandName.equals(Configuration.CMD_PREPARE)) {
             prepare(args, props);
         } else if (commandName.equals(Configuration.CMD_UPLOAD)) {
+            upload(args, props);
+        } else if (commandName.equals(Configuration.CMD_AUTO)) {
+            String[] args0 = new String[args.length + 3];
+            args0[args.length] = "--auto-commit";
+            args0[args.length + 1] = "--auto-perform";
+            args0[args.length + 2] = "--auto-delete";
+            System.arraycopy(args, 0, args0, 0, args.length);
             upload(args, props);
         } else {
             throw new IllegalArgumentException(
