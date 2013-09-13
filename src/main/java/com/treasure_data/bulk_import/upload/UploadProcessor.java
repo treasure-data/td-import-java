@@ -294,6 +294,16 @@ public class UploadProcessor {
             return err;
         }
 
+        if (!conf.autoDelete()) {
+            return new TaskResult();
+        }
+
+        // wait committing
+        err = waitCommit(client, conf, sessName);
+        if (err.error != null) {
+            return err;
+        }
+
         return new TaskResult();
     }
 
@@ -427,6 +437,48 @@ public class UploadProcessor {
             LOG.severe(emsg);
             err.error = e;
         }
+        return err;
+    }
+
+    public static TaskResult waitCommit(final BulkImportClient client,
+            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+        String m = String.format("Wait %s bulk import session committing...", sessionName);
+        System.out.println(m);
+        LOG.info(m);
+
+        TaskResult err = new TaskResult();
+        long waitTime = System.currentTimeMillis();
+        while (true) {
+            try {
+                retryClient.retry(new Retryable2(){
+                    @Override
+                    public void doTry() throws ClientException, IOException {
+                        summary = client.showSession(sessionName);
+                    }
+                }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+
+                if (summary.getStatus().equals("committed")){
+                    break;
+                } else if (summary.getStatus().equals("ready")) {
+                    throw new IOException("committing failed");
+                }
+
+                try {
+                    long deltaTime = System.currentTimeMillis() - waitTime;
+                    LOG.fine(String.format("Waiting for about %d sec.", (deltaTime / 1000)));
+                    Thread.sleep(3 * 1000);
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+            } catch (IOException e) {
+                m = String.format("Give up waiting %s bulk import session committing, %s", sessionName, e.getMessage());
+                System.out.println(m);
+                LOG.severe(m);
+                err.error = e;
+                break;
+            }
+        }
+
         return err;
     }
 
