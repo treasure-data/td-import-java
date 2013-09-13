@@ -156,6 +156,7 @@ public class UploadProcessor {
             }, task.sessName, task.partName, conf.getRetryCount(),
                     conf.getWaitSec() * 1000);
             time = System.currentTimeMillis() - time;
+            task.finishHook(task.fileName);
 
             LOG.info(String.format(
                     "Uploaded file %s (%d bytes) to session %s as part %s (time: %d sec.)", 
