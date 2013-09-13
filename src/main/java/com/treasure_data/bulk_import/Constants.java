@@ -172,7 +172,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     // encoding [utf-8,...]
     String BI_PREPARE_PARTS_ENCODING = "encoding";
     String BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE = "UTF-8";
-    String BI_PREPARE_PARTS_ENCODING_DESC = "encoding type [utf-8]";
+    String BI_PREPARE_PARTS_ENCODING_DESC = "encoding type [UTF-8]; default=UTF-8";
 
     // columns, column-types
     String BI_PREPARE_PARTS_COLUMNS = "columns";
