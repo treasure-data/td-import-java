@@ -81,7 +81,8 @@ public class RegexFileReader<T extends PrepareConfiguration> extends FixnumColum
 
         try {
             reader = new BufferedReader(new InputStreamReader(
-                    task.createInputStream(conf.getCompressionType())));
+                    task.createInputStream(conf.getCompressionType()),
+                    conf.getCharsetDecoder()));
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
