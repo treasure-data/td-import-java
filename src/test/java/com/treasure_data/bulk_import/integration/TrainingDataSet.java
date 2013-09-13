@@ -60,7 +60,7 @@ public class TrainingDataSet {
     private void createRow(Map<String, Object> row, long i) {
         for (int j = 0; j < availableHeader.length; j++) {
             if (availableHeader[j].startsWith("string-")) {
-                row.put(availableHeader[j], "muga" + rand.nextInt(100));
+                row.put(availableHeader[j], "muga西澤" + rand.nextInt(100));
             } else if (availableHeader[j].startsWith("int-")) {
                 row.put(availableHeader[j], Math.abs(rand.nextInt()));
             } else if (availableHeader[j].startsWith("double-")) {
