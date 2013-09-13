@@ -1,3 +1,5 @@
+Release 0.2.4 - 20XX/XX/XX
+
 Release 0.2.3 - 2013/09/13
   BUG FIXED
     Fixes 'encoding' option is inefficient when JSON and Apache log files are prepared.
