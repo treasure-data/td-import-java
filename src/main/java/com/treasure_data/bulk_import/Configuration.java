@@ -20,6 +20,7 @@ package com.treasure_data.bulk_import;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import com.treasure_data.bulk_import.Constants;
 
@@ -27,7 +28,9 @@ public class Configuration extends com.treasure_data.client.Config implements
         Constants {
 
     public static enum Command {
-        PREPARE(CMD_PREPARE), UPLOAD(CMD_UPLOAD), AUTO(CMD_AUTO);
+        PREPARE(CMD_PREPARE),
+        UPLOAD(CMD_UPLOAD),
+        AUTO(CMD_AUTO);
 
         private String name;
 
@@ -37,6 +40,10 @@ public class Configuration extends com.treasure_data.client.Config implements
 
         public String command() {
             return name;
+        }
+
+        public String showHelp(Configuration conf, Properties props) {
+            return conf.showHelp(props);
         }
 
         public static Command fromString(String name) {
@@ -58,5 +65,9 @@ public class Configuration extends com.treasure_data.client.Config implements
                 return REVERSE_DICTIONARY.get(key);
             }
         }
+    }
+
+    public String showHelp(Properties props) {
+        throw new UnsupportedOperationException();
     }
 }

@@ -465,8 +465,31 @@ public class PrepareConfiguration extends Configuration {
         return options.getOptions().has(BI_PREPARE_PARTS_HELP);
     }
 
-    public void showHelp() throws IOException {
-        options.showHelp();
+    @Override
+    public String showHelp(Properties props) {
+        StringBuilder sbuf = new StringBuilder();
+
+        // usage
+        sbuf.append("usage:\n");
+        sbuf.append(Configuration.CMD_PREPARE_USAGE);
+        sbuf.append("\n");
+
+        // example
+        sbuf.append("example:\n");
+        sbuf.append(Configuration.CMD_PREPARE_EXAMPLE);
+        sbuf.append("\n");
+
+        // description
+        sbuf.append("description:\n");
+        sbuf.append(Configuration.CMD_PREPARE_DESC);
+        sbuf.append("\n");
+
+        // options
+        sbuf.append("options:\n");
+        sbuf.append(Configuration.CMD_PREPARE_OPTIONS);
+        sbuf.append("\n");
+
+        return sbuf.toString();
     }
 
     public void setFormat() {

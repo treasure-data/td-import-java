@@ -22,6 +22,7 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 
 import com.treasure_data.bulk_import.BulkImportOptions;
+import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
 
 public class UploadConfiguration extends PrepareConfiguration {
@@ -57,6 +58,51 @@ public class UploadConfiguration extends PrepareConfiguration {
 
     public UploadConfiguration() {
         super();
+    }
+
+    @Override
+    public String showHelp(Properties props) {
+        boolean isAuto = Boolean.parseBoolean(props.getProperty(CMD_AUTO_ENABLE, "false"));
+
+        StringBuilder sbuf = new StringBuilder();
+
+        // usage
+        sbuf.append("usage:\n");
+        if (isAuto) {
+            sbuf.append(Configuration.CMD_AUTO_USAGE);
+        } else {
+            sbuf.append(Configuration.CMD_UPLOAD_USAGE);
+        }
+        sbuf.append("\n");
+
+        // example
+        sbuf.append("example:\n");
+        if (isAuto) {
+            sbuf.append(Configuration.CMD_AUTO_EXAMPLE);
+        } else {
+            sbuf.append(Configuration.CMD_UPLOAD_EXAMPLE);
+        }
+        sbuf.append("\n");
+
+        // description
+        sbuf.append("description:\n");
+        if (isAuto) {
+            sbuf.append(Configuration.CMD_AUTO_DESC);
+        } else {
+            sbuf.append(Configuration.CMD_UPLOAD_DESC);
+        }
+        sbuf.append("\n");
+
+        // options
+        sbuf.append("options:\n");
+        if (isAuto) {
+            sbuf.append(Configuration.CMD_AUTO_OPTIONS);
+        } else {
+            sbuf.append(Configuration.CMD_UPLOAD_OPTIONS);
+        }
+        sbuf.append("\n");
+
+        return sbuf.toString();
     }
 
     public void configure(Properties props, BulkImportOptions options) {
