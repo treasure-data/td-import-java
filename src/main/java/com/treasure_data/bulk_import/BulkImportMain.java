@@ -316,7 +316,7 @@ public class BulkImportMain {
         PrepareConfiguration conf = fact.newPrepareConfiguration(args);
 
         if (!isUploaded) {
-            showHelp(conf, args);
+            showHelp(Configuration.Command.PREPARE, conf, props, args);
         }
 
         conf.configure(props, fact.getBulkImportOptions());
@@ -327,19 +327,15 @@ public class BulkImportMain {
         UploadConfiguration.Factory fact = new UploadConfiguration.Factory(props);
         UploadConfiguration conf = fact.newUploadConfiguration(args);
 
-        showHelp(conf, args);
+        showHelp(Configuration.Command.UPLOAD, conf, props, args);
 
         conf.configure(props, fact.getBulkImportOptions());
         return conf;
     }
 
-    private static void showHelp(PrepareConfiguration conf, String[] args) {
+    private static void showHelp(Configuration.Command cmd, PrepareConfiguration conf, Properties props, String[] args) {
         if (conf.hasHelpOption()) {
-            try {
-                conf.showHelp();
-            } catch (IOException e) {
-                throw new IllegalArgumentException(e);
-            }
+            System.out.println(cmd.showHelp(conf, props));
             System.exit(0);
         }
     }
@@ -475,7 +471,15 @@ public class BulkImportMain {
         } else if (cmd.equals(Configuration.Command.UPLOAD)) {
             upload(args, props);
         } else if (cmd.equals(Configuration.Command.AUTO)) {
-            auto(args, props);
+            String[] args0 = new String[args.length + 3];
+            args0[args.length] = "--auto-commit";
+            args0[args.length + 1] = "--auto-perform";
+            args0[args.length + 2] = "--auto-delete";
+            System.arraycopy(args, 0, args0, 0, args.length);
+
+            props.setProperty(Configuration.CMD_AUTO_ENABLE, "true");
+
+            upload(args, props);
         } else {
             throw new UnsupportedOperationException("Fatal error");
         }

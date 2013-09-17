@@ -43,6 +43,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     String CMD_UPLOAD_DESC = "  Upload or re-upload files into a bulk import session";
 
     String CMD_AUTO = "auto";
+    String CMD_AUTO_ENABLE = "td.bulk_import.auto.enable";
 
     String CMD_AUTO_USAGE =
             "  $ td import:auto <session name> <files...>\n";
@@ -53,7 +54,10 @@ public interface Constants extends com.treasure_data.client.Constants {
             "  $ td import:auto parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
             "  $ td import:auto mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
 
-    String CMD_AUTO_DESC = "  Automatically upload or re-upload files into a bulk import session. It's functional equivalent of 'upload' command with 'auto-perform', 'auto-commit' and 'auto-delete' options\n";
+    String CMD_AUTO_DESC = "  Automatically upload or re-upload files into a bulk import session. "
+            + "It's functional equivalent of 'upload' command with 'auto-perform', 'auto-commit' and 'auto-delete' options. "
+            + "But it, by default, doesn't provide 'auto-create' option. "
+            + "If you want 'auto-create' option, you explicitly must declare it as command options.\n";
 
     String CMD_PREPARE_OPTIONS =
             "    -f, --format FORMAT              source file format [csv, tsv, json, msgpack, mysql]; default=csv\n" +
@@ -103,6 +107,14 @@ public interface Constants extends com.treasure_data.client.Constants {
     String STAT_ERROR = "ERROR";
 
     ////////////////////////////////////////
+    // OPTIONS                            //
+    ////////////////////////////////////////
+
+    // help
+    String BI_PREPARE_PARTS_HELP = "help";
+    String BI_PREPARE_PARTS_HELP_DESC = "show this help message";
+
+    ////////////////////////////////////////
     // UPLOAD_PARTS_OPTIONS               //
     ////////////////////////////////////////
 
@@ -145,10 +157,6 @@ public interface Constants extends com.treasure_data.client.Constants {
     ////////////////////////////////////////
     // PREPARE_PARTS_OPTIONS              //
     ////////////////////////////////////////
-
-    // help
-    String BI_PREPARE_PARTS_HELP = "help";
-    String BI_PREPARE_PARTS_HELP_DESC = "show this help message";
 
     // format [csv, tsv, json, msgpack, apache, regexp]; default=auto detect
     String BI_PREPARE_PARTS_FORMAT = "format";
