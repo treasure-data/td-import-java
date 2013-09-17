@@ -34,62 +34,6 @@ import joptsimple.OptionSet;
 public class BulkImportOptions {
     private static final Logger LOG = Logger.getLogger(BulkImportOptions.class.getName());
 
-    private static class SimpleHelpFormatter implements HelpFormatter {
-        private boolean isPrepare(Map<String, ? extends OptionDescriptor> options) {
-            for (OptionDescriptor desc : options.values()) {
-                if (desc.options().contains("parallel")) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public String format(Map<String, ? extends OptionDescriptor> options) {
-            boolean isPrepare = isPrepare(options);
-            System.out.println("command: " + isPrepare);
-
-            StringBuilder sbuf = new StringBuilder();
-
-            // usage
-            sbuf.append("usage:\n");
-            if (isPrepare) {
-                sbuf.append(Configuration.CMD_PREPARE_USAGE);
-            } else {
-                sbuf.append(Configuration.CMD_UPLOAD_USAGE);
-            }
-            sbuf.append("\n");
-
-            // example
-            sbuf.append("example:\n");
-            if (isPrepare) {
-                sbuf.append(Configuration.CMD_PREPARE_EXAMPLE);
-            } else {
-                sbuf.append(Configuration.CMD_UPLOAD_EXAMPLE);
-            }
-            sbuf.append("\n");
-
-            // description
-            sbuf.append("description:\n");
-            if (isPrepare) {
-                sbuf.append(Configuration.CMD_PREPARE_DESC);
-            } else {
-                sbuf.append(Configuration.CMD_UPLOAD_DESC);
-            }
-            sbuf.append("\n");
-
-            // options
-            sbuf.append("options:\n");
-            if (isPrepare) {
-                sbuf.append(Configuration.CMD_PREPARE_OPTIONS);
-            } else {
-                sbuf.append(Configuration.CMD_UPLOAD_OPTIONS);
-            }
-            sbuf.append("\n");
-
-            return sbuf.toString();
-        }
-    }
-
     protected OptionParser op;
     protected OptionSet options;
 
@@ -98,7 +42,7 @@ public class BulkImportOptions {
     }
 
     public void initPrepareOptionParser(Properties props) {
-        op.formatHelpWith(new SimpleHelpFormatter());
+        //op.formatHelpWith(new SimpleHelpFormatter());
         op.acceptsAll(Arrays.asList("h",
                 Configuration.BI_PREPARE_PARTS_HELP),
                 Configuration.BI_PREPARE_PARTS_HELP_DESC);
