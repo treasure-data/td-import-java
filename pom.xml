@@ -249,7 +249,7 @@
             <phase>package</phase>
             <configuration>
               <tasks>
-                <copy file="target/td-bulk-import-${version}-jar-with-dependencies.jar" todir="src/test/resources/java/" />
+                <copy file="target/td-bulk-import-${version}-jar-with-dependencies.jar" tofile="src/test/resources/java/td-bulk-import.jar" />
               </tasks>
             </configuration>
             <goals>
