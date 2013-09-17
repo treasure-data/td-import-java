@@ -17,9 +17,46 @@
 //
 package com.treasure_data.bulk_import;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.treasure_data.bulk_import.Constants;
 
 public class Configuration extends com.treasure_data.client.Config implements
         Constants {
 
+    public static enum Command {
+        PREPARE(CMD_PREPARE), UPLOAD(CMD_UPLOAD), AUTO(CMD_AUTO);
+
+        private String name;
+
+        Command(String name) {
+            this.name = name;
+        }
+
+        public String command() {
+            return name;
+        }
+
+        public static Command fromString(String name) {
+            return StringToCommand.get(name);
+        }
+
+        private static class StringToCommand {
+            private static final Map<String, Command> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, Command> map = new HashMap<String, Command>();
+                for (Command elem : Command.values()) {
+                    map.put(elem.command(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static Command get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
 }

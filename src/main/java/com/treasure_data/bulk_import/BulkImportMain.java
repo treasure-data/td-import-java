@@ -462,22 +462,22 @@ public class BulkImportMain {
             throw new IllegalArgumentException("Command not specified");
         }
 
-        String commandName = args[0];
         Properties props = System.getProperties();
-        if (commandName.equals(Configuration.CMD_PREPARE)) {
-            prepare(args, props);
-        } else if (commandName.equals(Configuration.CMD_UPLOAD)) {
-            upload(args, props);
-        } else if (commandName.equals(Configuration.CMD_AUTO)) {
-            String[] args0 = new String[args.length + 3];
-            args0[args.length] = "--auto-commit";
-            args0[args.length + 1] = "--auto-perform";
-            args0[args.length + 2] = "--auto-delete";
-            System.arraycopy(args, 0, args0, 0, args.length);
-            upload(args, props);
-        } else {
+        String commandName = args[0].toLowerCase();
+        Configuration.Command cmd = Configuration.Command.fromString(commandName);
+        if (cmd == null) {
             throw new IllegalArgumentException(
                     String.format("Not support command %s", commandName));
+        }
+
+        if (cmd.equals(Configuration.Command.PREPARE)) {
+            prepare(args, props);
+        } else if (cmd.equals(Configuration.Command.UPLOAD)) {
+            upload(args, props);
+        } else if (cmd.equals(Configuration.Command.AUTO)) {
+            auto(args, props);
+        } else {
+            throw new UnsupportedOperationException("Fatal error");
         }
     }
 
