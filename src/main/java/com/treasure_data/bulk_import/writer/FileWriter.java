@@ -19,15 +19,19 @@ package com.treasure_data.bulk_import.writer;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.model.AliasTimeColumnValue;
+import com.treasure_data.bulk_import.model.ArrayColumnValue;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.DoubleColumnValue;
 import com.treasure_data.bulk_import.model.IntColumnValue;
 import com.treasure_data.bulk_import.model.LongColumnValue;
+import com.treasure_data.bulk_import.model.MapColumnValue;
 import com.treasure_data.bulk_import.model.Row;
 import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
@@ -130,10 +134,14 @@ public abstract class FileWriter implements Closeable {
     public abstract void write(int v) throws PreparePartsException;
     public abstract void write(long v) throws PreparePartsException;
     public abstract void write(double v) throws PreparePartsException;
+    public abstract void write(List<Object> v) throws PreparePartsException;
+    public abstract void write(Map<Object, Object> v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException;
+    public abstract void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException;
+    public abstract void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException;
     public abstract void writeEndRow() throws PreparePartsException;
 
     public void resetRowNum() {

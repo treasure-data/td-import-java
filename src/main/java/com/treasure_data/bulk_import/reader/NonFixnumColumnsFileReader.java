@@ -19,6 +19,8 @@ package com.treasure_data.bulk_import.reader;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.treasure_data.bulk_import.Configuration;
@@ -72,6 +74,10 @@ public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration>
             return ColumnType.STRING;
         } else if (value instanceof Long) {
             return ColumnType.LONG;
+        } else if (value instanceof List) {
+            return ColumnType.ARRAY;
+        } else if (value instanceof Map) {
+            return ColumnType.MAP;
         } else {
             throw new UnsupportedOperationException("During toColumnType() execution");
         }

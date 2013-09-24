@@ -25,9 +25,11 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
+import com.treasure_data.bulk_import.model.ArrayColumnValue;
 import com.treasure_data.bulk_import.model.DoubleColumnValue;
 import com.treasure_data.bulk_import.model.IntColumnValue;
 import com.treasure_data.bulk_import.model.LongColumnValue;
+import com.treasure_data.bulk_import.model.MapColumnValue;
 import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
@@ -79,6 +81,15 @@ public class JSONFileWriter extends FileWriter {
     }
 
     @Override
+    public void write(List<Object> v) throws PreparePartsException {
+        recordElements.add(v);
+    }
+
+    @Override
+    public void write(Map<Object, Object> v) throws PreparePartsException {
+        recordElements.add(v);
+    }
+    @Override
     public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
         String timeString = v.getString();
         long time = 0;
@@ -107,6 +118,16 @@ public class JSONFileWriter extends FileWriter {
 
     @Override
     public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
+    public void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
+    public void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException {
         throw new PreparePartsException("not implemented method");
     }
 

@@ -23,15 +23,19 @@ import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
+import com.treasure_data.bulk_import.model.ArrayColumnValue;
 import com.treasure_data.bulk_import.model.DoubleColumnValue;
 import com.treasure_data.bulk_import.model.IntColumnValue;
 import com.treasure_data.bulk_import.model.LongColumnValue;
+import com.treasure_data.bulk_import.model.MapColumnValue;
 import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
@@ -180,6 +184,33 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
+    public void write(List<Object> v) throws PreparePartsException {
+        try {
+            packer.writeArrayBegin(v.size());
+            for (Object e : v) {
+                packer.write(e);
+            }
+            packer.writeArrayEnd();
+        } catch (IOException e) {
+            throw new PreparePartsException(e);
+        }
+    }
+
+    @Override
+    public void write(Map<Object, Object> v) throws PreparePartsException {
+        try {
+            packer.writeMapBegin(v.size());
+            for (Map.Entry<Object, Object> e : v.entrySet()) {
+                packer.write(e.getKey());
+                packer.write(e.getValue());
+            }
+            packer.writeMapEnd();
+        } catch (IOException e) {
+            throw new PreparePartsException(e);
+        }
+    }
+
+    @Override
     public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
         String timeString = v.getString();
         long time = 0;
@@ -208,6 +239,16 @@ public class MsgpackGZIPFileWriter extends FileWriter {
 
     @Override
     public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
+    public void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
+    public void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException {
         throw new PreparePartsException("not implemented method");
     }
 

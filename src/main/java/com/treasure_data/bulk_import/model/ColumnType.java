@@ -145,6 +145,54 @@ public enum ColumnType {
             throw new UnsupportedOperationException();
         }
     },
+    ARRAY("array", 5) {
+        @Override
+        public ColumnValue createColumnValue() {
+            return new ArrayColumnValue(this);
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            into.parse(v);
+        }
+
+        @Override
+        public void setColumnValue(Object v, ColumnValue cv)
+                throws PreparePartsException {
+            cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
+            with.write(filter, (ArrayColumnValue) v);
+        }
+    },
+    MAP("map", 6) {
+        @Override
+        public ColumnValue createColumnValue() {
+            return new MapColumnValue(this);
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            into.parse(v);
+        }
+
+        @Override
+        public void setColumnValue(Object v, ColumnValue cv)
+                throws PreparePartsException {
+            cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
+            with.write(filter, (MapColumnValue) v);
+        }
+    }
     ;
 
     private String name;
