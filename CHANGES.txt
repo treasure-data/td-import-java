@@ -1,6 +1,7 @@
 Release 0.2.4 - 20XX/XX/XX
   BUG FIXED
     Fixes usage, examples, description of 'auto' command
+    Fixes JSON file reader. It allows reading JSON map and array values and recognizing Java based Map and List objects.
 
 Release 0.2.3 - 2013/09/13
   BUG FIXED
