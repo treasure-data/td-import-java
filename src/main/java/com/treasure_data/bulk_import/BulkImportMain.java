@@ -134,6 +134,8 @@ public class BulkImportMain {
             e = UploadProcessor.checkTable(tdClient, uploadConf,
                     sessionName, databaseName, tableName);
             if (e.error != null) {
+                // TODO FIXME #MN should create table automatically if
+                // it is not found.
                 throw new IllegalArgumentException(e.error);
             }
 
