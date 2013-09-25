@@ -37,6 +37,7 @@ import com.treasure_data.bulk_import.upload.UploadConfiguration;
 import com.treasure_data.bulk_import.upload.UploadProcessor;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
+import com.treasure_data.model.bulkimport.SessionSummary;
 
 public class BulkImportMain {
     private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
@@ -155,6 +156,14 @@ public class BulkImportMain {
             }
 
             filePos = 2;
+        }
+
+        // if session is already freezed, exception is thrown.
+        SessionSummary sess = UploadProcessor.showSession(biClient, uploadConf, sessionName);
+        if (sess.uploadFrozen()) {
+            throw new IllegalArgumentException(String.format(
+                    "Bulk import session %s is already freezed. Please check it with 'td import:show %s'",
+                    sessionName, sessionName));
         }
 
         // configure uploaded file list
