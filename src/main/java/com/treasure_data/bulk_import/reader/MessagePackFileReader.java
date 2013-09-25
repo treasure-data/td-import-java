@@ -83,6 +83,8 @@ public class MessagePackFileReader extends NonFixnumColumnsFileReader<MessagePac
             return false;
         }
 
+        incrementLineNum();
+
         Value v = iterator.next();
         if (v == null || !v.isMapValue()) {
             return false;

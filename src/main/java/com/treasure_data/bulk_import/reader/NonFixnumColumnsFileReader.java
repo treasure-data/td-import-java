@@ -116,7 +116,6 @@ public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration>
 
     @Override
     public boolean next() throws PreparePartsException {
-        incrementLineNum();
         try {
             if (!readRow()) {
                 return false;

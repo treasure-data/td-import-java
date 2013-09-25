@@ -89,6 +89,9 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
             if (line == null) {
                 return false;
             }
+
+            incrementLineNum();
+
             row = (Map<String, Object>) parser.parse(line);
             return row != null;
         } catch (ParseException e) {
