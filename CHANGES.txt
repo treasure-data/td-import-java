@@ -6,6 +6,7 @@ Release 0.2.4 - 20XX/XX/XX
     Fixes usage, examples, description of 'auto' command
     Fixes JSON file reader. It allows reading JSON map and array values and recognizing Java based Map and List objects.
     Fixes {JSON,MessagePack}FileReader classes. caller side of incrementLineNumber method calls is changed.
+    Fixes TimeColumnSampling. It throws NPE when it parses null values.
 
 Release 0.2.3 - 2013/09/13
   BUG FIXED
