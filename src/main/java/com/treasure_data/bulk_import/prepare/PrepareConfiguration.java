@@ -680,12 +680,12 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
-    public ExtStrftime getTimeFormat() {
-        return timeFormat == null ? null : new ExtStrftime(timeFormat);
+    public Strftime getTimeFormat() {
+        return timeFormat == null ? null : new Strftime(timeFormat);
     }
 
-    public ExtStrftime getTimeFormat(String strfString) {
-        return strfString == null ? null : new ExtStrftime(strfString);
+    public Strftime getTimeFormat(String strfString) {
+        return strfString == null ? null : new Strftime(strfString);
     }
 
     public void setOutputDirName() {

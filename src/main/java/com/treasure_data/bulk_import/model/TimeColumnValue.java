@@ -17,15 +17,15 @@
 //
 package com.treasure_data.bulk_import.model;
 
-import com.treasure_data.bulk_import.prepare.ExtStrftime;
+import com.treasure_data.bulk_import.prepare.Strftime;
 import com.treasure_data.bulk_import.prepare.PreparePartsException;
 import com.treasure_data.bulk_import.writer.FileWriter;
 
 public class TimeColumnValue {
     protected int index;
-    protected ExtStrftime timeFormat;
+    protected Strftime timeFormat;
 
-    public TimeColumnValue(int index, ExtStrftime timeFormat) {
+    public TimeColumnValue(int index, Strftime timeFormat) {
         this.index = index;
         this.timeFormat = timeFormat;
     }
@@ -34,7 +34,7 @@ public class TimeColumnValue {
         return index;
     }
 
-    public ExtStrftime getTimeFormat() {
+    public Strftime getTimeFormat() {
         return timeFormat;
     }
 

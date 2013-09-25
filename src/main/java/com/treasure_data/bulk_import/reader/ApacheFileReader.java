@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import com.treasure_data.bulk_import.model.ColumnType;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare.ApachePrepareConfiguration;
-import com.treasure_data.bulk_import.prepare.ExtStrftime;
+import com.treasure_data.bulk_import.prepare.Strftime;
 import com.treasure_data.bulk_import.prepare.PreparePartsException;
 import com.treasure_data.bulk_import.prepare.Task;
 import com.treasure_data.bulk_import.writer.FileWriter;
@@ -61,6 +61,6 @@ public class ApacheFileReader extends RegexFileReader<ApachePrepareConfiguration
     }
 
     protected void updateTimeColumnValue() {
-        timeColumnValue = new TimeColumnValue(2, new ExtStrftime("%d/%b/%Y:%H:%M:%S %z"));
+        timeColumnValue = new TimeColumnValue(2, new Strftime("%d/%b/%Y:%H:%M:%S %z"));
     }
 }

@@ -38,7 +38,7 @@ import com.treasure_data.bulk_import.model.LongColumnValue;
 import com.treasure_data.bulk_import.model.StringColumnValue;
 import com.treasure_data.bulk_import.model.TimeColumnValue;
 import com.treasure_data.bulk_import.prepare.ApachePrepareConfiguration;
-import com.treasure_data.bulk_import.prepare.ExtStrftime;
+import com.treasure_data.bulk_import.prepare.Strftime;
 import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
 import com.treasure_data.bulk_import.prepare.PreparePartsException;
 import com.treasure_data.bulk_import.prepare.SyslogPrepareConfiguration;
@@ -103,6 +103,6 @@ public class SyslogFileReader extends RegexFileReader<SyslogPrepareConfiguration
     }
 
     protected void updateTimeColumnValue() {
-        timeColumnValue = new TimeColumnValue(2, new ExtStrftime("%b %d %H:%M:%S"));
+        timeColumnValue = new TimeColumnValue(2, new Strftime("%b %d %H:%M:%S"));
     }
 }
