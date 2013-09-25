@@ -44,6 +44,11 @@ public class TimeColumnSampling extends ColumnSampling {
     public void parse(String value) {
         super.parse(value);
 
+        if (value == null) {
+            // any score are not changed
+            return;
+        }
+
         for (int i = 0; i < timeScores.length; i++) {
             ParsePosition pp = new ParsePosition(0);
             Date d = SDF_LIST[i].parse(value, pp);
