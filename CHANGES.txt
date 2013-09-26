@@ -1,4 +1,7 @@
 Release 0.2.4 - 20XX/XX/XX
+  NEW FEATURES
+    Adds feature for parsing 'millseconds' as strftime format.
+
   IMPROVEMENTS
     Fixes BulkImportMain class's upload method. Uploading should fail immediately if the session is frozen.
 
