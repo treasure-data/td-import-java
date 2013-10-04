@@ -18,15 +18,12 @@
 package com.treasure_data.bulk_import;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
-
-import javax.swing.event.ListSelectionEvent;
 
 import com.treasure_data.bulk_import.TaskResult;
 import com.treasure_data.bulk_import.prepare.MultiThreadPrepareProcessor;
@@ -112,7 +109,7 @@ public class BulkImportMain {
         BulkImportClient biClient = new BulkImportClient(tdClient);
 
         // configure session name
-        TaskResult e;
+        TaskResult e = null;
         final String sessionName;
         int filePos;
         if (uploadConf.autoCreate()) { // 'auto-create-session'
@@ -178,7 +175,6 @@ public class BulkImportMain {
         uploadProc.registerWorkers();
         uploadProc.startWorkers();
 
-        List<TaskResult> errs = new ArrayList<TaskResult>();
         List<com.treasure_data.bulk_import.prepare.TaskResult> prepareResults = null;
 
         if (!uploadConf.hasPrepareOptions()) {
