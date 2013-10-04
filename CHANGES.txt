@@ -1,8 +1,10 @@
-Release 0.2.4 - 20XX/XX/XX
+Release 0.3.0 - 2013/10/04
   NEW FEATURES
     Adds feature for parsing 'millseconds' as strftime format.
 
   IMPROVEMENTS
+    Changes project name: 'td-bulk-import-java' to 'td-import-java'.
+    Changes package name: 'com.treasure_data.bulk_import' to 'com.treasure_data.td_import'.
     Fixes BulkImportMain class's upload method. Uploading should fail immediately if the session is frozen.
 
   BUG FIXED
