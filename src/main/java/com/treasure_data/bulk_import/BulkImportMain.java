@@ -430,10 +430,11 @@ public class BulkImportMain {
             } else {
                 status = Configuration.STAT_ERROR;
             }
+            com.treasure_data.bulk_import.upload.UploadTask task = (com.treasure_data.bulk_import.upload.UploadTask) result.task;
             System.out.println(String.format("  File    : %s", result.task.fileName));
             System.out.println(String.format("    Status          : %s", status));
-            System.out.println(String.format("    Part name       : %s", ((com.treasure_data.bulk_import.upload.UploadTask) result.task).partName));
-            System.out.println(String.format("    Size            : %d", result.task.size));
+            System.out.println(String.format("    Part name       : %s", task.partName));
+            System.out.println(String.format("    Size            : %d", task.size));
             System.out.println(String.format("    Retry count     : %d", result.retryCount));
         }
         System.out.println();
