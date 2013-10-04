@@ -2,12 +2,12 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.treasure_data</groupId>
-  <artifactId>td-bulk-import</artifactId>
-  <name>Treasure Data Bulk-Import Tool in Java</name>
-  <description>Treasure Data Bulk-Import Tool in Java.</description>
-  <version>0.2.4-SNAPSHOT</version>
+  <artifactId>td-import</artifactId>
+  <name>Treasure Data Import Tool in Java</name>
+  <description>Treasure Data Import Tool in Java.</description>
+  <version>0.3.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <url>https://github.com/treasure-data/td-bulk-import-java</url>
+  <url>https://github.com/treasure-data/td-import-java</url>
 
   <licenses>
     <license>
@@ -18,14 +18,14 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git://github.com/treasure-data/td-bulk-import-java.git</connection>
-    <developerConnection>scm:git:git@github.com:treasure-data/td-bulk-import-java.git</developerConnection>
-    <url>scm:git:git://github.com/treasure-data/td-bulk-import-java.git</url>
+    <connection>scm:git:git://github.com/treasure-data/td-import-java.git</connection>
+    <developerConnection>scm:git:git@github.com:treasure-data/td-import-java.git</developerConnection>
+    <url>scm:git:git://github.com/treasure-data/td-import-java.git</url>
   </scm>
 
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/treasure-data/td-bulk-import-java/issues</url>
+    <url>https://github.com/treasure-data/td-import-java/issues</url>
   </issueManagement>
 
   <developers>
@@ -249,7 +249,7 @@
             <phase>package</phase>
             <configuration>
               <tasks>
-                <copy file="target/td-bulk-import-${version}-jar-with-dependencies.jar" tofile="src/test/resources/java/td-bulk-import.jar" />
+                <copy file="target/td-import-${version}-jar-with-dependencies.jar" tofile="src/test/resources/java/td-import.jar" />
               </tasks>
             </configuration>
             <goals>
