@@ -17,33 +17,24 @@
 //
 package com.treasure_data.bulk_import.prepare;
 
-import java.io.File;
-
 import com.treasure_data.bulk_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.prepare.Task;
 
-public class UploadTask extends Task {
-    public String sessionName;
-
-    public UploadTask(String sessionName, String fileName) {
+public abstract class SequentialUploadTaskBase extends Task {
+    public SequentialUploadTaskBase(String fileName) {
         super(fileName);
-        this.sessionName = sessionName;
     }
 
     @Override
     public void finishHook(String outputFileName) {
         super.finishHook(outputFileName);
-
-        long size = new File(outputFileName).length();
-        com.treasure_data.bulk_import.upload.Task task =
-                new com.treasure_data.bulk_import.upload.Task(
-                sessionName, outputFileName, size);
-        MultiThreadUploadProcessor.addTask(task);
+        MultiThreadUploadProcessor.addTask(createNextTask(outputFileName));
     }
+
+    public abstract com.treasure_data.bulk_import.upload.UploadTaskBase createNextTask(String outputFileName);
 
     @Override
     public String toString() {
-        return String.format("prepare_upload_task{file=%s, session=%s}",
-                fileName, sessionName);
+        throw new UnsupportedOperationException();
     }
 }

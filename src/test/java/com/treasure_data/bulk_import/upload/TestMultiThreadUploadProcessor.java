@@ -19,7 +19,7 @@ import org.junit.Test;
 import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.BulkImportOptionsTestUtil;
 import com.treasure_data.bulk_import.upload.MultiThreadUploadProcessor;
-import com.treasure_data.bulk_import.upload.Task;
+import com.treasure_data.bulk_import.upload.UploadTask;
 import com.treasure_data.bulk_import.upload.TaskResult;
 import com.treasure_data.bulk_import.upload.UploadConfiguration;
 import com.treasure_data.bulk_import.upload.UploadProcessor;
@@ -44,7 +44,7 @@ public class TestMultiThreadUploadProcessor {
             String fileName = "file" + i;
             long size = bytes.length;
 
-            Task task = new Task(sessName, fileName, size);
+            UploadTask task = new UploadTask(sessName, fileName, size);
             task = spy(task);
             task.isTest = true;
             task.testBinary = bytes;
@@ -93,7 +93,7 @@ public class TestMultiThreadUploadProcessor {
     public void dontGetErrorsWhenWorkersWorkNormally() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doNothing().when(child).executeUpload(any(Task.class));
+            doNothing().when(child).executeUpload(any(UploadTask.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();
@@ -112,7 +112,7 @@ public class TestMultiThreadUploadProcessor {
     public void getErrorsWhenWorkersThrowIOError() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doThrow(new IOException("dummy")).when(child).executeUpload(any(Task.class));
+            doThrow(new IOException("dummy")).when(child).executeUpload(any(UploadTask.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();
@@ -134,7 +134,7 @@ public class TestMultiThreadUploadProcessor {
     public void getErrorsWhenWorkersThrowClientError() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doThrow(new ClientException("dummy")).when(child).executeUpload(any(Task.class));
+            doThrow(new ClientException("dummy")).when(child).executeUpload(any(UploadTask.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();

@@ -30,10 +30,10 @@ import com.treasure_data.client.bulkimport.BulkImportClient;
 public class MultiThreadUploadProcessor {
     static class Worker extends Thread {
         private MultiThreadUploadProcessor parent;
-        private UploadProcessor proc;
+        private UploadProcessorBase proc;
         AtomicBoolean isFinished = new AtomicBoolean(false);
 
-        public Worker(MultiThreadUploadProcessor parent, UploadProcessor proc) {
+        public Worker(MultiThreadUploadProcessor parent, UploadProcessorBase proc) {
             this.parent = parent;
             this.proc = proc;
         }
@@ -41,7 +41,7 @@ public class MultiThreadUploadProcessor {
         @Override
         public void run() {
             while (true) {
-                Task t = parent.taskQueue.poll();
+                UploadTaskBase t = parent.taskQueue.poll();
                 if (t == null) {
                     continue;
                 } else if (t.endTask()) {
@@ -56,13 +56,13 @@ public class MultiThreadUploadProcessor {
     }
 
     private static final Logger LOG = Logger.getLogger(MultiThreadUploadProcessor.class.getName());
-    private static BlockingQueue<Task> taskQueue;
+    private static BlockingQueue<UploadTaskBase> taskQueue;
 
     static {
-        taskQueue = new LinkedBlockingQueue<Task>();
+        taskQueue = new LinkedBlockingQueue<UploadTaskBase>();
     }
 
-    public static synchronized void addTask(Task task) {
+    public static synchronized void addTask(UploadTaskBase task) {
         taskQueue.add(task);
     }
 
@@ -71,17 +71,17 @@ public class MultiThreadUploadProcessor {
         taskQueue.clear();
     }
 
-    public static synchronized void addFinishTask(UploadConfiguration conf) {
+    public static synchronized void addFinishTask(UploadConfigurationBase conf) {
         for (int i = 0; i < conf.getNumOfUploadThreads() * 2; i++) {
-            taskQueue.add(Task.FINISH_TASK);
+            taskQueue.add(UploadTaskBase.FINISH_TASK);
         }
     }
 
-    private UploadConfiguration conf;
+    private UploadConfigurationBase conf;
     private List<Worker> workers;
     private List<TaskResult> results;
 
-    public MultiThreadUploadProcessor(UploadConfiguration conf) {
+    public MultiThreadUploadProcessor(UploadConfigurationBase conf) {
         this.conf = conf;
         workers = new ArrayList<Worker>();
         results = new ArrayList<TaskResult>();
@@ -101,7 +101,7 @@ public class MultiThreadUploadProcessor {
         }
     }
 
-    protected Worker createWorker(UploadConfiguration conf) {
+    protected Worker createWorker(UploadConfigurationBase conf) {
         return new Worker(this, createUploadProcessor(conf));
     }
 
@@ -109,11 +109,11 @@ public class MultiThreadUploadProcessor {
         workers.add(w);
     }
 
-    protected UploadProcessor createUploadProcessor(UploadConfiguration conf) {
-        return new UploadProcessor(createBulkImportClient(conf), conf);
+    protected UploadProcessorBase createUploadProcessor(UploadConfigurationBase conf) {
+        return conf.createNewUploadProcessor();
     }
 
-    protected BulkImportClient createBulkImportClient(UploadConfiguration conf) {
+    protected BulkImportClient createBulkImportClient(UploadConfigurationBase conf) {
         return new BulkImportClient(new TreasureDataClient(conf.getProperties()));
     }
 

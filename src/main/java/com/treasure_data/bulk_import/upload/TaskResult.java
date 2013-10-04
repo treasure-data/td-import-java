@@ -17,7 +17,7 @@
 //
 package com.treasure_data.bulk_import.upload;
 
-public class TaskResult extends com.treasure_data.bulk_import.TaskResult<Task> {
+public class TaskResult extends com.treasure_data.bulk_import.TaskResult<UploadTaskBase> {
     public int retryCount = 0;
 
     public TaskResult() {

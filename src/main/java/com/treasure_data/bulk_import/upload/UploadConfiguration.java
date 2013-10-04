@@ -24,8 +24,10 @@ import joptsimple.OptionSet;
 import com.treasure_data.bulk_import.BulkImportOptions;
 import com.treasure_data.bulk_import.Configuration;
 import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
+import com.treasure_data.client.TreasureDataClient;
+import com.treasure_data.client.bulkimport.BulkImportClient;
 
-public class UploadConfiguration extends PrepareConfiguration {
+public class UploadConfiguration extends UploadConfigurationBase {
 
     public static class Factory {
         protected BulkImportOptions options;
@@ -52,12 +54,17 @@ public class UploadConfiguration extends PrepareConfiguration {
     protected boolean autoPerform = false;
     protected boolean autoCommit = false;
     protected boolean autoDelete = false;
-    protected int numOfUploadThreads;
     protected int retryCount;
     protected long waitSec;
 
     public UploadConfiguration() {
         super();
+    }
+
+    @Override
+    public UploadProcessorBase createNewUploadProcessor() {
+        BulkImportClient c = new BulkImportClient(new TreasureDataClient(getProperties()));
+        return new UploadProcessor(c, this);
     }
 
     @Override
@@ -122,52 +129,6 @@ public class UploadConfiguration extends PrepareConfiguration {
 
         // auto-delete-session
         setAutoDelete();
-
-        // retryCount
-        String rcount = props.getProperty(BI_UPLOAD_PARTS_RETRYCOUNT,
-                BI_UPLOAD_PARTS_RETRYCOUNT_DEFAULTVALUE);
-        try {
-            retryCount = Integer.parseInt(rcount);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "'int' value is required as 'retry count' option e.g. -D%s=5",
-                    BI_UPLOAD_PARTS_RETRYCOUNT);
-            throw new IllegalArgumentException(msg, e);
-        }
-
-        // waitSec
-        String wsec = props.getProperty(BI_UPLOAD_PARTS_WAITSEC,
-                BI_UPLOAD_PARTS_WAITSEC_DEFAULTVALUE);
-        try {
-            waitSec = Long.parseLong(wsec);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "'long' value is required as 'wait sec' e.g. -D%s=5",
-                    BI_UPLOAD_PARTS_WAITSEC);
-            throw new IllegalArgumentException(msg, e);
-        }
-    }
-
-    public Properties getProperties() {
-        return props;
-    }
-
-    public boolean hasPrepareOptions() {
-        return optionSet.has(BI_PREPARE_PARTS_FORMAT)
-                || optionSet.has(BI_PREPARE_PARTS_COMPRESSION)
-                || optionSet.has(BI_PREPARE_PARTS_PARALLEL)
-                || optionSet.has(BI_PREPARE_PARTS_ENCODING)
-                || optionSet.has(BI_PREPARE_PARTS_TIMECOLUMN)
-                || optionSet.has(BI_PREPARE_PARTS_TIMEFORMAT)
-                || optionSet.has(BI_PREPARE_PARTS_TIMEVALUE)
-                || optionSet.has(BI_PREPARE_PARTS_OUTPUTDIR)
-                || optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)
-                || optionSet.has("dry-run")
-                || optionSet.has(BI_PREPARE_PARTS_SPLIT_SIZE)
-                || optionSet.has(BI_PREPARE_PARTS_COLUMNS)
-                || optionSet.has(BI_PREPARE_PARTS_COLUMNTYPES)
-                || optionSet.has(BI_PREPARE_PARTS_EXCLUDE_COLUMNS)
-                || optionSet.has(BI_PREPARE_PARTS_ONLY_COLUMNS);
     }
 
     public void setAutoPerform() {
@@ -214,6 +175,7 @@ public class UploadConfiguration extends PrepareConfiguration {
         return autoDelete;
     }
 
+    @Override
     public void setNumOfUploadThreads() {
         String num;
         if (!optionSet.has(BI_UPLOAD_PARTS_PARALLEL)) {
@@ -237,10 +199,6 @@ public class UploadConfiguration extends PrepareConfiguration {
                     BI_UPLOAD_PARTS_PARALLEL);
             throw new IllegalArgumentException(msg, e);
         }
-    }
-
-    public int getNumOfUploadThreads() {
-        return numOfUploadThreads;
     }
 
     public int getRetryCount() {

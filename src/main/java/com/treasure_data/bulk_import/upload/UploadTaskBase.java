@@ -19,13 +19,11 @@ package com.treasure_data.bulk_import.upload;
 
 import java.io.File;
 
-public class Task implements com.treasure_data.bulk_import.Task {
-    private static final String TAG = "__FINISH__";
+public class UploadTaskBase implements com.treasure_data.bulk_import.Task {
+    protected static final String TAG = "__FINISH__";
 
-    static final Task FINISH_TASK = new Task(TAG, TAG, 0);
+    protected static final UploadTaskBase FINISH_TASK = new UploadTaskBase(TAG, 0);
 
-    public String sessName;
-    public String partName;
     public String fileName;
     public long size;
 
@@ -33,27 +31,18 @@ public class Task implements com.treasure_data.bulk_import.Task {
     public boolean isTest = false;
     public byte[] testBinary = null;
 
-    public Task(String sessName, String fileName, long size) {
-        this.sessName = sessName;
-        int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
-        this.partName = fileName.substring(lastSepIndex + 1,
-                fileName.length()).replace('.', '_');
+    public UploadTaskBase(String fileName, long size) {
         this.fileName = fileName;
         this.size = size;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (! (obj instanceof Task)) {
-            return false;
-        }
-
-        Task t = (Task) obj;
-        return t.sessName.equals(sessName) && t.partName.equals(partName);
+        throw new UnsupportedOperationException();
     }
 
     public boolean endTask() {
-        return equals(FINISH_TASK);
+        return fileName.equals(TAG) && size == 0;
     }
 
     @Override

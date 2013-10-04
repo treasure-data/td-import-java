@@ -31,7 +31,7 @@ import javax.swing.event.ListSelectionEvent;
 import com.treasure_data.bulk_import.TaskResult;
 import com.treasure_data.bulk_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.bulk_import.prepare.PrepareConfiguration;
-import com.treasure_data.bulk_import.prepare.UploadTask;
+import com.treasure_data.bulk_import.prepare.SequentialUploadTask;
 import com.treasure_data.bulk_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.bulk_import.upload.UploadConfiguration;
 import com.treasure_data.bulk_import.upload.UploadProcessor;
@@ -188,8 +188,8 @@ public class BulkImportMain {
                     for (int i = 0; i < fileNames.length; i++) {
                         try {
                             long size = new File(fileNames[i]).length();
-                            com.treasure_data.bulk_import.upload.Task task =
-                                    new com.treasure_data.bulk_import.upload.Task(
+                            com.treasure_data.bulk_import.upload.UploadTask task =
+                                    new com.treasure_data.bulk_import.upload.UploadTask(
                                     sessionName, fileNames[i], size);
                             MultiThreadUploadProcessor.addTask(task);
                         } catch (Throwable t) {
@@ -220,7 +220,7 @@ public class BulkImportMain {
                 public void run() {
                     for (int i = 0; i < fileNames.length; i++) {
                         try {
-                            UploadTask task = new UploadTask(sessionName, fileNames[i]);
+                            SequentialUploadTask task = new SequentialUploadTask(sessionName, fileNames[i]);
                             MultiThreadPrepareProcessor.addTask(task);
                         } catch (Throwable t) {
                             LOG.severe("Error occurred During 'addTask' method call");
@@ -432,7 +432,7 @@ public class BulkImportMain {
             }
             System.out.println(String.format("  File    : %s", result.task.fileName));
             System.out.println(String.format("    Status          : %s", status));
-            System.out.println(String.format("    Part name       : %s", result.task.partName));
+            System.out.println(String.format("    Part name       : %s", ((com.treasure_data.bulk_import.upload.UploadTask) result.task).partName));
             System.out.println(String.format("    Size            : %d", result.task.size));
             System.out.println(String.format("    Retry count     : %d", result.retryCount));
         }
