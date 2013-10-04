@@ -204,6 +204,42 @@ public class BulkImportOptions {
                 Configuration.BI_UPLOAD_PARTS_AUTO_DELETE_DESC);
     }
 
+    public void initTableImportOptionParser(Properties props) {
+        this.initPrepareOptionParser(props);
+        op.acceptsAll(Arrays.asList("h",
+                Configuration.BI_PREPARE_PARTS_HELP),
+                Configuration.BI_PREPARE_PARTS_HELP_DESC);
+        /**
+        op.acceptsAll(Arrays.asList(
+                Configuration.TABLE_IMPORT_FORMAT),
+                Configuration.TABLE_IMPORT_FORMAT_DESC)
+                .withRequiredArg()
+                .describedAs("FORMAT")
+                .ofType(String.class);
+         */
+        op.acceptsAll(Arrays.asList(
+                Configuration.TABLE_IMPORT_FORMAT_APACHE),
+                Configuration.TABLE_IMPORT_FORMAT_APACHE_DESC);
+        op.acceptsAll(Arrays.asList(
+                Configuration.TABLE_IMPORT_FORMAT_SYSLOG),
+                Configuration.TABLE_IMPORT_FORMAT_SYSLOG_DESC);
+        op.acceptsAll(Arrays.asList(
+                Configuration.TABLE_IMPORT_FORMAT_MSGPACK),
+                Configuration.TABLE_IMPORT_FORMAT_MSGPACK_DESC);
+        op.acceptsAll(Arrays.asList(
+                Configuration.TABLE_IMPORT_FORMAT_JSON),
+                Configuration.TABLE_IMPORT_FORMAT_JSON_DESC);
+        op.acceptsAll(Arrays.asList("t",
+                Configuration.TABLE_IMPORT_TIME_KEY),
+                Configuration.TABLE_IMPORT_TIME_KEY_DESC)
+                .withRequiredArg()
+                .describedAs("COL_NAME")
+                .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
+                Configuration.TABLE_IMPORT_AUTO_CREATE_TABLE),
+                Configuration.TABLE_IMPORT_AUTO_CREATE_TABLE_DESC);
+    }
+
     public void showHelp() throws IOException {
         // this method should be called after invoking initXXXOptionParser(..)
         op.printHelpOn(System.out);

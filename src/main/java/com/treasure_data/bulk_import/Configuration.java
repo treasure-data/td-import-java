@@ -28,6 +28,7 @@ public class Configuration extends com.treasure_data.client.Config implements
         Constants {
 
     public static enum Command {
+        TABLEIMPORT(CMD_TABLEIMPORT),
         PREPARE(CMD_PREPARE),
         UPLOAD(CMD_UPLOAD),
         AUTO(CMD_AUTO);

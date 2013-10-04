@@ -18,6 +18,24 @@
 package com.treasure_data.bulk_import;
 
 public interface Constants extends com.treasure_data.client.Constants {
+    String CMD_TABLEIMPORT = "table_import";
+
+    String CMD_TABLEIMPORT_USAGE = "  $ td table:import <db> <table> <files...>\n";
+
+    String CMD_TABLEIMPORT_EXAMPLE =
+            "  $ td table:import example_db table1 --apache access.log\n" +
+            "  $ td table:import example_db table1 --json -t time - < test.json\n";
+
+    String CMD_TABLEIMPORT_DESC = "  Parse and import files to a table\n";
+
+    String CMD_TABLEIMPORT_OPTIONS =
+            "      --format FORMAT              file format (default: apache)\n" +
+            "      --apache                     same as --format apache; apache common log format\n" +
+            "      --syslog                     same as --format syslog; syslog\n" +
+            "      --msgpack                    same as --format msgpack; msgpack stream format\n" +
+            "      --json                       same as --format json; LF-separated json format\n" +
+            "  -t, --time-key COL_NAME          time key name for json and msgpack format (e.g. 'created_at')\n" +
+            "      --auto-create-table          Create table and database if doesn't exist\n";
 
     String CMD_PREPARE = "prepare";
 
@@ -28,36 +46,6 @@ public interface Constants extends com.treasure_data.client.Constants {
             "  $ td import:prepare mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
 
     String CMD_PREPARE_DESC = "  Convert files into part file format\n";
-
-    String CMD_UPLOAD = "upload";
-
-    String CMD_UPLOAD_USAGE =
-            "  $ td import:upload <session name> <files...>\n";
-
-    String CMD_UPLOAD_EXAMPLE =
-            "  $ td import:upload mysess parts/* --parallel 4\n" +
-            "  $ td import:upload mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
-            "  $ td import:upload parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
-            "  $ td import:upload mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
-
-    String CMD_UPLOAD_DESC = "  Upload or re-upload files into a bulk import session";
-
-    String CMD_AUTO = "auto";
-    String CMD_AUTO_ENABLE = "td.bulk_import.auto.enable";
-
-    String CMD_AUTO_USAGE =
-            "  $ td import:auto <session name> <files...>\n";
-
-    String CMD_AUTO_EXAMPLE =
-            "  $ td import:auto mysess parts/* --parallel 4\n" +
-            "  $ td import:auto mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
-            "  $ td import:auto parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
-            "  $ td import:auto mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
-
-    String CMD_AUTO_DESC = "  Automatically upload or re-upload files into a bulk import session. "
-            + "It's functional equivalent of 'upload' command with 'auto-perform', 'auto-commit' and 'auto-delete' options. "
-            + "But it, by default, doesn't provide 'auto-create' option. "
-            + "If you want 'auto-create' option, you explicitly must declare it as command options.\n";
 
     String CMD_PREPARE_OPTIONS =
             "    -f, --format FORMAT              source file format [csv, tsv, json, msgpack, mysql]; default=csv\n" +
@@ -86,6 +74,19 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --db-user NAME                   user name for MySQL account\n" +
             "    --db-password PASSWORD           password for MySQL account\n";
 
+    String CMD_UPLOAD = "upload";
+
+    String CMD_UPLOAD_USAGE =
+            "  $ td import:upload <session name> <files...>\n";
+
+    String CMD_UPLOAD_EXAMPLE =
+            "  $ td import:upload mysess parts/* --parallel 4\n" +
+            "  $ td import:upload mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:upload parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:upload mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
+
+    String CMD_UPLOAD_DESC = "  Upload or re-upload files into a bulk import session";
+
     String CMD_UPLOAD_OPTIONS =
             "    --auto-create DATABASE.TABLE     create automatically bulk import session by specified database and table names\n" +
             "                                     If you use 'auto-create' option, you MUST not specify any session name as first argument.\n" +
@@ -95,6 +96,23 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --parallel NUM                   upload in parallel (default: 2; max 8)\n" +
             "\n" +
             CMD_PREPARE_OPTIONS;
+
+    String CMD_AUTO = "auto";
+    String CMD_AUTO_ENABLE = "td.bulk_import.auto.enable";
+
+    String CMD_AUTO_USAGE =
+            "  $ td import:auto <session name> <files...>\n";
+
+    String CMD_AUTO_EXAMPLE =
+            "  $ td import:auto mysess parts/* --parallel 4\n" +
+            "  $ td import:auto mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:auto parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:auto mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
+
+    String CMD_AUTO_DESC = "  Automatically upload or re-upload files into a bulk import session. "
+            + "It's functional equivalent of 'upload' command with 'auto-perform', 'auto-commit' and 'auto-delete' options. "
+            + "But it, by default, doesn't provide 'auto-create' option. "
+            + "If you want 'auto-create' option, you explicitly must declare it as command options.\n";
 
     String CMD_AUTO_OPTIONS =
             "    --auto-create DATABASE.TABLE     create automatically bulk import session by specified database and table names\n" +
@@ -113,6 +131,30 @@ public interface Constants extends com.treasure_data.client.Constants {
     // help
     String BI_PREPARE_PARTS_HELP = "help";
     String BI_PREPARE_PARTS_HELP_DESC = "show this help message";
+
+    ////////////////////////////////////////
+    // TABLE_IMPORT_OPTIONS               //
+    ////////////////////////////////////////
+
+    // format
+    String TABLE_IMPORT_FORMAT_DESC = "file format (default: apache)"; // default 'apache'
+    String TABLE_IMPORT_FORMAT_APACHE = "apache";
+    String TABLE_IMPORT_FORMAT_APACHE_DESC = "same as --format apache; apache common log format";
+    String TABLE_IMPORT_FORMAT_SYSLOG = "syslog";
+    String TABLE_IMPORT_FORMAT_SYSLOG_DESC = "same as --format syslog; syslog";
+    String TABLE_IMPORT_FORMAT_MSGPACK = "msgpack";
+    String TABLE_IMPORT_FORMAT_MSGPACK_DESC = "same as --format msgpack; msgpack stream format";
+    String TABLE_IMPORT_FORMAT_JSON = "json";
+    String TABLE_IMPORT_FORMAT_JSON_DESC = "same as --format json; LF-separated json format";
+    String TABLE_IMPORT_FORMAT_DEFAULTVALUE = TABLE_IMPORT_FORMAT_APACHE;
+
+    // time-key
+    String TABLE_IMPORT_TIME_KEY = "time-key";
+    String TABLE_IMPORT_TIME_KEY_DESC = "time key name for json and msgpack format (e.g. 'created_at')";
+
+    // auto-create-table
+    String TABLE_IMPORT_AUTO_CREATE_TABLE = "auto-create-table";
+    String TABLE_IMPORT_AUTO_CREATE_TABLE_DESC = "Create table and database if doesn't exist";
 
     ////////////////////////////////////////
     // UPLOAD_PARTS_OPTIONS               //
