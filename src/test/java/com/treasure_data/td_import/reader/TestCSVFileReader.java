@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.spy;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
@@ -296,7 +296,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context02 context = new Context02();
 
         // override system properties:-(
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
         options.setOptions(new String[] {
                 "--format",
@@ -317,7 +317,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context03 context = new Context03();
 
         // override system properties:-(
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
         options.setOptions(new String[] {
                 "--format",
@@ -338,7 +338,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context04 context = new Context04();
 
         // override system properties:-(
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
         options.setOptions(new String[] {
                 "--format",
@@ -359,7 +359,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context05 context = new Context05();
 
         // override system properties:-(
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
         options.setOptions(new String[] {
                 "--format",
@@ -380,7 +380,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         Context06 context = new Context06();
 
         // override system properties:-(
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
         options.setOptions(new String[] {
                 "--format",

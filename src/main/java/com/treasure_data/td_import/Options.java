@@ -31,13 +31,13 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 
-public class BulkImportOptions {
-    private static final Logger LOG = Logger.getLogger(BulkImportOptions.class.getName());
+public class Options {
+    private static final Logger LOG = Logger.getLogger(Options.class.getName());
 
     protected OptionParser op;
     protected OptionSet options;
 
-    public BulkImportOptions() {
+    public Options() {
         op = new OptionParser();
     }
 

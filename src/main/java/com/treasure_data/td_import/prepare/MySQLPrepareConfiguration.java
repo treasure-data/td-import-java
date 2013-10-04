@@ -20,7 +20,7 @@ package com.treasure_data.td_import.prepare;
 import java.util.List;
 import java.util.Properties;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
 
@@ -30,7 +30,7 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
     protected String table;
 
     @Override
-    public void configure(Properties props, BulkImportOptions options) {
+    public void configure(Properties props, Options options) {
         super.configure(props, options);
 
         setJdbcUrl();

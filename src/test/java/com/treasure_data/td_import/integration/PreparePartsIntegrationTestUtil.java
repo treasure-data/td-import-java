@@ -22,7 +22,7 @@ import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.UnpackerIterator;
 
 import com.treasure_data.td_import.BulkImportMain;
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 
 @Ignore

@@ -19,7 +19,7 @@ package com.treasure_data.td_import.upload;
 
 import java.util.Properties;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 
 public class UploadConfigurationBase extends PrepareConfiguration {
@@ -35,7 +35,7 @@ public class UploadConfigurationBase extends PrepareConfiguration {
         throw new UnsupportedOperationException();
     }
 
-    public void configure(Properties props, BulkImportOptions options) {
+    public void configure(Properties props, Options options) {
         super.configure(props, options);
 
         // parallel

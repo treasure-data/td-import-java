@@ -23,21 +23,21 @@ import joptsimple.OptionSet;
 
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 
 public class UploadConfiguration extends UploadConfigurationBase {
 
     public static class Factory {
-        protected BulkImportOptions options;
+        protected Options options;
 
         public Factory(Properties props) {
-            options = new BulkImportOptions();
+            options = new Options();
             options.initUploadOptionParser(props);
         }
 
-        public BulkImportOptions getBulkImportOptions() {
+        public Options getBulkImportOptions() {
             return options;
         }
 
@@ -112,7 +112,7 @@ public class UploadConfiguration extends UploadConfigurationBase {
         return sbuf.toString();
     }
 
-    public void configure(Properties props, BulkImportOptions options) {
+    public void configure(Properties props, Options options) {
         super.configure(props, options);
 
         // auto-create-session

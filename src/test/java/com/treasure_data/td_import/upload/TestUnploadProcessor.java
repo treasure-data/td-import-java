@@ -18,7 +18,7 @@ import org.junit.Test;
 import com.treasure_data.client.ClientException;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.upload.TaskResult;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
@@ -50,7 +50,7 @@ public class TestUnploadProcessor {
     }
 
     private Properties props;
-    protected BulkImportOptions options;
+    protected Options options;
     private UploadConfiguration conf;
     private UploadProcessor proc;
 
@@ -64,7 +64,7 @@ public class TestUnploadProcessor {
     public void createResources() throws Exception {
         props = System.getProperties();
 
-        options = new BulkImportOptions();
+        options = new Options();
         options.initUploadOptionParser(props);
         options.setOptions(new String[0]);
 

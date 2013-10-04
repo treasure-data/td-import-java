@@ -35,7 +35,7 @@ import java.util.zip.GZIPInputStream;
 
 import joptsimple.OptionSet;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.reader.ApacheFileReader;
@@ -51,10 +51,10 @@ import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
 public class PrepareConfiguration extends Configuration {
 
     public static class Factory {
-        protected BulkImportOptions options;
+        protected Options options;
 
         public Factory(Properties props, boolean isUploaded) {
-            options = new BulkImportOptions();
+            options = new Options();
             if (isUploaded) {
                 options.initUploadOptionParser(props);
             } else {
@@ -62,7 +62,7 @@ public class PrepareConfiguration extends Configuration {
             }
         }
 
-        public BulkImportOptions getBulkImportOptions() {
+        public Options getBulkImportOptions() {
             return options;
         }
 
@@ -385,7 +385,7 @@ public class PrepareConfiguration extends Configuration {
 
     // FIXME this field is also declared in td-client.Config.
     protected Properties props;
-    protected BulkImportOptions options;
+    protected Options options;
     protected OptionSet optionSet;
 
     protected Format format;
@@ -409,7 +409,7 @@ public class PrepareConfiguration extends Configuration {
     public PrepareConfiguration() {
     }
 
-    public void configure(Properties props, BulkImportOptions options) {
+    public void configure(Properties props, Options options) {
         this.props = props;
         this.options = options;
         this.optionSet = options.getOptions();

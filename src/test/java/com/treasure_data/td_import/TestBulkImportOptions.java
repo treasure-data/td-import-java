@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 
 public class TestBulkImportOptions {
 
@@ -38,12 +38,12 @@ public class TestBulkImportOptions {
     private final String sampleParallel = "10";
 
     protected Properties props;
-    protected BulkImportOptions actualOpts;
+    protected Options actualOpts;
 
     @Before
     public void createResources() throws Exception {
         props = System.getProperties();
-        actualOpts = new BulkImportOptions();
+        actualOpts = new Options();
     }
 
     @Test @Ignore
@@ -102,7 +102,7 @@ public class TestBulkImportOptions {
         return uploadArgs;
     }
 
-    public void assertPrepareOptionEquals(BulkImportOptions actualOpts) throws Exception {
+    public void assertPrepareOptionEquals(Options actualOpts) throws Exception {
         assertOptionEquals("f", sampleFormat, actualOpts);
         assertOptionEquals("format", sampleFormat, actualOpts);
         assertOptionEquals("C", sampleCompress, actualOpts);
@@ -128,13 +128,13 @@ public class TestBulkImportOptions {
         assertOptionEquals("prepare-parallel", samplePrepareParallel, actualOpts);
     }
 
-    public void assertUploadOptionEquals(BulkImportOptions actualOpts) throws Exception {
+    public void assertUploadOptionEquals(Options actualOpts) throws Exception {
         assertPrepareOptionEquals(actualOpts);
         assertOptionEquals("auto-perform", actualOpts);
         assertOptionEquals("auto-commit", actualOpts);
         assertOptionEquals("parallel", sampleParallel, actualOpts);
     }
-    public void assertOptionEquals(String expectedName, BulkImportOptions actual)
+    public void assertOptionEquals(String expectedName, Options actual)
             throws Exception {
         OptionSet set = actual.getOptions();
         assertTrue(set.has(expectedName));
@@ -142,13 +142,13 @@ public class TestBulkImportOptions {
     }
 
     public void assertOptionEquals(String expectedName, String expectedArg,
-            BulkImportOptions actual) throws Exception {
+            Options actual) throws Exception {
         assertOptionWithRequiredArgEquals(expectedName, actual);
         assertEquals(expectedArg, actual.getOptions().valueOf(expectedName));
     }
 
     public void assertOptionEquals(String expectedName, String[] expectedArgs,
-            BulkImportOptions actual) throws Exception {
+            Options actual) throws Exception {
         assertOptionWithRequiredArgEquals(expectedName, actual);
         @SuppressWarnings("unchecked")
         List<String> args = (List<String>) actual.getOptions().valuesOf(expectedName);
@@ -159,7 +159,7 @@ public class TestBulkImportOptions {
     }
 
     public void assertOptionWithRequiredArgEquals(String expectedName,
-            BulkImportOptions actual) throws Exception {
+            Options actual) throws Exception {
         OptionSet set = actual.getOptions();
         assertTrue(set.has(expectedName));
         assertTrue(set.hasArgument(expectedName));

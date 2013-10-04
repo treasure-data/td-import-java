@@ -17,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.treasure_data.client.ClientException;
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.BulkImportOptionsTestUtil;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.TaskResult;
@@ -56,7 +56,7 @@ public class TestMultiThreadUploadProcessor {
     }
 
     private Properties props;
-    protected BulkImportOptions options;
+    protected Options options;
     private UploadConfiguration conf;
     private MultiThreadUploadProcessor proc;
 

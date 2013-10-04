@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.writer.FileWriter;
@@ -16,7 +16,7 @@ import com.treasure_data.td_import.writer.FileWriter;
 public class TestMsgpackGZIPFileWriter {
 
     protected Properties props;
-    protected BulkImportOptions options;
+    protected Options options;
     protected PrepareConfiguration conf;
     protected FileWriter writer;
 
@@ -28,7 +28,7 @@ public class TestMsgpackGZIPFileWriter {
                 Configuration.BI_PREPARE_PARTS_OUTPUTFORMAT_DEFAULTVALUE); // msgpackgz
 
         // create options
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
         options.setOptions(new String[0]);
 

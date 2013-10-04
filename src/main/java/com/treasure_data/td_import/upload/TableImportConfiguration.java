@@ -20,20 +20,20 @@ package com.treasure_data.td_import.upload;
 import java.util.Properties;
 
 import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 
 public class TableImportConfiguration extends UploadConfigurationBase {
 
     public static class Factory {
-        protected BulkImportOptions options;
+        protected Options options;
 
         public Factory(Properties props) {
-            options = new BulkImportOptions();
+            options = new Options();
             options.initTableImportOptionParser(props);
         }
 
-        public BulkImportOptions getTableImportOptions() {
+        public Options getTableImportOptions() {
             return options;
         }
 
@@ -84,7 +84,7 @@ public class TableImportConfiguration extends UploadConfigurationBase {
         return sbuf.toString();
     }
 
-    public void configure(Properties props, BulkImportOptions options) {
+    public void configure(Properties props, Options options) {
         super.configure(props, options);
 
         // 'format' is checked in super.configuration(..)

@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
@@ -21,7 +21,7 @@ public class FileReaderTestUtil<T extends PrepareConfiguration> {
     protected long baseTime;
 
     protected Properties props;
-    protected BulkImportOptions options;
+    protected Options options;
     protected T conf;
 
     protected FileReader<T> reader;
@@ -49,7 +49,7 @@ public class FileReaderTestUtil<T extends PrepareConfiguration> {
     }
 
     protected void createBulkImportOptions() throws Exception {
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
     }
 

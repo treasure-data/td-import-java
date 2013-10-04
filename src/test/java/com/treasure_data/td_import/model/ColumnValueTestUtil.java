@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.model.ColumnValue;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
@@ -23,7 +23,7 @@ import com.treasure_data.td_import.writer.FileWriterTestUtil;
 public class ColumnValueTestUtil<T> {
 
     protected Properties props;
-    protected BulkImportOptions options;
+    protected Options options;
     protected PrepareConfiguration conf;
 
     protected ColumnValue columnValue;
@@ -38,7 +38,7 @@ public class ColumnValueTestUtil<T> {
     public void createResources() throws Exception {
         props = System.getProperties();
 
-        options = new BulkImportOptions();
+        options = new Options();
         options.initPrepareOptionParser(props);
         options.setOptions(new String[0]);
 

@@ -20,7 +20,7 @@ package com.treasure_data.td_import.prepare;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.treasure_data.td_import.BulkImportOptions;
+import com.treasure_data.td_import.Options;
 
 public class SyslogPrepareConfiguration extends PrepareConfiguration {
     private static final Logger LOG = Logger
@@ -29,7 +29,7 @@ public class SyslogPrepareConfiguration extends PrepareConfiguration {
     public SyslogPrepareConfiguration() {
     }
 
-    public void configure(Properties props, BulkImportOptions options) {
+    public void configure(Properties props, Options options) {
         super.configure(props, options);
     }
 }
