@@ -251,8 +251,9 @@ public class BulkImportCommand extends BulkImport {
         uploadProc.joinWorkers();
         List<com.treasure_data.td_import.upload.TaskResult> uploadResults = uploadProc
                 .getTaskResults();
-        showUploadResults(uploadResults);
-        listNextStepOfUploadProc(uploadResults, sessionName);
+
+        commandHelper.showUploadResults(uploadResults);
+        commandHelper.listNextStepOfUploadProc(uploadResults, sessionName);
 
         if (!hasNoUploadError(uploadResults)
                 || (prepareResults != null && !hasNoPrepareError(prepareResults))) {
@@ -268,51 +269,6 @@ public class BulkImportCommand extends BulkImport {
         }
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
-    }
-
-    private static void showUploadResults(List<com.treasure_data.td_import.upload.TaskResult> results) {
-        System.out.println();
-        System.out.println("Upload status:");
-        for (com.treasure_data.td_import.upload.TaskResult result : results) {
-            String status;
-            if (result.error == null) {
-                status = Configuration.STAT_SUCCESS;
-            } else {
-                status = Configuration.STAT_ERROR;
-            }
-            com.treasure_data.td_import.upload.UploadTask task = (com.treasure_data.td_import.upload.UploadTask) result.task;
-            System.out.println(String.format("  File    : %s", result.task.fileName));
-            System.out.println(String.format("    Status          : %s", status));
-            System.out.println(String.format("    Part name       : %s", task.partName));
-            System.out.println(String.format("    Size            : %d", task.size));
-            System.out.println(String.format("    Retry count     : %d", result.retryCount));
-        }
-        System.out.println();
-    }
-
-    private static void listNextStepOfUploadProc(List<com.treasure_data.td_import.upload.TaskResult> results,
-            String sessionName) {
-        System.out.println();
-        System.out.println("Next Steps:");
-        boolean hasErrors = false;
-        for (com.treasure_data.td_import.upload.TaskResult result : results) {
-            if (result.error != null) {
-                // error
-                System.out.println(String.format(
-                        "  => check td-bulk-import.log and re-upload %s: %s.",
-                        result.task.fileName, result.error.getMessage()));
-                hasErrors = true;
-            }
-        }
-
-        if (!hasErrors) {
-            // success
-            System.out.println(String.format(
-                    "  => execute 'td import:perform %s'.",
-                    sessionName));
-        }
-
-        System.out.println();
     }
 
     public static void main(final String[] args) throws Exception {
