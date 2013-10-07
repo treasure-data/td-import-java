@@ -36,24 +36,46 @@ import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
 
-public class BulkImportMain {
-    private static final Logger LOG = Logger.getLogger(BulkImportMain.class.getName());
+public class BulkImportCommand extends BulkImport {
+    private static final Logger LOG = Logger.getLogger(BulkImportCommand.class.getName());
 
-    public static void prepare(final String[] args, Properties props)
-            throws Exception {
+    protected CommandHelper commandHelper;
+
+    public BulkImportCommand(Properties props) {
+        super(props);
+        commandHelper = new CommandHelper();
+    }
+
+    public void doCommand(final Configuration.Command cmd, final String[] args) throws Exception {
+        if (cmd.equals(Configuration.Command.PREPARE)) {
+            doPrepareCommand(args);
+        } else if (cmd.equals(Configuration.Command.UPLOAD)) {
+            doUploadCommand(args);
+        } else if (cmd.equals(Configuration.Command.AUTO)) {
+            String[] realargs = new String[args.length + 3];
+            realargs[args.length] = Configuration.BI_UPLOAD_AUTO_COMMIT_HYPHEN;
+            realargs[args.length + 1] = Configuration.BI_UPLOAD_AUTO_PERFORM_HYPHEN;
+            realargs[args.length + 2] = Configuration.BI_UPLOAD_AUTO_DELETE_HYPHEN;
+            System.arraycopy(args, 0, realargs, 0, args.length);
+
+            props.setProperty(Configuration.CMD_AUTO_ENABLE, "true");
+
+            doUploadCommand(realargs);
+        } else {
+            throw new UnsupportedOperationException("Fatal error");
+        }
+    }
+
+    public void doPrepareCommand(final String[] args) throws Exception {
         LOG.info(String.format("Start '%s' command", Configuration.CMD_PREPARE));
 
         // create configuration for 'prepare' processing
-        final PrepareConfiguration conf = createPrepareConfiguration(props, args);
+        final PrepareConfiguration conf = createPrepareConf(props, args);
 
-        // extract command-line arguments
-        List<String> argList = conf.getNonOptionArguments();
-        final String[] fileNames = new String[argList.size() - 1]; // delete 'prepare_parts'
-        for (int i = 0; i < fileNames.length; i++) {
-            fileNames[i] = argList.get(i + 1);
-        }
+        // extract and get file names from command-line arguments
+        final String[] fileNames = getFileNames(conf, 1);
 
-        showPrepare(fileNames, conf.getOutputDirName());
+        commandHelper.showPrepare(fileNames, conf.getOutputDirName());
 
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -84,25 +106,24 @@ public class BulkImportMain {
             }
         }).start();
 
+        // wait for finishing prepare processing
         proc.joinWorkers();
-        List<com.treasure_data.td_import.prepare.TaskResult> prepareResults = proc
-                .getTaskResults();
 
-        showPrepareResults(prepareResults);
-        listNextStepOfPrepareProc(prepareResults);
+        // extract task results of each prepare processing
+        List<com.treasure_data.td_import.prepare.TaskResult> prepareResults =
+                proc.getTaskResults();
+
+        commandHelper.showPrepareResults(prepareResults);
+        commandHelper.listNextStepOfPrepareProc(prepareResults);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
     }
 
-    public static void upload(final String[] args, Properties props)
-            throws Exception {
+    public void doUploadCommand(final String[] args) throws Exception {
         LOG.info(String.format("Start '%s' command", Configuration.CMD_UPLOAD));
 
         // create configuration for 'upload' processing
-        final UploadConfiguration uploadConf = createUploadConfiguration(props, args);
-
-        // extract command-line arguments
-        List<String> argList = uploadConf.getNonOptionArguments();
+        final UploadConfiguration uploadConf = createUploadConf(props, args);
 
         // create TreasureDataClient and BulkImportClient objects
         TreasureDataClient tdClient = new TreasureDataClient(uploadConf.getProperties());
@@ -145,7 +166,9 @@ public class BulkImportMain {
 
             filePos = 1;
         } else {
-            sessionName = argList.get(1); // get session name from command-line arguments
+            // get session name from command-line arguments
+            sessionName = getBulkImportSessionName(uploadConf);
+
             // validate that the session is live or not
             e = UploadProcessor.checkSession(biClient, uploadConf, sessionName);
             if (e.error != null) {
@@ -163,13 +186,10 @@ public class BulkImportMain {
                     sessionName, sessionName));
         }
 
-        // configure uploaded file list
-        final String[] fileNames = new String[argList.size() - filePos]; // delete command
-        for (int i = 0; i < fileNames.length; i++) {
-            fileNames[i] = argList.get(i + filePos);
-        }
+        // get and extract uploaded files from command-line arguments
+        final String[] fileNames = getFileNames(uploadConf, filePos);
 
-        showUpload(fileNames, sessionName);
+        commandHelper.showUpload(fileNames, sessionName);
 
         MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
         uploadProc.registerWorkers();
@@ -205,7 +225,7 @@ public class BulkImportMain {
             }).start();
         } else {
             // create configuration for 'prepare' processing
-            final PrepareConfiguration prepareConf = createPrepareConfiguration(props, args, true);
+            final PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
 
             MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(prepareConf);
             prepareProc.registerWorkers();
@@ -236,8 +256,8 @@ public class BulkImportMain {
 
             prepareProc.joinWorkers();
             prepareResults = prepareProc.getTaskResults();
-            showPrepareResults(prepareResults);
-            listNextStepOfPrepareProc(prepareResults);
+            commandHelper.showPrepareResults(prepareResults);
+            commandHelper.listNextStepOfPrepareProc(prepareResults);
 
             // end of file list
             try {
@@ -268,152 +288,6 @@ public class BulkImportMain {
         }
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
-    }
-
-    private static boolean hasNoPrepareError(List<com.treasure_data.td_import.prepare.TaskResult> results) {
-        boolean hasNoError = true;
-        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
-            if (result.error != null) {
-                hasNoError = false;
-                break;
-            }
-        }
-        return hasNoError;
-    }
-
-    private static boolean hasNoUploadError(List<com.treasure_data.td_import.upload.TaskResult> results) {
-        boolean hasNoError = true;
-        for (com.treasure_data.td_import.upload.TaskResult result : results) {
-            if (result.error != null) {
-                hasNoError = false;
-                break;
-            }
-        }
-        return hasNoError;
-    }
-
-    private static void showPrepare(String[] fileNames, String outputDirName) {
-        System.out.println();
-        System.out.println("Preparing files");
-        System.out.println(String.format("  Output dir   : %s", outputDirName));
-        showFiles(fileNames);
-        System.out.println();
-    }
-
-    private static void showUpload(String[] fileNames, String sessionName) {
-        System.out.println();
-        System.out.println("Uploading prepared files");
-        System.out.println(String.format("  Session name : %s", sessionName));
-        showFiles(fileNames);
-        System.out.println();
-    }
-
-    private static void showFiles(String[] fileNames) {
-        for (String fileName : fileNames) {
-            System.out.println(String.format("  File       : %s (%d bytes)", fileName, new File(fileName).length()));
-        }
-    }
-
-    private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args) {
-        return createPrepareConfiguration(props, args, false);
-    }
-
-    private static PrepareConfiguration createPrepareConfiguration(Properties props, String[] args, boolean isUploaded) {
-        PrepareConfiguration.Factory fact = new PrepareConfiguration.Factory(props, isUploaded);
-        PrepareConfiguration conf = fact.newPrepareConfiguration(args);
-
-        if (!isUploaded) {
-            showHelp(Configuration.Command.PREPARE, conf, props, args);
-        }
-
-        conf.configure(props, fact.getBulkImportOptions());
-        return conf;
-    }
-
-    private static UploadConfiguration createUploadConfiguration(Properties props, String[] args) {
-        UploadConfiguration.Factory fact = new UploadConfiguration.Factory(props);
-        UploadConfiguration conf = fact.newUploadConfiguration(args);
-
-        showHelp(Configuration.Command.UPLOAD, conf, props, args);
-
-        conf.configure(props, fact.getBulkImportOptions());
-        return conf;
-    }
-
-    private static void showHelp(Configuration.Command cmd, PrepareConfiguration conf, Properties props, String[] args) {
-        if (conf.hasHelpOption()) {
-            System.out.println(cmd.showHelp(conf, props));
-            System.exit(0);
-        }
-    }
-
-    private static void showPrepareResults(List<com.treasure_data.td_import.prepare.TaskResult> results) {
-        System.out.println();
-        System.out.println("Prepare status:");
-        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
-            String status;
-            if (result.error == null) {
-                status = Configuration.STAT_SUCCESS;
-            } else {
-                status = Configuration.STAT_ERROR;
-            }
-            System.out.println(String.format("  File    : %s", result.task.fileName));
-            System.out.println(String.format("    Status          : %s", status));
-            System.out.println(String.format("    Read lines      : %d", result.readLines));
-            System.out.println(String.format("    Valid rows      : %d", result.convertedRows));
-            System.out.println(String.format("    Invalid rows    : %d", result.invalidRows));
-            int len = result.outFileNames.size();
-            boolean first = true;
-            for (int i = 0; i < len; i++) {
-                if (first) {
-                    System.out.println(String.format("    Converted Files : %s (%d bytes)",
-                            result.outFileNames.get(i), result.outFileSizes.get(i)));
-                    first = false;
-                } else {
-                    System.out.println(String.format("                      %s (%d bytes)",
-                            result.outFileNames.get(i), result.outFileSizes.get(i)));
-                }
-            }
-        }
-        System.out.println();
-    }
-
-    private static void listNextStepOfPrepareProc(List<com.treasure_data.td_import.prepare.TaskResult> results) {
-        System.out.println();
-        System.out.println("Next steps:");
-
-        List<String> readyToUploadFiles = new ArrayList<String>();
-
-        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
-            if (result.error == null) {
-                int len = result.outFileNames.size();
-                // success
-                for (int i = 0; i < len; i++) {
-                    readyToUploadFiles.add(result.outFileNames.get(i));
-                }
-            } else {
-                // error
-                System.out.println(String.format(
-                        "  => check td-bulk-import.log and original %s: %s.",
-                        result.task.fileName, result.error.getMessage()));
-            }
-        }
-
-        if(!readyToUploadFiles.isEmpty()) {
-            System.out.println(String.format(
-                        "  => execute following 'td import:upload' command. "
-                        + "if the bulk import session is not created yet, please create it "
-                        + "with 'td import:create <session> <database> <table>' command."));
-            StringBuilder sb = new StringBuilder();
-            sb.append("     $ td import:upload <session>");
-            for(String file : readyToUploadFiles) {
-                sb.append(" '");
-                sb.append(file);
-                sb.append("'");
-            }
-            System.out.println(sb);
-        }
-        System.out.println();
     }
 
     private static void showUploadResults(List<com.treasure_data.td_import.upload.TaskResult> results) {
@@ -466,31 +340,13 @@ public class BulkImportMain {
             throw new IllegalArgumentException("Command not specified");
         }
 
-        Properties props = System.getProperties();
-        String commandName = args[0].toLowerCase();
-        Configuration.Command cmd = Configuration.Command.fromString(commandName);
+        String cmdName = args[0].toLowerCase();
+        Configuration.Command cmd = Configuration.Command.fromString(cmdName);
         if (cmd == null) {
-            throw new IllegalArgumentException(
-                    String.format("Not support command %s", commandName));
+            throw new IllegalArgumentException(String.format("Command not support: %s", cmdName));
         }
 
-        if (cmd.equals(Configuration.Command.PREPARE)) {
-            prepare(args, props);
-        } else if (cmd.equals(Configuration.Command.UPLOAD)) {
-            upload(args, props);
-        } else if (cmd.equals(Configuration.Command.AUTO)) {
-            String[] args0 = new String[args.length + 3];
-            args0[args.length] = "--auto-commit";
-            args0[args.length + 1] = "--auto-perform";
-            args0[args.length + 2] = "--auto-delete";
-            System.arraycopy(args, 0, args0, 0, args.length);
-
-            props.setProperty(Configuration.CMD_AUTO_ENABLE, "true");
-
-            upload(args, props);
-        } else {
-            throw new UnsupportedOperationException("Fatal error");
-        }
+        Properties props = System.getProperties();
+        new BulkImportCommand(props).doCommand(cmd, args);
     }
-
 }
