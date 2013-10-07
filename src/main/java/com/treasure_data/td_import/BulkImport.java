@@ -52,34 +52,15 @@ public class BulkImport {
         // extract and get file names from command-line arguments
         final String[] fileNames = getFileNames(conf, 1);
 
-        MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
-        proc.registerWorkers();
-        proc.startWorkers();
+        MultiThreadPrepareProcessor proc =
+                createAndStartMultiThreadPrepareProcessor(conf);
 
-        // scan files that are uploaded
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < fileNames.length; i++) {
-                    try {
-                        com.treasure_data.td_import.prepare.Task task =
-                                new com.treasure_data.td_import.prepare.Task(
-                                        fileNames[i]);
-                        MultiThreadPrepareProcessor.addTask(task);
-                    } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addTask' method call");
-                        LOG.throwing("Main", "addTask", t);
-                    }
-                }
+        // create prepare tasks
+        final com.treasure_data.td_import.prepare.Task[] tasks =
+                createPrepareTasks(conf, fileNames);
 
-                // end of file list
-                try {
-                    MultiThreadPrepareProcessor.addFinishTask(conf);
-                } catch (Throwable t) {
-                    LOG.severe("Error occurred During 'addFinishTask' method call");
-                    LOG.throwing("Main", "addFinishTask", t);
-                }
-            }
-        }).start();
+        // start prepare tasks
+        startPrepareTasks(conf, tasks);
 
         // wait for finishing prepare processing
         proc.joinWorkers();
@@ -158,9 +139,8 @@ public class BulkImport {
         // get and extract uploaded files from command-line arguments
         final String[] fileNames = getFileNames(uploadConf, filePos);
 
-        MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
-        uploadProc.registerWorkers();
-        uploadProc.startWorkers();
+        MultiThreadUploadProcessor uploadProc =
+                createAndStartMultiThreadUploadProcessor(uploadConf);
 
         List<com.treasure_data.td_import.prepare.TaskResult> prepareResults = null;
 
@@ -194,9 +174,8 @@ public class BulkImport {
             // create configuration for 'prepare' processing
             final PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
 
-            MultiThreadPrepareProcessor prepareProc = new MultiThreadPrepareProcessor(prepareConf);
-            prepareProc.registerWorkers();
-            prepareProc.startWorkers();
+            MultiThreadPrepareProcessor prepareProc =
+                    createAndStartMultiThreadPrepareProcessor(prepareConf);
 
             // scan files that are uploaded
             new Thread(new Runnable() {
@@ -234,8 +213,8 @@ public class BulkImport {
         }
 
         uploadProc.joinWorkers();
-        List<com.treasure_data.td_import.upload.TaskResult> uploadResults = uploadProc
-                .getTaskResults();
+        List<com.treasure_data.td_import.upload.TaskResult> uploadResults =
+                uploadProc.getTaskResults();
 
         if (!hasNoUploadError(uploadResults)
                 || (prepareResults != null && !hasNoPrepareError(prepareResults))) {
@@ -253,14 +232,6 @@ public class BulkImport {
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
     }
 
-    protected String getBulkImportSessionName(UploadConfiguration conf) {
-        List<String> argList = conf.getNonOptionArguments();
-        if (argList.size() < 1) {
-            throw new IllegalArgumentException("Session name not specified");
-        }
-        return argList.get(1);
-    }
-
     protected String[] getFileNames(PrepareConfiguration conf, int filePos) {
         List<String> argList = conf.getNonOptionArguments();
         final String[] fileNames = new String[argList.size() - filePos];
@@ -268,6 +239,64 @@ public class BulkImport {
             fileNames[i] = argList.get(i + filePos);
         }
         return fileNames;
+    }
+
+    protected MultiThreadUploadProcessor createAndStartMultiThreadUploadProcessor(UploadConfiguration conf) {
+        MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
+        proc.registerWorkers();
+        proc.startWorkers();
+        return proc;
+    }
+
+    protected com.treasure_data.td_import.prepare.Task[] createPrepareTasks(
+            final PrepareConfiguration conf,
+            final String[] fileNames) {
+        com.treasure_data.td_import.prepare.Task[] tasks =
+                new com.treasure_data.td_import.prepare.Task[fileNames.length];
+        for (int i = 0; i < fileNames.length; i++) {
+            tasks[i] = new com.treasure_data.td_import.prepare.Task(fileNames[i]);
+        }
+        return tasks;
+    }
+
+    protected void startPrepareTasks(
+            final PrepareConfiguration conf,
+            final com.treasure_data.td_import.prepare.Task[] tasks) {
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < tasks.length; i++) {
+                    try {
+                        MultiThreadPrepareProcessor.addTask(tasks[i]);
+                    } catch (Throwable t) {
+                        LOG.severe("Error occurred During 'addTask' method call");
+                        LOG.throwing("Main", "addTask", t);
+                    }
+                }
+
+                // end of file list
+                try {
+                    MultiThreadPrepareProcessor.addFinishTask(conf);
+                } catch (Throwable t) {
+                    LOG.severe("Error occurred During 'addFinishTask' method call");
+                    LOG.throwing("Main", "addFinishTask", t);
+                }
+            }
+        }).start();
+    }
+
+    protected MultiThreadPrepareProcessor createAndStartMultiThreadPrepareProcessor(PrepareConfiguration conf) {
+        MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
+        proc.registerWorkers();
+        proc.startWorkers();
+        return proc;
+    }
+
+    protected String getBulkImportSessionName(UploadConfiguration conf) {
+        List<String> argList = conf.getNonOptionArguments();
+        if (argList.size() < 1) {
+            throw new IllegalArgumentException("Session name not specified");
+        }
+        return argList.get(1);
     }
 
     protected boolean hasNoPrepareError(List<com.treasure_data.td_import.prepare.TaskResult> results) {

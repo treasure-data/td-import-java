@@ -77,34 +77,15 @@ public class BulkImportCommand extends BulkImport {
 
         commandHelper.showPrepare(fileNames, conf.getOutputDirName());
 
-        MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
-        proc.registerWorkers();
-        proc.startWorkers();
+        MultiThreadPrepareProcessor proc =
+                createAndStartMultiThreadPrepareProcessor(conf);
 
-        // scan files that are uploaded
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < fileNames.length; i++) {
-                    try {
-                        com.treasure_data.td_import.prepare.Task task =
-                                new com.treasure_data.td_import.prepare.Task(
-                                        fileNames[i]);
-                        MultiThreadPrepareProcessor.addTask(task);
-                    } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addTask' method call");
-                        LOG.throwing("Main", "addTask", t);
-                    }
-                }
+        // create prepare tasks
+        final com.treasure_data.td_import.prepare.Task[] tasks =
+                createPrepareTasks(conf, fileNames);
 
-                // end of file list
-                try {
-                    MultiThreadPrepareProcessor.addFinishTask(conf);
-                } catch (Throwable t) {
-                    LOG.severe("Error occurred During 'addFinishTask' method call");
-                    LOG.throwing("Main", "addFinishTask", t);
-                }
-            }
-        }).start();
+        // start prepare tasks
+        startPrepareTasks(conf, tasks);
 
         // wait for finishing prepare processing
         proc.joinWorkers();
@@ -191,9 +172,8 @@ public class BulkImportCommand extends BulkImport {
 
         commandHelper.showUpload(fileNames, sessionName);
 
-        MultiThreadUploadProcessor uploadProc = new MultiThreadUploadProcessor(uploadConf);
-        uploadProc.registerWorkers();
-        uploadProc.startWorkers();
+        MultiThreadUploadProcessor uploadProc =
+                createAndStartMultiThreadUploadProcessor(uploadConf);
 
         List<com.treasure_data.td_import.prepare.TaskResult> prepareResults = null;
 
