@@ -21,8 +21,7 @@ import org.msgpack.type.Value;
 import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.UnpackerIterator;
 
-import com.treasure_data.td_import.BulkImportMain;
-import com.treasure_data.td_import.Options;
+import com.treasure_data.td_import.BulkImportCommand;
 import com.treasure_data.td_import.Configuration;
 
 @Ignore
@@ -39,11 +38,15 @@ public class PreparePartsIntegrationTestUtil {
     protected List<String> opts;
     protected List<String> args;
 
+    protected BulkImportCommand command;
+
     @Before
     public void createResources() throws Exception {
         props = new Properties();
         opts = new ArrayList<String>();
         args = new ArrayList<String>();
+
+        command = new BulkImportCommand(props);
     }
 
     @After
@@ -111,7 +114,7 @@ public class PreparePartsIntegrationTestUtil {
         args.add(fileName);
         args.addAll(opts);
 
-        BulkImportMain.prepare(args.toArray(new String[0]), props);
+        command.doPrepareCommand(args.toArray(new String[0]));
     }
 
     public void preparePartsFromCSVWithTimeColumn() throws Exception {

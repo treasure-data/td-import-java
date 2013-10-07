@@ -7,10 +7,9 @@ import java.util.Properties;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.td_import.BulkImportMain;
 import com.treasure_data.td_import.Configuration;
 
-public class TestBulkImportMain {
+public class TestBulkImportCommand {
 
     @Test @Ignore
     public void testPrepareParts01() throws Exception {
@@ -42,7 +41,7 @@ public class TestBulkImportMain {
 
         args.addAll(opts);
 
-        BulkImportMain.prepare(args.toArray(new String[0]), props);
+        new BulkImportCommand(props).doPrepareCommand(args.toArray(new String[0]));
     }
 
 //    @Test @Ignore
@@ -89,7 +88,7 @@ public class TestBulkImportMain {
 
         args.addAll(opts);
 
-        BulkImportMain.upload(args.toArray(new String[0]), props);
+        new BulkImportCommand(props).doUploadCommand(args.toArray(new String[0]));
     }
 
     @Test @Ignore
@@ -115,7 +114,7 @@ public class TestBulkImportMain {
 
         args.addAll(opts);
 
-        BulkImportMain.upload(args.toArray(new String[0]), props);
+        new BulkImportCommand(props).doUploadCommand(args.toArray(new String[0]));
     }
 
 //    @Test @Ignore
