@@ -17,5 +17,102 @@
 //
 package com.treasure_data.td_import;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 public class CommandHelper {
+    public CommandHelper() {
+    }
+
+    public void showPrepare(String[] fileNames, String outputDirName) {
+        System.out.println();
+        System.out.println("Preparing files");
+        System.out.println(String.format("  Output dir   : %s", outputDirName));
+        showFiles(fileNames);
+        System.out.println();
+    }
+
+    public void showUpload(String[] fileNames, String sessionName) {
+        System.out.println();
+        System.out.println("Uploading prepared files");
+        System.out.println(String.format("  Session name : %s", sessionName));
+        showFiles(fileNames);
+        System.out.println();
+    }
+
+    protected void showFiles(String[] fileNames) {
+        for (String fileName : fileNames) {
+            System.out.println(String.format("  File       : %s (%d bytes)", fileName, new File(fileName).length()));
+        }
+    }
+
+    public void showPrepareResults(List<com.treasure_data.td_import.prepare.TaskResult> results) {
+        System.out.println();
+        System.out.println("Prepare status:");
+        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
+            String status;
+            if (result.error == null) {
+                status = Configuration.STAT_SUCCESS;
+            } else {
+                status = Configuration.STAT_ERROR;
+            }
+            System.out.println(String.format("  File    : %s", result.task.fileName));
+            System.out.println(String.format("    Status          : %s", status));
+            System.out.println(String.format("    Read lines      : %d", result.readLines));
+            System.out.println(String.format("    Valid rows      : %d", result.convertedRows));
+            System.out.println(String.format("    Invalid rows    : %d", result.invalidRows));
+            int len = result.outFileNames.size();
+            boolean first = true;
+            for (int i = 0; i < len; i++) {
+                if (first) {
+                    System.out.println(String.format("    Converted Files : %s (%d bytes)",
+                            result.outFileNames.get(i), result.outFileSizes.get(i)));
+                    first = false;
+                } else {
+                    System.out.println(String.format("                      %s (%d bytes)",
+                            result.outFileNames.get(i), result.outFileSizes.get(i)));
+                }
+            }
+        }
+        System.out.println();
+    }
+
+    public void listNextStepOfPrepareProc(List<com.treasure_data.td_import.prepare.TaskResult> results) {
+        System.out.println();
+        System.out.println("Next steps:");
+
+        List<String> readyToUploadFiles = new ArrayList<String>();
+
+        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
+            if (result.error == null) {
+                int len = result.outFileNames.size();
+                // success
+                for (int i = 0; i < len; i++) {
+                    readyToUploadFiles.add(result.outFileNames.get(i));
+                }
+            } else {
+                // error
+                System.out.println(String.format(
+                        "  => check td-bulk-import.log and original %s: %s.",
+                        result.task.fileName, result.error.getMessage()));
+            }
+        }
+
+        if(!readyToUploadFiles.isEmpty()) {
+            System.out.println(String.format(
+                        "  => execute following 'td import:upload' command. "
+                        + "if the bulk import session is not created yet, please create it "
+                        + "with 'td import:create <session> <database> <table>' command."));
+            StringBuilder sb = new StringBuilder();
+            sb.append("     $ td import:upload <session>");
+            for(String file : readyToUploadFiles) {
+                sb.append(" '");
+                sb.append(file);
+                sb.append("'");
+            }
+            System.out.println(sb);
+        }
+        System.out.println();
+    }
 }
