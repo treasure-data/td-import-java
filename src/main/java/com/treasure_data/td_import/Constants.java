@@ -130,6 +130,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // help
     String BI_PREPARE_PARTS_HELP = "help";
+    String HYPHENHYPHEN = "--";
     String BI_PREPARE_PARTS_HELP_DESC = "show this help message";
 
     ////////////////////////////////////////
@@ -165,25 +166,30 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // auto-craete
     String BI_UPLOAD_PARTS_AUTO_CREATE = "auto-create";
+    String BI_UPLOAD_AUTO_CREATE_HYPHEN = HYPHENHYPHEN + BI_UPLOAD_PARTS_AUTO_CREATE;
     String BI_UPLOAD_PARTS_AUTO_CREATE_DESC =
             "create automatically bulk import session by specified database and table names";
 
     // auto-delete
     String BI_UPLOAD_PARTS_AUTO_DELETE = "auto-delete";
+    String BI_UPLOAD_AUTO_DELETE_HYPHEN = HYPHENHYPHEN + BI_UPLOAD_PARTS_AUTO_DELETE;
     String BI_UPLOAD_PARTS_AUTO_DELETE_DESC = "delete bulk import session automatically";
 
     // auto-perform
     String BI_UPLOAD_PARTS_AUTO_PERFORM = "auto-perform";
+    String BI_UPLOAD_AUTO_PERFORM_HYPHEN = HYPHENHYPHEN + BI_UPLOAD_PARTS_AUTO_PERFORM;
     String BI_UPLOAD_PARTS_AUTO_PERFORM_DEFAULTVALUE = "false";
     String BI_UPLOAD_PARTS_AUTO_PERFORM_DESC = "perform bulk import job automatically";
 
     // auto-commit
     String BI_UPLOAD_PARTS_AUTO_COMMIT = "auto-commit";
+    String BI_UPLOAD_AUTO_COMMIT_HYPHEN = HYPHENHYPHEN + BI_UPLOAD_PARTS_AUTO_COMMIT;
     String BI_UPLOAD_PARTS_AUTO_COMMIT_DEFAULTVALUE = "false";
     String BI_UPLOAD_PARTS_AUTO_COMMIT_DESC = "commit bulk import job automatically";
 
     // parallel NUM
     String BI_UPLOAD_PARTS_PARALLEL = "parallel";
+    String BI_UPLOAD_AUTO_PARALLEL_HYPHEN = HYPHENHYPHEN + BI_UPLOAD_PARTS_PARALLEL;
     String BI_UPLOAD_PARTS_PARALLEL_DEFAULTVALUE = "2";
     String BI_UPLOAD_PARTS_PARALLEL_MAX_VALUE = "8";
     String BI_UPLOAD_PARTS_PARALLEL_DESC = "upload in parallel (default: 2; max 8)";
@@ -202,6 +208,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // format [csv, tsv, json, msgpack, apache, regexp]; default=auto detect
     String BI_PREPARE_PARTS_FORMAT = "format";
+    String BI_PREPARE_FORMAT_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_FORMAT;
     String BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE = "csv"; // default 'csv'
     String BI_PREPARE_PARTS_FORMAT_DESC = "source file format [csv, tsv, json, msgpack]; default=csv";
 
@@ -211,51 +218,63 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // compress [gzip,.., auto]; default=auto detect
     String BI_PREPARE_PARTS_COMPRESSION = "compress";
+    String BI_PREPARE_COMPRESSION_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COMPRESSION;
     String BI_PREPARE_PARTS_COMPRESSION_DEFAULTVALUE = "auto";
     String BI_PREPARE_PARTS_COMPRESSION_DESC = "compressed type [gzip, none]; default=auto detect";
 
     // parallel
     String BI_PREPARE_PARTS_PARALLEL = "prepare-parallel";
+    String BI_PREPARE_PARALLEL_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_PARALLEL;
     String BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE = "1";
     String BI_PREPARE_PARTS_PARALLEL_DESC = "prepare in parallel (default: 2; max 8)";
 
     // encoding [utf-8,...]
     String BI_PREPARE_PARTS_ENCODING = "encoding";
+    String BI_PREPARE_ENCODING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ENCODING;
     String BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE = "UTF-8";
     String BI_PREPARE_PARTS_ENCODING_DESC = "encoding type [UTF-8]; default=UTF-8";
 
     // columns, column-types
     String BI_PREPARE_PARTS_COLUMNS = "columns";
+    String BI_PREPARE_COLUMNS_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNS;
     String BI_PREPARE_PARTS_COLUMNS_DESC = "column names (use --column-header instead if the first line has column names)";
     String BI_PREPARE_PARTS_COLUMNTYPES = "column-types";
+    String BI_PREPARE_COLUMNTYPES_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNTYPES;
     String BI_PREPARE_PARTS_COLUMNTYPES_DESC = "column types [string, int, long]";
 
     // exclude-columns, only-columns
     String BI_PREPARE_PARTS_EXCLUDE_COLUMNS = "exclude-columns";
+    String BI_PREPARE_EXCLUDE_COLUMNS_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_EXCLUDE_COLUMNS;
     String BI_PREPARE_PARTS_EXCLUDE_COLUMNS_DESC = "exclude columns";
     String BI_PREPARE_PARTS_ONLY_COLUMNS = "only-columns";
+    String BI_PREPARE_ONLY_COLUMNS_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ONLY_COLUMNS;
     String BI_PREPARE_PARTS_ONLY_COLUMNS_DESC = "only columns";
 
     // time-column NAME; default='time'
     String BI_PREPARE_PARTS_TIMECOLUMN = "time-column";
+    String BI_PREPARE_TIMECOLUMN_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_TIMECOLUMN;
     String BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE = "time";
     String BI_PREPARE_PARTS_TIMECOLUMN_DESC = "name of the time column";
 
     // time-value
     String BI_PREPARE_PARTS_TIMEVALUE = "time-value";
+    String BI_PREPARE_TIMEVALUE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_TIMEVALUE;
     String BI_PREPARE_PARTS_TIMEVALUE_DESC = "long value of the time column";
 
     // time-format STRF_FORMAT; default=auto detect
     String BI_PREPARE_PARTS_TIMEFORMAT = "time-format";
+    String BI_PREPARE_TIMEFORMAT_HYPHEN_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_TIMEFORMAT;
     String BI_PREPARE_PARTS_TIMEFORMAT_DESC = "STRF_FORMAT; strftime(3) format of the time column";
 
     // output DIR
     String BI_PREPARE_PARTS_OUTPUTDIR = "output";
+    String BI_PREPARE_OUTPUTDIR_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_OUTPUTDIR;
     String BI_PREPARE_PARTS_OUTPUTDIR_DEFAULTVALUE = "out"; // './out/'
     String BI_PREPARE_PARTS_OUTPUTDIR_DESC = "output directory";
 
     // error handling
     String BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING = "error-records-handling";
+    String BI_PREPARE_ERROR_RECORDS_HANDLING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING;
     String BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE= "skip";
     String BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DESC = "error records handling mode [skip, abort]; default=skip";
 
@@ -264,6 +283,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_DRYRUN_DEFAULTVALUE = "false";
 
     String BI_PREPARE_PARTS_SPLIT_SIZE = "split-size";
+    String BI_PREPARE_SPLIT_SIZE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_SPLIT_SIZE;
     String BI_PREPARE_PARTS_SPLIT_SIZE_DEFAULTVALUE ="16384";
     String BI_PREPARE_PARTS_SPLIT_SIZE_DESC = "size of each parts (default: 16384)";
 
@@ -273,22 +293,26 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // quote [DOUBLE, SINGLE]; default=DOUBLE
     String BI_PREPARE_PARTS_QUOTE = "quote";
+    String BI_PREPARE_QUOTE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_QUOTE;
     String BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE = "DOUBLE";
     String BI_PREPARE_PARTS_QUOTE_DESC = "quote [DOUBLE, SINGLE]; default=DOUBLE";
 
     // delimiter CHAR; default=',' at 'csv', '\t' at 'tsv'
     String BI_PREPARE_PARTS_DELIMITER = "delimiter";
+    String BI_PREPARE_DELIMITER_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_DELIMITER;
     String BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE = ",";
     String BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE = "\t";
     String BI_PREPARE_PARTS_DELIMITER_DESC = "delimiter CHAR; default=\",\" at csv, \"\\t\" at tsv";
 
     // newline [CRLF, LF, CR]; default=CRLF (or auto detect?)
     String BI_PREPARE_PARTS_NEWLINE = "newline";
+    String BI_PREPARE_NEWLINE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_NEWLINE;
     String BI_PREPARE_PARTS_NEWLINE_DEFAULTVALUE = "CRLF"; // default CRLF
     String BI_PREPARE_PARTS_NEWLINE_DESC = "newline [CRLR, LR, CR];  default=CRLF";
 
     // column-header; default=true
     String BI_PREPARE_PARTS_COLUMNHEADER = "column-header";
+    String BI_PREPARE_COLUMNHEADER_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNHEADER;
     String BI_PREPARE_PARTS_COLUMNHEADER_DEFAULTVALUE = "false";
     String BI_PREPARE_PARTS_COLUMNHEADER_DESC = "first line includes column names";
 
