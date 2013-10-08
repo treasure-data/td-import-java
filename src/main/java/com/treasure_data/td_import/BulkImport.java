@@ -53,7 +53,7 @@ public class BulkImport {
         String[] fileNames = getFileNames(conf, 1);
 
         MultiThreadPrepareProcessor proc =
-                createAndStartMultiThreadPrepareProcessor(conf);
+                createAndStartPrepareProcessor(conf);
 
         // create prepare tasks
         com.treasure_data.td_import.prepare.Task[] tasks = createPrepareTasks(conf, fileNames);
@@ -61,12 +61,10 @@ public class BulkImport {
         // start prepare tasks
         startPrepareTasks(conf, tasks);
 
-        return stopMultiThreadPrepareProcessor(proc);
+        return stopPrepareProcessor(proc);
     }
 
     public List<com.treasure_data.td_import.TaskResult<?>> doUpload(final String[] args) throws Exception {
-        LOG.info(String.format("Start '%s' command", Configuration.CMD_UPLOAD));
-
         // create configuration for 'upload' processing
         UploadConfiguration uploadConf = createUploadConf(props, args);
 
@@ -108,7 +106,7 @@ public class BulkImport {
         String[] fileNames = getFileNames(uploadConf, filePos);
 
         MultiThreadUploadProcessor uploadProc =
-                createAndStartMultiThreadUploadProcessor(uploadConf);
+                createAndStartUploadProcessor(uploadConf);
 
         List<com.treasure_data.td_import.TaskResult<?>> results =
                 new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
@@ -116,8 +114,8 @@ public class BulkImport {
 
         if (!uploadConf.hasPrepareOptions()) {
             // create upload tasks
-            com.treasure_data.td_import.upload.UploadTask[] tasks = createUploadTasks(
-                    sessionName, fileNames);
+            com.treasure_data.td_import.upload.UploadTask[] tasks =
+                    createUploadTasks(sessionName, fileNames);
 
             // start upload tasks
             startUploadTasks(uploadConf, tasks);
@@ -126,7 +124,7 @@ public class BulkImport {
             PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
 
             MultiThreadPrepareProcessor prepareProc =
-                    createAndStartMultiThreadPrepareProcessor(prepareConf);
+                    createAndStartPrepareProcessor(prepareConf);
 
             // create sequential upload (prepare) tasks
             com.treasure_data.td_import.prepare.Task[] tasks = createSequentialUploadTasks(
@@ -135,7 +133,7 @@ public class BulkImport {
             // start sequential upload (prepare) tasks
             startPrepareTasks(prepareConf, tasks);
 
-            prepareResults = stopMultiThreadPrepareProcessor(prepareProc);
+            prepareResults = stopPrepareProcessor(prepareProc);
             results.addAll(prepareResults);
 
             if (!hasNoPrepareError(prepareResults)) {
@@ -152,7 +150,7 @@ public class BulkImport {
         }
 
         List<com.treasure_data.td_import.upload.TaskResult> uploadResults =
-                stopMultiThreadUploadProcessor(uploadProc);
+                stopUploadProcessor(uploadProc);
         results.addAll(uploadResults);
 
         if (!hasNoUploadError(uploadResults)) {
@@ -167,8 +165,6 @@ public class BulkImport {
             UploadProcessor.deleteSession(biClient, uploadConf, sessionName);
         }
 
-        LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
-
         return results;
     }
 
@@ -181,7 +177,7 @@ public class BulkImport {
         return fileNames;
     }
 
-    protected MultiThreadPrepareProcessor createAndStartMultiThreadPrepareProcessor(
+    protected MultiThreadPrepareProcessor createAndStartPrepareProcessor(
             PrepareConfiguration conf) {
         MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
@@ -189,7 +185,7 @@ public class BulkImport {
         return proc;
     }
 
-    protected List<com.treasure_data.td_import.prepare.TaskResult> stopMultiThreadPrepareProcessor(
+    protected List<com.treasure_data.td_import.prepare.TaskResult> stopPrepareProcessor(
             MultiThreadPrepareProcessor proc) {
         // wait for finishing prepare processing
         proc.joinWorkers();
@@ -213,7 +209,7 @@ public class BulkImport {
             final String sessionName,
             final String[] fileNames) {
         com.treasure_data.td_import.prepare.Task[] tasks =
-                new com.treasure_data.td_import.prepare.SequentialUploadTask[fileNames.length];
+                new com.treasure_data.td_import.prepare.Task[fileNames.length];
         for (int i = 0; i < fileNames.length; i++) {
             tasks[i] = new com.treasure_data.td_import.prepare.SequentialUploadTask(
                     sessionName, fileNames[i]);
@@ -246,14 +242,14 @@ public class BulkImport {
         }).start();
     }
 
-    protected MultiThreadUploadProcessor createAndStartMultiThreadUploadProcessor(UploadConfiguration conf) {
+    protected MultiThreadUploadProcessor createAndStartUploadProcessor(UploadConfiguration conf) {
         MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
         proc.registerWorkers();
         proc.startWorkers();
         return proc;
     }
 
-    protected List<com.treasure_data.td_import.upload.TaskResult> stopMultiThreadUploadProcessor(
+    protected List<com.treasure_data.td_import.upload.TaskResult> stopUploadProcessor(
             MultiThreadUploadProcessor proc) {
         // wait for finishing upload processing
         proc.joinWorkers();

@@ -17,10 +17,6 @@
 //
 package com.treasure_data.td_import;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -31,7 +27,6 @@ import com.treasure_data.model.bulkimport.SessionSummary;
 import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
-import com.treasure_data.td_import.prepare.SequentialUploadTask;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
@@ -78,7 +73,7 @@ public class BulkImportCommand extends BulkImport {
         commandHelper.showPrepare(fileNames, conf.getOutputDirName());
 
         MultiThreadPrepareProcessor proc =
-                createAndStartMultiThreadPrepareProcessor(conf);
+                createAndStartPrepareProcessor(conf);
 
         // create prepare tasks
         com.treasure_data.td_import.prepare.Task[] tasks = createPrepareTasks(conf, fileNames);
@@ -145,7 +140,7 @@ public class BulkImportCommand extends BulkImport {
         commandHelper.showUpload(fileNames, sessionName);
 
         MultiThreadUploadProcessor uploadProc =
-                createAndStartMultiThreadUploadProcessor(uploadConf);
+                createAndStartUploadProcessor(uploadConf);
 
         if (!uploadConf.hasPrepareOptions()) {
             // create upload tasks
@@ -159,7 +154,7 @@ public class BulkImportCommand extends BulkImport {
             PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
 
             MultiThreadPrepareProcessor prepareProc =
-                    createAndStartMultiThreadPrepareProcessor(prepareConf);
+                    createAndStartPrepareProcessor(prepareConf);
 
             // create sequential upload (prepare) tasks
             com.treasure_data.td_import.prepare.Task[] tasks = createSequentialUploadTasks(
@@ -169,7 +164,7 @@ public class BulkImportCommand extends BulkImport {
             startPrepareTasks(prepareConf, tasks);
 
             List<com.treasure_data.td_import.prepare.TaskResult> prepareResults =
-                    stopMultiThreadPrepareProcessor(prepareProc);
+                    stopPrepareProcessor(prepareProc);
 
             commandHelper.showPrepareResults(prepareResults);
             commandHelper.listNextStepOfPrepareProc(prepareResults);
@@ -188,7 +183,7 @@ public class BulkImportCommand extends BulkImport {
         }
 
         List<com.treasure_data.td_import.upload.TaskResult> uploadResults =
-                stopMultiThreadUploadProcessor(uploadProc);
+                stopUploadProcessor(uploadProc);
 
         commandHelper.showUploadResults(uploadResults);
         commandHelper.listNextStepOfUploadProc(uploadResults, sessionName);
