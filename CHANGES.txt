@@ -1,4 +1,6 @@
 Release 0.3.1 - 20XX/XX/XX
+  IMPROVEMENTS
+    Defines bulk_import API. It's described in BulkImport and BulkImportCommand classes.
 
 Release 0.3.0 - 2013/10/04
   NEW FEATURES
