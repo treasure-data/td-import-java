@@ -19,6 +19,7 @@ package com.treasure_data.td_import;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -30,7 +31,6 @@ import com.treasure_data.model.bulkimport.SessionSummary;
 import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
-import com.treasure_data.td_import.prepare.SequentialUploadTask;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
@@ -47,72 +47,40 @@ public class BulkImport {
     public List<com.treasure_data.td_import.prepare.TaskResult> doPrepare(final String[] args)
             throws Exception {
         // create prepare configuration
-        final PrepareConfiguration conf = createPrepareConf(props, args);
+        PrepareConfiguration conf = createPrepareConf(props, args);
 
         // extract and get file names from command-line arguments
-        final String[] fileNames = getFileNames(conf, 1);
+        String[] fileNames = getFileNames(conf, 1);
 
         MultiThreadPrepareProcessor proc =
                 createAndStartMultiThreadPrepareProcessor(conf);
 
         // create prepare tasks
-        final com.treasure_data.td_import.prepare.Task[] tasks =
-                createPrepareTasks(conf, fileNames);
+        com.treasure_data.td_import.prepare.Task[] tasks = createPrepareTasks(conf, fileNames);
 
         // start prepare tasks
         startPrepareTasks(conf, tasks);
 
-        // wait for finishing prepare processing
-        proc.joinWorkers();
-
-        // wait for finishing prepare processing
-        return proc.getTaskResults();
+        return stopMultiThreadPrepareProcessor(proc);
     }
 
-    public void doUpload(final String[] args) throws Exception {
+    public List<com.treasure_data.td_import.TaskResult<?>> doUpload(final String[] args) throws Exception {
         LOG.info(String.format("Start '%s' command", Configuration.CMD_UPLOAD));
 
         // create configuration for 'upload' processing
-        final UploadConfiguration uploadConf = createUploadConf(props, args);
+        UploadConfiguration uploadConf = createUploadConf(props, args);
 
         // create TreasureDataClient and BulkImportClient objects
         TreasureDataClient tdClient = new TreasureDataClient(uploadConf.getProperties());
         BulkImportClient biClient = new BulkImportClient(tdClient);
 
         // configure session name
-        TaskResult e = null;
-        final String sessionName;
+        TaskResult<?> e = null;
+        String sessionName;
         int filePos;
         if (uploadConf.autoCreate()) { // 'auto-create-session'
-            String databaseName = uploadConf.enableMake()[0];
-            String tableName = uploadConf.enableMake()[1];
-            Date d = new Date();
-            String format = "yyyy_MM_dd";
-            String timestamp = new SimpleDateFormat(format).format(d);
-            sessionName = String.format("%s_%s_%s_%d", databaseName, tableName,
-                    timestamp, (d.getTime() / 1000));
-
-            // validate that database is live or not
-            e = UploadProcessor.checkDatabase(tdClient, uploadConf,
-                    sessionName, databaseName);
-            if (e.error != null) {
-                throw new IllegalArgumentException(e.error);
-            }
-
-            // validate that table is live or not
-            e = UploadProcessor.checkTable(tdClient, uploadConf,
-                    sessionName, databaseName, tableName);
-            if (e.error != null) {
-                // TODO FIXME #MN should create table automatically if
-                // it is not found.
-                throw new IllegalArgumentException(e.error);
-            }
-
-            // create bulk import session
-            e = UploadProcessor.createSession(biClient, uploadConf, sessionName, databaseName, tableName);
-            if (e.error != null) {
-                throw new IllegalArgumentException(e.error);
-            }
+            // create session automatically
+            sessionName = createBulkImportSessionName(uploadConf, tdClient, biClient);
 
             filePos = 1;
         } else {
@@ -137,71 +105,42 @@ public class BulkImport {
         }
 
         // get and extract uploaded files from command-line arguments
-        final String[] fileNames = getFileNames(uploadConf, filePos);
+        String[] fileNames = getFileNames(uploadConf, filePos);
 
         MultiThreadUploadProcessor uploadProc =
                 createAndStartMultiThreadUploadProcessor(uploadConf);
 
+        List<com.treasure_data.td_import.TaskResult<?>> results =
+                new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
         List<com.treasure_data.td_import.prepare.TaskResult> prepareResults = null;
 
         if (!uploadConf.hasPrepareOptions()) {
-            // scan files that are uploaded
-            new Thread(new Runnable() {
-                public void run() {
-                    for (int i = 0; i < fileNames.length; i++) {
-                        try {
-                            long size = new File(fileNames[i]).length();
-                            com.treasure_data.td_import.upload.UploadTask task =
-                                    new com.treasure_data.td_import.upload.UploadTask(
-                                    sessionName, fileNames[i], size);
-                            MultiThreadUploadProcessor.addTask(task);
-                        } catch (Throwable t) {
-                            LOG.severe("Error occurred During 'addTask' method call");
-                            LOG.throwing("Main", "addTask", t);
-                        }
-                    }
+            // create upload tasks
+            com.treasure_data.td_import.upload.UploadTask[] tasks = createUploadTasks(
+                    sessionName, fileNames);
 
-                    // end of file list
-                    try {
-                        MultiThreadUploadProcessor.addFinishTask(uploadConf);
-                    } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addFinishTask' method call");
-                        LOG.throwing("Main", "addFinishTask", t);
-                    }
-                }
-            }).start();
+            // start upload tasks
+            startUploadTasks(uploadConf, tasks);
         } else {
             // create configuration for 'prepare' processing
-            final PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
+            PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
 
             MultiThreadPrepareProcessor prepareProc =
                     createAndStartMultiThreadPrepareProcessor(prepareConf);
 
-            // scan files that are uploaded
-            new Thread(new Runnable() {
-                public void run() {
-                    for (int i = 0; i < fileNames.length; i++) {
-                        try {
-                            SequentialUploadTask task = new SequentialUploadTask(sessionName, fileNames[i]);
-                            MultiThreadPrepareProcessor.addTask(task);
-                        } catch (Throwable t) {
-                            LOG.severe("Error occurred During 'addTask' method call");
-                            LOG.throwing("Main", "addTask", t);
-                        }
-                    }
+            // create sequential upload (prepare) tasks
+            com.treasure_data.td_import.prepare.Task[] tasks = createSequentialUploadTasks(
+                    sessionName, fileNames);
 
-                    // end of file list
-                    try {
-                        MultiThreadPrepareProcessor.addFinishTask(prepareConf);
-                    } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addFinishTask' method call");
-                        LOG.throwing("Main", "addFinishTask", t);
-                    }
-                }
-            }).start();
+            // start sequential upload (prepare) tasks
+            startPrepareTasks(prepareConf, tasks);
 
-            prepareProc.joinWorkers();
-            prepareResults = prepareProc.getTaskResults();
+            prepareResults = stopMultiThreadPrepareProcessor(prepareProc);
+            results.addAll(prepareResults);
+
+            if (!hasNoPrepareError(prepareResults)) {
+                return results;
+            }
 
             // end of file list
             try {
@@ -212,13 +151,12 @@ public class BulkImport {
             }
         }
 
-        uploadProc.joinWorkers();
         List<com.treasure_data.td_import.upload.TaskResult> uploadResults =
-                uploadProc.getTaskResults();
+                stopMultiThreadUploadProcessor(uploadProc);
+        results.addAll(uploadResults);
 
-        if (!hasNoUploadError(uploadResults)
-                || (prepareResults != null && !hasNoPrepareError(prepareResults))) {
-            return;
+        if (!hasNoUploadError(uploadResults)) {
+            return results;
         }
 
         // 'auto-perform' and 'auto-commit'
@@ -230,6 +168,8 @@ public class BulkImport {
         }
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));
+
+        return results;
     }
 
     protected String[] getFileNames(PrepareConfiguration conf, int filePos) {
@@ -241,11 +181,21 @@ public class BulkImport {
         return fileNames;
     }
 
-    protected MultiThreadUploadProcessor createAndStartMultiThreadUploadProcessor(UploadConfiguration conf) {
-        MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
+    protected MultiThreadPrepareProcessor createAndStartMultiThreadPrepareProcessor(
+            PrepareConfiguration conf) {
+        MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
         proc.registerWorkers();
         proc.startWorkers();
         return proc;
+    }
+
+    protected List<com.treasure_data.td_import.prepare.TaskResult> stopMultiThreadPrepareProcessor(
+            MultiThreadPrepareProcessor proc) {
+        // wait for finishing prepare processing
+        proc.joinWorkers();
+
+        // wait for finishing prepare processing
+        return proc.getTaskResults();
     }
 
     protected com.treasure_data.td_import.prepare.Task[] createPrepareTasks(
@@ -255,6 +205,18 @@ public class BulkImport {
                 new com.treasure_data.td_import.prepare.Task[fileNames.length];
         for (int i = 0; i < fileNames.length; i++) {
             tasks[i] = new com.treasure_data.td_import.prepare.Task(fileNames[i]);
+        }
+        return tasks;
+    }
+
+    protected com.treasure_data.td_import.prepare.Task[] createSequentialUploadTasks(
+            final String sessionName,
+            final String[] fileNames) {
+        com.treasure_data.td_import.prepare.Task[] tasks =
+                new com.treasure_data.td_import.prepare.SequentialUploadTask[fileNames.length];
+        for (int i = 0; i < fileNames.length; i++) {
+            tasks[i] = new com.treasure_data.td_import.prepare.SequentialUploadTask(
+                    sessionName, fileNames[i]);
         }
         return tasks;
     }
@@ -284,11 +246,94 @@ public class BulkImport {
         }).start();
     }
 
-    protected MultiThreadPrepareProcessor createAndStartMultiThreadPrepareProcessor(PrepareConfiguration conf) {
-        MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
+    protected MultiThreadUploadProcessor createAndStartMultiThreadUploadProcessor(UploadConfiguration conf) {
+        MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
         proc.registerWorkers();
         proc.startWorkers();
         return proc;
+    }
+
+    protected List<com.treasure_data.td_import.upload.TaskResult> stopMultiThreadUploadProcessor(
+            MultiThreadUploadProcessor proc) {
+        // wait for finishing upload processing
+        proc.joinWorkers();
+
+        // wait for finishing upload processing
+        return proc.getTaskResults();
+    }
+
+    protected com.treasure_data.td_import.upload.UploadTask[] createUploadTasks(
+            final String sessionName,
+            final String[] fileNames) {
+        com.treasure_data.td_import.upload.UploadTask[] tasks =
+                new com.treasure_data.td_import.upload.UploadTask[fileNames.length];
+        for (int i = 0; i < fileNames.length; i++) {
+            long size = new File(fileNames[i]).length();
+            tasks[i] = new com.treasure_data.td_import.upload.UploadTask(
+                    sessionName, fileNames[i], size);
+        }
+        return tasks;
+    }
+
+    protected void startUploadTasks(
+            final UploadConfiguration conf,
+            final com.treasure_data.td_import.upload.UploadTask[] tasks) {
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < tasks.length; i++) {
+                    try {
+                        MultiThreadUploadProcessor.addTask(tasks[i]);
+                    } catch (Throwable t) {
+                        LOG.severe("Error occurred During 'addTask' method call");
+                        LOG.throwing("Main", "addTask", t);
+                    }
+                }
+
+                // end of file list
+                try {
+                    MultiThreadUploadProcessor.addFinishTask(conf);
+                } catch (Throwable t) {
+                    LOG.severe("Error occurred During 'addFinishTask' method call");
+                    LOG.throwing("Main", "addFinishTask", t);
+                }
+            }
+        }).start();
+    }
+
+    protected String createBulkImportSessionName(UploadConfiguration conf,
+            TreasureDataClient tdClient, BulkImportClient biClient) throws Exception {
+        String databaseName = conf.enableMake()[0];
+        String tableName = conf.enableMake()[1];
+        Date d = new Date();
+        String format = "yyyy_MM_dd";
+        String timestamp = new SimpleDateFormat(format).format(d);
+        String sessionName = String.format("%s_%s_%s_%d", databaseName, tableName,
+                timestamp, (d.getTime() / 1000));
+
+        TaskResult<?> e = null;
+        // validate that database is live or not
+        e = UploadProcessor.checkDatabase(tdClient, conf,
+                sessionName, databaseName);
+        if (e.error != null) {
+            throw new IllegalArgumentException(e.error);
+        }
+
+        // validate that table is live or not
+        e = UploadProcessor.checkTable(tdClient, conf,
+                sessionName, databaseName, tableName);
+        if (e.error != null) {
+            // TODO FIXME #MN should create table automatically if
+            // it is not found.
+            throw new IllegalArgumentException(e.error);
+        }
+
+        // create bulk import session
+        e = UploadProcessor.createSession(biClient, conf, sessionName, databaseName, tableName);
+        if (e.error != null) {
+            throw new IllegalArgumentException(e.error);
+        }
+
+        return sessionName;
     }
 
     protected String getBulkImportSessionName(UploadConfiguration conf) {
