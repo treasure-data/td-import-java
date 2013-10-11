@@ -17,6 +17,13 @@
 //
 package com.treasure_data.td_import;
 
+import java.util.Properties;
+
 public class Import {
 
+    protected Properties props;
+
+    public Import(Properties props) {
+        this.props = props;
+    }
 }

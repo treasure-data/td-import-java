@@ -29,13 +29,11 @@ import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.TableImportConfiguration;
 
-public class TableImport {
+public class TableImport extends Import {
     private static final Logger LOG = Logger.getLogger(TableImport.class.getName());
 
-    protected Properties props;
-
     public TableImport(Properties props) {
-        this.props = props;
+        super(props);
     }
 
     public List<com.treasure_data.td_import.TaskResult<?>> tableImport(final String[] args)
