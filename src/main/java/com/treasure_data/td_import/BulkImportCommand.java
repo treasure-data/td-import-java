@@ -17,6 +17,7 @@
 //
 package com.treasure_data.td_import;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
 
-public class BulkImportCommand extends BulkImport {
+public final class BulkImportCommand extends BulkImport {
     private static final Logger LOG = Logger.getLogger(BulkImportCommand.class.getName());
 
     protected CommandHelper commandHelper;
@@ -65,28 +66,27 @@ public class BulkImportCommand extends BulkImport {
         LOG.info(String.format("Start '%s' command", Configuration.CMD_PREPARE));
 
         // create configuration for 'prepare' processing
-        PrepareConfiguration conf = createPrepareConf(props, args);
+        PrepareConfiguration prepareConf = createPrepareConf(props, args);
 
         // extract and get file names from command-line arguments
-        String[] fileNames = getFileNames(conf, 1);
+        String[] fileNames = getFileNames(prepareConf, 1);
 
-        commandHelper.showPrepare(fileNames, conf.getOutputDirName());
+        commandHelper.showPrepare(fileNames, prepareConf.getOutputDirName());
 
-        MultiThreadPrepareProcessor proc =
-                createAndStartPrepareProcessor(conf);
+        MultiThreadPrepareProcessor prepareProc =
+                createAndStartPrepareProcessor(prepareConf);
 
         // create prepare tasks
-        com.treasure_data.td_import.prepare.Task[] tasks = createPrepareTasks(conf, fileNames);
+        com.treasure_data.td_import.prepare.Task[] tasks =
+                createPrepareTasks(prepareConf, fileNames);
 
         // start prepare tasks
-        startPrepareTasks(conf, tasks);
+        startPrepareTasks(prepareConf, tasks);
 
         // wait for finishing prepare processing
-        proc.joinWorkers();
-
         // extract task results of each prepare processing
-        List<com.treasure_data.td_import.prepare.TaskResult> prepareResults =
-                proc.getTaskResults();
+        List<com.treasure_data.td_import.TaskResult<?>> prepareResults =
+                stopPrepareProcessor(prepareProc);
 
         commandHelper.showPrepareResults(prepareResults);
         commandHelper.listNextStepOfPrepareProc(prepareResults);
@@ -135,12 +135,15 @@ public class BulkImportCommand extends BulkImport {
         }
 
         // get and extract uploaded files from command-line arguments
-        final String[] fileNames = getFileNames(uploadConf, filePos);
+        String[] fileNames = getFileNames(uploadConf, filePos);
 
         commandHelper.showUpload(fileNames, sessionName);
 
         MultiThreadUploadProcessor uploadProc =
                 createAndStartUploadProcessor(uploadConf);
+
+        List<com.treasure_data.td_import.TaskResult<?>> results =
+                new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
 
         if (!uploadConf.hasPrepareOptions()) {
             // create upload tasks
@@ -163,13 +166,12 @@ public class BulkImportCommand extends BulkImport {
             // start sequential upload (prepare) tasks
             startPrepareTasks(prepareConf, tasks);
 
-            List<com.treasure_data.td_import.prepare.TaskResult> prepareResults =
-                    stopPrepareProcessor(prepareProc);
+            results.addAll(stopPrepareProcessor(prepareProc));
 
-            commandHelper.showPrepareResults(prepareResults);
-            commandHelper.listNextStepOfPrepareProc(prepareResults);
+            commandHelper.showPrepareResults(results);
+            commandHelper.listNextStepOfPrepareProc(results);
 
-            if (!hasNoPrepareError(prepareResults)) {
+            if (!hasNoPrepareError(results)) {
                 return;
             }
 
@@ -182,13 +184,12 @@ public class BulkImportCommand extends BulkImport {
             }
         }
 
-        List<com.treasure_data.td_import.upload.TaskResult> uploadResults =
-                stopUploadProcessor(uploadProc);
+        results.addAll(stopUploadProcessor(uploadProc));
 
-        commandHelper.showUploadResults(uploadResults);
-        commandHelper.listNextStepOfUploadProc(uploadResults, sessionName);
+        commandHelper.showUploadResults(results);
+        commandHelper.listNextStepOfUploadProc(results, sessionName);
 
-        if (!hasNoUploadError(uploadResults)) {
+        if (!hasNoUploadError(results)) {
             return;
         }
 

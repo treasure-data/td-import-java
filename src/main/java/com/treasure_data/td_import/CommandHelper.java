@@ -47,16 +47,17 @@ public class CommandHelper {
         }
     }
 
-    public void showPrepareResults(List<com.treasure_data.td_import.prepare.TaskResult> results) {
+    public void showPrepareResults(List<com.treasure_data.td_import.TaskResult<?>> results) {
         System.out.println();
         System.out.println("Prepare status:");
-        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
-            String status;
-            if (result.error == null) {
-                status = Configuration.STAT_SUCCESS;
-            } else {
-                status = Configuration.STAT_ERROR;
+        for (com.treasure_data.td_import.TaskResult<?> r : results) {
+            if (! (r instanceof com.treasure_data.td_import.prepare.TaskResult)) {
+                continue;
             }
+
+            com.treasure_data.td_import.prepare.TaskResult result =
+                    (com.treasure_data.td_import.prepare.TaskResult) r;
+            String status = result.error == null ? Configuration.STAT_SUCCESS : Configuration.STAT_ERROR;
             System.out.println(String.format("  File    : %s", result.task.fileName));
             System.out.println(String.format("    Status          : %s", status));
             System.out.println(String.format("    Read lines      : %d", result.readLines));
@@ -78,13 +79,19 @@ public class CommandHelper {
         System.out.println();
     }
 
-    public void listNextStepOfPrepareProc(List<com.treasure_data.td_import.prepare.TaskResult> results) {
+    public void listNextStepOfPrepareProc(List<com.treasure_data.td_import.TaskResult<?>> results) {
         System.out.println();
         System.out.println("Next steps:");
 
         List<String> readyToUploadFiles = new ArrayList<String>();
 
-        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
+        for (com.treasure_data.td_import.TaskResult<?> r : results) {
+            if (! (r instanceof com.treasure_data.td_import.prepare.TaskResult)) {
+                continue;
+            }
+
+            com.treasure_data.td_import.prepare.TaskResult result =
+                    (com.treasure_data.td_import.prepare.TaskResult) r;
             if (result.error == null) {
                 int len = result.outFileNames.size();
                 // success
@@ -116,17 +123,19 @@ public class CommandHelper {
         System.out.println();
     }
 
-    public void showUploadResults(List<com.treasure_data.td_import.upload.TaskResult> results) {
+    public void showUploadResults(List<com.treasure_data.td_import.TaskResult<?>> results) {
         System.out.println();
         System.out.println("Upload status:");
-        for (com.treasure_data.td_import.upload.TaskResult result : results) {
-            String status;
-            if (result.error == null) {
-                status = Configuration.STAT_SUCCESS;
-            } else {
-                status = Configuration.STAT_ERROR;
+        for (com.treasure_data.td_import.TaskResult<?> r : results) {
+            if (! (r instanceof com.treasure_data.td_import.upload.TaskResult)) {
+                continue;
             }
-            com.treasure_data.td_import.upload.UploadTask task = (com.treasure_data.td_import.upload.UploadTask) result.task;
+
+            com.treasure_data.td_import.upload.TaskResult result =
+                    (com.treasure_data.td_import.upload.TaskResult) r;
+            String status = result.error == null ? Configuration.STAT_SUCCESS : Configuration.STAT_ERROR;
+            com.treasure_data.td_import.upload.UploadTask task =
+                    (com.treasure_data.td_import.upload.UploadTask) result.task;
             System.out.println(String.format("  File    : %s", result.task.fileName));
             System.out.println(String.format("    Status          : %s", status));
             System.out.println(String.format("    Part name       : %s", task.partName));
@@ -136,12 +145,18 @@ public class CommandHelper {
         System.out.println();
     }
 
-    public void listNextStepOfUploadProc(List<com.treasure_data.td_import.upload.TaskResult> results,
+    public void listNextStepOfUploadProc(List<com.treasure_data.td_import.TaskResult<?>> results,
             String sessionName) {
         System.out.println();
         System.out.println("Next Steps:");
         boolean hasErrors = false;
-        for (com.treasure_data.td_import.upload.TaskResult result : results) {
+        for (com.treasure_data.td_import.TaskResult<?> r : results) {
+            if (! (r instanceof com.treasure_data.td_import.upload.TaskResult)) {
+                continue;
+            }
+
+            com.treasure_data.td_import.upload.TaskResult result =
+                    (com.treasure_data.td_import.upload.TaskResult) r;
             if (result.error != null) {
                 // error
                 System.out.println(String.format(

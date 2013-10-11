@@ -44,7 +44,7 @@ public class BulkImport {
         this.props = props;
     }
 
-    public List<com.treasure_data.td_import.prepare.TaskResult> doPrepare(final String[] args)
+    public List<com.treasure_data.td_import.TaskResult<?>> doPrepare(final String[] args)
             throws Exception {
         // create prepare configuration
         PrepareConfiguration conf = createPrepareConf(props, args);
@@ -56,7 +56,8 @@ public class BulkImport {
                 createAndStartPrepareProcessor(conf);
 
         // create prepare tasks
-        com.treasure_data.td_import.prepare.Task[] tasks = createPrepareTasks(conf, fileNames);
+        com.treasure_data.td_import.prepare.Task[] tasks =
+                createPrepareTasks(conf, fileNames);
 
         // start prepare tasks
         startPrepareTasks(conf, tasks);
@@ -64,7 +65,8 @@ public class BulkImport {
         return stopPrepareProcessor(proc);
     }
 
-    public List<com.treasure_data.td_import.TaskResult<?>> doUpload(final String[] args) throws Exception {
+    public List<com.treasure_data.td_import.TaskResult<?>> doUpload(final String[] args)
+            throws Exception {
         // create configuration for 'upload' processing
         UploadConfiguration uploadConf = createUploadConf(props, args);
 
@@ -110,7 +112,6 @@ public class BulkImport {
 
         List<com.treasure_data.td_import.TaskResult<?>> results =
                 new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
-        List<com.treasure_data.td_import.prepare.TaskResult> prepareResults = null;
 
         if (!uploadConf.hasPrepareOptions()) {
             // create upload tasks
@@ -133,10 +134,8 @@ public class BulkImport {
             // start sequential upload (prepare) tasks
             startPrepareTasks(prepareConf, tasks);
 
-            prepareResults = stopPrepareProcessor(prepareProc);
-            results.addAll(prepareResults);
-
-            if (!hasNoPrepareError(prepareResults)) {
+            results.addAll(stopPrepareProcessor(prepareProc));
+            if (!hasNoPrepareError(results)) {
                 return results;
             }
 
@@ -149,11 +148,8 @@ public class BulkImport {
             }
         }
 
-        List<com.treasure_data.td_import.upload.TaskResult> uploadResults =
-                stopUploadProcessor(uploadProc);
-        results.addAll(uploadResults);
-
-        if (!hasNoUploadError(uploadResults)) {
+        results.addAll(stopUploadProcessor(uploadProc));
+        if (!hasNoUploadError(results)) {
             return results;
         }
 
@@ -185,13 +181,16 @@ public class BulkImport {
         return proc;
     }
 
-    protected List<com.treasure_data.td_import.prepare.TaskResult> stopPrepareProcessor(
+    protected List<com.treasure_data.td_import.TaskResult<?>> stopPrepareProcessor(
             MultiThreadPrepareProcessor proc) {
         // wait for finishing prepare processing
         proc.joinWorkers();
 
         // wait for finishing prepare processing
-        return proc.getTaskResults();
+        List<com.treasure_data.td_import.TaskResult<?>> results =
+                new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
+        results.addAll(proc.getTaskResults());
+        return results;
     }
 
     protected com.treasure_data.td_import.prepare.Task[] createPrepareTasks(
@@ -249,13 +248,16 @@ public class BulkImport {
         return proc;
     }
 
-    protected List<com.treasure_data.td_import.upload.TaskResult> stopUploadProcessor(
+    protected List<com.treasure_data.td_import.TaskResult<?>> stopUploadProcessor(
             MultiThreadUploadProcessor proc) {
         // wait for finishing upload processing
         proc.joinWorkers();
 
         // wait for finishing upload processing
-        return proc.getTaskResults();
+        List<com.treasure_data.td_import.TaskResult<?>> results =
+                new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
+        results.addAll(proc.getTaskResults());
+        return results;
     }
 
     protected com.treasure_data.td_import.upload.UploadTask[] createUploadTasks(
@@ -340,9 +342,13 @@ public class BulkImport {
         return argList.get(1);
     }
 
-    protected boolean hasNoPrepareError(List<com.treasure_data.td_import.prepare.TaskResult> results) {
+    protected boolean hasNoPrepareError(List<com.treasure_data.td_import.TaskResult<?>> results) {
         boolean hasNoError = true;
-        for (com.treasure_data.td_import.prepare.TaskResult result : results) {
+        for (com.treasure_data.td_import.TaskResult<?> result : results) {
+            if (! (result instanceof com.treasure_data.td_import.prepare.TaskResult)) {
+                continue;
+            }
+
             if (result.error != null) {
                 hasNoError = false;
                 break;
@@ -351,9 +357,13 @@ public class BulkImport {
         return hasNoError;
     }
 
-    protected boolean hasNoUploadError(List<com.treasure_data.td_import.upload.TaskResult> results) {
+    protected boolean hasNoUploadError(List<com.treasure_data.td_import.TaskResult<?>> results) {
         boolean hasNoError = true;
-        for (com.treasure_data.td_import.upload.TaskResult result : results) {
+        for (com.treasure_data.td_import.TaskResult<?> result : results) {
+            if (! (result instanceof com.treasure_data.td_import.upload.TaskResult)) {
+                continue;
+            }
+
             if (result.error != null) {
                 hasNoError = false;
                 break;
