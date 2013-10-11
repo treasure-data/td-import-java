@@ -7,8 +7,6 @@ import java.util.Properties;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.td_import.Configuration;
-
 public class TestBulkImportCommand {
 
     @Test @Ignore

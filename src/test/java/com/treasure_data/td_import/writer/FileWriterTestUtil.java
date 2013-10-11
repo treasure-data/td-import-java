@@ -77,15 +77,18 @@ public class FileWriterTestUtil extends FileWriter {
     public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
         String timeString = v.getString();
         long time = 0;
-        try {
-            time = Long.parseLong(timeString);
-        } catch (Throwable t) {
-            throw new PreparePartsException(String.format(
-                    "'%s' could not be parsed as long type", timeString));
+
+        if (filter.getTimeFormat() != null) {
+            time = filter.getTimeFormat().getTime(timeString);
         }
 
-        if (time == 0 && filter.getTimeFormat() != null) {
-            time = filter.getTimeFormat().getTime(timeString);
+        if (time == 0) {
+            try {
+                time = Long.parseLong(timeString);
+            } catch (Throwable t) {
+                throw new PreparePartsException(String.format(
+                        "'%s' could not be parsed as long type", timeString));
+            }
         }
 
         write(time);
