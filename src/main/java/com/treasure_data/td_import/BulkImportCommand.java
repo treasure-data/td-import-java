@@ -66,7 +66,7 @@ public final class BulkImportCommand extends BulkImport {
         LOG.info(String.format("Start '%s' command", Configuration.CMD_PREPARE));
 
         // create configuration for 'prepare' processing
-        PrepareConfiguration prepareConf = createPrepareConf(props, args);
+        PrepareConfiguration prepareConf = createPrepareConf(args);
 
         // extract and get file names from command-line arguments
         String[] fileNames = getFileNames(prepareConf, 1);
@@ -98,7 +98,7 @@ public final class BulkImportCommand extends BulkImport {
         LOG.info(String.format("Start '%s' command", Configuration.CMD_UPLOAD));
 
         // create configuration for 'upload' processing
-        UploadConfiguration uploadConf = createUploadConf(props, args);
+        UploadConfiguration uploadConf = createUploadConf(args);
 
         // create TreasureDataClient and BulkImportClient objects
         TreasureDataClient tdClient = new TreasureDataClient(uploadConf.getProperties());
@@ -154,7 +154,7 @@ public final class BulkImportCommand extends BulkImport {
             startUploadTasks(uploadConf, tasks);
         } else {
             // create configuration for 'prepare' processing
-            PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
+            PrepareConfiguration prepareConf = createPrepareConf(args, true);
 
             MultiThreadPrepareProcessor prepareProc =
                     createAndStartPrepareProcessor(prepareConf);

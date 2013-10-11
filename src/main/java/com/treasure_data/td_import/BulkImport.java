@@ -47,7 +47,7 @@ public class BulkImport {
     public List<com.treasure_data.td_import.TaskResult<?>> doPrepare(final String[] args)
             throws Exception {
         // create prepare configuration
-        PrepareConfiguration conf = createPrepareConf(props, args);
+        PrepareConfiguration conf = createPrepareConf(args);
 
         // extract and get file names from command-line arguments
         String[] fileNames = getFileNames(conf, 1);
@@ -68,14 +68,14 @@ public class BulkImport {
     public List<com.treasure_data.td_import.TaskResult<?>> doUpload(final String[] args)
             throws Exception {
         // create configuration for 'upload' processing
-        UploadConfiguration uploadConf = createUploadConf(props, args);
+        UploadConfiguration uploadConf = createUploadConf(args);
 
         // create TreasureDataClient and BulkImportClient objects
         TreasureDataClient tdClient = new TreasureDataClient(uploadConf.getProperties());
         BulkImportClient biClient = new BulkImportClient(tdClient);
 
         // configure session name
-        TaskResult<?> e = null;
+        TaskResult<?> r = null;
         String sessionName;
         int filePos;
         if (uploadConf.autoCreate()) { // 'auto-create-session'
@@ -88,9 +88,9 @@ public class BulkImport {
             sessionName = getBulkImportSessionName(uploadConf);
 
             // validate that the session is live or not
-            e = UploadProcessor.checkSession(biClient, uploadConf, sessionName);
-            if (e.error != null) {
-                throw new IllegalArgumentException(e.error);
+            r = UploadProcessor.checkSession(biClient, uploadConf, sessionName);
+            if (r.error != null) {
+                throw new IllegalArgumentException(r.error);
             }
 
             filePos = 2;
@@ -122,7 +122,7 @@ public class BulkImport {
             startUploadTasks(uploadConf, tasks);
         } else {
             // create configuration for 'prepare' processing
-            PrepareConfiguration prepareConf = createPrepareConf(props, args, true);
+            PrepareConfiguration prepareConf = createPrepareConf(args, true);
 
             MultiThreadPrepareProcessor prepareProc =
                     createAndStartPrepareProcessor(prepareConf);
@@ -372,33 +372,33 @@ public class BulkImport {
         return hasNoError;
     }
 
-    protected PrepareConfiguration createPrepareConf(Properties props, String[] args) {
-        return createPrepareConf(props, args, false);
+    protected PrepareConfiguration createPrepareConf(String[] args) {
+        return createPrepareConf(args, false);
     }
 
-    protected PrepareConfiguration createPrepareConf(Properties props, String[] args, boolean isUploaded) {
+    protected PrepareConfiguration createPrepareConf(String[] args, boolean isUploaded) {
         PrepareConfiguration.Factory fact = new PrepareConfiguration.Factory(props, isUploaded);
         PrepareConfiguration conf = fact.newPrepareConfiguration(args);
 
         if (!isUploaded) {
-            showHelp(Configuration.Command.PREPARE, conf, props, args);
+            showHelp(Configuration.Command.PREPARE, conf, args);
         }
 
         conf.configure(props, fact.getBulkImportOptions());
         return conf;
     }
 
-    protected UploadConfiguration createUploadConf(Properties props, String[] args) {
+    protected UploadConfiguration createUploadConf(String[] args) {
         UploadConfiguration.Factory fact = new UploadConfiguration.Factory(props);
         UploadConfiguration conf = fact.newUploadConfiguration(args);
 
-        showHelp(Configuration.Command.UPLOAD, conf, props, args);
+        showHelp(Configuration.Command.UPLOAD, conf, args);
 
         conf.configure(props, fact.getBulkImportOptions());
         return conf;
     }
 
-    protected void showHelp(Configuration.Command cmd, PrepareConfiguration conf, Properties props, String[] args) {
+    protected void showHelp(Configuration.Command cmd, PrepareConfiguration conf, String[] args) {
         if (conf.hasHelpOption()) {
             System.out.println(cmd.showHelp(conf, props));
             System.exit(0);
