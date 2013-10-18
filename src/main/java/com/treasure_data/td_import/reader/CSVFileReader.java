@@ -34,6 +34,7 @@ import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
+import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.FileWriter;
@@ -193,18 +194,38 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                     timeColumnValue = new TimeColumnValue(timeColumnIndex,
                             conf.getTimeFormat());
                 } else {
-                    timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                            conf.getTimeFormat(sampleColumnValues[timeColumnIndex]
-                                    .getSTRFTimeFormatRank()));
+                    String suggested =
+                            sampleColumnValues[timeColumnIndex].getSTRFTimeFormatRank();
+                    if (suggested != null) {
+                        if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
+                            timeColumnValue = new TimeColumnValue(timeColumnIndex,
+                                    new HHmmssStrftime());
+                        } else {
+                            timeColumnValue = new TimeColumnValue(timeColumnIndex,
+                                    conf.getTimeFormat(suggested));
+                        }
+                    } else {
+                        timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
+                    }
                 }
             } else if (aliasTimeColumnIndex >= 0) {
                 if (conf.getTimeFormat() != null) {
                     timeColumnValue = new AliasTimeColumnValue(
                             aliasTimeColumnIndex, conf.getTimeFormat());
                 } else {
-                    timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
-                            conf.getTimeFormat(sampleColumnValues[aliasTimeColumnIndex]
-                                    .getSTRFTimeFormatRank()));
+                    String suggested =
+                            sampleColumnValues[aliasTimeColumnIndex].getSTRFTimeFormatRank();
+                    if (suggested != null) {
+                        if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
+                            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
+                                    new HHmmssStrftime());
+                        } else {
+                            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
+                                    conf.getTimeFormat(suggested));
+                        }
+                    } else {
+                        timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
+                    }
                 }
             } else {
                 timeColumnValue = new TimeValueTimeColumnValue(

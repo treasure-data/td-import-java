@@ -22,19 +22,46 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TimeColumnSampling extends ColumnSampling {
-    private static final SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
-    private static final SimpleDateFormat yyyyMMdd$1HHmmss = new SimpleDateFormat("yyyyMMdd$1HHmmss");
-    private static final SimpleDateFormat yyyyMMdd$1HHmmssZ = new SimpleDateFormat("yyyyMMdd$1HHmmss Z");
-    private static final SimpleDateFormat[] SDF_LIST = new SimpleDateFormat[] {
-        yyyyMMdd, yyyyMMdd$1HHmmss, yyyyMMdd$1HHmmssZ };
+    public static final String HHmmss = "HHmmss";
+
+    private static final SimpleDateFormat yyyyMMdd_SDF;
+    private static final SimpleDateFormat yyyyMMdd$1HHmmss_SDF;
+    private static final SimpleDateFormat yyyyMMdd$1HHmmssZ_SDF;
+    public static final SimpleDateFormat HHmmss_SDF;
+
+    private static final SimpleDateFormat[] SDF_LIST;
+
+    static {
+        yyyyMMdd_SDF = new SimpleDateFormat("yyyyMMdd");
+        yyyyMMdd_SDF.setLenient(false);
+        yyyyMMdd$1HHmmss_SDF = new SimpleDateFormat("yyyyMMdd$1HHmmss");
+        yyyyMMdd$1HHmmss_SDF.setLenient(false);
+        yyyyMMdd$1HHmmssZ_SDF = new SimpleDateFormat("yyyyMMdd$1HHmmss Z");
+        yyyyMMdd$1HHmmssZ_SDF.setLenient(false);
+        HHmmss_SDF = new SimpleDateFormat("HHmmss");
+        HHmmss_SDF.setLenient(false);
+
+        SDF_LIST = new SimpleDateFormat[] {
+                yyyyMMdd_SDF,
+                yyyyMMdd$1HHmmss_SDF,
+                yyyyMMdd$1HHmmssZ_SDF,
+                HHmmss_SDF,
+        };
+    }
 
     private static final String yyyyMMdd_STRF = "%Y%m%d";
     private static final String yyyyMMdd$1HHmmss_STRF = "%Y%m%d$1%H%M%S";
     private static final String yyyyMMdd$1HHmmssZ_STRF = "%Y%m%d$1%H%M%S %Z";
-    private static final String[] STRF_LIST = new String[] {
-        yyyyMMdd_STRF, yyyyMMdd$1HHmmss_STRF, yyyyMMdd$1HHmmssZ_STRF };
+    public static final String HHmmss_STRF = "%T";
 
-    protected int[] timeScores = new int[] { 0, 0, 0 };
+    private static final String[] STRF_LIST = new String[] {
+        yyyyMMdd_STRF,
+        yyyyMMdd$1HHmmss_STRF,
+        yyyyMMdd$1HHmmssZ_STRF,
+        HHmmss_STRF
+    };
+
+    protected int[] timeScores = new int[] { 0, 0, 0, 0 };
 
     public TimeColumnSampling(int numRows) {
         super(numRows);
@@ -72,7 +99,7 @@ public class TimeColumnSampling extends ColumnSampling {
             }
         }
 
-        if (maxIndex == 0) {
+        if (max == 0) {
             return null;
         } else {
             return STRF_LIST[maxIndex];
