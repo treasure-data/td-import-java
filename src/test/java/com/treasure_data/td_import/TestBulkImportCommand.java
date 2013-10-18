@@ -8,6 +8,28 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestBulkImportCommand {
+    @Test
+    public void testPrepareParts000() throws Exception {
+        Properties props = System.getProperties();
+//        props.load(this.getClass().getClassLoader()
+//                .getResourceAsStream("treasure-data.properties"));
+
+        List<String> opts = new ArrayList<String>();
+        //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
+        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
+        opts.add("--columns");
+        opts.add("time,a,b");
+//        opts.add("--time-format");
+//        opts.add("%T");
+        opts.add("--time-column");
+        opts.add("time");
+        List<String> args = new ArrayList<String>();
+        args.add("prepare");
+        args.add("in/test.log");
+        args.addAll(opts);
+
+        new BulkImportCommand(props).doPrepareCommand(args.toArray(new String[0]));
+    }
 
     @Test @Ignore
     public void testPrepareParts01() throws Exception {

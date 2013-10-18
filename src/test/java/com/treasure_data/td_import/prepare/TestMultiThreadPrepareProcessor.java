@@ -15,7 +15,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.treasure_data.td_import.Options;
-import com.treasure_data.td_import.BulkImportOptionsTestUtil;
+import com.treasure_data.td_import.OptionsTestUtil;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
@@ -31,7 +31,7 @@ public class TestMultiThreadPrepareProcessor {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
 
-        Options options = BulkImportOptionsTestUtil.createPrepareOptions(props);
+        Options options = OptionsTestUtil.createPrepareOptions(props);
         options.setOptions(new String[] { "--prepare-parallel", "3" });
 
         CSVPrepareConfiguration conf = new CSVPrepareConfiguration();

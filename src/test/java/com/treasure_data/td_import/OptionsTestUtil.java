@@ -7,7 +7,7 @@ import org.junit.Ignore;
 import com.treasure_data.td_import.Options;
 
 @Ignore
-public class BulkImportOptionsTestUtil {
+public class OptionsTestUtil {
 
     public static Options createPrepareOptions(Properties props) {
         Options options = new Options();
