@@ -66,7 +66,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    CSV/TSV specific options:\n" +
             "    --column-header                  first line includes column names\n" +
             "    --delimiter CHAR                 delimiter CHAR; default=\",\" at csv, \"\\t\" at tsv\n" +
-            "    --newline TYPE                   newline [CRLR, LR, CR];  default=CRLF\n" +
+            "    --newline TYPE                   newline [CRLF, LF, CR];  default=CRLF\n" +
             "    --quote CHAR                     quote [DOUBLE, SINGLE]; default=DOUBLE\n" +
             "\n" +
             "    MySQL specific options:\n" +
