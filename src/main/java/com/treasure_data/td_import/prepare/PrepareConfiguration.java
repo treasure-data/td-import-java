@@ -44,6 +44,7 @@ import com.treasure_data.td_import.reader.FileReader;
 import com.treasure_data.td_import.reader.JSONFileReader;
 import com.treasure_data.td_import.reader.MessagePackFileReader;
 import com.treasure_data.td_import.reader.MySQLTableReader;
+import com.treasure_data.td_import.reader.RegexFileReader;
 import com.treasure_data.td_import.reader.SyslogFileReader;
 import com.treasure_data.td_import.writer.FileWriter;
 import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
@@ -144,6 +145,20 @@ public class PrepareConfiguration extends Configuration {
             @Override
             public PrepareConfiguration createPrepareConfiguration() {
                 return new JSONPrepareConfiguration();
+            }
+        },
+        REGEX("regex") {
+            @Override
+            public FileReader<RegexPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, FileWriter writer)
+                    throws PreparePartsException {
+                return new RegexFileReader<RegexPrepareConfiguration>(
+                        (RegexPrepareConfiguration) conf, writer);
+            }
+
+            @Override
+            public PrepareConfiguration createPrepareConfiguration() {
+                return new RegexPrepareConfiguration();
             }
         },
         APACHE("apache") {
@@ -773,6 +788,10 @@ public class PrepareConfiguration extends Configuration {
         } else {
             columnNames = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNS).toArray(new String[0]);
         }
+    }
+
+    public void setColumnNames(String[] columnNames) {
+        this.columnNames = columnNames;
     }
 
     public String[] getColumnNames() {

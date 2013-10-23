@@ -26,16 +26,21 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasure_data.td_import.Configuration;
+import com.treasure_data.td_import.model.AliasTimeColumnValue;
+import com.treasure_data.td_import.model.ColumnType;
+import com.treasure_data.td_import.model.TimeColumnSampling;
+import com.treasure_data.td_import.model.TimeColumnValue;
+import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
+import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.PreparePartsException;
+import com.treasure_data.td_import.prepare.RegexPrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.JSONFileWriter;
 
-public class RegexFileReader<T extends PrepareConfiguration> extends FixnumColumnsFileReader<T> {
-    private static final Logger LOG = Logger.getLogger(RegexFileReader.class
-            .getName());
-
-    protected String regex;
+public class RegexFileReader<T extends RegexPrepareConfiguration> extends FixnumColumnsFileReader<T> {
+    private static final Logger LOG = Logger.getLogger(RegexFileReader.class.getName());
 
     protected BufferedReader reader;
     protected Pattern pat;
@@ -43,41 +48,16 @@ public class RegexFileReader<T extends PrepareConfiguration> extends FixnumColum
     protected String line;
     protected List<String> row = new ArrayList<String>();
 
-    public RegexFileReader(T conf, FileWriter writer, String regex)
+    public RegexFileReader(T conf, FileWriter writer)
             throws PreparePartsException {
         super(conf, writer);
-        this.regex = regex;
-    }
-
-    protected void updateColumnNames() {
-        throw new UnsupportedOperationException();
-    }
-
-    protected void updateColumnTypes() {
-        throw new UnsupportedOperationException();
-    }
-
-    protected void updateTimeColumnValue() {
-        throw new UnsupportedOperationException();
     }
 
     @Override
     public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
-        // column names
-        updateColumnNames();
-
-        // column types
-        updateColumnTypes();
-
-        // time column
-        updateTimeColumnValue();
-
-        initializeConvertedRow();
-
-        // check properties of exclude/only columns
-        setSkipColumns();
+        sample(task);
 
         try {
             reader = new BufferedReader(new InputStreamReader(
@@ -87,7 +67,212 @@ public class RegexFileReader<T extends PrepareConfiguration> extends FixnumColum
             throw new PreparePartsException(e);
         }
 
-        pat = Pattern.compile(regex);
+        pat = Pattern.compile(conf.getRegexPattern());
+    }
+
+    public void sample(Task task) throws PreparePartsException {
+        BufferedReader sampleReader = null;
+
+        int timeColumnIndex = -1;
+        int aliasTimeColumnIndex = -1;
+        List<String> row = new ArrayList<String>();
+
+        try {
+            sampleReader = new BufferedReader(new InputStreamReader(
+                    task.createInputStream(conf.getCompressionType()),
+                    conf.getCharsetDecoder()));
+
+            // get index of 'time' column
+            // [ "time", "name", "price" ] as all columns is given,
+            // the index is zero.
+            for (int i = 0; i < columnNames.length; i++) {
+                if (columnNames[i].equals(
+                        Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+                    timeColumnIndex = i;
+                    break;
+                }
+            }
+
+            // get index of specified alias time column
+            // [ "timestamp", "name", "price" ] as all columns and
+            // "timestamp" as alias time column are given, the index is zero.
+            //
+            // if 'time' column exists in row data, the specified alias
+            // time column is ignore.
+            if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
+                for (int i = 0; i < columnNames.length; i++) {
+                    if (columnNames[i].equals(conf.getAliasTimeColumn())) {
+                        aliasTimeColumnIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // if 'time' and the alias columns don't exist, ...
+            if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
+                if (conf.getTimeValue() >= 0) {
+                } else {
+                    throw new PreparePartsException(
+                            "Time column not found. --time-column or --time-value option is required");
+                }
+            }
+
+            boolean isFirstRow = true;
+            List<String> firstRow = new ArrayList<String>();
+            final int sampleRowSize = 30; // TODO
+            TimeColumnSampling[] sampleColumnValues = new TimeColumnSampling[columnNames.length];
+            for (int i = 0; i < sampleColumnValues.length; i++) {
+                sampleColumnValues[i] = new TimeColumnSampling(sampleRowSize);
+            }
+
+            // read some rows
+            for (int i = 0; i < sampleRowSize; i++) {
+                if (!isFirstRow && (columnTypes == null || columnTypes.length == 0)) {
+                    break;
+                }
+
+                String sampleLine = sampleReader.readLine();
+
+                if (sampleLine == null) {
+                    break;
+                }
+
+                Pattern samplePat = Pattern.compile(conf.getRegexPattern());
+                Matcher sampleMat = samplePat.matcher(sampleLine);
+
+                if (!sampleMat.matches()) {
+                    throw new PreparePartsException("Don't match");
+                }
+
+                for (int j = 1; j < (columnNames.length + 1); j++) { // extract groups
+                    row.add(sampleMat.group(j));
+                }
+
+                if (isFirstRow) {
+                    firstRow.addAll(row);
+                    isFirstRow = false;
+                }
+
+                validateRowSize(sampleColumnValues, row, i);
+
+                // sampling
+                for (int j = 0; j < sampleColumnValues.length; j++) {
+                    sampleColumnValues[j].parse(row.get(j));
+                }
+
+                row.clear();
+            }
+
+            // initialize types of all columns
+            if (columnTypes == null || columnTypes.length == 0) {
+                columnTypes = new ColumnType[columnNames.length];
+                for (int i = 0; i < columnTypes.length; i++) {
+                    columnTypes[i] = sampleColumnValues[i].getColumnTypeRank();
+                }
+                conf.setColumnTypes(columnTypes);
+            }
+
+            if (timeColumnValue == null) {
+                // initialize time column value
+                if (timeColumnIndex >= 0) {
+                    if (conf.getTimeFormat() != null) {
+                        timeColumnValue = new TimeColumnValue(timeColumnIndex,
+                                conf.getTimeFormat());
+                    } else {
+                        String suggested =
+                                sampleColumnValues[timeColumnIndex].getSTRFTimeFormatRank();
+                        if (suggested != null) {
+                            if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
+                                timeColumnValue = new TimeColumnValue(timeColumnIndex,
+                                        new HHmmssStrftime());
+                            } else {
+                                timeColumnValue = new TimeColumnValue(timeColumnIndex,
+                                        conf.getTimeFormat(suggested));
+                            }
+                        } else {
+                            timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
+                        }
+                    }
+                } else if (aliasTimeColumnIndex >= 0) {
+                    if (conf.getTimeFormat() != null) {
+                        timeColumnValue = new AliasTimeColumnValue(
+                                aliasTimeColumnIndex, conf.getTimeFormat());
+                    } else {
+                        String suggested =
+                                sampleColumnValues[aliasTimeColumnIndex].getSTRFTimeFormatRank();
+                        if (suggested != null) {
+                            if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
+                                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
+                                        new HHmmssStrftime());
+                            } else {
+                                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
+                                        conf.getTimeFormat(suggested));
+                            }
+                        } else {
+                            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
+                        }
+                    }
+                } else {
+                    timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+                }
+            }
+
+            initializeConvertedRow();
+
+            // check properties of exclude/only columns
+            setSkipColumns();
+
+            // print first sample row
+            JSONFileWriter w = null;
+            try {
+                w = new JSONFileWriter(conf);
+                w.setColumnNames(getColumnNames());
+                w.setColumnTypes(getColumnTypes());
+                w.setSkipColumns(getSkipColumns());
+                w.setTimeColumnValue(getTimeColumnValue());
+                this.row.addAll(firstRow);
+
+                // convert each column in row
+                convertTypesOfColumns();
+                // write each column value
+                w.next(convertedRow);
+                String ret = w.toJSONString();
+                String msg = null;
+                if (ret != null) {
+                    msg = "sample row: " + ret;
+                } else {
+                    msg = "cannot get sample row";
+                }
+                System.out.println(msg);
+                LOG.info(msg);
+            } finally {
+                if (w != null) {
+                    w.close();
+                }
+            }
+        } catch (IOException e) {
+            throw new PreparePartsException(e);
+        } finally {
+            if (sampleReader != null) {
+                try {
+                    sampleReader.close();
+                } catch (IOException e) {
+                    throw new PreparePartsException(e);
+                }
+            }
+        }
+    }
+
+    public void validateRowSize(TimeColumnSampling[] sampleColumnValues,
+            List<String> row, int lineNum) throws PreparePartsException {
+        if (sampleColumnValues.length != row.size()) {
+            throw new PreparePartsException(
+                    String.format("The number of columns to be processed (%d) must " +
+                                  "match the number of column types (%d): check that the " +
+                                  "number of column types you have defined matches the " +
+                                  "expected number of columns being read/written [line: %d] %s",
+                            row.size(), columnTypes.length, lineNum, row));
+        }
     }
 
     @Override
