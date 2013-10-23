@@ -72,7 +72,10 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    MySQL specific options:\n" +
             "    --db-url URL                     JDBC connection URL\n" +
             "    --db-user NAME                   user name for MySQL account\n" +
-            "    --db-password PASSWORD           password for MySQL account\n";
+            "    --db-password PASSWORD           password for MySQL account\n" +
+            "\n" +
+            "    REGEX specific options:\n" +
+            "    --regex-pattern PATTERN          pattern to parse line\n";
 
     String CMD_UPLOAD = "upload";
 
@@ -339,4 +342,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     // password
     String BI_PREPARE_PARTS_JDBC_PASSWORD = "db-password";
     String BI_PREPARE_PARTS_JDBC_PASSWORD_DESC = "password for MySQL account";
+
+    ////////////////////////////////////////
+    // REGEX PREPARE_PARTS_OPTIONS        //
+    ////////////////////////////////////////
+
+    String BI_PREPARE_PARTS_REGEX_PATTERN = "regex-pattern";
+    String BI_PREPARE_PARTS_REGEX_PATTERN_DESC = "pattern to parse line";
 }

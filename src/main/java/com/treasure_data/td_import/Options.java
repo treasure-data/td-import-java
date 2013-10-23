@@ -176,6 +176,14 @@ public class Options {
                 .withRequiredArg()
                 .describedAs("NAME")
                 .ofType(String.class);
+
+        // regex
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_REGEX_PATTERN),
+                Configuration.BI_PREPARE_PARTS_REGEX_PATTERN_DESC)
+                .withRequiredArg()
+                .describedAs("PATTERN")
+                .ofType(String.class);
     }
 
     public void initUploadOptionParser(Properties props) {
