@@ -21,8 +21,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Options;
+import com.treasure_data.td_import.model.ColumnType;
+import com.treasure_data.td_import.reader.ApacheFileReader;
 
-public class ApachePrepareConfiguration extends PrepareConfiguration {
+public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
     private static final Logger LOG = Logger
             .getLogger(ApachePrepareConfiguration.class.getName());
 
@@ -31,5 +33,24 @@ public class ApachePrepareConfiguration extends PrepareConfiguration {
 
     public void configure(Properties props, Options options) {
         super.configure(props, options);
+    }
+
+    @Override
+    public void setRegexPattern() {
+        regexPattern = ApacheFileReader.commonLogPatString;
+    }
+
+    @Override
+    public void setColumnNames() {
+        columnNames = new String[] { "host", "user", "time", "method", "path",
+                "code", "size", "referer", "agent" };
+    }
+
+    @Override
+    public void setColumnTypes() {
+        columnTypes = new ColumnType[] { ColumnType.STRING, ColumnType.STRING,
+                ColumnType.STRING, ColumnType.STRING, ColumnType.STRING,
+                ColumnType.INT, ColumnType.LONG, ColumnType.STRING,
+                ColumnType.STRING, };
     }
 }

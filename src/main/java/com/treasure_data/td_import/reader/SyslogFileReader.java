@@ -36,6 +36,7 @@ import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.StringColumnValue;
+import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.prepare.ApachePrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
@@ -51,7 +52,7 @@ public class SyslogFileReader extends RegexFileReader<SyslogPrepareConfiguration
     private static final Logger LOG = Logger.getLogger(SyslogFileReader.class
             .getName());
 
-    private static final String syslogPatString =
+    public static final String syslogPatString =
             "^([^ ]* [^ ]* [^ ]*) ([^ ]*) ([a-zA-Z0-9_\\/\\.\\-]*)(?:\\([a-zA-Z0-9_\\/\\.\\-]*\\))(?:\\[([0-9]+)\\])?[^\\:]*\\: *(.*)$";
 
     public static class ExtFileWriter extends MsgpackGZIPFileWriter {
@@ -90,19 +91,13 @@ public class SyslogFileReader extends RegexFileReader<SyslogPrepareConfiguration
 
     public SyslogFileReader(SyslogPrepareConfiguration conf, FileWriter writer)
             throws PreparePartsException {
-        super(conf, writer, syslogPatString);
-    }
-
-    protected void updateColumnNames() {
-        columnNames = new String[] { "time", "host", "ident", "pid", "message" };
-    }
-
-    protected void updateColumnTypes() {
-        columnTypes = new ColumnType[] { ColumnType.STRING, ColumnType.STRING,
-                ColumnType.STRING, ColumnType.INT, ColumnType.STRING, };
-    }
-
-    protected void updateTimeColumnValue() {
+        super(conf, writer);
         timeColumnValue = new TimeColumnValue(2, new Strftime("%b %d %H:%M:%S"));
+    }
+
+    @Override
+    public void validateRowSize(TimeColumnSampling[] sampleColumnValues,
+            List<String> row, int lineNum) throws PreparePartsException {
+        // ignore
     }
 }

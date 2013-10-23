@@ -21,8 +21,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Options;
+import com.treasure_data.td_import.model.ColumnType;
+import com.treasure_data.td_import.reader.SyslogFileReader;
 
-public class SyslogPrepareConfiguration extends PrepareConfiguration {
+public class SyslogPrepareConfiguration extends RegexPrepareConfiguration {
     private static final Logger LOG = Logger
             .getLogger(SyslogPrepareConfiguration.class.getName());
 
@@ -31,5 +33,21 @@ public class SyslogPrepareConfiguration extends PrepareConfiguration {
 
     public void configure(Properties props, Options options) {
         super.configure(props, options);
+    }
+
+    @Override
+    public void setRegexPattern() {
+        regexPattern = SyslogFileReader.syslogPatString;
+    }
+
+    @Override
+    public void setColumnNames() {
+        columnNames = new String[] { "time", "host", "ident", "pid", "message" };
+    }
+
+    @Override
+    public void setColumnTypes() {
+        columnTypes = new ColumnType[] { ColumnType.STRING, ColumnType.STRING,
+                ColumnType.STRING, ColumnType.INT, ColumnType.STRING, };
     }
 }
