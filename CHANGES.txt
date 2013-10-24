@@ -1,4 +1,7 @@
 Release 0.3.1 - 20XX/XX/XX
+  NEW FEATURES
+    Adds 'regex' file format. It allows users to parse line by regular expression specified as 'regex-pattern' option.
+
   IMPROVEMENTS
     Defines bulk_import API. It's described in BulkImport and BulkImportCommand classes.
 
