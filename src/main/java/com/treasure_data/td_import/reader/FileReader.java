@@ -23,10 +23,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.treasure_data.td_import.Configuration;
+import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
 import com.treasure_data.td_import.model.Row;
+import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
+import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
+import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
@@ -59,6 +64,18 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
         // check compression type of the file
         conf.checkCompressionType(name);
+    }
+
+    public void resetLineNum() {
+        lineNum = 0;
+    }
+
+    public void incrementLineNum() {
+        lineNum++;
+    }
+
+    public long getLineNum() {
+        return lineNum;
     }
 
     public String[] getColumnNames() {
@@ -111,8 +128,80 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         }
     }
 
+    public int getTimeColumnIndex() {
+        int index = -1;
+        for (int i = 0; i < columnNames.length; i++) {
+            if (columnNames[i].equals(
+                    Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public int getAliasTimeColumnIndex(int timeColumnIndex) {
+        int index = -1;
+        if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
+            for (int i = 0; i < columnNames.length; i++) {
+                if (columnNames[i].equals(conf.getAliasTimeColumn())) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        return index;
+    }
+
+    public void initializeColumnTypes(TimeColumnSampling[] sampleColumnValues) {
+        if (columnTypes == null || columnTypes.length == 0) {
+            columnTypes = new ColumnType[columnNames.length];
+            for (int i = 0; i < columnTypes.length; i++) {
+                columnTypes[i] = sampleColumnValues[i].getColumnTypeRank();
+            }
+            conf.setColumnTypes(columnTypes);
+        }
+    }
+
     public TimeColumnValue getTimeColumnValue() {
         return timeColumnValue;
+    }
+
+    public void setTimeColumnValue(TimeColumnSampling[] sampleColumnValues,
+            int timeColumnIndex, int aliasTimeColumnIndex) {
+        if (timeColumnIndex >= 0) {
+            if (conf.getTimeFormat() != null) {
+                timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat());
+            } else {
+                String suggested = sampleColumnValues[timeColumnIndex].getSTRFTimeFormatRank();
+                if (suggested != null) {
+                    if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
+                        timeColumnValue = new TimeColumnValue(timeColumnIndex, new HHmmssStrftime());
+                    } else {
+                        timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat(suggested));
+                    }
+                } else {
+                    timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
+                }
+            }
+        } else if (aliasTimeColumnIndex >= 0) {
+            if (conf.getTimeFormat() != null) {
+                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat());
+            } else {
+                String suggested = sampleColumnValues[aliasTimeColumnIndex].getSTRFTimeFormatRank();
+                if (suggested != null) {
+                    if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
+                        timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, new HHmmssStrftime());
+                    } else {
+                        timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat(suggested));
+                    }
+                } else {
+                    timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
+                }
+            }
+        } else {
+            timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+        }
     }
 
     public void initializeConvertedRow() {
@@ -121,18 +210,6 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             values[i] = columnTypes[i].createColumnValue();
         }
         convertedRow = new Row(values);
-    }
-
-    public void resetLineNum() {
-        lineNum = 0;
-    }
-
-    public void incrementLineNum() {
-        lineNum++;
-    }
-
-    public long getLineNum() {
-        return lineNum;
     }
 
     public boolean next() throws PreparePartsException {

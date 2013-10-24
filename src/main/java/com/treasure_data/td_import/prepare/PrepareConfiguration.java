@@ -416,6 +416,7 @@ public class PrepareConfiguration extends Configuration {
     protected boolean dryRun = false;
     protected String outputDirName;
     protected int splitSize;
+    protected int sampleRowSize;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected String[] excludeColumns;
@@ -470,6 +471,9 @@ public class PrepareConfiguration extends Configuration {
 
         // split size
         setSplitSize();
+
+        // row size with sample reader
+        setSampleReaderRowSize();
     }
 
     public List<String> getNonOptionArguments() {
@@ -780,6 +784,25 @@ public class PrepareConfiguration extends Configuration {
 
     public int getSplitSize() {
         return splitSize;
+    }
+
+    public void setSampleReaderRowSize() {
+        String sRowSize = props.getProperty(
+                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
+                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
+        try {
+            sampleRowSize = Integer.parseInt(sRowSize);
+        } catch (NumberFormatException e) {
+            String msg = String.format(
+                    "sample row size is required as int type e.g. -D%s=%s",
+                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
+                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
+            throw new IllegalArgumentException(msg, e);
+        }
+    }
+
+    public int getSampleRowSize() {
+        return sampleRowSize;
     }
 
     public void setColumnNames() {

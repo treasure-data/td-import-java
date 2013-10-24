@@ -78,12 +78,19 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
         }
     }
 
+    private void setColumnNamesWithColumnHeader(Tokenizer tokenizer) throws IOException {
+        List<String> sampleRow = new ArrayList<String>();
+        if (conf.hasColumnHeader()) {
+            tokenizer.readColumns(sampleRow);
+            if (columnNames == null || columnNames.length == 0) {
+                columnNames = sampleRow.toArray(new String[0]);
+                conf.setColumnNames(columnNames);
+            }
+        }
+    }
+
     public void sample(Task task) throws PreparePartsException {
         Tokenizer sampleTokenizer = null;
-
-        int timeColumnIndex = -1;
-        int aliasTimeColumnIndex = -1;
-        List<String> row = new ArrayList<String>();
 
         try {
             // create sample reader
@@ -96,24 +103,12 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             // 1) [ "time", "name", "price" ]
             // 2) [ "timestamp", "name", "price" ]
             // 3) [ "name", "price" ]
-            if (conf.hasColumnHeader()) {
-                sampleTokenizer.readColumns(row);
-                if (columnNames == null || columnNames.length == 0) {
-                    columnNames = row.toArray(new String[0]);
-                    conf.setColumnNames(columnNames);
-                }
-            }
+            setColumnNamesWithColumnHeader(sampleTokenizer);
 
             // get index of 'time' column
             // [ "time", "name", "price" ] as all columns is given,
             // the index is zero.
-            for (int i = 0; i < columnNames.length; i++) {
-                if (columnNames[i].equals(
-                        Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                    timeColumnIndex = i;
-                    break;
-                }
-            }
+            int timeColumnIndex = getTimeColumnIndex();
 
             // get index of specified alias time column
             // [ "timestamp", "name", "price" ] as all columns and
@@ -121,14 +116,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             //
             // if 'time' column exists in row data, the specified alias
             // time column is ignore.
-            if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
-                for (int i = 0; i < columnNames.length; i++) {
-                    if (columnNames[i].equals(conf.getAliasTimeColumn())) {
-                        aliasTimeColumnIndex = i;
-                        break;
-                    }
-                }
-            }
+            int aliasTimeColumnIndex = getAliasTimeColumnIndex(timeColumnIndex);
 
             // if 'time' and the alias columns don't exist, ...
             if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
@@ -148,89 +136,43 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             }
 
             // read some rows
+            List<String> sampleRow = new ArrayList<String>();
             for (int i = 0; i < sampleRowSize; i++) {
                 if (!isFirstRow && (columnTypes == null || columnTypes.length == 0)) {
                     break;
                 }
 
-                sampleTokenizer.readColumns(row);
+                sampleTokenizer.readColumns(sampleRow);
 
-                if (row == null || row.isEmpty()) {
+                if (sampleRow == null || sampleRow.isEmpty()) {
                     break;
                 }
 
                 if (isFirstRow) {
-                    firstRow.addAll(row);
+                    firstRow.addAll(sampleRow);
                     isFirstRow = false;
                 }
 
-                if (sampleColumnValues.length != row.size()) {
+                if (sampleColumnValues.length != sampleRow.size()) {
                     throw new PreparePartsException(String.format(
                             "The number of columns to be processed (%d) must " +
                             "match the number of column types (%d): check that the " +
                             "number of column types you have defined matches the " +
                             "expected number of columns being read/written [line: %d] %s",
-                            row.size(), columnTypes.length, i, row));
+                            sampleRow.size(), columnTypes.length, i, sampleRow));
                 }
 
                 // sampling
                 for (int j = 0; j < sampleColumnValues.length; j++) {
-                    sampleColumnValues[j].parse(row.get(j));
+                    sampleColumnValues[j].parse(sampleRow.get(j));
                 }
             }
 
             // initialize types of all columns
-            if (columnTypes == null || columnTypes.length == 0) {
-                columnTypes = new ColumnType[columnNames.length];
-                for (int i = 0; i < columnTypes.length; i++) {
-                    columnTypes[i] = sampleColumnValues[i].getColumnTypeRank();
-                }
-                conf.setColumnTypes(columnTypes);
-            }
+            initializeColumnTypes(sampleColumnValues);
 
             // initialize time column value
-            if (timeColumnIndex >= 0) {
-                if (conf.getTimeFormat() != null) {
-                    timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                            conf.getTimeFormat());
-                } else {
-                    String suggested =
-                            sampleColumnValues[timeColumnIndex].getSTRFTimeFormatRank();
-                    if (suggested != null) {
-                        if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
-                            timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                                    new HHmmssStrftime());
-                        } else {
-                            timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                                    conf.getTimeFormat(suggested));
-                        }
-                    } else {
-                        timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
-                    }
-                }
-            } else if (aliasTimeColumnIndex >= 0) {
-                if (conf.getTimeFormat() != null) {
-                    timeColumnValue = new AliasTimeColumnValue(
-                            aliasTimeColumnIndex, conf.getTimeFormat());
-                } else {
-                    String suggested =
-                            sampleColumnValues[aliasTimeColumnIndex].getSTRFTimeFormatRank();
-                    if (suggested != null) {
-                        if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
-                            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
-                                    new HHmmssStrftime());
-                        } else {
-                            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
-                                    conf.getTimeFormat(suggested));
-                        }
-                    } else {
-                        timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
-                    }
-                }
-            } else {
-                timeColumnValue = new TimeValueTimeColumnValue(
-                        conf.getTimeValue());
-            }
+            setTimeColumnValue(sampleColumnValues, timeColumnIndex, aliasTimeColumnIndex);
 
             initializeConvertedRow();
 

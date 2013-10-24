@@ -73,10 +73,6 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
     public void sample(Task task) throws PreparePartsException {
         BufferedReader sampleReader = null;
 
-        int timeColumnIndex = -1;
-        int aliasTimeColumnIndex = -1;
-        List<String> row = new ArrayList<String>();
-
         try {
             sampleReader = new BufferedReader(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
@@ -85,13 +81,7 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
             // get index of 'time' column
             // [ "time", "name", "price" ] as all columns is given,
             // the index is zero.
-            for (int i = 0; i < columnNames.length; i++) {
-                if (columnNames[i].equals(
-                        Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                    timeColumnIndex = i;
-                    break;
-                }
-            }
+            int timeColumnIndex = getTimeColumnIndex();
 
             // get index of specified alias time column
             // [ "timestamp", "name", "price" ] as all columns and
@@ -99,14 +89,7 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
             //
             // if 'time' column exists in row data, the specified alias
             // time column is ignore.
-            if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
-                for (int i = 0; i < columnNames.length; i++) {
-                    if (columnNames[i].equals(conf.getAliasTimeColumn())) {
-                        aliasTimeColumnIndex = i;
-                        break;
-                    }
-                }
-            }
+            int aliasTimeColumnIndex = getAliasTimeColumnIndex(timeColumnIndex);
 
             // if 'time' and the alias columns don't exist, ...
             if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
@@ -119,13 +102,14 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
 
             boolean isFirstRow = true;
             List<String> firstRow = new ArrayList<String>();
-            final int sampleRowSize = 30; // TODO
+            final int sampleRowSize = conf.getSampleRowSize();
             TimeColumnSampling[] sampleColumnValues = new TimeColumnSampling[columnNames.length];
             for (int i = 0; i < sampleColumnValues.length; i++) {
                 sampleColumnValues[i] = new TimeColumnSampling(sampleRowSize);
             }
 
             // read some rows
+            List<String> sampleRow = new ArrayList<String>();
             for (int i = 0; i < sampleRowSize; i++) {
                 if (!isFirstRow && (columnTypes == null || columnTypes.length == 0)) {
                     break;
@@ -145,77 +129,28 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
                 }
 
                 for (int j = 1; j < (columnNames.length + 1); j++) { // extract groups
-                    row.add(sampleMat.group(j));
+                    sampleRow.add(sampleMat.group(j));
                 }
 
                 if (isFirstRow) {
-                    firstRow.addAll(row);
+                    firstRow.addAll(sampleRow);
                     isFirstRow = false;
                 }
 
-                validateRowSize(sampleColumnValues, row, i);
+                validateRowSize(sampleColumnValues, sampleRow, i);
 
                 // sampling
                 for (int j = 0; j < sampleColumnValues.length; j++) {
-                    sampleColumnValues[j].parse(row.get(j));
+                    sampleColumnValues[j].parse(sampleRow.get(j));
                 }
 
-                row.clear();
+                sampleRow.clear();
             }
 
             // initialize types of all columns
-            if (columnTypes == null || columnTypes.length == 0) {
-                columnTypes = new ColumnType[columnNames.length];
-                for (int i = 0; i < columnTypes.length; i++) {
-                    columnTypes[i] = sampleColumnValues[i].getColumnTypeRank();
-                }
-                conf.setColumnTypes(columnTypes);
-            }
+            initializeColumnTypes(sampleColumnValues);
 
-            if (timeColumnValue == null) {
-                // initialize time column value
-                if (timeColumnIndex >= 0) {
-                    if (conf.getTimeFormat() != null) {
-                        timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                                conf.getTimeFormat());
-                    } else {
-                        String suggested =
-                                sampleColumnValues[timeColumnIndex].getSTRFTimeFormatRank();
-                        if (suggested != null) {
-                            if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
-                                timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                                        new HHmmssStrftime());
-                            } else {
-                                timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                                        conf.getTimeFormat(suggested));
-                            }
-                        } else {
-                            timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
-                        }
-                    }
-                } else if (aliasTimeColumnIndex >= 0) {
-                    if (conf.getTimeFormat() != null) {
-                        timeColumnValue = new AliasTimeColumnValue(
-                                aliasTimeColumnIndex, conf.getTimeFormat());
-                    } else {
-                        String suggested =
-                                sampleColumnValues[aliasTimeColumnIndex].getSTRFTimeFormatRank();
-                        if (suggested != null) {
-                            if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
-                                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
-                                        new HHmmssStrftime());
-                            } else {
-                                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex,
-                                        conf.getTimeFormat(suggested));
-                            }
-                        } else {
-                            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
-                        }
-                    }
-                } else {
-                    timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
-                }
-            }
+            setTimeColumnValue(sampleColumnValues, timeColumnIndex, aliasTimeColumnIndex);
 
             initializeConvertedRow();
 
@@ -278,15 +213,16 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
     @Override
     public boolean readRow() throws IOException, PreparePartsException {
         row.clear();
+
         if ((line = reader.readLine()) == null) {
             return false;
         }
 
         incrementLineNum();
 
-        Matcher commonLogMatcher = pat.matcher(line);
+        Matcher mat = pat.matcher(line);
 
-        if (!commonLogMatcher.matches()) {
+        if (!mat.matches()) {
             writer.incrementErrorRowNum();
             throw new PreparePartsException(String.format(
                     "line is not matched at apache common log format [line: %d]",
@@ -295,7 +231,7 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
 
         // extract groups
         for (int i = 1; i < (columnNames.length + 1); i++) {
-            row.add(commonLogMatcher.group(i));
+            row.add(mat.group(i));
         }
 
         int rawRowSize = row.size();

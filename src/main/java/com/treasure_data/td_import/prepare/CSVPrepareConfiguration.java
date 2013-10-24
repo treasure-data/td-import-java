@@ -62,7 +62,6 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
     protected NewLine newline;
     protected boolean hasColumnHeader;
     protected String typeErrorMode;
-    protected int sampleRowSize;
 
     public CSVPrepareConfiguration() {
         super();
@@ -89,9 +88,6 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
 
         // column-types
         setColumnTypes();
-
-        // row size with sample reader
-        setSampleReaderRowSize();
     }
 
     public void setDelimiterChar() {
@@ -170,24 +166,4 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
     public boolean hasColumnHeader() {
         return hasColumnHeader;
     }
-
-    public void setSampleReaderRowSize() {
-        String sRowSize = props.getProperty(
-                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
-        try {
-            sampleRowSize = Integer.parseInt(sRowSize);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "sample row size is required as int type e.g. -D%s=%s",
-                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE,
-                    Configuration.BI_PREPARE_PARTS_SAMPLE_ROWSIZE_DEFAULTVALUE);
-            throw new IllegalArgumentException(msg, e);
-        }
-    }
-
-    public int getSampleRowSize() {
-        return sampleRowSize;
-    }
-
 }

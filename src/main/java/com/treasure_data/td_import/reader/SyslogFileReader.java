@@ -92,12 +92,17 @@ public class SyslogFileReader extends RegexFileReader<SyslogPrepareConfiguration
     public SyslogFileReader(SyslogPrepareConfiguration conf, FileWriter writer)
             throws PreparePartsException {
         super(conf, writer);
-        timeColumnValue = new TimeColumnValue(2, new Strftime("%b %d %H:%M:%S"));
     }
 
     @Override
     public void validateRowSize(TimeColumnSampling[] sampleColumnValues,
             List<String> row, int lineNum) throws PreparePartsException {
         // ignore
+    }
+
+    @Override
+    public void setTimeColumnValue(TimeColumnSampling[] sampleColumnValues,
+            int timeColumnIndex, int aliasTimeColumnIndex) {
+        timeColumnValue = new TimeColumnValue(2, new Strftime("%b %d %H:%M:%S"));
     }
 }
