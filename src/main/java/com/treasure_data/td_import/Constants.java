@@ -48,7 +48,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     String CMD_PREPARE_DESC = "  Convert files into part file format\n";
 
     String CMD_PREPARE_OPTIONS =
-            "    -f, --format FORMAT              source file format [csv, tsv, json, msgpack, mysql]; default=csv\n" +
+            "    -f, --format FORMAT              source file format [csv, tsv, json, msgpack, apache, regex, mysql]; default=csv\n" +
             "    -C, --compress TYPE              compressed type [gzip, none, auto]; default=auto detect\n" +
             "    -T, --time-format FORMAT         STRF_FORMAT; strftime(3) format of the time column\n" +
             "    -e, --encoding TYPE              encoding type [utf-8]\n" +
@@ -75,7 +75,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --db-password PASSWORD           password for MySQL account\n" +
             "\n" +
             "    REGEX specific options:\n" +
-            "    --regex-pattern PATTERN          pattern to parse line\n";
+            "    --regex-pattern PATTERN          pattern to parse line. When 'regex' is used as source file format, this option is required\n";
 
     String CMD_UPLOAD = "upload";
 
@@ -209,7 +209,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     // PREPARE_PARTS_OPTIONS              //
     ////////////////////////////////////////
 
-    // format [csv, tsv, json, msgpack, apache, regexp]; default=auto detect
+    // format [csv, tsv, json, msgpack, apache, regex]; default=auto detect
     String BI_PREPARE_PARTS_FORMAT = "format";
     String BI_PREPARE_FORMAT_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_FORMAT;
     String BI_PREPARE_PARTS_FORMAT_DEFAULTVALUE = "csv"; // default 'csv'
@@ -348,5 +348,5 @@ public interface Constants extends com.treasure_data.client.Constants {
     ////////////////////////////////////////
 
     String BI_PREPARE_PARTS_REGEX_PATTERN = "regex-pattern";
-    String BI_PREPARE_PARTS_REGEX_PATTERN_DESC = "pattern to parse line";
+    String BI_PREPARE_PARTS_REGEX_PATTERN_DESC = "pattern to parse line. When 'regex' is used as source file format, this option is required";
 }
