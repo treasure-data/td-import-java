@@ -35,13 +35,11 @@ import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
 
-public class BulkImport {
+public class BulkImport extends Import {
     private static final Logger LOG = Logger.getLogger(BulkImport.class.getName());
 
-    protected Properties props;
-
     public BulkImport(Properties props) {
-        this.props = props;
+        super(props);
     }
 
     public List<com.treasure_data.td_import.TaskResult<?>> doPrepare(final String[] args)
@@ -164,35 +162,6 @@ public class BulkImport {
         return results;
     }
 
-    protected String[] getFileNames(PrepareConfiguration conf, int filePos) {
-        List<String> argList = conf.getNonOptionArguments();
-        final String[] fileNames = new String[argList.size() - filePos];
-        for (int i = 0; i < fileNames.length; i++) {
-            fileNames[i] = argList.get(i + filePos);
-        }
-        return fileNames;
-    }
-
-    protected MultiThreadPrepareProcessor createAndStartPrepareProcessor(
-            PrepareConfiguration conf) {
-        MultiThreadPrepareProcessor proc = new MultiThreadPrepareProcessor(conf);
-        proc.registerWorkers();
-        proc.startWorkers();
-        return proc;
-    }
-
-    protected List<com.treasure_data.td_import.TaskResult<?>> stopPrepareProcessor(
-            MultiThreadPrepareProcessor proc) {
-        // wait for finishing prepare processing
-        proc.joinWorkers();
-
-        // wait for finishing prepare processing
-        List<com.treasure_data.td_import.TaskResult<?>> results =
-                new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
-        results.addAll(proc.getTaskResults());
-        return results;
-    }
-
     protected com.treasure_data.td_import.prepare.Task[] createPrepareTasks(
             final PrepareConfiguration conf,
             final String[] fileNames) {
@@ -214,50 +183,6 @@ public class BulkImport {
                     sessionName, fileNames[i]);
         }
         return tasks;
-    }
-
-    protected void startPrepareTasks(
-            final PrepareConfiguration conf,
-            final com.treasure_data.td_import.prepare.Task[] tasks) {
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < tasks.length; i++) {
-                    try {
-                        MultiThreadPrepareProcessor.addTask(tasks[i]);
-                    } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addTask' method call");
-                        LOG.throwing("Main", "addTask", t);
-                    }
-                }
-
-                // end of file list
-                try {
-                    MultiThreadPrepareProcessor.addFinishTask(conf);
-                } catch (Throwable t) {
-                    LOG.severe("Error occurred During 'addFinishTask' method call");
-                    LOG.throwing("Main", "addFinishTask", t);
-                }
-            }
-        }).start();
-    }
-
-    protected MultiThreadUploadProcessor createAndStartUploadProcessor(UploadConfiguration conf) {
-        MultiThreadUploadProcessor proc = new MultiThreadUploadProcessor(conf);
-        proc.registerWorkers();
-        proc.startWorkers();
-        return proc;
-    }
-
-    protected List<com.treasure_data.td_import.TaskResult<?>> stopUploadProcessor(
-            MultiThreadUploadProcessor proc) {
-        // wait for finishing upload processing
-        proc.joinWorkers();
-
-        // wait for finishing upload processing
-        List<com.treasure_data.td_import.TaskResult<?>> results =
-                new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
-        results.addAll(proc.getTaskResults());
-        return results;
     }
 
     protected com.treasure_data.td_import.upload.UploadTask[] createUploadTasks(
@@ -342,36 +267,6 @@ public class BulkImport {
         return argList.get(1);
     }
 
-    protected boolean hasNoPrepareError(List<com.treasure_data.td_import.TaskResult<?>> results) {
-        boolean hasNoError = true;
-        for (com.treasure_data.td_import.TaskResult<?> result : results) {
-            if (! (result instanceof com.treasure_data.td_import.prepare.TaskResult)) {
-                continue;
-            }
-
-            if (result.error != null) {
-                hasNoError = false;
-                break;
-            }
-        }
-        return hasNoError;
-    }
-
-    protected boolean hasNoUploadError(List<com.treasure_data.td_import.TaskResult<?>> results) {
-        boolean hasNoError = true;
-        for (com.treasure_data.td_import.TaskResult<?> result : results) {
-            if (! (result instanceof com.treasure_data.td_import.upload.TaskResult)) {
-                continue;
-            }
-
-            if (result.error != null) {
-                hasNoError = false;
-                break;
-            }
-        }
-        return hasNoError;
-    }
-
     protected PrepareConfiguration createPrepareConf(String[] args) {
         return createPrepareConf(args, false);
     }
@@ -397,12 +292,4 @@ public class BulkImport {
         conf.configure(props, fact.getBulkImportOptions());
         return conf;
     }
-
-    protected void showHelp(Configuration.Command cmd, PrepareConfiguration conf, String[] args) {
-        if (conf.hasHelpOption()) {
-            System.out.println(cmd.showHelp(conf, props));
-            System.exit(0);
-        }
-    }
-
 }
