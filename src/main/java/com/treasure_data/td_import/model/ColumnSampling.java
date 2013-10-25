@@ -21,7 +21,7 @@ import java.math.BigInteger;
 
 public class ColumnSampling {
     protected int numRows;
-    protected int[] scores = new int[] { 0, 0, 0, 0, 0 };
+    protected int[] scores = new int[] { 0, 0, 0, 0, 0, 0 };
 
     public ColumnSampling(int numRows) {
         this.numRows = numRows;
@@ -40,6 +40,14 @@ public class ColumnSampling {
         try {
             Double.parseDouble((String) value);
             scores[ColumnType.DOUBLE.getIndex()] += 1;
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+
+        // value looks like Float object?
+        try {
+            Float.parseFloat((String) value);
+            scores[ColumnType.FLOAT.getIndex()] += 1;
         } catch (NumberFormatException e) {
             // ignore
         }

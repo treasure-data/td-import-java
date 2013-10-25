@@ -29,6 +29,7 @@ import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ArrayColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.DoubleColumnValue;
+import com.treasure_data.td_import.model.FloatColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.MapColumnValue;
@@ -140,6 +141,7 @@ public abstract class FileWriter implements Closeable {
     public abstract void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException;
+    public abstract void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException;
     public abstract void writeEndRow() throws PreparePartsException;

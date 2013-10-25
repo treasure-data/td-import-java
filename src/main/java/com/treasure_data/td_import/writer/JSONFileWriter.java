@@ -27,6 +27,7 @@ import org.json.simple.JSONValue;
 
 import com.treasure_data.td_import.model.ArrayColumnValue;
 import com.treasure_data.td_import.model.DoubleColumnValue;
+import com.treasure_data.td_import.model.FloatColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.MapColumnValue;
@@ -121,6 +122,11 @@ public class JSONFileWriter extends FileWriter {
 
     @Override
     public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
+    public void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException {
         throw new PreparePartsException("not implemented method");
     }
 

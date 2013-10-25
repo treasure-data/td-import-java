@@ -49,7 +49,7 @@ public enum ColumnType {
             with.write(filter, (StringColumnValue) v);
         }
     },
-    INT("int", 3) {
+    INT("int", 4) {
         @Override
         public ColumnValue createColumnValue() {
             return new IntColumnValue(this);
@@ -73,7 +73,7 @@ public enum ColumnType {
             with.write(filter, (IntColumnValue) v);
         }
     },
-    DOUBLE("double", 1) {
+    DOUBLE("double", 2) {
         @Override
         public ColumnValue createColumnValue() {
             return new DoubleColumnValue(this);
@@ -97,7 +97,31 @@ public enum ColumnType {
             with.write(filter, (DoubleColumnValue) v);
         }
     },
-    LONG("long", 4) {
+    FLOAT("float", 1) {
+        @Override
+        public ColumnValue createColumnValue() {
+            return new FloatColumnValue(this);
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            into.parse(v);
+        }
+
+        @Override
+        public void setColumnValue(Object v, ColumnValue cv)
+                throws PreparePartsException {
+            cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
+                throws PreparePartsException {
+            with.write(filter, (FloatColumnValue) v);
+        }
+    },
+    LONG("long", 5) {
         @Override
         public ColumnValue createColumnValue() {
             return new LongColumnValue(this);
@@ -121,7 +145,7 @@ public enum ColumnType {
             with.write(filter, (LongColumnValue) v);
         }
     },
-    BIGINT("bigint", 2) {
+    BIGINT("bigint", 3) {
         @Override
         public ColumnValue createColumnValue() {
             throw new UnsupportedOperationException();
@@ -145,7 +169,7 @@ public enum ColumnType {
             throw new UnsupportedOperationException();
         }
     },
-    ARRAY("array", 5) {
+    ARRAY("array", 6) {
         @Override
         public ColumnValue createColumnValue() {
             return new ArrayColumnValue(this);
@@ -169,7 +193,7 @@ public enum ColumnType {
             with.write(filter, (ArrayColumnValue) v);
         }
     },
-    MAP("map", 6) {
+    MAP("map", 7) {
         @Override
         public ColumnValue createColumnValue() {
             return new MapColumnValue(this);
