@@ -28,6 +28,7 @@ public class TimeColumnSampling extends ColumnSampling {
     private static final SimpleDateFormat yyyyMMdd$1HHmmss_SDF;
     private static final SimpleDateFormat yyyyMMdd$1HHmmssZ_SDF;
     public static final SimpleDateFormat HHmmss_SDF;
+    public static final SimpleDateFormat yyyyMMdd_HHmmss_SDF; //2013/10/25 22:49:52
 
     private static final SimpleDateFormat[] SDF_LIST;
 
@@ -40,12 +41,15 @@ public class TimeColumnSampling extends ColumnSampling {
         yyyyMMdd$1HHmmssZ_SDF.setLenient(false);
         HHmmss_SDF = new SimpleDateFormat(HHmmss);
         HHmmss_SDF.setLenient(false);
+        yyyyMMdd_HHmmss_SDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        yyyyMMdd_HHmmss_SDF.setLenient(false);
 
         SDF_LIST = new SimpleDateFormat[] {
                 yyyyMMdd_SDF,
                 yyyyMMdd$1HHmmss_SDF,
                 yyyyMMdd$1HHmmssZ_SDF,
                 HHmmss_SDF,
+                yyyyMMdd_HHmmss_SDF,
         };
     }
 
@@ -53,15 +57,17 @@ public class TimeColumnSampling extends ColumnSampling {
     private static final String yyyyMMdd$1HHmmss_STRF = "%Y%m%d$1%H%M%S";
     private static final String yyyyMMdd$1HHmmssZ_STRF = "%Y%m%d$1%H%M%S %Z";
     public static final String HHmmss_STRF = "%T";
+    public static final String yyyyMMdd_HHmmss_STRF = "%Y/%m/%d %T";
 
     private static final String[] STRF_LIST = new String[] {
         yyyyMMdd_STRF,
         yyyyMMdd$1HHmmss_STRF,
         yyyyMMdd$1HHmmssZ_STRF,
-        HHmmss_STRF
+        HHmmss_STRF,
+        yyyyMMdd_HHmmss_STRF,
     };
 
-    protected int[] timeScores = new int[] { 0, 0, 0, 0 };
+    protected int[] timeScores = new int[] { 0, 0, 0, 0, 0 };
 
     public TimeColumnSampling(int numRows) {
         super(numRows);
