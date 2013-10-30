@@ -34,6 +34,7 @@ import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
+import com.treasure_data.td_import.prepare.Strftime;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.FileWriter;
 
@@ -169,38 +170,40 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     public void setTimeColumnValue(TimeColumnSampling[] sampleColumnValues,
             int timeColumnIndex, int aliasTimeColumnIndex) {
+        int index = -1;
+        boolean isAlias = false;
+
         if (timeColumnIndex >= 0) {
-            if (conf.getTimeFormat() != null) {
-                timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat());
-            } else {
-                String suggested = sampleColumnValues[timeColumnIndex].getSTRFTimeFormatRank();
-                if (suggested != null) {
-                    if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
-                        timeColumnValue = new TimeColumnValue(timeColumnIndex, new HHmmssStrftime());
-                    } else {
-                        timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat(suggested));
-                    }
-                } else {
-                    timeColumnValue = new TimeColumnValue(timeColumnIndex, null);
-                }
-            }
+            index = timeColumnIndex;
+            isAlias = false;
         } else if (aliasTimeColumnIndex >= 0) {
-            if (conf.getTimeFormat() != null) {
-                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat());
-            } else {
-                String suggested = sampleColumnValues[aliasTimeColumnIndex].getSTRFTimeFormatRank();
-                if (suggested != null) {
-                    if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
-                        timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, new HHmmssStrftime());
-                    } else {
-                        timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat(suggested));
-                    }
-                } else {
-                    timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, null);
-                }
-            }
-        } else {
+            index = aliasTimeColumnIndex;
+            isAlias = true;
+        }
+
+        if (index < 0) {
             timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+        } else if (conf.getTimeFormat() != null) {
+            timeColumnValue = createTimeColumnValue(index, isAlias, conf.getTimeFormat());
+        } else {
+            String suggested = sampleColumnValues[index].getSTRFTimeFormatRank();
+            if (suggested != null) {
+                if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
+                    timeColumnValue = createTimeColumnValue(index, isAlias, new HHmmssStrftime());
+                } else {
+                    timeColumnValue = createTimeColumnValue(index, isAlias, conf.getTimeFormat(suggested));
+                }
+            } else {
+                timeColumnValue = createTimeColumnValue(index, isAlias, null);
+            }
+        }
+    }
+
+    private TimeColumnValue createTimeColumnValue(int index, boolean isAlias, Strftime strftime) {
+        if (!isAlias) {
+            return new TimeColumnValue(index, strftime);
+        } else {
+            return new AliasTimeColumnValue(index, strftime);
         }
     }
 
