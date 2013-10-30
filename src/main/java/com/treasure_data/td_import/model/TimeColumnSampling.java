@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TimeColumnSampling extends ColumnSampling {
-    public static final String HHmmss = "HHmmss";
+    public static final String HHmmss = "HH:mm:ss";
 
     private static final SimpleDateFormat yyyyMMdd_SDF;
     private static final SimpleDateFormat yyyyMMdd$1HHmmss_SDF;
@@ -38,7 +38,7 @@ public class TimeColumnSampling extends ColumnSampling {
         yyyyMMdd$1HHmmss_SDF.setLenient(false);
         yyyyMMdd$1HHmmssZ_SDF = new SimpleDateFormat("yyyyMMdd$1HHmmss Z");
         yyyyMMdd$1HHmmssZ_SDF.setLenient(false);
-        HHmmss_SDF = new SimpleDateFormat("HHmmss");
+        HHmmss_SDF = new SimpleDateFormat(HHmmss);
         HHmmss_SDF.setLenient(false);
 
         SDF_LIST = new SimpleDateFormat[] {
