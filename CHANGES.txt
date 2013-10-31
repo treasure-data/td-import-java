@@ -6,6 +6,9 @@ Release 0.3.1 - 20XX/XX/XX
   IMPROVEMENTS
     Defines bulk_import API. It's described in BulkImport and BulkImportCommand classes.
 
+  BUG FIXED
+    Fixes NPE error. It occurs when unknown column type is specified as 'column-types' option.
+
 Release 0.3.0 - 2013/10/04
   NEW FEATURES
     Adds feature for parsing 'millseconds' as strftime format.
