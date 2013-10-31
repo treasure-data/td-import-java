@@ -829,6 +829,10 @@ public class PrepareConfiguration extends Configuration {
             columnTypes = new ColumnType[types.length];
             for (int i = 0; i < types.length; i++) {
                 columnTypes[i] = ColumnType.fromString(types[i].toLowerCase());
+                if (columnTypes[i] == null) {
+                    throw new IllegalArgumentException(String.format(
+                            "'%s' cannot be specified as column type", types[i]));
+                }
             }
         }
     }
