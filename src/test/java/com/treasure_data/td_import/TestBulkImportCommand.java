@@ -8,25 +8,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestBulkImportCommand {
-    @Test @Ignore
-    public void testPrepareParts000() throws Exception {
-        Properties props = System.getProperties();
-//        props.load(this.getClass().getClassLoader()
-//                .getResourceAsStream("treasure-data.properties"));
-
-        List<String> opts = new ArrayList<String>();
-        opts.add("--format");
-        opts.add("csv");
-        opts.add("--column-header");
-        opts.add("--time-column");
-        opts.add("date_code");
-        List<String> args = new ArrayList<String>();
-        args.add("prepare");
-        args.add("s3://keyid@scretkey/bucket/path1/path2/*.csv");
-        args.addAll(opts);
-
-        new BulkImportCommand(props).doPrepareCommand(args.toArray(new String[0]));
-    }
 
     @Test @Ignore
     public void testPrepareParts01() throws Exception {
