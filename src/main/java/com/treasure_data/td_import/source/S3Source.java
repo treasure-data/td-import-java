@@ -19,43 +19,106 @@ package com.treasure_data.td_import.source;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ListObjectsRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 public class S3Source extends Source {
+    private static final Logger LOG = Logger.getLogger(S3Source.class.getName());
+
     public static List<Source> createSources(SourceDesc desc) {
         String rawPath = desc.getPath();
         String[] elm = rawPath.split("/");
 
         String bucket = elm[0];
-        String path = rawPath.substring(bucket.length(), rawPath.length());
-        String keyId = desc.getUser();
-        String secretKey = desc.getHost();
+        String basePath = rawPath.substring(bucket.length() + 1, rawPath.length());
 
-        // TODO FIXME #MN
-        return null;
+        AmazonS3Client client = createAmazonS3Client(desc);
+        List<String> srcNames = getSourceNames(client, bucket, basePath);
+        List<Source> srcs = new ArrayList<Source>();
+        for (String srcName : srcNames) {
+            srcs.add(new S3Source(client, rawPath, bucket, srcName));
+        }
+
+        return srcs;
     }
 
-    protected String keyId;
-    protected String secretKey;
+    static AmazonS3Client createAmazonS3Client(SourceDesc desc) {
+        String accessKey = desc.getUser();
+        if (accessKey == null || accessKey.isEmpty()) {
+            throw new IllegalArgumentException("S3 AccessKey is null or empty.");
+        }
+        String secretAccessKey = desc.getHost();
+        if (secretAccessKey == null || secretAccessKey.isEmpty()) {
+            throw new IllegalArgumentException("S3 SecretAccessKey is null or empty.");
+        }
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretAccessKey);
+
+        ClientConfiguration conf = new ClientConfiguration();
+        conf.setProtocol(Protocol.HTTP); // TODO
+        conf.setMaxConnections(10); // SDK default: 50 // TODO
+        conf.setMaxErrorRetry(5); // SDK default: 3 // TODO
+        conf.setSocketTimeout(8 * 60 * 1000); // SDK default: 50 * 1000 // TODO
+
+        return new AmazonS3Client(credentials, conf);
+    }
+
+    static List<String> getSourceNames(AmazonS3Client client, String bucket, String basePath) {
+        LOG.info(String.format("list s3 files: bucket=%s, basePath=%s", bucket, basePath));
+
+        // TODO pattern matching
+
+        List<String> srcNames = new ArrayList<String>();
+        String lastKey = basePath;
+        do {
+            ObjectListing listing = client.listObjects(new ListObjectsRequest(
+                    bucket, basePath, lastKey, null, 1024));
+            for(S3ObjectSummary s : listing.getObjectSummaries()) {
+                srcNames.add(s.getKey());
+            }
+            lastKey = listing.getNextMarker();
+        } while (lastKey != null);
+
+        return srcNames;
+    }
+
+    protected AmazonS3Client client;
+
     protected String bucket;
     protected String path;
 
-    public S3Source(String rawPath, String keyId, String secretKey, String bucket, String path) {
+    S3Source(AmazonS3Client client, String rawPath, String bucket, String path) {
         super(rawPath);
-        this.keyId = keyId;
-        this.secretKey = secretKey;
+        this.client = client;
         this.bucket = bucket;
         this.path = path;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        throw new UnsupportedOperationException("this method should be declared in sub-class");
+        LOG.info(String.format("get s3 file: bucket=%s, path=%s", bucket, path));
+        S3Object object = client.getObject(new GetObjectRequest(bucket, path));
+
+        if (object != null) {
+            return object.getObjectContent();
+        } else {
+            throw new IOException("s3 file is null.");
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("s3-src(keyId=%s,secretKey=%s,bucket=%s,path=%s)",
-                keyId, secretKey, bucket, path);
+        return String.format("s3-src(bucket=%s,path=%s)", bucket, path);
     }
 }

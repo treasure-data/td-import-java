@@ -83,7 +83,8 @@ public class SourceDesc {
                 if (rawPassword != null) {
                     src.password = URLDecoder.decode(rawPassword, "UTF-8");
                 }
-                src.host = URLDecoder.decode(rawHost, "UTF-8");
+                src.host = rawHost; // TODO
+                //src.host = URLDecoder.decode(rawHost, "UTF-8");
                 src.port = port;
                 src.endpoint = URLDecoder.decode(rawEndpoint, "UTF-8");
                 src.path = URLDecoder.decode(rawPath, "UTF-8");
