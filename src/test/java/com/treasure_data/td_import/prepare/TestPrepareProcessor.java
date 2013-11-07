@@ -27,6 +27,8 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.PrepareProcessor;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
+import com.treasure_data.td_import.source.LocalFileSource;
+import com.treasure_data.td_import.source.Source;
 
 public class TestPrepareProcessor {
 
@@ -37,7 +39,7 @@ public class TestPrepareProcessor {
 
         CSVPrepareConfiguration conf = new CSVPrepareConfiguration();
         conf = spy(conf);
-        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(Source.class));
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
         conf.configure(props, options);
         PrepareProcessor proc = new PrepareProcessor(conf);
@@ -45,7 +47,7 @@ public class TestPrepareProcessor {
         String csvtext = "time,user,age\n" + "1370416181,muga,10\n";
         String fileName = "file01";
 
-        Task task = new Task(fileName);
+        Task task = new Task(new LocalFileSource(fileName));
         task.isTest = true;
         task.testBinary = csvtext.getBytes();
 
@@ -79,7 +81,7 @@ public class TestPrepareProcessor {
         conf = new CSVPrepareConfiguration();
         conf.configure(props, options);
         conf = spy(conf);
-        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(String.class));
+        doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).checkCompressionType(any(Source.class));
         doReturn(PrepareConfiguration.CompressionType.NONE).when(conf).getCompressionType();
 
         // create prepare processor

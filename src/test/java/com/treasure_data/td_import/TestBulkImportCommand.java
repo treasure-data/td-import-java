@@ -8,24 +8,21 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestBulkImportCommand {
-    @Test
+    @Test @Ignore
     public void testPrepareParts000() throws Exception {
         Properties props = System.getProperties();
 //        props.load(this.getClass().getClassLoader()
 //                .getResourceAsStream("treasure-data.properties"));
 
         List<String> opts = new ArrayList<String>();
-        //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
-        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
-        opts.add("--columns");
-        opts.add("time,a,b");
-//        opts.add("--time-format");
-//        opts.add("%T");
+        opts.add("--format");
+        opts.add("csv");
+        opts.add("--column-header");
         opts.add("--time-column");
-        opts.add("time");
+        opts.add("date_code");
         List<String> args = new ArrayList<String>();
         args.add("prepare");
-        args.add("in/test.log");
+        args.add("s3://keyid@scretkey/bucket/path1/path2/*.csv");
         args.addAll(opts);
 
         new BulkImportCommand(props).doPrepareCommand(args.toArray(new String[0]));
@@ -34,21 +31,18 @@ public class TestBulkImportCommand {
     @Test @Ignore
     public void testPrepareParts01() throws Exception {
         Properties props = System.getProperties();
-        props.load(this.getClass().getClassLoader()
-                .getResourceAsStream("treasure-data.properties"));
+//        props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
 
         List<String> opts = new ArrayList<String>();
         //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
         //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
         opts.add("--time-column");
         opts.add("date_code");
-        opts.add("--prepare-parallel");
-        opts.add("2");
         opts.add("--column-header");
         List<String> args = new ArrayList<String>();
-        args.add("prepare_parts");
-        args.add("in/from_SQLServer_to_csv_10000000_v01.csv");
-//        args.add("./in/from_SQLServer_to_csv_10_v01.csv");
+        args.add("prepare");
+//        args.add("in/from_SQLServer_to_csv_10000000_v01.csv");
+        args.add("./in/from_SQLServer_to_csv_10_v01.csv");
 //        args.add("./in/from_SQLServer_to_csv_10_v02.csv");
 //        args.add("./in/from_SQLServer_to_csv_10_v03.csv");
 //        args.add("./in/from_SQLServer_to_csv_10_v04.csv");
@@ -63,29 +57,6 @@ public class TestBulkImportCommand {
 
         new BulkImportCommand(props).doPrepareCommand(args.toArray(new String[0]));
     }
-
-//    @Test @Ignore
-//    public void testPrepareParts02() throws Exception {
-//        Properties props = System.getProperties();
-//        props.load(this.getClass().getClassLoader()
-//                .getResourceAsStream("treasure-data.properties"));
-//
-//        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, "date_code");
-//        //props.setProperty(Config.BI_PREPARE_PARTS_ENCODING, "Shift_JIS");
-//        //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEVALUE, "1370941200");
-//        //props.setProperty(Configuration.BI_PREPARE_PARTS_PARALLEL, "2");
-//        props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, "mysql");
-//        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_CONNECTION_URL, props.getProperty("mysql.test.url"));
-//        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_USER, props.getProperty("mysql.test.user"));
-//        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_PASSWORD, props.getProperty("mysql.test.password"));
-//        props.setProperty(Configuration.BI_PREPARE_PARTS_JDBC_TABLE, props.getProperty("mysql.test.table"));
-//        final String[] args = new String[] {
-//                "prepare_parts",
-//                "mugatbl"
-//        };
-//
-//        BulkImportMain.prepareParts(args, props);
-//    }
 
     @Test @Ignore
     public void testUploadParts01() throws Exception {

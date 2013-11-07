@@ -19,6 +19,7 @@ import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.reader.FileReader;
+import com.treasure_data.td_import.source.LocalFileSource;
 
 public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguration> {
 
@@ -402,7 +403,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         context.createContext(this);
 
         // create task
-        task = new Task(fileName);
+        task = new Task(new LocalFileSource(fileName));
         task = spy(task);
         task.isTest = true;
         task.testBinary = context.generateCSVText(this).getBytes();

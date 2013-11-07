@@ -10,6 +10,7 @@ import org.junit.Ignore;
 
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
+import com.treasure_data.td_import.source.LocalFileSource;
 
 @Ignore
 public class PrepareProcessorTestUtil {
@@ -21,7 +22,7 @@ public class PrepareProcessorTestUtil {
             sbuf.append(String.format("1370416181,muga%d,%d\n", i, i));
         }
 
-        Task t = new Task("file" + i);
+        Task t = new Task(new LocalFileSource("file" + i));
         t.isTest = true;
         t.testBinary = sbuf.toString().getBytes();
         return t;
@@ -29,7 +30,7 @@ public class PrepareProcessorTestUtil {
 
     public static Task createErrorTask(int i)
             throws Exception {
-        Task t = new Task("file" + i);
+        Task t = new Task(new LocalFileSource("file" + i));
         t = spy(t);
         doThrow(new IOException("dummy")).when(t).createInputStream(
                 any(PrepareConfiguration.CompressionType.class));

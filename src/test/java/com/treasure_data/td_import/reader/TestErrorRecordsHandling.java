@@ -17,6 +17,7 @@ import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.reader.FileReader;
+import com.treasure_data.td_import.source.LocalFileSource;
 import com.treasure_data.td_import.writer.FileWriterTestUtil;
 
 public class TestErrorRecordsHandling {
@@ -140,7 +141,7 @@ public class TestErrorRecordsHandling {
     }
 
     private Task createNormalCSVFileTask() {
-        Task task = new Task("dummy.txt");
+        Task task = new Task(new LocalFileSource("dummy.txt"));
         task = spy(task);
         task.isTest = true;
         task.testBinary = "name,count,time\nbar,10,1000\nfoo,11,1100\nbaz,12,1200".getBytes();
@@ -148,7 +149,7 @@ public class TestErrorRecordsHandling {
     }
 
     private Task createInvalidCSVFileTask() {
-        Task task = new Task("dummy.txt");
+        Task task = new Task(new LocalFileSource("dummy.txt"));
         task = spy(task);
         task.isTest = true;
         task.testBinary = "name,count,time\nbar,10,1000\nfoo,111100\nbaz,12,1200".getBytes();

@@ -12,6 +12,7 @@ import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.reader.FileReader;
+import com.treasure_data.td_import.source.LocalFileSource;
 import com.treasure_data.td_import.writer.FileWriterTestUtil;
 
 @Ignore
@@ -40,7 +41,7 @@ public class TestApacheFileReader {
         writer = new FileWriterTestUtil(conf);
         reader = PrepareConfiguration.Format.APACHE.createFileReader(conf, writer);
 
-        Task task = new Task("dummy.txt");
+        Task task = new Task(new LocalFileSource("dummy.txt"));
         task = spy(task);
         task.isTest = true;
         task.testBinary =
