@@ -28,6 +28,7 @@ import com.treasure_data.model.bulkimport.SessionSummary;
 import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
@@ -68,17 +69,22 @@ public final class BulkImportCommand extends BulkImport {
         // create configuration for 'prepare' processing
         PrepareConfiguration prepareConf = createPrepareConf(args);
 
-        // extract and get file names from command-line arguments
-        String[] fileNames = getFileNames(prepareConf, 1);
+        // extract and get source names from command-line arguments
+        Source[] srcs = getSources(prepareConf, 1);
 
-        commandHelper.showPrepare(fileNames, prepareConf.getOutputDirName());
+        List<String> srcNames = new ArrayList<String>();
+        for (Source src : srcs) {
+            srcNames.add(src.getRawPath());
+        }
+        commandHelper.showPrepare(srcNames.toArray(new String[0]),
+                prepareConf.getOutputDirName());
 
         MultiThreadPrepareProcessor prepareProc =
                 createAndStartPrepareProcessor(prepareConf);
 
         // create prepare tasks
         com.treasure_data.td_import.prepare.Task[] tasks =
-                createPrepareTasks(prepareConf, fileNames);
+                createPrepareTasks(prepareConf, srcs);
 
         // start prepare tasks
         startPrepareTasks(prepareConf, tasks);
@@ -134,10 +140,14 @@ public final class BulkImportCommand extends BulkImport {
                     sessionName, sessionName));
         }
 
-        // get and extract uploaded files from command-line arguments
-        String[] fileNames = getFileNames(uploadConf, filePos);
+        // get and extract uploaded sources from command-line arguments
+        Source[] srcs = getSources(uploadConf, filePos);
 
-        commandHelper.showUpload(fileNames, sessionName);
+        List<String> srcNames = new ArrayList<String>();
+        for (Source src : srcs) {
+            srcNames.add(src.getRawPath());
+        }
+        commandHelper.showUpload(srcNames.toArray(new String[0]), sessionName);
 
         MultiThreadUploadProcessor uploadProc =
                 createAndStartUploadProcessor(uploadConf);
@@ -148,7 +158,7 @@ public final class BulkImportCommand extends BulkImport {
         if (!uploadConf.hasPrepareOptions()) {
             // create upload tasks
             com.treasure_data.td_import.upload.UploadTask[] tasks = createUploadTasks(
-                    sessionName, fileNames);
+                    sessionName, srcs);
 
             // start upload tasks
             startUploadTasks(uploadConf, tasks);
@@ -161,7 +171,7 @@ public final class BulkImportCommand extends BulkImport {
 
             // create sequential upload (prepare) tasks
             com.treasure_data.td_import.prepare.Task[] tasks = createSequentialUploadTasks(
-                    sessionName, fileNames);
+                    sessionName, srcs);
 
             // start sequential upload (prepare) tasks
             startPrepareTasks(prepareConf, tasks);

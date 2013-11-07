@@ -24,6 +24,9 @@ import java.util.logging.Logger;
 
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasure_data.td_import.source.LocalFileSource;
+import com.treasure_data.td_import.source.Source;
+import com.treasure_data.td_import.source.SourceDesc;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfigurationBase;
 
@@ -43,6 +46,28 @@ public abstract class Import {
             fileNames[i] = argList.get(i + filePos);
         }
         return fileNames;
+    }
+
+    protected Source[] getSources(PrepareConfiguration conf, int srcPos) {
+        List<String> argList = conf.getNonOptionArguments();
+        int len = argList.size() - srcPos;
+        List<Source> srcs = new ArrayList<Source>();
+        for (int i = 0; i < len; i++) {
+            srcs.addAll(getSources(conf, argList.get(i + srcPos)));
+        }
+        return srcs.toArray(new Source[0]);
+    }
+
+    protected List<Source> getSources(PrepareConfiguration conf, String srcName) {
+        try {
+            SourceDesc desc = SourceDesc.create(srcName);
+            return Source.Factory.createSources(desc);
+        } catch (Throwable t) {
+            LOG.info("create source as LocalFileSource: " + srcName);
+            List<Source> srcs = new ArrayList<Source>();
+            srcs.add(new LocalFileSource(srcName));
+            return srcs;
+        }
     }
 
     protected MultiThreadPrepareProcessor createAndStartPrepareProcessor(

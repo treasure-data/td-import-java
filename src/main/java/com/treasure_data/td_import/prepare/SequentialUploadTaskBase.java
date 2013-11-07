@@ -18,11 +18,12 @@
 package com.treasure_data.td_import.prepare;
 
 import com.treasure_data.td_import.prepare.Task;
+import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 
 public abstract class SequentialUploadTaskBase extends Task {
-    public SequentialUploadTaskBase(String fileName) {
-        super(fileName);
+    public SequentialUploadTaskBase(Source source) {
+        super(source);
     }
 
     @Override

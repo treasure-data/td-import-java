@@ -26,15 +26,8 @@ import java.util.logging.Logger;
 import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
-import com.treasure_data.td_import.Configuration;
-import com.treasure_data.td_import.model.AliasTimeColumnValue;
-import com.treasure_data.td_import.model.ColumnSampling;
-import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.TimeColumnSampling;
-import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
-import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.FileWriter;

@@ -46,6 +46,7 @@ import com.treasure_data.td_import.reader.MessagePackFileReader;
 import com.treasure_data.td_import.reader.MySQLTableReader;
 import com.treasure_data.td_import.reader.RegexFileReader;
 import com.treasure_data.td_import.reader.SyslogFileReader;
+import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.writer.FileWriter;
 import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
 
@@ -566,7 +567,7 @@ public class PrepareConfiguration extends Configuration {
         return compressionType;
     }
 
-    public CompressionType checkCompressionType(String fileName) throws PreparePartsException {
+    public CompressionType checkCompressionType(Source source) throws PreparePartsException {
         if (getCompressionType() != CompressionType.AUTO) {
             return getCompressionType();
         }
@@ -580,9 +581,9 @@ public class PrepareConfiguration extends Configuration {
             InputStream in = null;
             try {
                 if (candidateCompressTypes[i].equals(CompressionType.GZIP)) {
-                    in = CompressionType.GZIP.createInputStream(new FileInputStream(fileName));
+                    in = CompressionType.GZIP.createInputStream(source.getInputStream());
                 } else if (candidateCompressTypes[i].equals(CompressionType.NONE)) {
-                    in = CompressionType.NONE.createInputStream(new FileInputStream(fileName));
+                    in = CompressionType.NONE.createInputStream(source.getInputStream());
                 } else {
                     throw new PreparePartsException("fatal error");
                 }
@@ -592,8 +593,7 @@ public class PrepareConfiguration extends Configuration {
                 compressionType = candidateCompressTypes[i];
                 break;
             } catch (IOException e) {
-                LOG.fine(String.format("file %s is %s", fileName,
-                        e.getMessage()));
+                LOG.fine(String.format("source %s is %s", source, e.getMessage()));
             } finally {
                 if (in != null) {
                     try {

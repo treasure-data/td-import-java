@@ -26,9 +26,11 @@ import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.TableImportConfiguration;
 
+@Deprecated
 public class TableImport extends Import {
     private static final Logger LOG = Logger.getLogger(TableImport.class.getName());
 
@@ -49,8 +51,9 @@ public class TableImport extends Import {
         TaskResult<?> r = null;
         String databaseName = getDatabaseName(importConf); // database exists? TODO
         String tableName = getTableName(importConf); // table exists? TODO
-        // get and extract uploaded files from command-line arguments
-        String[] fileNames = getFileNames(importConf, 2);
+
+        // get and extract uploaded sources from command-line arguments
+        Source[] srcs = getSources(importConf, 2);
 
         MultiThreadUploadProcessor uploadProc =
                 createAndStartUploadProcessor(importConf);
@@ -66,7 +69,7 @@ public class TableImport extends Import {
 
         // create sequential upload (prepare) tasks
         com.treasure_data.td_import.prepare.Task[] tasks =
-                createSequentialImportTasks(databaseName, tableName, fileNames);
+                createSequentialImportTasks(databaseName, tableName, srcs);
 
         // start sequential upload (prepare) tasks
         startPrepareTasks(importConf, tasks);
@@ -101,12 +104,12 @@ public class TableImport extends Import {
     }
 
     protected com.treasure_data.td_import.prepare.Task[] createSequentialImportTasks(
-            final String databaseName, final String tableName, final String[] fileNames) {
+            final String databaseName, final String tableName, final Source[] sources) {
         com.treasure_data.td_import.prepare.Task[] tasks =
-                new com.treasure_data.td_import.prepare.Task[fileNames.length];
-        for (int i = 0; i < fileNames.length; i++) {
+                new com.treasure_data.td_import.prepare.Task[sources.length];
+        for (int i = 0; i < sources.length; i++) {
             tasks[i] = new com.treasure_data.td_import.prepare.SequentialImportTask(
-                    databaseName, tableName, fileNames[i]);
+                    databaseName, tableName, sources[i]);
         }
         return tasks;
     }

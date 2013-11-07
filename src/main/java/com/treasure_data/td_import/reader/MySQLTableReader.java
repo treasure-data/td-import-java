@@ -69,7 +69,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
         String url = conf.getJdbcUrl();
         String user = conf.getUser();
         String password = conf.getPassword();
-        String table = task.fileName;
+        String table = task.getSource().getRawPath();
 
         // create and test a connection
         try {

@@ -17,7 +17,6 @@
 //
 package com.treasure_data.td_import;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +30,8 @@ import com.treasure_data.model.bulkimport.SessionSummary;
 import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasure_data.td_import.source.LocalFileSource;
+import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
@@ -47,15 +48,15 @@ public class BulkImport extends Import {
         // create prepare configuration
         PrepareConfiguration conf = createPrepareConf(args);
 
-        // extract and get file names from command-line arguments
-        String[] fileNames = getFileNames(conf, 1);
+        // extract and get source names from command-line arguments
+        Source[] sources = getSources(conf, 1);
 
         MultiThreadPrepareProcessor proc =
                 createAndStartPrepareProcessor(conf);
 
         // create prepare tasks
         com.treasure_data.td_import.prepare.Task[] tasks =
-                createPrepareTasks(conf, fileNames);
+                createPrepareTasks(conf, sources);
 
         // start prepare tasks
         startPrepareTasks(conf, tasks);
@@ -102,8 +103,8 @@ public class BulkImport extends Import {
                     sessionName, sessionName));
         }
 
-        // get and extract uploaded files from command-line arguments
-        String[] fileNames = getFileNames(uploadConf, filePos);
+        // get and extract uploaded sources from command-line arguments
+        Source[] srcs = getSources(uploadConf, filePos);
 
         MultiThreadUploadProcessor uploadProc =
                 createAndStartUploadProcessor(uploadConf);
@@ -114,7 +115,7 @@ public class BulkImport extends Import {
         if (!uploadConf.hasPrepareOptions()) {
             // create upload tasks
             com.treasure_data.td_import.upload.UploadTask[] tasks =
-                    createUploadTasks(sessionName, fileNames);
+                    createUploadTasks(sessionName, srcs);
 
             // start upload tasks
             startUploadTasks(uploadConf, tasks);
@@ -127,7 +128,7 @@ public class BulkImport extends Import {
 
             // create sequential upload (prepare) tasks
             com.treasure_data.td_import.prepare.Task[] tasks = createSequentialUploadTasks(
-                    sessionName, fileNames);
+                    sessionName, srcs);
 
             // start sequential upload (prepare) tasks
             startPrepareTasks(prepareConf, tasks);
@@ -164,36 +165,35 @@ public class BulkImport extends Import {
 
     protected com.treasure_data.td_import.prepare.Task[] createPrepareTasks(
             final PrepareConfiguration conf,
-            final String[] fileNames) {
+            final Source[] sources) {
         com.treasure_data.td_import.prepare.Task[] tasks =
-                new com.treasure_data.td_import.prepare.Task[fileNames.length];
-        for (int i = 0; i < fileNames.length; i++) {
-            tasks[i] = new com.treasure_data.td_import.prepare.Task(fileNames[i]);
+                new com.treasure_data.td_import.prepare.Task[sources.length];
+        for (int i = 0; i < sources.length; i++) {
+            tasks[i] = new com.treasure_data.td_import.prepare.Task(sources[i]);
         }
         return tasks;
     }
 
     protected com.treasure_data.td_import.prepare.Task[] createSequentialUploadTasks(
             final String sessionName,
-            final String[] fileNames) {
+            final Source[] sources) {
         com.treasure_data.td_import.prepare.Task[] tasks =
-                new com.treasure_data.td_import.prepare.Task[fileNames.length];
-        for (int i = 0; i < fileNames.length; i++) {
+                new com.treasure_data.td_import.prepare.Task[sources.length];
+        for (int i = 0; i < sources.length; i++) {
             tasks[i] = new com.treasure_data.td_import.prepare.SequentialUploadTask(
-                    sessionName, fileNames[i]);
+                    sessionName, sources[i]);
         }
         return tasks;
     }
 
     protected com.treasure_data.td_import.upload.UploadTask[] createUploadTasks(
             final String sessionName,
-            final String[] fileNames) {
+            final Source[] sources) {
         com.treasure_data.td_import.upload.UploadTask[] tasks =
-                new com.treasure_data.td_import.upload.UploadTask[fileNames.length];
-        for (int i = 0; i < fileNames.length; i++) {
-            long size = new File(fileNames[i]).length();
+                new com.treasure_data.td_import.upload.UploadTask[sources.length];
+        for (int i = 0; i < sources.length; i++) {
             tasks[i] = new com.treasure_data.td_import.upload.UploadTask(
-                    sessionName, fileNames[i], size);
+                    sessionName, (LocalFileSource) sources[i]);
         }
         return tasks;
     }

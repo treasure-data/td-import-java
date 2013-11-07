@@ -36,6 +36,7 @@ import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Strftime;
 import com.treasure_data.td_import.prepare.Task;
+import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.writer.FileWriter;
 
 public abstract class FileReader<T extends PrepareConfiguration> implements Closeable {
@@ -45,7 +46,8 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     protected FileWriter writer;
     protected Row convertedRow;
 
-    protected String name;
+    //protected String name;
+    protected Source source;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected Set<String> skipColumns = new HashSet<String>();
@@ -59,12 +61,12 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     }
 
     public void configure(Task task) throws PreparePartsException {
-        name = task.fileName;
+        source = task.getSource();
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
 
         // check compression type of the file
-        conf.checkCompressionType(name);
+        conf.checkCompressionType(source);
     }
 
     public void resetLineNum() {
@@ -237,7 +239,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             writer.incrementErrorRowNum();
 
             // the row data should be written to error rows file
-            String msg = String.format("line %d in %s: %s", lineNum, name, getCurrentRow());
+            String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRow());
             LOG.warning(e.getMessage());
             LOG.warning(msg);
             handleError(e);

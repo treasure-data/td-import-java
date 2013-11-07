@@ -18,29 +18,35 @@
 package com.treasure_data.td_import.prepare;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class Task implements com.treasure_data.td_import.Task {
-    private static final String TAG = "__PREPARE_FINISH__";
-    static final Task FINISH_TASK = new Task(TAG);
+import com.treasure_data.td_import.source.LocalFileSource;
+import com.treasure_data.td_import.source.Source;
 
-    public String fileName;
+public class Task implements com.treasure_data.td_import.Task {
+    private static final Source FINISH_SRC = new LocalFileSource("__PREPARE_FINISH__");
+    static final Task FINISH_TASK = new Task(FINISH_SRC);
+
+    protected Source source;
 
     // unit testing
     public boolean isTest = false;
     public byte[] testBinary = null;
 
-    public Task(String fileName) {
-        this.fileName = fileName;
+    public Task(Source source) {
+        this.source = source;
+    }
+
+    public Source getSource() {
+        return source;
     }
 
     public InputStream createInputStream(
             PrepareConfiguration.CompressionType compressionType)
             throws IOException {
         if (!isTest) {
-            return compressionType.createInputStream(new FileInputStream(fileName));
+            return compressionType.createInputStream(source.getInputStream());
         } else {
             return new ByteArrayInputStream(testBinary);
         }
@@ -63,12 +69,12 @@ public class Task implements com.treasure_data.td_import.Task {
         }
 
         Task t = (Task) obj;
-        return t.fileName.equals(fileName);
+        return t.source.equals(source);
     }
 
     @Override
     public String toString() {
-        return String.format("prepare_task{file=%s}", fileName);
+        return String.format("prepare_task{src=%s}", source);
     }
 
     @Override

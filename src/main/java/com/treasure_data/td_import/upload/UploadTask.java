@@ -19,6 +19,8 @@ package com.treasure_data.td_import.upload;
 
 import java.io.File;
 
+import com.treasure_data.td_import.source.LocalFileSource;
+
 public class UploadTask extends UploadTaskBase {
     public String sessName;
     public String partName;
@@ -26,6 +28,14 @@ public class UploadTask extends UploadTaskBase {
     // unit testing
     public boolean isTest = false;
     public byte[] testBinary = null;
+
+    public UploadTask(String sessName, LocalFileSource source) {
+        super(source);
+        this.sessName = sessName;
+        int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
+        this.partName = fileName.substring(lastSepIndex + 1,
+                fileName.length()).replace('.', '_');
+    }
 
     public UploadTask(String sessName, String fileName, long size) {
         super(fileName, size);

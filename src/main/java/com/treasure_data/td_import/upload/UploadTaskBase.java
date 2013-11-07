@@ -17,7 +17,7 @@
 //
 package com.treasure_data.td_import.upload;
 
-import java.io.File;
+import com.treasure_data.td_import.source.LocalFileSource;
 
 public class UploadTaskBase implements com.treasure_data.td_import.Task {
     protected static final String TAG = "__FINISH__";
@@ -30,6 +30,10 @@ public class UploadTaskBase implements com.treasure_data.td_import.Task {
     // unit testing
     public boolean isTest = false;
     public byte[] testBinary = null;
+
+    public UploadTaskBase(LocalFileSource source) {
+        this(source.getRawPath(), source.getSize());
+    }
 
     public UploadTaskBase(String fileName, long size) {
         this.fileName = fileName;
