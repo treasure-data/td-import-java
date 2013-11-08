@@ -123,6 +123,7 @@ public abstract class Import {
             }
 
             if (result.error != null) {
+                //result.error.printStackTrace(); // for debug
                 hasNoError = false;
                 break;
             }
