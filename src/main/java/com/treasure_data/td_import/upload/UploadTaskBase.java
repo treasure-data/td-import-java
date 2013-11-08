@@ -32,7 +32,7 @@ public class UploadTaskBase implements com.treasure_data.td_import.Task {
     public byte[] testBinary = null;
 
     public UploadTaskBase(LocalFileSource source) {
-        this(source.getRawPath(), source.getSize());
+        this(source.getPath(), source.getSize());
     }
 
     public UploadTaskBase(String fileName, long size) {

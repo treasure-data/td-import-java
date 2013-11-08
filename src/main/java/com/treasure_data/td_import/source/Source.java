@@ -83,18 +83,19 @@ public class Source {
         }
     }
 
-    protected String rawPath;
+    protected String path;
 
-    public Source(String rawPath) {
-        this.rawPath = rawPath;
+    public Source(String path) {
+        this.path = path;
     }
 
-    public String getRawPath() {
-        return rawPath;
+    public String getPath() {
+        return path;
     }
 
     public InputStream getInputStream() throws IOException {
-        throw new UnsupportedOperationException("this method should be declared in sub-class");
+        throw new UnsupportedOperationException(
+                "this method should be declared in sub-class");
     }
 
     @Override
@@ -104,6 +105,6 @@ public class Source {
         }
 
         Source other = (Source) o;
-        return rawPath.equals(other.rawPath);
+        return path.equals(other.path);
     }
 }

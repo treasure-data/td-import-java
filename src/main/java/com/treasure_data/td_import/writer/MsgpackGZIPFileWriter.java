@@ -95,7 +95,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
         msgpack = new MessagePack();
 
         // outputFilePrefix
-        String inName = task.getSource().getRawPath();
+        String inName = task.getSource().getPath();
         int lastSepIndex = inName.lastIndexOf(File.separatorChar);
         outputFilePrefix = inName.substring(lastSepIndex + 1, inName.length()).replace('.', '_');
 

@@ -74,7 +74,7 @@ public final class BulkImportCommand extends BulkImport {
 
         List<String> srcNames = new ArrayList<String>();
         for (Source src : srcs) {
-            srcNames.add(src.getRawPath());
+            srcNames.add(src.getPath());
         }
         commandHelper.showPrepare(srcNames.toArray(new String[0]),
                 prepareConf.getOutputDirName());
@@ -145,7 +145,7 @@ public final class BulkImportCommand extends BulkImport {
 
         List<String> srcNames = new ArrayList<String>();
         for (Source src : srcs) {
-            srcNames.add(src.getRawPath());
+            srcNames.add(src.getPath());
         }
         commandHelper.showUpload(srcNames.toArray(new String[0]), sessionName);
 

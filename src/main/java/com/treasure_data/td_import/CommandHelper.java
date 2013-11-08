@@ -58,7 +58,7 @@ public class CommandHelper {
             com.treasure_data.td_import.prepare.TaskResult result =
                     (com.treasure_data.td_import.prepare.TaskResult) r;
             String status = result.error == null ? Configuration.STAT_SUCCESS : Configuration.STAT_ERROR;
-            System.out.println(String.format("  Source    : %s", result.task.getSource().getRawPath()));
+            System.out.println(String.format("  Source    : %s", result.task.getSource().getPath()));
             System.out.println(String.format("    Status          : %s", status));
             System.out.println(String.format("    Read lines      : %d", result.readLines));
             System.out.println(String.format("    Valid rows      : %d", result.convertedRows));
@@ -102,7 +102,7 @@ public class CommandHelper {
                 // error
                 System.out.println(String.format(
                         "  => check td-bulk-import.log and original %s: %s.",
-                        result.task.getSource().getRawPath(), result.error.getMessage()));
+                        result.task.getSource().getPath(), result.error.getMessage()));
             }
         }
 

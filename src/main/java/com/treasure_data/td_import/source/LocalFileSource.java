@@ -33,17 +33,21 @@ public class LocalFileSource extends Source {
         return sources;
     }
 
-    public LocalFileSource(String rawPath) {
-        super(rawPath);
+    public LocalFileSource(String fileName) {
+        super(fileName);
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new BufferedInputStream(new FileInputStream(rawPath));
+        return new BufferedInputStream(new FileInputStream(getFileName()));
+    }
+
+    public String getFileName() {
+        return getPath();
     }
 
     public File getFile() {
-        return new File(rawPath);
+        return new File(getFileName());
     }
 
     public long getSize() {
@@ -52,6 +56,6 @@ public class LocalFileSource extends Source {
 
     @Override
     public String toString() {
-        return String.format("local-src(path=%s)", rawPath);
+        return String.format("local-src(path=%s)", getFileName());
     }
 }

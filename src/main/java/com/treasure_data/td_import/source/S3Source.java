@@ -121,19 +121,21 @@ public class S3Source extends Source {
     protected AmazonS3Client client;
 
     protected String bucket;
-    protected String path;
+    protected String key;
+    protected String rawPath;
 
-    S3Source(AmazonS3Client client, String rawPath, String bucket, String path) {
-        super(rawPath);
+    S3Source(AmazonS3Client client, String rawPath, String bucket, String key) {
+        super(bucket + "/" + key);
         this.client = client;
+        this.rawPath = rawPath;
         this.bucket = bucket;
-        this.path = path;
+        this.key = key;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        LOG.info(String.format("get s3 file: bucket=%s, path=%s", bucket, path));
-        S3Object object = client.getObject(new GetObjectRequest(bucket, path));
+        LOG.info(String.format("get s3 file: bucket=%s, key=%s", bucket, key));
+        S3Object object = client.getObject(new GetObjectRequest(bucket, key));
 
         if (object != null) {
             return object.getObjectContent();

@@ -36,7 +36,7 @@ public class PrepareProcessor {
     }
 
     public TaskResult execute(final Task task) {
-        String msg = String.format("Converting '%s'...", task.source.getRawPath());
+        String msg = String.format("Converting '%s'...", task.source.getPath());
         System.out.println(msg);
         LOG.info(msg);
 
@@ -101,7 +101,7 @@ public class PrepareProcessor {
             }
         }
 
-        LOG.info(String.format("Converted %s, result: %s", task.source.getRawPath(), result));
+        LOG.info(String.format("Converted %s, result: %s", task.source.getPath(), result));
 
         return result;
     }
