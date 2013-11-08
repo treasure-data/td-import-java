@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.Protocol;
@@ -75,22 +77,45 @@ public class S3Source extends Source {
     }
 
     static List<String> getSourceNames(AmazonS3Client client, String bucket, String basePath) {
-        LOG.info(String.format("list s3 files: bucket=%s, basePath=%s", bucket, basePath));
+        String prefix;
+        int index = basePath.indexOf('*');
+        if (index >= 0) {
+            prefix = basePath.substring(0, index);
+        } else {
+            prefix = basePath;
+        }
 
-        // TODO pattern matching
+        LOG.info(String.format("list s3 files: bucket=%s, basePath=%s, prefix=%s",
+                bucket, basePath, prefix));
 
         List<String> srcNames = new ArrayList<String>();
-        String lastKey = basePath;
+        String lastKey = prefix;
         do {
             ObjectListing listing = client.listObjects(new ListObjectsRequest(
-                    bucket, basePath, lastKey, null, 1024));
+                    bucket, prefix, lastKey, null, 1024));
             for(S3ObjectSummary s : listing.getObjectSummaries()) {
                 srcNames.add(s.getKey());
             }
             lastKey = listing.getNextMarker();
         } while (lastKey != null);
 
-        return srcNames;
+        return filterSourceNames(srcNames, basePath);
+    }
+
+    static List<String> filterSourceNames(List<String> names, String basePath) {
+        String regex = basePath.replace("*", "([^\\s]*)");
+        Pattern pattern = Pattern.compile(regex);
+
+        LOG.info(String.format("regex matching: regex=%s", regex));
+
+        List<String> matched = new ArrayList<String>();
+        for (String name : names) {
+            Matcher m = pattern.matcher(name);
+            if (m.matches()) {
+                matched.add(name);
+            }
+        }
+        return matched;
     }
 
     protected AmazonS3Client client;
