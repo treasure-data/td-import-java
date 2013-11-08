@@ -132,8 +132,12 @@ public final class BulkImportCommand extends BulkImport {
             filePos = 2;
         }
 
-        // if session is already freezed, exception is thrown.
         SessionSummary sess = UploadProcessor.showSession(biClient, uploadConf, sessionName);
+        if (sess == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Bulk import session is not specified or created yet."));
+        }
+        // if session is already freezed, exception is thrown.
         if (sess.uploadFrozen()) {
             throw new IllegalArgumentException(String.format(
                     "Bulk import session %s is already freezed. Please check it with 'td import:show %s'",
