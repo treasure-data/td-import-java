@@ -233,9 +233,10 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             writer.incrementRowNum();
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
-            LOG.throwing("CSVFileParser", "parseRow", e);
+            LOG.throwing(this.getClass().getName(), "next", e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
+            LOG.throwing(this.getClass().getName(), "next", e);
             writer.incrementErrorRowNum();
 
             // the row data should be written to error rows file

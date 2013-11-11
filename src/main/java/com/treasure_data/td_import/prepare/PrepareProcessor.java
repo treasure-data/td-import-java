@@ -49,6 +49,7 @@ public class PrepareProcessor {
             w = conf.getOutputFormat().createFileWriter(conf);
             w.configure(task, result);
         } catch (Exception e) {
+            LOG.throwing(this.getClass().getName(), "initialize file writer in execute", e);
             result.error = e;
             return result;
         }
@@ -59,6 +60,8 @@ public class PrepareProcessor {
             r = conf.getFormat().createFileReader(conf, w);
             r.configure(task);
         } catch (Exception e) {
+            e.printStackTrace();
+            LOG.throwing(this.getClass().getName(), "initialize file reader in execute", e);
             result.error = e;
             return result;
         }
@@ -78,7 +81,7 @@ public class PrepareProcessor {
                 result.convertedRows = w.getRowNum();
                 result.invalidRows = w.getErrorRowNum();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.throwing(this.getClass().getName(), "process all rows in execute", e);
                 result.error = e;
             }
         }
@@ -87,6 +90,7 @@ public class PrepareProcessor {
             try {
                 r.close();
             } catch (IOException e) {
+                LOG.throwing(this.getClass().getName(), "close file reader in execute", e);
                 result.error = e;
                 return result;
             }
@@ -96,6 +100,7 @@ public class PrepareProcessor {
             try {
                 w.close();
             } catch (IOException e) {
+                LOG.throwing(this.getClass().getName(), "close file writer in execute", e);
                 result.error = e;
                 return result;
             }

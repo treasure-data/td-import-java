@@ -67,6 +67,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                 tokenizer.readColumns(new ArrayList<String>());
             }
         } catch (IOException e) {
+            LOG.throwing(this.getClass().getName(), "configure", e);
             throw new PreparePartsException(e);
         }
     }
@@ -202,12 +203,14 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                 }
             }
         } catch (IOException e) {
+            LOG.throwing(this.getClass().getName(), "sample", e);
             throw new PreparePartsException(e);
         } finally {
             if (sampleTokenizer != null) {
                 try {
                     sampleTokenizer.close();
                 } catch (IOException e) {
+                    LOG.throwing(this.getClass().getName(), "sample", e);
                     throw new PreparePartsException(e);
                 }
             }
