@@ -93,6 +93,11 @@ public class Source {
         return path;
     }
 
+    public long getSize() {
+        throw new UnsupportedOperationException(
+                "this method should be declared in sub-class");
+    }
+
     public InputStream getInputStream() throws IOException {
         throw new UnsupportedOperationException(
                 "this method should be declared in sub-class");

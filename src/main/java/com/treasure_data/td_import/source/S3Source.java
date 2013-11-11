@@ -47,10 +47,10 @@ public class S3Source extends Source {
         String basePath = rawPath.substring(bucket.length() + 1, rawPath.length());
 
         AmazonS3Client client = createAmazonS3Client(desc);
-        List<String> srcNames = getSourceNames(client, bucket, basePath);
+        List<S3ObjectSummary> s3objects = getSources(client, bucket, basePath);
         List<Source> srcs = new ArrayList<Source>();
-        for (String srcName : srcNames) {
-            srcs.add(new S3Source(client, rawPath, bucket, srcName));
+        for (S3ObjectSummary s3object : s3objects) {
+            srcs.add(new S3Source(createAmazonS3Client(desc), rawPath, s3object));
         }
 
         return srcs;
@@ -76,7 +76,7 @@ public class S3Source extends Source {
         return new AmazonS3Client(credentials, conf);
     }
 
-    static List<String> getSourceNames(AmazonS3Client client, String bucket, String basePath) {
+    static List<S3ObjectSummary> getSources(AmazonS3Client client, String bucket, String basePath) {
         String prefix;
         int index = basePath.indexOf('*');
         if (index >= 0) {
@@ -88,31 +88,31 @@ public class S3Source extends Source {
         LOG.info(String.format("list s3 files: bucket=%s, basePath=%s, prefix=%s",
                 bucket, basePath, prefix));
 
-        List<String> srcNames = new ArrayList<String>();
+        List<S3ObjectSummary> s3objects = new ArrayList<S3ObjectSummary>();
         String lastKey = prefix;
         do {
             ObjectListing listing = client.listObjects(new ListObjectsRequest(
                     bucket, prefix, lastKey, null, 1024));
-            for(S3ObjectSummary s : listing.getObjectSummaries()) {
-                srcNames.add(s.getKey());
+            for(S3ObjectSummary s3object : listing.getObjectSummaries()) {
+                s3objects.add(s3object);
             }
             lastKey = listing.getNextMarker();
         } while (lastKey != null);
 
-        return filterSourceNames(srcNames, basePath);
+        return filterSources(s3objects, basePath);
     }
 
-    static List<String> filterSourceNames(List<String> names, String basePath) {
+    static List<S3ObjectSummary> filterSources(List<S3ObjectSummary> s3objects, String basePath) {
         String regex = basePath.replace("*", "([^\\s]*)");
         Pattern pattern = Pattern.compile(regex);
 
         LOG.info(String.format("regex matching: regex=%s", regex));
 
-        List<String> matched = new ArrayList<String>();
-        for (String name : names) {
-            Matcher m = pattern.matcher(name);
+        List<S3ObjectSummary> matched = new ArrayList<S3ObjectSummary>();
+        for (S3ObjectSummary s3object : s3objects) {
+            Matcher m = pattern.matcher(s3object.getKey());
             if (m.matches()) {
-                matched.add(name);
+                matched.add(s3object);
             }
         }
         return matched;
@@ -122,20 +122,29 @@ public class S3Source extends Source {
 
     protected String bucket;
     protected String key;
+    protected long size;
     protected String rawPath;
 
-    S3Source(AmazonS3Client client, String rawPath, String bucket, String key) {
-        super(bucket + "/" + key);
+    S3Source(AmazonS3Client client, String rawPath, S3ObjectSummary s3object) {
+        super("s3://" + s3object.getBucketName() + "/" + s3object.getKey());
         this.client = client;
+        this.bucket = s3object.getBucketName();
+        this.key = s3object.getKey();
+        this.size = s3object.getSize();
         this.rawPath = rawPath;
-        this.bucket = bucket;
-        this.key = key;
+    }
+
+    @Override
+    public long getSize() {
+        return size;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
         LOG.info(String.format("get s3 file: bucket=%s, key=%s", bucket, key));
-        S3Object object = client.getObject(new GetObjectRequest(bucket, key));
+        GetObjectRequest req = new GetObjectRequest(bucket, key);
+        req.setRange(0, size);
+        S3Object object = client.getObject(req);
 
         if (object != null) {
             return object.getObjectContent();

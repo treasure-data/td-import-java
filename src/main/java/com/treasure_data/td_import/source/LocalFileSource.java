@@ -50,6 +50,7 @@ public class LocalFileSource extends Source {
         return new File(getFileName());
     }
 
+    @Override
     public long getSize() {
         return getFile().length();
     }
