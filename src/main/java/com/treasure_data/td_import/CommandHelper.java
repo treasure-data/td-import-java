@@ -17,33 +17,36 @@
 //
 package com.treasure_data.td_import;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.treasure_data.td_import.source.Source;
 
 public class CommandHelper {
     public CommandHelper() {
     }
 
-    public void showPrepare(String[] fileNames, String outputDirName) {
+    public void showPrepare(Source[] sources, String outputDirName) {
         System.out.println();
-        System.out.println("Preparing files");
+        System.out.println("Preparing sources");
         System.out.println(String.format("  Output dir   : %s", outputDirName));
-        showFiles(fileNames);
+        showSources(sources);
         System.out.println();
     }
 
-    public void showUpload(String[] fileNames, String sessionName) {
+    public void showUpload(Source[] sources, String sessionName) {
         System.out.println();
-        System.out.println("Uploading prepared files");
+        System.out.println("Uploading prepared sources");
         System.out.println(String.format("  Session name : %s", sessionName));
-        showFiles(fileNames);
+        showSources(sources);
         System.out.println();
     }
 
-    protected void showFiles(String[] fileNames) {
-        for (String fileName : fileNames) {
-            System.out.println(String.format("  File       : %s (%d bytes)", fileName, new File(fileName).length()));
+    protected void showSources(Source[] sources) {
+        for (Source source : sources) {
+            String name = source.getPath();
+            long size = source.getSize();
+            System.out.println(String.format("  Source     : %s (%d bytes)", name, size));
         }
     }
 
@@ -136,7 +139,7 @@ public class CommandHelper {
             String status = result.error == null ? Configuration.STAT_SUCCESS : Configuration.STAT_ERROR;
             com.treasure_data.td_import.upload.UploadTask task =
                     (com.treasure_data.td_import.upload.UploadTask) result.task;
-            System.out.println(String.format("  File    : %s", result.task.fileName));
+            System.out.println(String.format("  Source  : %s", result.task.fileName));
             System.out.println(String.format("    Status          : %s", status));
             System.out.println(String.format("    Part name       : %s", task.partName));
             System.out.println(String.format("    Size            : %d", task.size));

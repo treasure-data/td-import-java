@@ -76,8 +76,7 @@ public final class BulkImportCommand extends BulkImport {
         for (Source src : srcs) {
             srcNames.add(src.getPath());
         }
-        commandHelper.showPrepare(srcNames.toArray(new String[0]),
-                prepareConf.getOutputDirName());
+        commandHelper.showPrepare(srcs, prepareConf.getOutputDirName());
 
         MultiThreadPrepareProcessor prepareProc =
                 createAndStartPrepareProcessor(prepareConf);
@@ -151,7 +150,7 @@ public final class BulkImportCommand extends BulkImport {
         for (Source src : srcs) {
             srcNames.add(src.getPath());
         }
-        commandHelper.showUpload(srcNames.toArray(new String[0]), sessionName);
+        commandHelper.showUpload(srcs, sessionName);
 
         MultiThreadUploadProcessor uploadProc =
                 createAndStartUploadProcessor(uploadConf);
