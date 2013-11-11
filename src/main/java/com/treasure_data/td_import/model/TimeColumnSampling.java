@@ -32,6 +32,7 @@ public class TimeColumnSampling extends ColumnSampling {
     public static final SimpleDateFormat yyyyMMdd_HHmmssZ_SDF; //2013/10/25 22:49:52 +0900
 
     private static final SimpleDateFormat[] SDF_LIST;
+    private static final Object SDF_LIST_LOCK = new Object();
 
     static {
         yyyyMMdd_SDF = new SimpleDateFormat("yyyyMMdd");
@@ -89,10 +90,12 @@ public class TimeColumnSampling extends ColumnSampling {
         }
 
         for (int i = 0; i < timeScores.length; i++) {
-            ParsePosition pp = new ParsePosition(0);
-            Date d = SDF_LIST[i].parse(value, pp);
-            if (d != null && pp.getErrorIndex() == -1) {
-                timeScores[i] += 1;
+            synchronized (SDF_LIST_LOCK) {
+                ParsePosition pp = new ParsePosition(0);
+                Date d = SDF_LIST[i].parse(value, pp);
+                if (d != null && pp.getErrorIndex() == -1) {
+                    timeScores[i] += 1;
+                }
             }
         }
     }
