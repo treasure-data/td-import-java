@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.junit.Ignore;
 
+import com.treasure_data.td_import.source.LocalFileSource;
 import com.treasure_data.td_import.upload.TaskResult;
 import com.treasure_data.td_import.upload.UploadProcessor;
 import com.treasure_data.td_import.upload.UploadTask;
@@ -15,7 +16,7 @@ import com.treasure_data.td_import.upload.UploadTask;
 public class UploadProcessorTestUtil {
 
     public static UploadTask createTask(int i) {
-        return new UploadTask("sess" + i, "file" + i, 32 + i * 32);
+        return new UploadTask("sess" + i, new LocalFileSource("file" + i));
     }
 
     public static void executeTaskNormally(UploadProcessor proc,

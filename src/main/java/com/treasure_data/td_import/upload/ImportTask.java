@@ -17,6 +17,8 @@
 //
 package com.treasure_data.td_import.upload;
 
+import com.treasure_data.td_import.source.Source;
+
 public class ImportTask extends UploadTaskBase {
     public String databaseName;
     public String tableName;
@@ -25,8 +27,8 @@ public class ImportTask extends UploadTaskBase {
     public boolean isTest = false;
     public byte[] testBinary = null;
 
-    public ImportTask(String databaseName, String tableName, String fileName, long size) {
-        super(fileName, size);
+    public ImportTask(String databaseName, String tableName, Source source) {
+        super(source);
         this.databaseName = databaseName;
         this.tableName = tableName;
     }

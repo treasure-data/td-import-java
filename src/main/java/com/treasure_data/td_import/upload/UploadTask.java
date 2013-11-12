@@ -37,13 +37,13 @@ public class UploadTask extends UploadTaskBase {
                 fileName.length()).replace('.', '_');
     }
 
-    public UploadTask(String sessName, String fileName, long size) {
-        super(fileName, size);
-        this.sessName = sessName;
-        int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
-        this.partName = fileName.substring(lastSepIndex + 1,
-                fileName.length()).replace('.', '_');
-    }
+//    public UploadTask(String sessName, String fileName, long size) {
+//        super(fileName, size);
+//        this.sessName = sessName;
+//        int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
+//        this.partName = fileName.substring(lastSepIndex + 1,
+//                fileName.length()).replace('.', '_');
+//    }
 
     @Override
     public boolean equals(Object obj) {

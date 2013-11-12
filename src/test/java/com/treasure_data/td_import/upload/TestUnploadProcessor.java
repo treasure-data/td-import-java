@@ -19,6 +19,7 @@ import com.treasure_data.client.ClientException;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.td_import.Options;
+import com.treasure_data.td_import.source.LocalFileSource;
 import com.treasure_data.td_import.upload.TaskResult;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
@@ -40,9 +41,8 @@ public class TestUnploadProcessor {
         byte[] bytes = "muga".getBytes();
         String sessName = "mugasess";
         String fileName = "file01";
-        long size = bytes.length;
 
-        UploadTask task = new UploadTask(sessName, fileName, size);
+        UploadTask task = new UploadTask(sessName, new LocalFileSource(fileName));
         task = spy(task);
         task.isTest = true;
         task.testBinary = bytes;

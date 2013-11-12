@@ -17,11 +17,8 @@
 //
 package com.treasure_data.td_import.prepare;
 
-import java.io.File;
-
-import com.treasure_data.td_import.prepare.Task;
+import com.treasure_data.td_import.source.LocalFileSource;
 import com.treasure_data.td_import.source.Source;
-import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 
 public class SequentialUploadTask extends SequentialUploadTaskBase {
     public String sessionName;
@@ -31,10 +28,10 @@ public class SequentialUploadTask extends SequentialUploadTaskBase {
         this.sessionName = sessionName;
     }
 
-    public com.treasure_data.td_import.upload.UploadTaskBase createNextTask(String outputFileName) {
-        long size = new File(outputFileName).length();
+    public com.treasure_data.td_import.upload.UploadTaskBase createNextTask(
+            String outputFileName) {
         return new com.treasure_data.td_import.upload.UploadTask(
-                sessionName, outputFileName, size);
+                sessionName, new LocalFileSource(outputFileName));
     }
 
     @Override
