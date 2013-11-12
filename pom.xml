@@ -56,7 +56,7 @@
     <jopt-simple.version>4.5</jopt-simple.version>
     <msgpack.version>0.6.7</msgpack.version>
     <super-csv.version>2.0.1</super-csv.version>
-    <td-client.version>0.2.14</td-client.version>
+    <td-client.version>0.3.0</td-client.version>
     <aws-java-sdk.version>1.3.22</aws-java-sdk.version>
     <junit.version>4.8.2</junit.version>
     <mockito.version>1.9.5</mockito.version>
