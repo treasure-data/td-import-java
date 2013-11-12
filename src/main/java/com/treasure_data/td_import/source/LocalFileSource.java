@@ -23,14 +23,65 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LocalFileSource extends Source {
+    private static final Logger LOG = Logger.getLogger(LocalFileSource.class.getName());
 
     public static List<Source> createSources(SourceDesc desc) {
-        List<Source> sources = new ArrayList<Source>();
-        sources.add(new LocalFileSource(desc.getPath()));
-        return sources;
+        String rawPath = File.separator + desc.getPath();
+
+        List<File> files = getSources(rawPath);
+        List<Source> srcs = new ArrayList<Source>();
+        for (File file : files) {
+            LOG.info(String.format("create local-src file=%s, rawPath=%s",
+                    file.getAbsolutePath(), rawPath));
+            srcs.add(new LocalFileSource(file.getAbsolutePath()));
+        }
+        return srcs;
+    }
+
+    static List<File> getSources(String basePath) {
+        int index = basePath.indexOf('*');
+        if (index < 0) {
+            return Arrays.asList(new File(basePath));
+        }
+
+        String prefix;
+        String firstStar = basePath.substring(0, index);
+        int lastPathSep = firstStar.lastIndexOf(File.separatorChar);
+        if (lastPathSep < 0) {
+            prefix = firstStar;
+        } else {
+            prefix = firstStar.substring(0, lastPathSep);
+        }
+
+        LOG.info(String.format("find local files: basePath=%s, prefix=%s",
+                basePath, prefix));
+
+        File findDir = new File(prefix);
+        File[] files = findDir.listFiles();
+
+        return filterSources(Arrays.asList(files), basePath);
+    }
+
+    static List<File> filterSources(List<File> files, String basePath) {
+        String regex = basePath.replace("*", "([^\\s]*)");
+        Pattern pattern = Pattern.compile(regex);
+
+        LOG.info(String.format("regex matching: regex=%s", regex));
+        List<File> matched = new ArrayList<File>();
+        for (File file : files) {
+            Matcher m = pattern.matcher(file.getAbsolutePath());
+            if (m.matches()) {
+                matched.add(file);
+            }
+        }
+        return matched;
     }
 
     public LocalFileSource(String fileName) {
