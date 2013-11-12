@@ -1,4 +1,9 @@
 Release 0.4.0 - 20XX/XX/XX
+  NEW FEATURES
+    Adds 'Source' model class.
+
+  IMPROVEMENTS
+    Changes Import and BulkImport APIs for adding 'source' features.
 
   BUG FIXED
     Fixes TimeColumnSampling class: NumberFormatException occurs when sample method in CSVFileReader class is executed. SimpleDateFormat objects are used in non synchronized block.
