@@ -39,6 +39,7 @@ public abstract class Import {
         this.props = props;
     }
 
+    @Deprecated
     protected String[] getFileNames(PrepareConfiguration conf, int filePos) {
         List<String> argList = conf.getNonOptionArguments();
         final String[] fileNames = new String[argList.size() - filePos];
