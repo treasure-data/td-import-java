@@ -26,7 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -35,6 +34,7 @@ import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.treasure_data.td_import.Configuration;
 
 public class S3Source extends Source {
     private static final Logger LOG = Logger.getLogger(S3Source.class.getName());
@@ -68,10 +68,10 @@ public class S3Source extends Source {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretAccessKey);
 
         ClientConfiguration conf = new ClientConfiguration();
-        conf.setProtocol(Protocol.HTTP); // TODO
-        conf.setMaxConnections(10); // SDK default: 50 // TODO
-        conf.setMaxErrorRetry(5); // SDK default: 3 // TODO
-        conf.setSocketTimeout(8 * 60 * 1000); // SDK default: 50 * 1000 // TODO
+        conf.setProtocol(Configuration.BI_PREPARE_S3_PROTOCOL);
+        conf.setMaxConnections(Configuration.BI_PREPARE_S3_MAX_CONNECTIONS);
+        conf.setMaxErrorRetry(Configuration.BI_PREPARE_S3_MAX_ERRORRETRY);
+        conf.setSocketTimeout(Configuration.BI_PREPARE_S3_SOCKET_TIMEOUT);
 
         return new AmazonS3Client(credentials, conf);
     }
