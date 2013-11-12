@@ -38,7 +38,6 @@ public class UploadProcessor extends UploadProcessorBase {
     private static final Logger LOG = Logger.getLogger(UploadProcessor.class.getName());
 
     private static SessionSummary summary;
-    private static UploadProcessorBase.RetryClient2 retryClient = new UploadProcessorBase.RetryClient2();
 
     protected BulkImportClient client;
 
@@ -58,19 +57,16 @@ public class UploadProcessor extends UploadProcessorBase {
                     task.fileName, task.size, task.sessName, task.partName));
 
             long time = System.currentTimeMillis();
-            new RetryClient3().retry(result, new Retryable2() {
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    executeUpload(task);
-                }
-            }, task.sessName, task.partName, conf.getRetryCount(),
-                    conf.getWaitSec() * 1000);
+            executeUpload(task);
             time = System.currentTimeMillis() - time;
             task.finishHook(task.fileName);
 
             LOG.info(String.format(
                     "Uploaded file %s (%d bytes) to session %s as part %s (time: %d sec.)", 
                     task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
+        } catch (ClientException e) {
+            LOG.severe(e.getMessage());
+            result.error = new IOException(e);
         } catch (IOException e) {
             LOG.severe(e.getMessage());
             result.error = e;
@@ -79,18 +75,9 @@ public class UploadProcessor extends UploadProcessorBase {
     }
 
     protected void executeUpload(final UploadTask task) throws ClientException, IOException {
-        LOG.fine(String.format("Uploading file %s (%d bytes) to session %s as part %s by thread %s",
-                task.fileName, task.size, task.sessName, task.partName, Thread.currentThread().getName()));
-
-        long time = System.currentTimeMillis();
         Session session = new Session(task.sessName, null, null);
         client.uploadPart(session, task.partName, createInputStream(task),
                 (int) task.size);
-        time = System.currentTimeMillis() - time;
-
-        LOG.fine(String.format("Uploaded file %s (%d bytes) to session %s as part %s by thread %s (time: %d sec.)",
-                task.fileName, task.size, task.sessName, task.partName,
-                Thread.currentThread().getName(), (time / 1000)));
     }
 
     protected InputStream createInputStream(final UploadTask task) throws IOException {
@@ -224,15 +211,10 @@ public class UploadProcessor extends UploadProcessorBase {
 
         summary = null;
         try {
-            retryClient.retry(new Retryable2(){
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    summary = client.showSession(sessionName);
-                }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
-        } catch (IOException e) {
+            summary = client.showSession(sessionName);
+        } catch (ClientException e) {
             LOG.severe(e.getMessage());
-            throw e;
+            throw new IOException(e);
         }
         return summary;
     }
@@ -245,18 +227,13 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2(){
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    Session session = new Session(sessionName, null, null);
-                    client.freezeSession(session);
-                }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
-        } catch (IOException e) {
+            Session session = new Session(sessionName, null, null);
+            client.freezeSession(session);
+        } catch (ClientException e) {
             m = String.format("Cannot freeze session %s, %s", sessionName, e.getMessage());
             System.out.println(m);
             LOG.severe(m);
-            err.error = e;
+            err.error = new IOException(e);
         }
         return err;
     }
@@ -269,18 +246,13 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2(){
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    Session session = new Session(sessionName, null, null);
-                    client.performSession(session);
-                }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
-        } catch (IOException e) {
+            Session session = new Session(sessionName, null, null);
+            client.performSession(session);
+        } catch (ClientException e) {
             m = String.format("Cannot perform bulk import session %s, %s", sessionName, e.getMessage());
             System.out.println(m);
             LOG.severe(m);
-            err.error = e;
+            err.error = new IOException(e);
         }
         return err;
     }
@@ -295,12 +267,7 @@ public class UploadProcessor extends UploadProcessorBase {
         long waitTime = System.currentTimeMillis();
         while (true) {
             try {
-                retryClient.retry(new Retryable2(){
-                    @Override
-                    public void doTry() throws ClientException, IOException {
-                        summary = client.showSession(sessionName);
-                    }
-                }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+                summary = client.showSession(sessionName);
 
                 if (summary.getStatus().equals("ready")){
                     break;
@@ -315,6 +282,12 @@ public class UploadProcessor extends UploadProcessorBase {
                 } catch (InterruptedException e) {
                     // ignore
                 }
+            } catch (ClientException e) {
+                m = String.format("Give up waiting %s bulk import session performing, %s", sessionName, e.getMessage());
+                System.out.println(m);
+                LOG.severe(m);
+                err.error = new IOException(e);
+                break;
             } catch (IOException e) {
                 m = String.format("Give up waiting %s bulk import session performing, %s", sessionName, e.getMessage());
                 System.out.println(m);
@@ -335,18 +308,13 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2(){
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    Session session = new Session(sessionName, null, null);
-                    client.commitSession(session);
-                }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
-        } catch (IOException e) {
+            Session session = new Session(sessionName, null, null);
+            client.commitSession(session);
+        } catch (ClientException e) {
             String emsg = String.format("Cannot commit '%s' bulk import session, %s", sessionName, e.getMessage());
             System.out.println(emsg);
             LOG.severe(emsg);
-            err.error = e;
+            err.error = new IOException(e);
         }
         return err;
     }
@@ -361,12 +329,7 @@ public class UploadProcessor extends UploadProcessorBase {
         long waitTime = System.currentTimeMillis();
         while (true) {
             try {
-                retryClient.retry(new Retryable2(){
-                    @Override
-                    public void doTry() throws ClientException, IOException {
-                        summary = client.showSession(sessionName);
-                    }
-                }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+                summary = client.showSession(sessionName);
 
                 if (summary.getStatus().equals("committed")){
                     break;
@@ -381,6 +344,12 @@ public class UploadProcessor extends UploadProcessorBase {
                 } catch (InterruptedException e) {
                     // ignore
                 }
+            } catch (ClientException e) {
+                m = String.format("Give up waiting %s bulk import session committing, %s", sessionName, e.getMessage());
+                System.out.println(m);
+                LOG.severe(m);
+                err.error = new IOException(e);
+                break;
             } catch (IOException e) {
                 m = String.format("Give up waiting %s bulk import session committing, %s", sessionName, e.getMessage());
                 System.out.println(m);
@@ -399,24 +368,28 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2() {
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    List<DatabaseSummary> dbs = client.listDatabases();
-                    boolean exist = false;
-                    for (DatabaseSummary db : dbs) {
-                        if (db.getName().equals(databaseName)) {
-                            exist = true;
-                            break;
-                        }
-                    }
-
-                    if (!exist) {
-                        throw new IOException(String.format(
-                                "Not found database %s", databaseName));
-                    }
+            List<DatabaseSummary> dbs = client.listDatabases();
+            boolean exist = false;
+            for (DatabaseSummary db : dbs) {
+                if (db.getName().equals(databaseName)) {
+                    exist = true;
+                    break;
                 }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+            }
+
+            if (!exist) {
+                throw new IOException(String.format("Not found database %s",
+                        databaseName));
+            }
+        } catch (ClientException e) {
+            String msg = String.format(
+                    "Cannot access database %s, %s. " +
+                    "Please check it with 'td database:list'. " +
+                    "If it doesn't exist, please create it with 'td database:create %s'.",
+                    databaseName, e.getMessage(), databaseName);
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = new IOException(e);
         } catch (IOException e) {
             String msg = String.format(
                     "Cannot access database %s, %s. " +
@@ -437,24 +410,27 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2() {
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    List<TableSummary> tbls = client.listTables(databaseName);
-                    boolean exist = false;
-                    for (TableSummary tbl : tbls) {
-                        if (tbl.getName().equals(tableName)) {
-                            exist = true;
-                            break;
-                        }
-                    }
-
-                    if (!exist) {
-                        throw new IOException(String.format(
-                                "Not found table %s", tableName));
-                    }
+            List<TableSummary> tbls = client.listTables(databaseName);
+            boolean exist = false;
+            for (TableSummary tbl : tbls) {
+                if (tbl.getName().equals(tableName)) {
+                    exist = true;
+                    break;
                 }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
+            }
+
+            if (!exist) {
+                throw new IOException(String.format("Not found table %s", tableName));
+            }
+        } catch (ClientException e) {
+            String msg = String.format(
+                    "Cannot access table '%s', %s. " +
+                    "Please check it with 'td table:list %s'. " +
+                    "If it doesn't exist, please create it with 'td table:create %s %s'.",
+                    tableName, e.getMessage(), databaseName, databaseName, tableName);
+            System.out.println(msg);
+            LOG.severe(msg);
+            err.error = new IOException(e);
         } catch (IOException e) {
             String msg = String.format(
                     "Cannot access table '%s', %s. " +
@@ -476,19 +452,14 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2() {
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    client.createSession(sessionName, databaseName, tableName);
-                }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
-        } catch (IOException e) {
+            client.createSession(sessionName, databaseName, tableName);
+        } catch (ClientException e) {
             String emsg = String.format(
                     "Cannot create bulk_import session %s by using %s:%s, %s. ",
                     sessionName, databaseName, tableName, e.getMessage());
             System.out.println(emsg);
             LOG.severe(emsg);
-            err.error = e;
+            err.error = new IOException(e);
         }
         return err;
     }
@@ -499,13 +470,8 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2() {
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    client.showSession(sessionName);
-                }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
-        } catch (IOException e) {
+            client.showSession(sessionName);
+        } catch (ClientException e) {
             String msg = String.format(
                     "Cannot access bulk_import session %s, %s. " +
                     "Please check it with 'td bulk_import:list'. " +
@@ -513,7 +479,7 @@ public class UploadProcessor extends UploadProcessorBase {
                     sessionName, e.getMessage());
             System.out.println(msg);
             LOG.severe(msg);
-            err.error = e;
+            err.error = new IOException(e);
         }
         return err;
     }
@@ -526,20 +492,15 @@ public class UploadProcessor extends UploadProcessorBase {
 
         TaskResult err = new TaskResult();
         try {
-            retryClient.retry(new Retryable2() {
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    client.deleteSession(sessionName);
-                }
-            }, sessionName, conf.getRetryCount(), conf.getWaitSec());
-        } catch (IOException e) {
+            client.deleteSession(sessionName);
+        } catch (ClientException e) {
             String emsg = String.format(
                     "Cannot delete bulk_import session %s, %s. " +
                     "Please check it with 'td bulk_import:list'.",
                     sessionName, e.getMessage());
             System.out.println(emsg);
             LOG.severe(emsg);
-            err.error = e;
+            err.error = new IOException(e);
         }
         return err;
     }

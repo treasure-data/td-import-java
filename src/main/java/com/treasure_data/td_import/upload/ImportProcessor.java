@@ -31,8 +31,6 @@ public class ImportProcessor extends UploadProcessorBase {
 
     private static final Logger LOG = Logger.getLogger(ImportProcessor.class.getName());
 
-    private static UploadProcessorBase.RetryClient2 retryClient = new UploadProcessorBase.RetryClient2();
-
     protected TreasureDataClient client;
 
     public ImportProcessor(TreasureDataClient client, UploadConfigurationBase conf) {
@@ -51,36 +49,21 @@ public class ImportProcessor extends UploadProcessorBase {
                     task.fileName, task.size, task.databaseName, task.tableName));
 
             long time = System.currentTimeMillis();
-            new RetryClient3().retry(result, new Retryable2() {
-                @Override
-                public void doTry() throws ClientException, IOException {
-                    executeUpload(task);
-                }
-            }, task.databaseName, task.tableName, conf.getRetryCount(),
-                    conf.getWaitSec() * 1000);
+            client.importData(task.databaseName, task.tableName, getData(task));
             time = System.currentTimeMillis() - time;
             task.finishHook(task.fileName);
 
             LOG.info(String.format(
                     "Imported file %s (%d bytes) to %s.%s (time: %d sec.)", 
                     task.fileName, task.size, task.databaseName, task.tableName, (time / 1000)));
+        } catch (ClientException e) {
+            LOG.severe(e.getMessage());
+            result.error = e;
         } catch (IOException e) {
             LOG.severe(e.getMessage());
             result.error = e;
         }
         return result;
-    }
-
-    protected void executeUpload(final ImportTask task) throws ClientException, IOException {
-        LOG.fine(String.format("Importing file %s (%d bytes) by thread %s",
-                task.fileName, task.size, Thread.currentThread().getName()));
-
-        long time = System.currentTimeMillis();
-        client.importData(task.databaseName, task.tableName, getData(task));
-        time = System.currentTimeMillis() - time;
-
-        LOG.fine(String.format("Imported file %s (%d bytes) by thread %s (time: %d sec.)",
-                task.fileName, task.size, Thread.currentThread().getName(), (time / 1000)));
     }
 
     private byte[] getData(final ImportTask task) throws IOException {
