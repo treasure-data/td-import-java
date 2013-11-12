@@ -230,8 +230,8 @@ public class BulkImport extends Import {
         Date d = new Date();
         String format = "yyyy_MM_dd";
         String timestamp = new SimpleDateFormat(format).format(d);
-        String sessionName = String.format("%s_%s_%s_%d", databaseName, tableName,
-                timestamp, (d.getTime() / 1000));
+        String sessionName = String.format("%s_%s_%s_%d",
+                databaseName, tableName, timestamp, d.getTime());
 
         TaskResult<?> e = null;
         // validate that database is live or not
