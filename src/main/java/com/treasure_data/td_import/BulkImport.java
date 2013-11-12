@@ -46,20 +46,20 @@ public class BulkImport extends Import {
     public List<com.treasure_data.td_import.TaskResult<?>> doPrepare(final String[] args)
             throws Exception {
         // create prepare configuration
-        PrepareConfiguration conf = createPrepareConf(args);
+        PrepareConfiguration prepareConf = createPrepareConf(args);
 
         // extract and get source names from command-line arguments
-        Source[] sources = getSources(conf, 1);
+        Source[] srcs = getSources(prepareConf, 1);
 
         MultiThreadPrepareProcessor proc =
-                createAndStartPrepareProcessor(conf);
+                createAndStartPrepareProcessor(prepareConf);
 
         // create prepare tasks
         com.treasure_data.td_import.prepare.Task[] tasks =
-                createPrepareTasks(conf, sources);
+                createPrepareTasks(prepareConf, srcs);
 
         // start prepare tasks
-        startPrepareTasks(conf, tasks);
+        startPrepareTasks(prepareConf, tasks);
 
         return stopPrepareProcessor(proc);
     }
