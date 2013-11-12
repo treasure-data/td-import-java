@@ -38,6 +38,12 @@ public class Source {
             public List<Source> createSources(SourceDesc desc) {
                 return S3Source.createSources(desc);
             }
+        },
+        MYSQL("mysql") {
+            @Override
+            public List<Source> createSources(SourceDesc desc) {
+                return MysqlSource.createSources(desc);
+            }
         };
 
         private String type;
