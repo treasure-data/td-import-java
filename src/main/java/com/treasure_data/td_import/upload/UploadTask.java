@@ -19,7 +19,7 @@ package com.treasure_data.td_import.upload;
 
 import java.io.File;
 
-import com.treasure_data.td_import.source.LocalFileSource;
+import com.treasure_data.td_import.source.Source;
 
 public class UploadTask extends UploadTaskBase {
     public String sessName;
@@ -29,7 +29,7 @@ public class UploadTask extends UploadTaskBase {
     public boolean isTest = false;
     public byte[] testBinary = null;
 
-    public UploadTask(String sessName, LocalFileSource source) {
+    public UploadTask(String sessName, Source source) {
         super(source);
         this.sessName = sessName;
         int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
