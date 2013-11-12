@@ -112,12 +112,12 @@ public final class BulkImportCommand extends BulkImport {
         // configure session name
         TaskResult<?> e = null;
         String sessionName;
-        int filePos;
+        int srcPos;
         if (uploadConf.autoCreate()) { // 'auto-create-session'
             // create session automatically
             sessionName = createBulkImportSessionName(uploadConf, tdClient, biClient);
 
-            filePos = 1;
+            srcPos = 1;
         } else {
             // get session name from command-line arguments
             sessionName = getBulkImportSessionName(uploadConf);
@@ -128,7 +128,7 @@ public final class BulkImportCommand extends BulkImport {
                 throw new IllegalArgumentException(e.error);
             }
 
-            filePos = 2;
+            srcPos = 2;
         }
 
         SessionSummary sess = UploadProcessor.showSession(biClient, uploadConf, sessionName);
@@ -144,7 +144,7 @@ public final class BulkImportCommand extends BulkImport {
         }
 
         // get and extract uploaded sources from command-line arguments
-        Source[] srcs = getSources(uploadConf, filePos);
+        Source[] srcs = getSources(uploadConf, srcPos);
 
         List<String> srcNames = new ArrayList<String>();
         for (Source src : srcs) {
