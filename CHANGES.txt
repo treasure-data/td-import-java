@@ -1,6 +1,6 @@
 Release 0.4.0 - 20XX/XX/XX
   NEW FEATURES
-    Adds 'Source' model class.
+    Adds {S3,LocalFile,}Source model class.
 
   IMPROVEMENTS
     Changes Import and BulkImport APIs for adding 'source' features.
