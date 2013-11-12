@@ -50,6 +50,8 @@ public class S3Source extends Source {
         List<S3ObjectSummary> s3objects = getSources(client, bucket, basePath);
         List<Source> srcs = new ArrayList<Source>();
         for (S3ObjectSummary s3object : s3objects) {
+            LOG.info(String.format("create s3-src s3object=%s, rawPath=%s",
+                    s3object.getKey(), rawPath));
             srcs.add(new S3Source(createAmazonS3Client(desc), rawPath, s3object));
         }
 
@@ -85,8 +87,8 @@ public class S3Source extends Source {
             prefix = basePath;
         }
 
-        LOG.info(String.format("list s3 files: bucket=%s, basePath=%s, prefix=%s",
-                bucket, basePath, prefix));
+        LOG.info(String.format("list s3 files by client %s: bucket=%s, basePath=%s, prefix=%s",
+                client, bucket, basePath, prefix));
 
         List<S3ObjectSummary> s3objects = new ArrayList<S3ObjectSummary>();
         String lastKey = prefix;
@@ -141,7 +143,8 @@ public class S3Source extends Source {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        LOG.info(String.format("get s3 file: bucket=%s, key=%s", bucket, key));
+        LOG.info(String.format("get s3 file by client %s: bucket=%s, key=%s",
+                client, bucket, key));
         GetObjectRequest req = new GetObjectRequest(bucket, key);
         req.setRange(0, size);
         S3Object object = client.getObject(req);
