@@ -64,6 +64,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
             "    --columns NAME,NAME,...          column names (use --column-header instead if the first line has column names)\n" +
             "    --column-types TYPE,TYPE,...     column types [string, int, long]\n" +
+            "    -S, --all-string                 disable automatic type conversion\n" +
             "\n" +
             "    CSV/TSV specific options:\n" +
             "    --column-header                  first line includes column names\n" +
@@ -246,6 +247,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_COLUMNTYPES = "column-types";
     String BI_PREPARE_COLUMNTYPES_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNTYPES;
     String BI_PREPARE_PARTS_COLUMNTYPES_DESC = "column types [string, int, long]";
+
+    // all-string
+    String BI_PREPARE_ALL_STRING = "all-string";
+    String BI_PREPARE_ALL_STRING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNS;
+    String BI_PREPARE_ALL_STRING_DESC = "disable automatic type conversion";
 
     // exclude-columns, only-columns
     String BI_PREPARE_PARTS_EXCLUDE_COLUMNS = "exclude-columns";

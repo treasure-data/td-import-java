@@ -420,6 +420,7 @@ public class PrepareConfiguration extends Configuration {
     protected int sampleRowSize;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
+    protected boolean hasAllString = false;
     protected String[] excludeColumns;
     protected String[] onlyColumns;
 
@@ -460,6 +461,9 @@ public class PrepareConfiguration extends Configuration {
 
         // error handling
         setErrorRecordsHandling();
+
+        // all-string
+        setAllString();
 
         // exclude-columns
         setExcludeColumns();
@@ -843,6 +847,14 @@ public class PrepareConfiguration extends Configuration {
 
     public ColumnType[] getColumnTypes() {
         return columnTypes;
+    }
+
+    public void setAllString() {
+        hasAllString = optionSet.has(BI_PREPARE_ALL_STRING);
+    }
+
+    public boolean hasAllString() {
+        return hasAllString;
     }
 
     public void setExcludeColumns() {

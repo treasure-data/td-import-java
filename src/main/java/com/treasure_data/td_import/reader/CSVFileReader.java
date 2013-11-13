@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.supercsv.io.Tokenizer;
 import org.supercsv.prefs.CsvPreference;
 
+import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;

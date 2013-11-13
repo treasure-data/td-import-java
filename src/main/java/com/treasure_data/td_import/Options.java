@@ -19,17 +19,11 @@ package com.treasure_data.td_import;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 
-import joptsimple.HelpFormatter;
-import joptsimple.OptionDescriptor;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-
 
 public class Options {
     private static final Logger LOG = Logger.getLogger(Options.class.getName());
@@ -136,6 +130,9 @@ public class Options {
                 .describedAs("TYPE,TYPE,...")
                 .ofType(String.class)
                 .withValuesSeparatedBy(",");
+        op.acceptsAll(Arrays.asList("S",
+                Configuration.BI_PREPARE_ALL_STRING),
+                Configuration.BI_PREPARE_ALL_STRING_DESC);
         op.acceptsAll(Arrays.asList(
                 Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS),
                 Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS_DESC)

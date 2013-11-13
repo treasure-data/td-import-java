@@ -160,7 +160,11 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         if (columnTypes == null || columnTypes.length == 0) {
             columnTypes = new ColumnType[columnNames.length];
             for (int i = 0; i < columnTypes.length; i++) {
-                columnTypes[i] = sampleColumnValues[i].getColumnTypeRank();
+                if (conf.hasAllString()) {
+                    columnTypes[i] = ColumnType.STRING;
+                } else {
+                    columnTypes[i] = sampleColumnValues[i].getColumnTypeRank();
+                }
             }
             conf.setColumnTypes(columnTypes);
         }
