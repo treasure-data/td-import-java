@@ -36,6 +36,9 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.treasure_data.td_import.Configuration;
 
+/**
+ * td import:prepare "s3://access_key_id:secret_access_key@/bucket/key_prefix"
+ */
 public class S3Source extends Source {
     private static final Logger LOG = Logger.getLogger(S3Source.class.getName());
 
@@ -63,7 +66,7 @@ public class S3Source extends Source {
         if (accessKey == null || accessKey.isEmpty()) {
             throw new IllegalArgumentException("S3 AccessKey is null or empty.");
         }
-        String secretAccessKey = desc.getHost();
+        String secretAccessKey = desc.getPassword();
         if (secretAccessKey == null || secretAccessKey.isEmpty()) {
             throw new IllegalArgumentException("S3 SecretAccessKey is null or empty.");
         }
