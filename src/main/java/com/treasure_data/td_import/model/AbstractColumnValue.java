@@ -19,6 +19,18 @@ package com.treasure_data.td_import.model;
 
 
 public abstract class AbstractColumnValue implements ColumnValue {
+    private static final String NULL_LOWERCASE = "null";
+    private static final String NULL_UPPERCASE = "NULL";
+    private static final String NIL_LOWERCASE = "nil";
+    private static final String NIL_UPPERCASE = "NIL";
+
+    protected static boolean isNullString(String v) {
+        return v.equals(NULL_LOWERCASE) || v.equals(NULL_UPPERCASE)
+                || v.equals(NIL_LOWERCASE) || v.equals(NIL_UPPERCASE);
+    }
+
+    protected boolean isNullString = false;
+
     private ColumnType columnType;
 
     public AbstractColumnValue(ColumnType columnType) {

@@ -17,10 +17,15 @@
 //
 package com.treasure_data.td_import.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.FileWriter;
 
 public class FloatColumnValue extends AbstractColumnValue {
+    private static final Logger LOG = Logger.getLogger(FloatColumnValue.class.getName());
+
     private float v;
 
     public FloatColumnValue(ColumnType columnType) {
@@ -37,9 +42,16 @@ public class FloatColumnValue extends AbstractColumnValue {
             return;
         }
 
+        if (isNullString = isNullString(v)) {
+            this.v = 0;
+            return;
+        }
+
         try {
             this.v = Float.parseFloat(v);
         } catch (Exception e) {
+            LOG.log(Level.WARNING, String.format(
+                    "Cannot parse '%s' to float type", v), e);
             throw new PreparePartsException(e);
         }
     }
@@ -50,6 +62,11 @@ public class FloatColumnValue extends AbstractColumnValue {
 
     @Override
     public void write(FileWriter with) throws PreparePartsException {
-        with.write(v);
+        if (isNullString) {
+            with.writeNil();
+            isNullString = false;
+        } else {
+            with.write(v);
+        }
     }
 }

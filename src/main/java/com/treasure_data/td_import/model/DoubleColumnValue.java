@@ -17,10 +17,15 @@
 //
 package com.treasure_data.td_import.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.FileWriter;
 
 public class DoubleColumnValue extends AbstractColumnValue {
+    private static final Logger LOG = Logger.getLogger(DoubleColumnValue.class.getName());
+
     private double v;
 
     public DoubleColumnValue(ColumnType columnType) {
@@ -37,9 +42,16 @@ public class DoubleColumnValue extends AbstractColumnValue {
             return;
         }
 
+        if (isNullString = isNullString(v)) {
+            this.v = 0.0;
+            return;
+        }
+
         try {
             this.v = Double.parseDouble(v);
         } catch (Exception e) {
+            LOG.log(Level.WARNING, String.format(
+                    "Cannot parse '%s' to double type", v), e);
             throw new PreparePartsException(e);
         }
     }
@@ -50,6 +62,11 @@ public class DoubleColumnValue extends AbstractColumnValue {
 
     @Override
     public void write(FileWriter with) throws PreparePartsException {
-        with.write(v);
+        if (isNullString) {
+            with.writeNil();
+            isNullString = false;
+        } else {
+            with.write(v);
+        }
     }
 }

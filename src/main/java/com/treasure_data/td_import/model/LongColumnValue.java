@@ -17,10 +17,15 @@
 //
 package com.treasure_data.td_import.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.FileWriter;
 
 public class LongColumnValue extends AbstractColumnValue {
+    private static final Logger LOG = Logger.getLogger(LongColumnValue.class.getName());
+
     private long v;
 
     public LongColumnValue(ColumnType columnType) {
@@ -37,9 +42,16 @@ public class LongColumnValue extends AbstractColumnValue {
             return;
         }
 
+        if (isNullString = isNullString(v)) {
+            this.v = 0;
+            return;
+        }
+
         try {
             this.v = Long.parseLong(v);
         } catch (Exception e) {
+            LOG.log(Level.WARNING, String.format(
+                    "Cannot parse '%s' to long type", v), e);
             throw new PreparePartsException(e);
         }
     }
@@ -50,6 +62,11 @@ public class LongColumnValue extends AbstractColumnValue {
 
     @Override
     public void write(FileWriter with) throws PreparePartsException {
-        with.write(v);
+        if (isNullString) {
+            with.writeNil();
+            isNullString = false;
+        } else {
+            with.write(v);
+        }
     }
 }
