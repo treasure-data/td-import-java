@@ -1,6 +1,7 @@
 Release 0.4.0 - 20XX/XX/XX
   NEW FEATURES
     Adds {S3,LocalFile,}Source model class.
+    Adds 'all-string' feature as prepare option.
 
   IMPROVEMENTS
     Changes Import and BulkImport APIs for adding 'source' features.
