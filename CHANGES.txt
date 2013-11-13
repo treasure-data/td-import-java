@@ -7,6 +7,7 @@ Release 0.4.0 - 20XX/XX/XX
 
   BUG FIXED
     Fixes TimeColumnSampling class: NumberFormatException occurs when sample method in CSVFileReader class is executed. SimpleDateFormat objects are used in non synchronized block.
+    Fixes column value classes: fixes incompatibility with bulk_import command regarding to 'NULL' string.
 
 Release 0.3.1 - 2013/11/05
   NEW FEATURES
