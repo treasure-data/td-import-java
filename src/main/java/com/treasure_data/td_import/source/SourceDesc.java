@@ -84,6 +84,9 @@ public class SourceDesc {
             src.endpoint = rawEndpoint;
             src.path = rawPath;
 
+            LOG.info(String.format(
+                    "created source description:\n  type=%s,\n  user=%s,\n  password=%s,\n  endpoint=%s,\n  path=%s",
+                    src.type, src.user, src.password, src.endpoint, src.path));
             return src;
         }
 
