@@ -17,16 +17,13 @@
 //
 package com.treasure_data.td_import.source;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SourceDesc {
     private static Logger LOG = Logger.getLogger(SourceDesc.class.getName());
-    private static Pattern remoteRegex = Pattern.compile("\\A(\\w+)\\:\\/\\/(?:([^@\\/\\:]*)(?:\\:([^@\\/\\:]*))?@)?([^\\/]*)(?:\\/([^\\?\\#]*)(?:\\?(.*))?)?\\z");
+    private static Pattern remoteRegex = Pattern.compile("\\A(\\w+)\\:\\/\\/(?:([^@\\:]*)(?:\\:([^@\\:]*))?@)?([^\\/]*)(?:\\/([^\\?\\#]*)(?:\\?(.*))?)?\\z");
 
     protected String type;
     private String user;
@@ -49,52 +46,45 @@ public class SourceDesc {
     }
 
     public static SourceDesc create(String s) {
-        try {
-            Matcher m;
+        Matcher m;
 
-            m = remoteRegex.matcher(s);
-            if (m.matches()) {
-                String rawType = m.group(1);
-                String rawUser = m.group(2);
-                String rawPassword = m.group(3);
-                String rawEndpoint = m.group(4);
-                String rawPath = m.group(5);
+        m = remoteRegex.matcher(s);
+        if (m.matches()) {
+            String rawType = m.group(1);
+            String rawUser = m.group(2);
+            String rawPassword = m.group(3);
+            String rawEndpoint = m.group(4);
+            String rawPath = m.group(5);
 
-                String rawHost;
-                int port;
-                String[] hp = rawEndpoint.split(":", 2);
-                if (hp.length == 2) {
-                    rawHost = hp[0];
-                    try {
-                        port = Integer.parseInt(hp[1]);
-                    } catch (NumberFormatException ex) {
-                        port = 0;
-                    }
-                } else {
-                    rawHost = hp[0];
+            String rawHost;
+            int port;
+            String[] hp = rawEndpoint.split(":", 2);
+            if (hp.length == 2) {
+                rawHost = hp[0];
+                try {
+                    port = Integer.parseInt(hp[1]);
+                } catch (NumberFormatException ex) {
                     port = 0;
                 }
-
-                SourceDesc src = new SourceDesc();
-                src.type = rawType;
-                if (rawUser != null) {
-                    src.user = rawUser;
-                    //src.user = URLDecoder.decode(rawUser, "UTF-8");
-                }
-                if (rawPassword != null) {
-                    src.password = rawPassword;
-                    //src.password = URLDecoder.decode(rawPassword, "UTF-8");
-                }
-                src.host = rawHost;
-                //src.host = URLDecoder.decode(rawHost, "UTF-8");
-                src.port = port;
-                src.endpoint = URLDecoder.decode(rawEndpoint, "UTF-8");
-                src.path = URLDecoder.decode(rawPath, "UTF-8");
-
-                return src;
+            } else {
+                rawHost = hp[0];
+                port = 0;
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("invalid URL: " + s, e);
+
+            SourceDesc src = new SourceDesc();
+            src.type = rawType;
+            if (rawUser != null) {
+                src.user = rawUser;
+            }
+            if (rawPassword != null) {
+                src.password = rawPassword;
+            }
+            src.host = rawHost;
+            src.port = port;
+            src.endpoint = rawEndpoint;
+            src.path = rawPath;
+
+            return src;
         }
 
         throw new RuntimeException("invalid URL: " + s);
@@ -134,31 +124,25 @@ public class SourceDesc {
 
     @Override
     public String toString() {
-        try {
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-            sb.append(type);
-            sb.append("://");
-            if (user != null) {
-                sb.append(URLEncoder.encode(user, "UTF-8"));
-                if (password != null) {
-                    sb.append(":");
-                    sb.append(URLEncoder.encode(password, "UTF-8"));
-                }
-                sb.append("@");
-            }
-            sb.append(URLEncoder.encode(host, "UTF-8"));
-            if (port != 0) {
+        sb.append(type);
+        sb.append("://");
+        if (user != null) {
+            sb.append(user);
+            if (password != null) {
                 sb.append(":");
-                sb.append(Integer.toString(port));
+                sb.append(password);
             }
-            sb.append(URLEncoder.encode(path, "UTF-8"));
-
-            return sb.toString();
-
-        } catch (UnsupportedEncodingException e) {
-            // "UTF-8" must be supported
-            return "";
+            sb.append("@");
         }
+        sb.append(host);
+        if (port != 0) {
+            sb.append(":");
+            sb.append(Integer.valueOf(port));
+        }
+        sb.append(path);
+
+        return sb.toString();
     }
 }
