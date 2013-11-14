@@ -1,4 +1,4 @@
-Release 0.4.0 - 20XX/XX/XX
+Release 0.4.0 - 2013/11/14
   NEW FEATURES
     Adds {S3,LocalFile,}Source model class.
     Adds 'all-string' feature as prepare option.
