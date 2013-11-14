@@ -20,6 +20,7 @@ package com.treasure_data.td_import.source;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -32,6 +33,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.treasure_data.td_import.Configuration;
@@ -87,7 +89,13 @@ public class S3Source extends Source {
         if (index >= 0) {
             prefix = basePath.substring(0, index);
         } else {
-            prefix = basePath;
+            ObjectMetadata om = client.getObjectMetadata(bucket, basePath);
+            S3ObjectSummary s3object = new S3ObjectSummary();
+            s3object.setBucketName(bucket);
+            s3object.setKey(basePath);
+            s3object.setSize(om.getContentLength());
+
+            return Arrays.asList(s3object);
         }
 
         LOG.info(String.format("list s3 files by client %s: bucket=%s, basePath=%s, prefix=%s",
