@@ -68,7 +68,6 @@ public class Options {
                 Configuration.BI_PREPARE_PARTS_TIMEFORMAT),
                 Configuration.BI_PREPARE_PARTS_TIMEFORMAT_DESC)
                 .withRequiredArg()
-                .withValuesSeparatedBy(",")
                 .describedAs("FORMAT")
                 .ofType(String.class);
         op.acceptsAll(Arrays.asList(
