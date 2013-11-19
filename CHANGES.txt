@@ -1,6 +1,10 @@
 Release 0.4.1 - 2013/XX/XX
+  IMPROVEMENTS
+    Updates td-client 0.3.1.
+
   BUG FIXED
     Fixes Options class: It cannot parse time-format options that include ',' charactor.
+    Fixes UploadProcessor class: It cannot re-upload data.
 
 Release 0.4.0 - 2013/11/14
   NEW FEATURES
