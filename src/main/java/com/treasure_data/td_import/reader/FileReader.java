@@ -21,6 +21,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Configuration;
@@ -237,10 +238,10 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             writer.incrementRowNum();
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
-            LOG.throwing(this.getClass().getName(), "next", e);
+            LOG.log(Level.WARNING, "next", e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
-            LOG.throwing(this.getClass().getName(), "next", e);
+            LOG.log(Level.WARNING, "next", e);
             writer.incrementErrorRowNum();
 
             // the row data should be written to error rows file
