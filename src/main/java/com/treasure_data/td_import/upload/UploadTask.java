@@ -52,7 +52,7 @@ public class UploadTask extends UploadTaskBase {
         }
 
         UploadTask t = (UploadTask) obj;
-        return t.sessName.equals(sessName) && t.partName.equals(partName);
+        return t.sessName.equals(sessName) && t.fileName.equals(fileName) && t.partName.equals(partName);
     }
 
 }

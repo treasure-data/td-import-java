@@ -76,8 +76,11 @@ public class UploadProcessor extends UploadProcessorBase {
 
     protected void executeUpload(final UploadTask task) throws ClientException, IOException {
         Session session = new Session(task.sessName, null, null);
-        client.uploadPart(session, task.partName, createInputStream(task),
-                (int) task.size);
+        if (!task.isTest) {
+            client.uploadPart(session, task.partName, task.fileName);
+        } else {
+            client.uploadPart(session, task.partName, task.testBinary);
+        }
     }
 
     protected InputStream createInputStream(final UploadTask task) throws IOException {
