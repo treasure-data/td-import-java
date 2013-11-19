@@ -22,7 +22,6 @@ import java.util.List;
 
 public class TaskResult extends com.treasure_data.td_import.TaskResult<Task> {
     public long readLines = 0;
-    public long skippedLines = 0;
     public long convertedRows = 0;
     public long invalidRows = 0;
 
@@ -33,6 +32,6 @@ public class TaskResult extends com.treasure_data.td_import.TaskResult<Task> {
     public String toString() {
         return String.format(
                 "prepare_task_result{task=%s, readLines=%d, convertedRows=%d, invalidRows=%d}",
-                task, readLines, skippedLines, convertedRows, invalidRows);
+                task, readLines, convertedRows, invalidRows);
     }
 }
