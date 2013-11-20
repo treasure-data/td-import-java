@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.supercsv.io.Tokenizer;
@@ -68,7 +69,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                 tokenizer.readColumns(new ArrayList<String>());
             }
         } catch (IOException e) {
-            LOG.throwing(this.getClass().getName(), "configure", e);
+            LOG.log(Level.SEVERE, "configure", e);
             throw new PreparePartsException(e);
         }
     }
