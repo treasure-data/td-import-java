@@ -155,8 +155,8 @@ public class BulkImport extends Import {
         // 'auto-perform' and 'auto-commit'
         results.add(UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName));
 
-        if (hasNoUploadError(results) && uploadConf.autoDelete()) {
-            // 'auto-delete-session'
+        // 'auto-delete'
+        if (hasNoUploadError(results) && uploadConf.autoDelete() && uploadConf.autoCommit()) {
             results.add(UploadProcessor.deleteSession(biClient, uploadConf, sessionName));
         }
 
