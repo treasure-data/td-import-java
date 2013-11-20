@@ -168,7 +168,16 @@ public class UploadConfiguration extends UploadConfigurationBase {
     }
 
     public void setAutoDelete() {
-        autoDelete = optionSet.has(BI_UPLOAD_PARTS_AUTO_DELETE);
+        boolean ad = optionSet.has(BI_UPLOAD_PARTS_AUTO_DELETE);
+        if (ad) {
+            if (autoCommit) {
+                autoDelete = ad;
+            } else {
+                throw new IllegalArgumentException(String.format(
+                        "'%s' option cannot be used without '%s' option.",
+                        BI_UPLOAD_PARTS_AUTO_DELETE, BI_UPLOAD_PARTS_AUTO_COMMIT));
+            }
+        }
     }
 
     public boolean autoDelete() {
