@@ -1,4 +1,4 @@
-Release 0.4.1 - 2013/XX/XX
+Release 0.4.1 - 2013/11/20
   IMPROVEMENTS
     Updates td-client 0.3.1.
 
