@@ -208,20 +208,6 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${maven-source-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
@@ -255,7 +241,7 @@
             <phase>package</phase>
             <configuration>
               <tasks>
-                <copy file="target/td-import-${version}-jar-with-dependencies.jar" tofile="src/test/resources/java/td-import.jar" />
+                <copy file="target/td-import-${project.version}-jar-with-dependencies.jar" tofile="src/test/resources/java/td-import.jar" />
               </tasks>
             </configuration>
             <goals>
