@@ -238,16 +238,15 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
             writer.incrementRowNum();
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
-            LOG.log(Level.WARNING, "next", e);
+            String msg = String.format("Cannot read raw data: line %d in %s", lineNum, source);
+            LOG.log(Level.WARNING, msg, e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
-            LOG.log(Level.WARNING, "next", e);
             writer.incrementErrorRowNum();
 
             // the row data should be written to error rows file
             String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRow());
-            LOG.warning(e.getMessage());
-            LOG.warning(msg);
+            LOG.log(Level.WARNING, msg, e);
             handleError(e);
         }
         return true;
