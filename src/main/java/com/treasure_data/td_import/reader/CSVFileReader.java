@@ -155,7 +155,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                             "match the number of column types (%d): check that the " +
                             "number of column types you have defined matches the " +
                             "expected number of columns being read/written [line: %d] %s",
-                            sampleRow.size(), columnTypes.length, i, sampleRow));
+                            sampleRow.size(), sampleColumnValues.length, i, sampleRow));
                 }
 
                 // sampling
