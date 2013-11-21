@@ -129,6 +129,12 @@ public class Options {
                 .describedAs("TYPE,TYPE,...")
                 .ofType(String.class)
                 .withValuesSeparatedBy(",");
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_COLUMNTYPE),
+                Configuration.BI_PREPARE_COLUMNTYPE_DESC)
+                .withRequiredArg()
+                .describedAs("NAME:TYPE")
+                .ofType(String.class);
         op.acceptsAll(Arrays.asList("S",
                 Configuration.BI_PREPARE_ALL_STRING),
                 Configuration.BI_PREPARE_ALL_STRING_DESC);

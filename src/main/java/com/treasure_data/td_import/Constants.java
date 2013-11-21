@@ -64,6 +64,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
             "    --columns NAME,NAME,...          column names (use --column-header instead if the first line has column names)\n" +
             "    --column-types TYPE,TYPE,...     column types [string, int, long]\n" +
+            "    --column-type NAME:TYPE          column type [string, int, long]. A pair of column name and type can be specified like 'age:int'\n" +
             "    -S, --all-string                 disable automatic type conversion\n" +
             "\n" +
             "    CSV/TSV specific options:\n" +
@@ -240,13 +241,16 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE = "UTF-8";
     String BI_PREPARE_PARTS_ENCODING_DESC = "encoding type [UTF-8]; default=UTF-8";
 
-    // columns, column-types
+    // columns, column-types, column-type
     String BI_PREPARE_PARTS_COLUMNS = "columns";
     String BI_PREPARE_COLUMNS_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNS;
     String BI_PREPARE_PARTS_COLUMNS_DESC = "column names (use --column-header instead if the first line has column names)";
     String BI_PREPARE_PARTS_COLUMNTYPES = "column-types";
     String BI_PREPARE_COLUMNTYPES_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNTYPES;
     String BI_PREPARE_PARTS_COLUMNTYPES_DESC = "column types [string, int, long]";
+    String BI_PREPARE_COLUMNTYPE = "column-type";
+    String BI_PREPARE_COLUMNTYPE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_COLUMNTYPE;
+    String BI_PREPARE_COLUMNTYPE_DESC = "column type [string, int, long]. A pair of column name and type can be specified like 'age:int'";
 
     // all-string
     String BI_PREPARE_ALL_STRING = "all-string";

@@ -88,6 +88,9 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
 
         // column-types
         setColumnTypes();
+
+        // column-type
+        setColumnTypeMap();
     }
 
     public void setDelimiterChar() {

@@ -27,6 +27,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -418,8 +419,10 @@ public class PrepareConfiguration extends Configuration {
     protected String outputDirName;
     protected int splitSize;
     protected int sampleRowSize;
+
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
+    protected Map<String, ColumnType> columnTypeMap = new HashMap<String, ColumnType>();
     protected boolean hasAllString = false;
     protected String[] excludeColumns;
     protected String[] onlyColumns;
@@ -847,6 +850,41 @@ public class PrepareConfiguration extends Configuration {
 
     public ColumnType[] getColumnTypes() {
         return columnTypes;
+    }
+
+    public void setColumnTypeMap() {
+        if (!optionSet.has(BI_PREPARE_COLUMNTYPE)) {
+            return;
+        }
+
+        List<?> args = optionSet.valuesOf(BI_PREPARE_COLUMNTYPE);
+        if (args == null || args.isEmpty()) {
+            return;
+        }
+
+        columnTypeMap.clear();
+        Iterator<?> argsIter = args.iterator();
+        while (argsIter.hasNext()) {
+            String arg = (String) argsIter.next();
+            int i = arg.indexOf(":");
+            if (i <= 0) {
+                continue;
+            }
+            String[] nameAndType = arg.split(":");
+            if (nameAndType.length != 2) {
+                continue;
+            }
+
+            String name = nameAndType[0];
+            ColumnType type = ColumnType.fromString(nameAndType[1]);
+            if (type != null) {
+                columnTypeMap.put(name, type);
+            }
+        }
+    }
+
+    public Map<String, ColumnType> getColumnTypeMap() {
+        return columnTypeMap;
     }
 
     public void setAllString() {
