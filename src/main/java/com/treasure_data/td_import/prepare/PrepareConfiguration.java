@@ -868,11 +868,13 @@ public class PrepareConfiguration extends Configuration {
             String arg = (String) argsIter.next();
             int i = arg.indexOf(":");
             if (i <= 0) {
-                continue;
+                throw new IllegalArgumentException(
+                        String.format("Invalid 'column-type' option: %s", arg));
             }
             String[] nameAndType = arg.split(":");
             if (nameAndType.length != 2) {
-                continue;
+                throw new IllegalArgumentException(
+                        String.format("Invalid 'column-type' option: %s", arg));
             }
 
             String name = nameAndType[0];
