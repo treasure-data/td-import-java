@@ -61,7 +61,6 @@ public class PrepareProcessor {
             r = conf.getFormat().createFileReader(conf, w);
             r.configure(task);
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.log(Level.WARNING, "initialize file reader in execute", e);
             result.error = e;
             return result;
