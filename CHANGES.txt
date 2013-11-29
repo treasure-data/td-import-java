@@ -2,6 +2,9 @@ Release 0.4.2 - 20XX/XX/XX
   NEW FEATURES
     Adds 'column-type' option to 'import:prepare' command. It allows users to specify a column type only instead of 'all-string' option.
 
+  BUG FIXED
+    Fixes bug: CSV/TSV file reader cannot parse columns that include '\"'.
+
 Release 0.4.1 - 2013/11/20
   IMPROVEMENTS
     Updates td-client 0.3.1.
