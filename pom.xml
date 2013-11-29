@@ -271,6 +271,7 @@
                   <include>org.msgpack</include>
                   <include>org.javassist:javassist</include>
                   <include>net.sf.jopt-simple:jopt-simple</include>
+                  <include>mysql:mysql-connector-java</include>
                 </includes>
               </artifactSet>
             </configuration>
