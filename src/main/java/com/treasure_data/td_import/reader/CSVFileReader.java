@@ -19,15 +19,16 @@ package com.treasure_data.td_import.reader;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.supercsv.io.Tokenizer;
+import org.supercsv.comment.CommentMatcher;
+import org.supercsv.exception.SuperCsvException;
 import org.supercsv.prefs.CsvPreference;
 
-import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
@@ -37,6 +38,230 @@ import com.treasure_data.td_import.writer.JSONFileWriter;
 
 public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(CSVFileReader.class.getName());
+
+    static class Tokenizer extends org.supercsv.io.AbstractTokenizer {
+        private static final char NEWLINE = '\n';
+
+        private static final char SPACE = ' ';
+
+        private final StringBuilder currentColumn = new StringBuilder();
+
+        /* the raw, untokenized CSV row (may span multiple lines) */
+        private final StringBuilder currentRow = new StringBuilder();
+
+        private final int quoteChar;
+
+        private final int delimeterChar;
+
+        private final boolean surroundingSpacesNeedQuotes;
+
+        private final CommentMatcher commentMatcher;
+
+        /**
+         * Enumeration of tokenizer states. QUOTE_MODE is activated between quotes.
+         */
+        private enum TokenizerState {
+            NORMAL, QUOTE_MODE;
+        }
+        /**
+         * Constructs a new <tt>Tokenizer</tt>, which reads the CSV file, line by line.
+         *
+         * @param reader
+         *            the reader
+         * @param preferences
+         *            the CSV preferences
+         * @throws NullPointerException
+         *             if reader or preferences is null
+         */
+        public Tokenizer(final Reader reader, final CsvPreference preferences) {
+            super(reader, preferences);
+            this.quoteChar = preferences.getQuoteChar();
+            this.delimeterChar = preferences.getDelimiterChar();
+            this.surroundingSpacesNeedQuotes = preferences.isSurroundingSpacesNeedQuotes();
+            this.commentMatcher = preferences.getCommentMatcher();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean readColumns(final List<String> columns) throws IOException {
+            if (columns == null) {
+                throw new NullPointerException("columns should not be null");
+            }
+
+            // clear the reusable List and StringBuilders
+            columns.clear();
+            currentColumn.setLength(0);
+            currentRow.setLength(0);
+
+            // keep reading lines until data is found
+            String line;
+            do {
+                line = readLine();
+                if (line == null) {
+                    return false; // EOF
+                }
+            } while (line.length() == 0
+                    || (commentMatcher != null && commentMatcher.isComment(line)));
+
+            // update the untokenized CSV row
+            currentRow.append(line);
+
+            // add a newline to determine end of line (making parsing easier)
+            line += NEWLINE;
+
+            // process each character in the line, catering for surrounding quotes (QUOTE_MODE)
+            TokenizerState state = TokenizerState.NORMAL;
+            int quoteScopeStartingLine = -1; // the line number where a potential multi-line cell starts
+            int potentialSpaces = 0; // keep track of spaces (so leading/trailing space can be removed if required)
+            int charIndex = 0;
+            while (true) {
+
+                final char c = line.charAt(charIndex);
+
+                if (TokenizerState.NORMAL.equals(state)) {
+                    /*
+                     * NORMAL mode (not within quotes).
+                     */
+
+                    if (c == delimeterChar) {
+                        /*
+                         * Delimiter. Save the column (trim trailing space if
+                         * required) then continue to next character.
+                         */
+                        if (!surroundingSpacesNeedQuotes) {
+                            appendSpaces(currentColumn, potentialSpaces);
+                        }
+                        columns.add(currentColumn.length() > 0 ? currentColumn.toString() : null); // "" -> null
+                        potentialSpaces = 0;
+                        currentColumn.setLength(0);
+                    } else if (c == SPACE) {
+                        /*
+                         * Space. Remember it, then continue to next character.
+                         */
+                        potentialSpaces++;
+                    } else if (c == NEWLINE) {
+                        /*
+                         * Newline. Add any required spaces (if surrounding
+                         * spaces don't need quotes) and return (we've read a
+                         * line!).
+                         */
+                        if (!surroundingSpacesNeedQuotes) {
+                            appendSpaces(currentColumn, potentialSpaces);
+                        }
+                        columns.add(currentColumn.length() > 0 ? currentColumn.toString() : null); // "" -> null
+                        return true;
+                    } else if (c == quoteChar) {
+                        /*
+                         * A single quote ("). Update to QUOTESCOPE (but don't
+                         * save quote), then continue to next character.
+                         */
+                        state = TokenizerState.QUOTE_MODE;
+                        quoteScopeStartingLine = getLineNumber();
+
+                        // cater for spaces before a quoted section (be
+                        // lenient!)
+                        if (!surroundingSpacesNeedQuotes
+                                || currentColumn.length() > 0) {
+                            appendSpaces(currentColumn, potentialSpaces);
+                        }
+                        potentialSpaces = 0;
+                    } else {
+                        /*
+                         * Just a normal character. Add any required spaces (but
+                         * trim any leading spaces if surrounding spaces need
+                         * quotes), add the character, then continue to next
+                         * character.
+                         */
+                        if (!surroundingSpacesNeedQuotes || currentColumn.length() > 0) {
+                            appendSpaces(currentColumn, potentialSpaces);
+                        }
+
+                        potentialSpaces = 0;
+                        currentColumn.append(c);
+                    }
+
+                } else {
+                    /*
+                     * QUOTE_MODE (within quotes).
+                     */
+
+                    if (c == NEWLINE) {
+
+                        /*
+                         * Newline. Doesn't count as newline while in QUOTESCOPE. Add the newline char, reset the charIndex
+                         * (will update to 0 for next iteration), read in the next line, then then continue to next
+                         * character. For a large file with an unterminated quoted section (no trailing quote), this could
+                         * cause memory issues as it will keep reading lines looking for the trailing quote. Maybe there
+                         * should be a configurable limit on max lines to read in quoted mode?
+                         */
+                        currentColumn.append(NEWLINE);
+                        currentRow.append(NEWLINE); // specific line terminator lost, \n will have to suffice
+
+                        charIndex = -1;
+                        line = readLine();
+                        if (line == null) {
+                            throw new SuperCsvException(
+                                    String.format(
+                                            "unexpected end of file while reading quoted column beginning on line %d and ending on line %d",
+                                            quoteScopeStartingLine,
+                                            getLineNumber()));
+                        }
+
+                        currentRow.append(line); // update untokenized CSV row
+                        line += NEWLINE; // add newline to simplify parsing
+                    } else if (c == quoteChar) {
+                        if (line.charAt(charIndex + 1) == quoteChar) {
+                            /*
+                             * An escaped quote (""). Add a single quote, then move the cursor so the next iteration of the
+                             * loop will read the character following the escaped quote.
+                             */
+                            currentColumn.append(c);
+                            charIndex++;
+                        } else if (charIndex > 1 && line.charAt(charIndex - 1) == '\\') {
+                            currentColumn.append(c);
+                            charIndex++;
+                        } else {
+                            /*
+                             * A single quote ("). Update to NORMAL (but don't save quote), then continue to next character.
+                             */
+                            state = TokenizerState.NORMAL;
+                            quoteScopeStartingLine = -1; // reset ready for next multi-line cell
+                        }
+                    } else {
+                        /*
+                         * Just a normal character, delimiter (they don't count in QUOTESCOPE) or space. Add the character,
+                         * then continue to next character.
+                         */
+                        currentColumn.append(c);
+                    }
+                }
+
+                charIndex++; // read next char of the line
+            }
+        }
+
+        /**
+         * Appends the required number of spaces to the StringBuilder.
+         *
+         * @param sb
+         *            the StringBuilder
+         * @param spaces
+         *            the required number of spaces to append
+         */
+        private static void appendSpaces(final StringBuilder sb, final int spaces) {
+            for( int i = 0; i < spaces; i++ ) {
+                sb.append(SPACE);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getUntokenizedRow() {
+            return currentRow.toString();
+        }
+    }
 
     protected CsvPreference csvPref;
     private Tokenizer tokenizer;
@@ -52,8 +277,11 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
         super.configure(task);
 
         // initialize csv preference
-        csvPref = new CsvPreference.Builder(conf.getQuoteChar().quote(),
-                conf.getDelimiterChar(), conf.getNewline().newline()).build();
+        CsvPreference.Builder b = new CsvPreference.Builder(
+                conf.getQuoteChar().quote(),
+                conf.getDelimiterChar(),
+                conf.getNewline().newline());
+        csvPref = b.build();
 
         // if conf object doesn't have column names, types, etc,
         // sample method checks those values.
@@ -63,17 +291,27 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             tokenizer = new Tokenizer(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
                     conf.getCharsetDecoder()), csvPref);
-            if (conf.hasColumnHeader()) {
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE,
+                    String.format("Cannot create CSV file reader [] %s",
+                            task.getSource()), e);
+            throw new PreparePartsException(e);
+        }
+        if (conf.hasColumnHeader()) {
+            try {
                 // header line is skipped
                 incrementLineNum();
                 tokenizer.readColumns(new ArrayList<String>());
+            } catch (IOException e) {
+                LOG.log(Level.SEVERE,
+                        String.format("Column header is not read or EOF [line: 1] %s",
+                                task.getSource()), e);
+                throw new PreparePartsException(e);
             }
-        } catch (IOException e) {
-            LOG.log(Level.SEVERE, "configure", e);
-            throw new PreparePartsException(e);
         }
     }
 
+    // TODO FIXME this method is bad design
     private void setColumnNamesWithColumnHeader(Tokenizer tokenizer) throws IOException {
         List<String> sampleRow = new ArrayList<String>();
         if (conf.hasColumnHeader()) {
@@ -134,11 +372,19 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             // read some rows
             List<String> sampleRow = new ArrayList<String>();
             for (int i = 0; i < sampleRowSize; i++) {
+                int lineNum = i + 1;
                 if (!isFirstRow && (columnTypes == null || columnTypes.length == 0)) {
                     break;
                 }
 
-                sampleTokenizer.readColumns(sampleRow);
+                try {
+                    sampleTokenizer.readColumns(sampleRow);
+                } catch (IOException e) {
+                    LOG.log(Level.SEVERE, String.format(
+                            "Anything is not read or EOF [line: %d] %s",
+                            lineNum, task.getSource()), e);
+                    throw new PreparePartsException(e);
+                }
 
                 if (sampleRow == null || sampleRow.isEmpty()) {
                     break;
@@ -155,7 +401,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                             "match the number of column types (%d): check that the " +
                             "number of column types you have defined matches the " +
                             "expected number of columns being read/written [line: %d] %s",
-                            sampleRow.size(), sampleColumnValues.length, i, sampleRow));
+                            sampleRow.size(), sampleColumnValues.length, lineNum, sampleRow));
                 }
 
                 // sampling
@@ -222,15 +468,18 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
     @Override
     public boolean readRow() throws IOException, PreparePartsException {
         row.clear();
-        if (!tokenizer.readColumns(row)) {
-            return false;
+        try {
+            if (!tokenizer.readColumns(row)) {
+                return false;
+            }
+        } catch (IOException e) {
+            throw new PreparePartsException(e);
         }
 
         incrementLineNum();
 
         int rawRowSize = row.size();
         if (rawRowSize != columnTypes.length) {
-            writer.incrementErrorRowNum();
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
                     "match the number of column types (%d): check that the " +
