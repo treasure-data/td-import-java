@@ -211,14 +211,19 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                         currentRow.append(line); // update untokenized CSV row
                         line += NEWLINE; // add newline to simplify parsing
                     } else if (c == quoteChar) {
-                        if (line.charAt(charIndex + 1) == quoteChar) {
+                        if (charIndex > 2 && line.charAt(charIndex - 2) == '\\'
+                                && line.charAt(charIndex - 1) == '\\') {
+                            // TODO FIXME it's monkey patch
+                            state = TokenizerState.NORMAL;
+                            quoteScopeStartingLine = -1;
+                        } else if (charIndex > 1 && line.charAt(charIndex - 1) == '\\') {
+                            currentColumn.append(c);
+                            //charIndex++;
+                        } else if (line.charAt(charIndex + 1) == quoteChar) {
                             /*
                              * An escaped quote (""). Add a single quote, then move the cursor so the next iteration of the
                              * loop will read the character following the escaped quote.
                              */
-                            currentColumn.append(c);
-                            charIndex++;
-                        } else if (charIndex > 1 && line.charAt(charIndex - 1) == '\\') {
                             currentColumn.append(c);
                             charIndex++;
                         } else {
