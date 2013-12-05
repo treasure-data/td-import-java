@@ -1,9 +1,10 @@
-Release 0.4.2 - 20XX/XX/XX
+Release 0.4.2 - 2013/12/05
   NEW FEATURES
     Adds 'column-type' option to 'import:prepare' command. It allows users to specify a column type only instead of 'all-string' option.
 
   BUG FIXED
     Fixes bug: CSV/TSV file reader cannot parse columns that include '\"'.
+    Fixes bug in 'upload' and 'auto' commands: 'upload' processes cannot be often stopped when some of 'prepare' processes failed.
 
 Release 0.4.1 - 2013/11/20
   IMPROVEMENTS
