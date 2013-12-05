@@ -85,7 +85,8 @@ public final class BulkImportCommand extends BulkImport {
         com.treasure_data.td_import.prepare.Task[] tasks =
                 createPrepareTasks(prepareConf, srcs);
 
-        // start prepare tasks
+        // start prepare tasks. the method call puts prepare tasks and
+        // *finish* tasks on task queue.
         startPrepareTasks(prepareConf, tasks);
 
         // wait for finishing prepare processing
@@ -158,12 +159,14 @@ public final class BulkImportCommand extends BulkImport {
         List<com.treasure_data.td_import.TaskResult<?>> results =
                 new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
 
+        boolean hasNoPrepareError = true;
         if (!uploadConf.hasPrepareOptions()) {
             // create upload tasks
             com.treasure_data.td_import.upload.UploadTask[] tasks = createUploadTasks(
                     sessionName, srcs);
 
-            // start upload tasks
+            // start upload tasks. the method call puts upload tasks and
+            // *finish* tasks on task queue
             startUploadTasks(uploadConf, tasks);
         } else {
             // create configuration for 'prepare' processing
@@ -176,33 +179,37 @@ public final class BulkImportCommand extends BulkImport {
             com.treasure_data.td_import.prepare.Task[] tasks = createSequentialUploadTasks(
                     sessionName, srcs);
 
-            // start sequential upload (prepare) tasks
+            // start sequential upload (prepare) tasks. the method call puts
+            // prepare tasks and *finish* prepare tasks on prepare task queue.
+            // after those prepare tasks are finished, automatically the
+            // upload tasks are put on upload task queue.
             startPrepareTasks(prepareConf, tasks);
 
+            // wait for finishing all prepare tasks by using *finish* prepare tasks.
             results.addAll(stopPrepareProcessor(prepareProc));
 
             commandHelper.showPrepareResults(results);
             commandHelper.listNextStepOfPrepareProc(results);
 
-            if (!hasNoPrepareError(results)) {
-                return;
-            }
-
-            // end of file list
+            // put *finish* upload tasks on upload task queue.
             try {
                 MultiThreadUploadProcessor.addFinishTask(uploadConf);
             } catch (Throwable t) {
                 LOG.severe("Error occurred During 'addFinishTask' method call");
                 LOG.throwing("Main", "addFinishTask", t);
             }
+
+            hasNoPrepareError = hasNoPrepareError(results);
         }
 
+
+        // wait for finishing all upload tasks by using *finish* tasks.
         results.addAll(stopUploadProcessor(uploadProc));
 
         commandHelper.showUploadResults(results);
         commandHelper.listNextStepOfUploadProc(results, sessionName);
 
-        if (!hasNoUploadError(results)) {
+        if (!hasNoUploadError(results) || !hasNoPrepareError) {
             return;
         }
 
