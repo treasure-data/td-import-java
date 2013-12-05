@@ -298,7 +298,8 @@ public class MsgpackGZIPFileWriter extends FileWriter {
         result.outFileNames.add(outputFile.getPath());
         result.outFileSizes.add(outputFile.length());
 
-        if (task != null && outputFile != null) {
+        if (task != null && outputFile != null &&
+                result != null && result.error == null) {
             // TODO FIXME #MN change getAbsolutePath() -> getPath() ??
             //task.finishHook(outputFile.getAbsolutePath());
             task.finishHook(outputFile.getPath());
