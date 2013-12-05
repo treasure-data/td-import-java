@@ -153,6 +153,7 @@ public class CommandHelper {
         System.out.println();
         System.out.println("Next Steps:");
         boolean hasErrors = false;
+        int countUploadTaskResults = 0;
         for (com.treasure_data.td_import.TaskResult<?> r : results) {
             if (! (r instanceof com.treasure_data.td_import.upload.TaskResult)) {
                 continue;
@@ -160,6 +161,7 @@ public class CommandHelper {
 
             com.treasure_data.td_import.upload.TaskResult result =
                     (com.treasure_data.td_import.upload.TaskResult) r;
+            countUploadTaskResults++;
             if (result.error != null) {
                 // error
                 System.out.println(String.format(
@@ -169,7 +171,7 @@ public class CommandHelper {
             }
         }
 
-        if (!hasErrors) {
+        if (!hasErrors && countUploadTaskResults != 0) {
             // success
             System.out.println(String.format(
                     "  => execute 'td import:perform %s'.",
