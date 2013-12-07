@@ -243,7 +243,7 @@ public class MsgpackGZIPFileWriter extends FileWriter {
 
     @Override
     public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
-        throw new PreparePartsException("not implemented method");
+        write((long) v.getDouble());
     }
 
     @Override
