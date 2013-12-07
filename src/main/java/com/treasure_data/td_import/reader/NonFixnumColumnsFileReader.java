@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Configuration;
@@ -139,13 +140,16 @@ public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration>
             writer.incrementRowNum();
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
-            LOG.throwing("SchemalessFileParser", "parseRow", e);
+            String msg = String.format("Cannot read raw data: line %d in %s", lineNum, source);
+            LOG.log(Level.WARNING, msg, e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
             writer.incrementErrorRowNum();
 
-            // TODO the row data should be written to error rows file
-            LOG.warning(e.getMessage());
+            // the row data should be written to error rows file
+            String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRow());
+            LOG.log(Level.WARNING, msg, e);
+            handleError(e);
         }
         return true;
     }
