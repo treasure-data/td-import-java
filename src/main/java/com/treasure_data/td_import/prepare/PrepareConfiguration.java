@@ -835,7 +835,7 @@ public class PrepareConfiguration extends Configuration {
             String[] types = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNTYPES).toArray(new String[0]);
             columnTypes = new ColumnType[types.length];
             for (int i = 0; i < types.length; i++) {
-                columnTypes[i] = ColumnType.fromString(types[i].toLowerCase());
+                columnTypes[i] = ColumnType.Conv.fromString(types[i].toLowerCase());
                 if (columnTypes[i] == null) {
                     throw new IllegalArgumentException(String.format(
                             "'%s' cannot be specified as column type", types[i]));
@@ -878,7 +878,7 @@ public class PrepareConfiguration extends Configuration {
             }
 
             String name = nameAndType[0];
-            ColumnType type = ColumnType.fromString(nameAndType[1]);
+            ColumnType type = ColumnType.Conv.fromString(nameAndType[1]);
             if (type != null) {
                 columnTypeMap.put(name, type);
             }

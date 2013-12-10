@@ -87,7 +87,7 @@ public class ColumnSampling {
             }
         }
 
-        ColumnType ret = ColumnType.fromInt(maxIndex);
+        ColumnType ret = ColumnType.Conv.fromInt(maxIndex);
         if (ret.equals(ColumnType.BIGINT)) {
             return ColumnType.STRING;
         }

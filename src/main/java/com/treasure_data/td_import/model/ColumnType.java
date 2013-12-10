@@ -17,7 +17,7 @@
 //
 package com.treasure_data.td_import.model;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,54 +26,40 @@ import com.treasure_data.td_import.writer.FileWriter;
 
 public interface ColumnType {
 
+    ColumnType DOUBLE = new DoubleColumnType();
+    ColumnType FLOAT = new FloatColumnType();
+    ColumnType INT = new IntColumnType();
+    ColumnType BIGINT = new BigIntColumnType();
+    ColumnType LONG = new LongColumnType();
+    ColumnType STRING = new StringColumnType();
+    ColumnType ARRAY = new ArrayColumnType();
+    ColumnType MAP = new MapColumnType();
+
     String getName();
     int getIndex();
 
     ColumnValue createColumnValue();
     void convertType(String v, ColumnValue into) throws PreparePartsException;
     void setColumnValue(Object v, ColumnValue cv) throws PreparePartsException;
-    void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
-            throws PreparePartsException;
+    void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with) throws PreparePartsException;
 
-
-
-    public static ColumnType fromInt(int index) {
-        return IntToColumnType.get(index);
-    }
-
-    public static ColumnType fromString(String name) {
-        return StringToColumnType.get(name);
-    }
-
-    private static class IntToColumnType {
-        private static final Map<Integer, ColumnType> REVERSE_DICTIONARY;
+    public static class Conv {
+        private static final Map<Integer, ColumnType> REVERSE_INTS = new HashMap<Integer, ColumnType>();
+        private static final Map<String, ColumnType> REVERSE_STRINGS = new HashMap<String, ColumnType>();
 
         static {
-            Map<Integer, ColumnType> map = new HashMap<Integer, ColumnType>();
-            for (ColumnType elem : ColumnType.values()) {
-                map.put(elem.getIndex(), elem);
+            for (ColumnType t : Arrays.asList(DOUBLE, FLOAT, INT, BIGINT, LONG, STRING, ARRAY, MAP)) {
+                REVERSE_INTS.put(t.getIndex(), t);
+                REVERSE_STRINGS.put(t.getName(), t);
             }
-            REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
         }
 
-        static ColumnType get(Integer index) {
-            return REVERSE_DICTIONARY.get(index);
-        }
-    }
-
-    private static class StringToColumnType {
-        private static final Map<String, ColumnType> REVERSE_DICTIONARY;
-
-        static {
-            Map<String, ColumnType> map = new HashMap<String, ColumnType>();
-            for (ColumnType elem : ColumnType.values()) {
-                map.put(elem.getName(), elem);
-            }
-            REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+        public static ColumnType fromInt(int index) {
+            return REVERSE_INTS.get(index);
         }
 
-        static ColumnType get(String key) {
-            return REVERSE_DICTIONARY.get(key);
+        public static ColumnType fromString(String name) {
+            return REVERSE_STRINGS.get(name);
         }
     }
 }

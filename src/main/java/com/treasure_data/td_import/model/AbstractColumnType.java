@@ -17,7 +17,7 @@
 //
 package com.treasure_data.td_import.model;
 
-protected abstract class AbstractColumnType implements ColumnType {
+abstract class AbstractColumnType implements ColumnType {
 
     protected String name;
     protected int index;
