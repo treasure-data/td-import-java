@@ -24,13 +24,11 @@ import com.treasure_data.td_import.Options;
 
 public class JSONPrepareConfiguration extends PrepareConfiguration {
 
-    private static final Logger LOG = Logger
-            .getLogger(JSONPrepareConfiguration.class.getName());
+    private static final Logger LOG = Logger.getLogger(JSONPrepareConfiguration.class.getName());
 
     public JSONPrepareConfiguration() {
         super();
     }
-
 
     @Override
     public void configure(Properties props, Options options) {
