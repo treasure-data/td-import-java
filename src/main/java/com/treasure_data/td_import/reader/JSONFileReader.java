@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.simple.parser.JSONParser;
@@ -33,6 +34,7 @@ import com.treasure_data.td_import.prepare.JSONPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.JSONFileWriter;
 
 public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(JSONFileReader.class.getName());
@@ -51,6 +53,8 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
     public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
+        sample(task);
+
         try {
             reader = new BufferedReader(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
@@ -61,6 +65,80 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
 
         // create parser
         parser = new JSONParser();
+    }
+
+    public void sample(Task task) throws PreparePartsException {
+        BufferedReader sampleReader = null;
+        try {
+            sampleReader = new BufferedReader(new InputStreamReader(
+                    task.createInputStream(conf.getCompressionType()),
+                    conf.getCharsetDecoder()));
+
+            // read first line only
+            line = sampleReader.readLine();
+            if (line == null) {
+                String msg = String.format("Anything is not read or EOF [line: 1] %s", task.getSource());
+                LOG.severe(msg);
+                throw new PreparePartsException(msg);
+            }
+
+            try {
+                JSONParser sampleParser = new JSONParser();
+                row = (Map<String, Object>) sampleParser.parse(line);
+                if (row == null) {
+                    String msg = String.format("Anything is not parsed [line: 1] %s", task.getSource());
+                    LOG.severe(msg);
+                    throw new PreparePartsException(msg);
+                }
+            } catch (ParseException e) {
+                LOG.log(Level.SEVERE, String.format("Anything is not parsed [line: 1] %s", task.getSource()), e);
+                throw new PreparePartsException(e);
+            }
+
+            // print first sample row
+            JSONFileWriter w = null;
+            try {
+                w = new JSONFileWriter(conf);
+                setColumnNames();
+                w.setColumnNames(getColumnNames());
+                setColumnTypes();
+                w.setColumnTypes(getColumnTypes());
+                setSkipColumns();
+                w.setSkipColumns(getSkipColumns());
+                setTimeColumnValue();
+                w.setTimeColumnValue(getTimeColumnValue());
+
+                // convert each column in row
+                convertTypesOfColumns();
+                // write each column value
+                w.next(convertedRow);
+                String ret = w.toJSONString();
+                String msg = null;
+                if (ret != null) {
+                    msg = "sample row: " + ret;
+                } else  {
+                    msg = "cannot get sample row";
+                }
+                System.out.println(msg);
+                LOG.info(msg);
+            } finally {
+                if (w != null) {
+                    w.close();
+                }
+            }
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "during sample method execution", e);
+            throw new PreparePartsException(e);
+        } finally {
+            if (sampleReader != null) {
+                try {
+                    sampleReader.close();
+                } catch (IOException e) {
+                    LOG.log(Level.SEVERE, "sampling reader cannot be closed", e);
+                    throw new PreparePartsException(e);
+                }
+            }
+        }
     }
 
     @Override
