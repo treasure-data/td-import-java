@@ -1,3 +1,7 @@
+Release 0.4.4 - 20XX/XX/XX
+  IMPROVEMENTS
+    Adds the feature for showing sample row to JSONFileReader class.
+
 Release 0.4.3 - 2013/12/06
   IMPROVEMENTS
     Implements MsgpackGZIPFileWriter#implemented write(TimeColumnValue, DoubleColumnValue). By the change, prepare command can accept unix time of both of long type and double type.
