@@ -503,7 +503,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
 
     @Override
     public String getCurrentRow() {
-        return row.toString();
+        return tokenizer.getUntokenizedRow();
     }
 
     @Override
