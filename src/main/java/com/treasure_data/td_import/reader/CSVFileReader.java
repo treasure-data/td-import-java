@@ -41,20 +41,17 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
 
     static class Tokenizer extends org.supercsv.io.AbstractTokenizer {
         private static final char NEWLINE = '\n';
-
         private static final char SPACE = ' ';
+        private static final int NONE = '\u0000';
 
         private final StringBuilder currentColumn = new StringBuilder();
 
         /* the raw, untokenized CSV row (may span multiple lines) */
         private final StringBuilder currentRow = new StringBuilder();
-
         private final int quoteChar;
-
+        private final boolean enableQuote;
         private final int delimeterChar;
-
         private final boolean surroundingSpacesNeedQuotes;
-
         private final CommentMatcher commentMatcher;
 
         /**
@@ -76,6 +73,9 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
         public Tokenizer(final Reader reader, final CsvPreference preferences) {
             super(reader, preferences);
             this.quoteChar = preferences.getQuoteChar();
+            this.enableQuote = this.quoteChar != NONE;
+            System.out.println("### quote: " + ((char) quoteChar));
+            System.out.println("### enable quote: " + enableQuote);
             this.delimeterChar = preferences.getDelimiterChar();
             this.surroundingSpacesNeedQuotes = preferences.isSurroundingSpacesNeedQuotes();
             this.commentMatcher = preferences.getCommentMatcher();
@@ -151,7 +151,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
                         }
                         columns.add(currentColumn.length() > 0 ? currentColumn.toString() : null); // "" -> null
                         return true;
-                    } else if (c == quoteChar) {
+                    } else if (c == quoteChar && enableQuote) {
                         /*
                          * A single quote ("). Update to QUOTESCOPE (but don't
                          * save quote), then continue to next character.

@@ -27,7 +27,7 @@ import com.treasure_data.td_import.model.ColumnType;
 public class CSVPrepareConfiguration extends PrepareConfiguration {
 
     public static enum Quote {
-        DOUBLE("\""), SINGLE("'");
+        DOUBLE("\""), SINGLE("'"), NONE("\u0000");
 
         private String quote;
 
