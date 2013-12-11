@@ -74,8 +74,6 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             super(reader, preferences);
             this.quoteChar = preferences.getQuoteChar();
             this.enableQuote = this.quoteChar != NONE;
-            System.out.println("### quote: " + ((char) quoteChar));
-            System.out.println("### enable quote: " + enableQuote);
             this.delimeterChar = preferences.getDelimiterChar();
             this.surroundingSpacesNeedQuotes = preferences.isSurroundingSpacesNeedQuotes();
             this.commentMatcher = preferences.getCommentMatcher();
