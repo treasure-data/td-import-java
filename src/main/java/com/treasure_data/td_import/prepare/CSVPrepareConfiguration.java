@@ -114,7 +114,11 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
     public void setQuoteChar() {
         String quote;
         if (!optionSet.has("quote")) {
-            quote = Configuration.BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE;
+            if (format.equals(Format.CSV)) { // 'csv'
+                quote = Configuration.BI_PREPARE_PARTS_QUOTE_CSV_DEFAULTVALUE;
+            } else { // 'tsv'
+                quote = Configuration.BI_PREPARE_PARTS_QUOTE_TSV_DEFAULTVALUE;
+            }
         } else {
             quote = (String) optionSet.valueOf("quote");
         }

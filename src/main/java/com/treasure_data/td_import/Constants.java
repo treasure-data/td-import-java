@@ -71,7 +71,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --column-header                  first line includes column names\n" +
             "    --delimiter CHAR                 delimiter CHAR; default=\",\" at csv, \"\\t\" at tsv\n" +
             "    --newline TYPE                   newline [CRLF, LF, CR];  default=CRLF\n" +
-            "    --quote CHAR                     quote [DOUBLE, SINGLE]; default=DOUBLE\n" +
+            "    --quote CHAR                     quote [DOUBLE, SINGLE, NONE]; if csv format, default=DOUBLE. if tsv format, default=NONE\n" +
             "\n" +
             "    MySQL specific options:\n" +
             "    --db-url URL                     JDBC connection URL\n" +
@@ -309,8 +309,9 @@ public interface Constants extends com.treasure_data.client.Constants {
     // quote [DOUBLE, SINGLE]; default=DOUBLE
     String BI_PREPARE_PARTS_QUOTE = "quote";
     String BI_PREPARE_QUOTE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_QUOTE;
-    String BI_PREPARE_PARTS_QUOTE_DEFAULTVALUE = "DOUBLE";
-    String BI_PREPARE_PARTS_QUOTE_DESC = "quote [DOUBLE, SINGLE]; default=DOUBLE";
+    String BI_PREPARE_PARTS_QUOTE_CSV_DEFAULTVALUE = "DOUBLE";
+    String BI_PREPARE_PARTS_QUOTE_TSV_DEFAULTVALUE = "NONE";
+    String BI_PREPARE_PARTS_QUOTE_DESC = "quote [DOUBLE, SINGLE, NONE]; if csv format, default=DOUBLE. if tsv format, default=NONE";
 
     // delimiter CHAR; default=',' at 'csv', '\t' at 'tsv'
     String BI_PREPARE_PARTS_DELIMITER = "delimiter";
