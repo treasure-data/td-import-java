@@ -447,8 +447,11 @@ public class PrepareConfiguration extends Configuration {
         // parallel
         setPrepareThreadNum();
 
+        // error handling
+        setErrorRecordsHandling();
+
         // encoding
-        setEncoding();
+        setEncoding(); // depends on error-records-handling
 
         // alias time column
         setAliasTimeColumn();
@@ -461,9 +464,6 @@ public class PrepareConfiguration extends Configuration {
 
         // output DIR
         setOutputDirName();
-
-        // error handling
-        setErrorRecordsHandling();
 
         // all-string
         setAllString();
@@ -660,9 +660,14 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void createCharsetDecoder(String encoding) throws Exception {
-        charsetDecoder = Charset.forName(encoding).newDecoder()
-                .onMalformedInput(CodingErrorAction.REPORT)
-                .onUnmappableCharacter(CodingErrorAction.REPORT);
+        charsetDecoder = Charset.forName(encoding).newDecoder();
+        if (errorRecordsHandling.equals(ErrorRecordsHandling.ABORT)) {
+            charsetDecoder.onMalformedInput(CodingErrorAction.REPORT);
+            charsetDecoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+        } else { // skip
+            charsetDecoder.onMalformedInput(CodingErrorAction.REPLACE);
+            charsetDecoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+        }
     }
 
     public CharsetDecoder getCharsetDecoder() throws PreparePartsException {
