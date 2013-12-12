@@ -2,6 +2,7 @@ Release 0.4.4 - 20XX/XX/XX
   IMPROVEMENTS
     Adds the feature for showing sample row to JSONFileReader class.
     Changes default quote character for TSV file reading: DOUBLE to NONE.
+    Changes behavior for handling decoding errors like malformed inputs and unmappable chars. If you specify 'skip' as error-records-handling option, file reader replaces invalid char with '\uFFFD'. If you specify 'abort' as error-records-handling option, it aborts by invalid char.
 
 Release 0.4.3 - 2013/12/06
   IMPROVEMENTS
