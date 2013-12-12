@@ -1,6 +1,7 @@
 Release 0.4.4 - 20XX/XX/XX
   IMPROVEMENTS
     Adds the feature for showing sample row to JSONFileReader class.
+    Changes default quote character for TSV file reading: DOUBLE to NONE.
 
 Release 0.4.3 - 2013/12/06
   IMPROVEMENTS
