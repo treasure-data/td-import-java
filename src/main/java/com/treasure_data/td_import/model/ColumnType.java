@@ -26,6 +26,7 @@ import com.treasure_data.td_import.writer.FileWriter;
 
 public interface ColumnType {
 
+    ColumnType BOOLEAN = new BooleanColumnType();
     ColumnType DOUBLE = new DoubleColumnType();
     ColumnType FLOAT = new FloatColumnType();
     ColumnType INT = new IntColumnType();
@@ -48,7 +49,7 @@ public interface ColumnType {
         private static final Map<String, ColumnType> REVERSE_STRINGS = new HashMap<String, ColumnType>();
 
         static {
-            for (ColumnType t : Arrays.asList(DOUBLE, FLOAT, INT, BIGINT, LONG, STRING, ARRAY, MAP)) {
+            for (ColumnType t : Arrays.asList(BOOLEAN, DOUBLE, FLOAT, INT, BIGINT, LONG, STRING, ARRAY, MAP)) {
                 REVERSE_INTS.put(t.getIndex(), t);
                 REVERSE_STRINGS.put(t.getName(), t);
             }
