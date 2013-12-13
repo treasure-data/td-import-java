@@ -1,4 +1,8 @@
 Release 0.4.4 - 20XX/XX/XX
+added new feature to 'mysql' table reader: it can translate values of datetime type into unix times of long type automatically
+  NEW FEATURES
+    Adds automatical type converter to 'mysql' table reader. It allows users to translate values of 'datetime' type into unix times of 'long' type automatically.
+
   IMPROVEMENTS
     Adds the feature for showing sample row to JSONFileReader class.
     Changes default quote character for TSV file reading: DOUBLE to NONE.
