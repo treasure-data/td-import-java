@@ -33,7 +33,7 @@ public class DoubleColumnValue extends AbstractColumnValue {
     }
 
     public void set(Object v) throws PreparePartsException {
-        this.v = (Double) v;
+        this.v = v != null ? (Double) v : 0.0;
     }
 
     public void parse(String v) throws PreparePartsException {

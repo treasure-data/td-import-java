@@ -33,7 +33,7 @@ public class IntColumnValue extends AbstractColumnValue {
     }
 
     public void set(Object v) throws PreparePartsException {
-        this.v = (Integer) v;
+        this.v = v != null ? (Integer) v : 0;
     }
 
     public void parse(String v) throws PreparePartsException {

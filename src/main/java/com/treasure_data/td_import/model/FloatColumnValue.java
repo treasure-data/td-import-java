@@ -33,7 +33,7 @@ public class FloatColumnValue extends AbstractColumnValue {
     }
 
     public void set(Object v) throws PreparePartsException {
-        this.v = (Float) v;
+        this.v = v != null ? (Float) v : 0;
     }
 
     public void parse(String v) throws PreparePartsException {

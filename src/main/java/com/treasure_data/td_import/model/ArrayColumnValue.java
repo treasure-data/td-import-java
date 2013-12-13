@@ -31,7 +31,7 @@ public class ArrayColumnValue extends AbstractColumnValue {
     }
 
     public void set(Object v) throws PreparePartsException {
-        this.v = (List) v;
+        this.v = v != null ? (List) v : null;
     }
 
     public void parse(String v) throws PreparePartsException {

@@ -30,7 +30,7 @@ public class MapColumnValue extends AbstractColumnValue {
     }
 
     public void set(Object v) throws PreparePartsException {
-        this.v = (Map) v;
+        this.v = v != null ? (Map) v : null;
     }
 
     public void parse(String v) throws PreparePartsException {

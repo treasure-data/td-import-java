@@ -33,7 +33,7 @@ public class LongColumnValue extends AbstractColumnValue {
     }
 
     public void set(Object v) throws PreparePartsException {
-        this.v = (Long) v;
+        this.v = v != null ? (Long) v : 0L;
     }
 
     public void parse(String v) throws PreparePartsException {
