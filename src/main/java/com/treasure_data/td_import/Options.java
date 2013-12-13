@@ -82,6 +82,12 @@ public class Options {
                 .withRequiredArg()
                 .describedAs("DIR")
                 .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT),
+                Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT_DESC)
+                .withRequiredArg()
+                .describedAs("DIR")
+                .ofType(String.class);
         op.acceptsAll(Arrays.asList("s",
                 Configuration.BI_PREPARE_PARTS_SPLIT_SIZE),
                 Configuration.BI_PREPARE_PARTS_SPLIT_SIZE_DESC )

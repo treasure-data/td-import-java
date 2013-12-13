@@ -62,6 +62,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --only-columns NAME,NAME,...     only columns\n" +
             "    --exclude-columns NAME,NAME,...  exclude columns\n" +
             "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
+            "    --error-records-output DIR       write error records; default directory is directory specified as 'output' option\n" +
             "    --columns NAME,NAME,...          column names (use --column-header instead if the first line has column names)\n" +
             "    --column-types TYPE,TYPE,...     column types [string, int, long]\n" +
             "    --column-type NAME:TYPE          column type [string, int, long]. A pair of column name and type can be specified like 'age:int'\n" +
@@ -292,6 +293,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_ERROR_RECORDS_HANDLING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING;
     String BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE= "skip";
     String BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DESC = "error records handling mode [skip, abort]; default=skip";
+
+    // error records output
+    String BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT = "error-records-output";
+    String BI_PREPARE_ERROR_RECORDS_OUTPUT_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT;
+    String BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT_DESC = "write error records; default directory is directory specified as 'output' option";
 
     // dry-run; show samples as JSON and exit
     String BI_PREPARE_PARTS_DRYRUN = "td.bulk_import.prepare_parts.dry-run";

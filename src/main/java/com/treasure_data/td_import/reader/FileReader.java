@@ -18,7 +18,13 @@
 package com.treasure_data.td_import.reader;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -56,6 +62,11 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     protected long lineNum = 0;
 
+    protected String errFileDirName;
+    private boolean errWriterCreated = false;
+    protected Writer errWriter;
+    protected File errFile;
+
     protected FileReader(T conf, FileWriter writer) {
         this.conf = conf;
         this.writer = writer;
@@ -65,6 +76,9 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         source = task.getSource();
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
+
+        // error records output
+        this.errFileDirName = conf.getErrorRecordsOutputDirName();
 
         // check compression type of the file
         conf.checkCompressionType(source);
@@ -250,9 +264,12 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         } catch (PreparePartsException e) {
             writer.incrementErrorRowNum();
 
-            // the row data should be written to error rows file
+            // the untokenized raw row is written to error rows file
+            writeErrorRecord(getCurrentRow());
+            // the untokenized raw row is written to LOG
             String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRow());
             LOG.log(Level.WARNING, msg, e);
+
             handleError(e);
         }
         return true;
@@ -270,5 +287,71 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
 
     // Closeable#close()
     public void close() throws IOException {
+        // file writer must not be closed. because PrepareProcessor will do that.
+
+        closeErrWriter();
     }
+
+    protected void writeErrorRecord(String record) {
+        if (!errWriterCreated) {
+            createErrWriter();
+        }
+
+        try {
+            errWriter.write(record);
+            errWriter.write('\n');
+        } catch (IOException e) {
+            LOG.log(Level.WARNING, String.format(
+                    "error records cannot be written: %s", record), e);
+        }
+    }
+
+    private void createErrWriter() {
+        String srcName = source.getPath();
+        int lastSepIndex = srcName.lastIndexOf(File.separatorChar);
+        String prefix = srcName.substring(lastSepIndex + 1, srcName.length()).replace('.', '_');
+        String errFileName = prefix + ".error-records.txt";
+
+        File dir = new File(errFileDirName);
+        if (dir.exists()) {
+            dir.mkdirs();
+        }
+
+        errFile = new File(errFileDirName, errFileName);
+        if (errFile.exists()) {
+            errFile.delete();
+        }
+
+        try {
+            errWriterCreated = errFile.createNewFile();
+            LOG.info(String.format("error records file is created: %s", errFile.getAbsolutePath()));
+        } catch (IOException e) {
+            LOG.log(Level.WARNING, "error records file cannot be created", e);
+        }
+
+        try {
+            errWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(errFile)));
+        } catch (FileNotFoundException e) {
+            LOG.log(Level.WARNING, "error records writer cannot be created", e);
+        }
+    }
+
+    protected void closeErrWriter() {
+        if (errWriterCreated) {
+            if (errWriter != null) {
+                try {
+                    errWriter.flush();
+                } catch (IOException e) {
+                    // ignore
+                }
+
+                try {
+                    errWriter.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+        }
+    }
+
 }

@@ -422,6 +422,7 @@ public class PrepareConfiguration extends Configuration {
     protected ErrorRecordsHandling errorRecordsHandling;
     protected boolean dryRun = false;
     protected String outputDirName;
+    protected String errorRecordsOutputDirName;
     protected int splitSize;
     protected int sampleRowSize;
 
@@ -469,6 +470,9 @@ public class PrepareConfiguration extends Configuration {
 
         // output DIR
         setOutputDirName();
+
+        // output DIR
+        setErrorRecordsOutputDirName(); // depends on output
 
         // all-string
         setAllString();
@@ -747,6 +751,14 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
+    public void setErrorRecordsOutputDirName() {
+        if (optionSet.has(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT)) {
+            errorRecordsOutputDirName = (String) optionSet.valueOf(BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT);
+        } else {
+            errorRecordsOutputDirName = outputDirName;
+        }
+    }
+
     public void setErrorRecordsHandling() {
         String mode;
         if (!optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)) {
@@ -780,6 +792,10 @@ public class PrepareConfiguration extends Configuration {
 
     public String getOutputDirName() {
         return outputDirName;
+    }
+
+    public String getErrorRecordsOutputDirName() {
+        return errorRecordsOutputDirName;
     }
 
     public void setSplitSize() {
