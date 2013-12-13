@@ -31,7 +31,7 @@ public abstract class AbstractColumnValue implements ColumnValue {
 
     protected boolean isNullString = false;
 
-    private ColumnType columnType;
+    protected ColumnType columnType;
 
     public AbstractColumnValue(ColumnType columnType) {
         this.columnType = columnType;
