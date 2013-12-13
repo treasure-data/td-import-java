@@ -17,12 +17,77 @@
 //
 package com.treasure_data.td_import.prepare;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 
 import com.treasure_data.td_import.Options;
+import com.treasure_data.td_import.model.AbstractColumnType;
+import com.treasure_data.td_import.model.AbstractColumnValue;
+import com.treasure_data.td_import.model.ColumnType;
+import com.treasure_data.td_import.model.ColumnValue;
+import com.treasure_data.td_import.model.TimeColumnValue;
+import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.JSONFileWriter;
+import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
 
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
+
+    public static class TimestampColumnType extends AbstractColumnType {
+
+        public TimestampColumnType() {
+            super("timestamp", 50);
+        }
+
+        @Override
+        public ColumnValue createColumnValue() {
+            return new TimestampColumnValue(this);
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setColumnValue(Object v, ColumnValue cv)
+                throws PreparePartsException {
+            cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(ColumnValue v, TimeColumnValue filter,
+                FileWriter with) throws PreparePartsException {
+            with.write(filter, (TimestampColumnValue) v);
+        }
+    }
+
+    public static class TimestampColumnValue extends AbstractColumnValue {
+        private long v;
+
+        public TimestampColumnValue(ColumnType columnType) {
+            super(columnType);
+        }
+
+        public void set(Object v) throws PreparePartsException {
+            if (v == null) {
+                this.v = 0L;
+            } else {
+                this.v = ((Timestamp) v).getTime() / 1000;
+            }
+        }
+
+        @Override
+        public void parse(String v) throws PreparePartsException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void write(FileWriter with) throws PreparePartsException {
+            with.write(v);
+        }
+    }
 
     protected String jdbcUrl;
     protected String user;

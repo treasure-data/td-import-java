@@ -33,6 +33,7 @@ import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.MapColumnValue;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
+import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
@@ -138,6 +139,11 @@ public class JSONFileWriter extends FileWriter {
     @Override
     public void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException {
         throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
+    public void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v) throws PreparePartsException {
+        v.write(this);
     }
 
     @Override

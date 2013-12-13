@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ArrayColumnValue;
+import com.treasure_data.td_import.model.BooleanColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.FloatColumnValue;
@@ -37,6 +38,7 @@ import com.treasure_data.td_import.model.Row;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
+import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
@@ -137,6 +139,11 @@ public abstract class FileWriter implements Closeable {
     public abstract void write(double v) throws PreparePartsException;
     public abstract void write(List<Object> v) throws PreparePartsException;
     public abstract void write(Map<Object, Object> v) throws PreparePartsException;
+
+    public void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException {
+        // TODO FIX ignore
+    }
+
     public abstract void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
@@ -144,6 +151,11 @@ public abstract class FileWriter implements Closeable {
     public abstract void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException;
     public abstract void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException;
+
+    public void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v) throws PreparePartsException {
+            // TODO FIXME ignore
+    }
+
     public abstract void writeEndRow() throws PreparePartsException;
 
     public void resetRowNum() {

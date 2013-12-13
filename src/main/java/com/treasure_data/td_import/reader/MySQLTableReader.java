@@ -33,8 +33,10 @@ import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
+import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
+import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
@@ -48,7 +50,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
     private static final String QUERY = "SELECT * FROM %s;";
 
     protected Connection conn;
-    protected List<String> row = new ArrayList<String>();
+    protected List<Object> row = new ArrayList<Object>();
     protected int numColumns;
     protected ResultSet resultSet;
 
@@ -94,37 +96,67 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
         }
     }
 
+    private void setColumnNames(ResultSetMetaData metadata) throws SQLException {
+        int count = metadata.getColumnCount();
+
+        if (columnNames != null && columnNames.length != 0) {
+            if (count != columnNames.length) {
+                throw new IllegalArgumentException(String.format(
+                        "The number of specified columns (%d) must " +
+                        "match the number of columns (%d) in the table",
+                        columnNames.length, count));
+            }
+        }
+
+        if (columnNames == null || columnNames.length == 0) {
+            columnNames = new String[numColumns];
+            for (int i = 0; i < numColumns; i++) {
+                columnNames[i] = metadata.getColumnName(i + 1);
+            }
+        }
+    }
+
+    private void  setTimeColumnValue(int timeColumnIndex, int aliasTimeColumnIndex) {
+        int index = -1;
+        boolean isAlias = false;
+
+        if (timeColumnIndex >= 0) {
+            index = timeColumnIndex;
+            isAlias = false;
+        } else if (aliasTimeColumnIndex >= 0) {
+            index = aliasTimeColumnIndex;
+            isAlias = true;
+        }
+
+        if (index < 0) {
+            timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+        } else {
+            if (!isAlias) {
+                timeColumnValue = new TimeColumnValue(index, conf.getTimeFormat());
+            } else {
+                timeColumnValue = new AliasTimeColumnValue(index, conf.getTimeFormat());
+            }
+        }
+    }
+
     private void sample(String table) throws PreparePartsException {
         Statement sampleStat = null;
         ResultSet sampleResultSet = null;
 
-        int timeColumnIndex = -1;
-        int aliasTimeColumnIndex = -1;
         try {
             // TODO FIXME
             // here, we should use conn.getMetaData().getColumns(..).
             sampleStat = conn.createStatement();
             sampleResultSet = sampleStat.executeQuery(String.format(QUERY_SAMPLE, table));
             ResultSetMetaData metaData = sampleResultSet.getMetaData();
-
             numColumns = metaData.getColumnCount();
-            if (columnNames == null || columnNames.length == 0) {
-                columnNames = new String[numColumns];
-                for (int i = 0; i < numColumns; i++) {
-                    columnNames[i] = metaData.getColumnName(i + 1);
-                }
-            }
+
+            this.setColumnNames(metaData);
 
             // get index of 'time' column
             // [ "time", "name", "price" ] as all columns is given,
             // the index is zero.
-            for (int i = 0; i < columnNames.length; i++) {
-                if (columnNames[i].equals(
-                        Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                    timeColumnIndex = i;
-                    break;
-                }
-            }
+            int timeColumnIndex = getTimeColumnIndex();
 
             // get index of specified alias time column
             // [ "timestamp", "name", "price" ] as all columns and
@@ -132,14 +164,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
             //
             // if 'time' column exists in row data, the specified alias
             // time column is ignore.
-            if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
-                for (int i = 0; i < columnNames.length; i++) {
-                    if (columnNames[i].equals(conf.getAliasTimeColumn())) {
-                        aliasTimeColumnIndex = i;
-                        break;
-                    }
-                }
-            }
+            int aliasTimeColumnIndex = getAliasTimeColumnIndex(timeColumnIndex);
 
             // if 'time' and the alias columns don't exist, ...
             if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
@@ -150,15 +175,16 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
                 }
             }
 
-            List<String> firstRow = new ArrayList<String>();
+            List<Object> firstRow = new ArrayList<Object>();
             if (sampleResultSet.next()) {
                 for (int i = 0; i < numColumns; i++) {
-                    firstRow.add(sampleResultSet.getString(i + 1));
+                    firstRow.add(sampleResultSet.getObject(i + 1));
                 }
             }
 
             // initialize types of all columns
             if (columnTypes == null || columnTypes.length == 0) {
+                // 'all-string' option is ignored
                 columnTypes = new ColumnType[numColumns];
                 for (int i = 0; i < numColumns; i++) {
                     columnTypes[i] = toColumnType(metaData.getColumnType(i + 1));
@@ -166,16 +192,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
             }
 
             // initialize time column value
-            if (timeColumnIndex >= 0) {
-                timeColumnValue = new TimeColumnValue(timeColumnIndex,
-                        conf.getTimeFormat());
-            } else if (aliasTimeColumnIndex >= 0) {
-                timeColumnValue = new AliasTimeColumnValue(
-                        aliasTimeColumnIndex, conf.getTimeFormat());
-            } else {
-                timeColumnValue = new TimeValueTimeColumnValue(
-                        conf.getTimeValue());
-            }
+            setTimeColumnValue(timeColumnIndex, aliasTimeColumnIndex);
 
             initializeConvertedRow();
 
@@ -236,19 +253,24 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
     private static ColumnType toColumnType(int jdbcType)
             throws PreparePartsException {
         switch (jdbcType) {
+        case Types.BIT:
+            return ColumnType.BOOLEAN;
         case Types.CHAR:
         case Types.VARCHAR:
         case Types.LONGVARCHAR:
             return ColumnType.STRING;
         case Types.TINYINT:
         case Types.SMALLINT:
-        case Types.INTEGER:
+        case Types.INTEGER: // INT
             return ColumnType.INT;
         case Types.BIGINT:
             return ColumnType.LONG;
         case Types.FLOAT:
         case Types.DOUBLE:
             return ColumnType.DOUBLE;
+        case Types.TIME:
+        case Types.TIMESTAMP: // DATETIME
+            return new MySQLPrepareConfiguration.TimestampColumnType();
         default:
             throw new PreparePartsException("unsupported jdbc type: " + jdbcType);
         }
@@ -264,7 +286,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
             }
 
             for (int i = 0; i < numColumns; i++) {
-                row.add(i, resultSet.getString(i + 1));
+                row.add(i, resultSet.getObject(i + 1));
             }
         } catch (SQLException e) {
             throw new IOException(e);
@@ -276,7 +298,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
         for (int i = 0; i < row.size(); i++) {
-            columnTypes[i].convertType(row.get(i), convertedRow.getValue(i));
+            columnTypes[i].setColumnValue(row.get(i), convertedRow.getValue(i));
         }
     }
 
