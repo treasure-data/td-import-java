@@ -37,15 +37,13 @@ import com.treasure_data.td_import.model.Row;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
 public abstract class AbstractFileWriter implements FileWriter {
-    private static final Logger LOG = Logger.getLogger(
-            AbstractFileWriter.class.getName());
+    private static final Logger LOG = Logger.getLogger(AbstractFileWriter.class.getName());
 
     protected PrepareConfiguration conf;
     protected Task task;

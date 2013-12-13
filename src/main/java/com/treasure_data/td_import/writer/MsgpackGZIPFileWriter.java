@@ -40,7 +40,6 @@ import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.MapColumnValue;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
