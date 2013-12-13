@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
-import com.treasure_data.td_import.model.ColumnType;
 
 public class CSVPrepareConfiguration extends PrepareConfiguration {
 
@@ -54,8 +53,7 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
         }
     }
 
-    private static final Logger LOG = Logger
-            .getLogger(CSVPrepareConfiguration.class.getName());
+    private static final Logger LOG = Logger.getLogger(CSVPrepareConfiguration.class.getName());
 
     protected char delimiterChar;
     protected Quote quoteChar;

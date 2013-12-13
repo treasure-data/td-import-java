@@ -17,7 +17,6 @@
 //
 package com.treasure_data.td_import.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;

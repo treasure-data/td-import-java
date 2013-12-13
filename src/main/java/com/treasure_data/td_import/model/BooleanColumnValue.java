@@ -17,7 +17,6 @@
 //
 package com.treasure_data.td_import.model;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
