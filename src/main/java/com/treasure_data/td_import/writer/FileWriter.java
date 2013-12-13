@@ -18,14 +18,10 @@
 package com.treasure_data.td_import.writer;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
-import com.treasure_data.td_import.Configuration;
-import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ArrayColumnValue;
 import com.treasure_data.td_import.model.BooleanColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
@@ -37,151 +33,44 @@ import com.treasure_data.td_import.model.MapColumnValue;
 import com.treasure_data.td_import.model.Row;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
-import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
-public abstract class FileWriter implements Closeable {
+public interface FileWriter extends Closeable {
 
-    private static final Logger LOG = Logger
-            .getLogger(FileWriter.class.getName());
+    void setColumnNames(String[] columnNames);
+    void setColumnTypes(ColumnType[] columnTypes);
+    void setSkipColumns(Set<String> skipColumns);
+    void setTimeColumnValue(TimeColumnValue timeColumnValue);
 
-    protected PrepareConfiguration conf;
-    protected Task task;
-    protected TaskResult result;
-    protected long rowNum = 0;
-    protected long errorNum = 0;
+    void configure(Task task, TaskResult result) throws PreparePartsException;
+    void next(Row row) throws PreparePartsException;
 
-    protected String[] columnNames;
-    protected ColumnType[] columnTypes;
+    void writeBeginRow(int size) throws PreparePartsException;
+    void writeNil() throws PreparePartsException;
+    void write(String v) throws PreparePartsException;
+    void write(int v) throws PreparePartsException;
+    void write(long v) throws PreparePartsException;
+    void write(double v) throws PreparePartsException;
+    void write(List<Object> v) throws PreparePartsException;
+    void write(Map<Object, Object> v) throws PreparePartsException;
+    void writeEndRow() throws PreparePartsException;
 
-    protected Set<String> skipColumns;
-    protected boolean needAdditionalTimeColumn = false;
-    protected TimeColumnValue timeColumnValue;
-    protected int timeColumnIndex = -1;
+    void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException;
+    void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
+    void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
+    void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
+    void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException;
+    void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException;
+    void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException;
+    void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException;
 
-    protected FileWriter(PrepareConfiguration conf) {
-        this.conf = conf;
-    }
+    void resetRowNum();
+    void incrementRowNum();
+    long getRowNum();
 
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
-    }
-
-    public void setColumnTypes(ColumnType[] columnTypes) {
-        this.columnTypes = columnTypes;
-    }
-
-    public void setSkipColumns(Set<String> skipColumns) {
-        this.skipColumns = skipColumns;
-    }
-
-    public void setTimeColumnValue(TimeColumnValue timeColumnValue) {
-        needAdditionalTimeColumn =
-                timeColumnValue instanceof AliasTimeColumnValue ||
-                timeColumnValue instanceof TimeValueTimeColumnValue;
-        if (!needAdditionalTimeColumn) {
-            timeColumnIndex = ((TimeColumnValue) timeColumnValue).getIndex();
-        }
-        this.timeColumnValue = timeColumnValue;
-    }
-
-    public void configure(Task task, TaskResult result)
-            throws PreparePartsException {
-        this.task = task;
-        this.result = result;
-    }
-
-    public void next(Row row) throws PreparePartsException {
-        int size = row.getValues().length;
-
-        // begin writing
-        if (needAdditionalTimeColumn) {
-            // if the row doesn't have 'time' column, new 'time' column needs
-            // to be appended to it.
-            writeBeginRow(size - skipColumns.size() + 1);
-        } else {
-            writeBeginRow(size - skipColumns.size());
-        }
-
-        // write columns
-        for (int i = 0; i < size; i++) {
-            if (skipColumns.contains(columnNames[i])) {
-                continue;
-            }
-
-            write(columnNames[i]);
-            if (i == timeColumnIndex) {
-                timeColumnValue.write(row.getValue(i), this);
-            } else {
-                row.getValue(i).write(this);
-            }
-        }
-
-        if (needAdditionalTimeColumn) {
-            write(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-            TimeColumnValue tcValue = timeColumnValue;
-            tcValue.write(row.getValue(tcValue.getIndex()), this);
-        }
-
-        // end
-        writeEndRow();
-    }
-
-    public abstract void writeBeginRow(int size) throws PreparePartsException;
-    public abstract void writeNil() throws PreparePartsException;
-    public abstract void write(String v) throws PreparePartsException;
-    public abstract void write(int v) throws PreparePartsException;
-    public abstract void write(long v) throws PreparePartsException;
-    public abstract void write(double v) throws PreparePartsException;
-    public abstract void write(List<Object> v) throws PreparePartsException;
-    public abstract void write(Map<Object, Object> v) throws PreparePartsException;
-
-    public void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException {
-        // TODO FIX ignore
-    }
-
-    public abstract void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException;
-
-    public void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v) throws PreparePartsException {
-            // TODO FIXME ignore
-    }
-
-    public abstract void writeEndRow() throws PreparePartsException;
-
-    public void resetRowNum() {
-        rowNum = 0;
-    }
-
-    public void incrementRowNum() {
-        rowNum++;
-    }
-
-    public long getRowNum() {
-        return rowNum;
-    }
-
-    public void resetErrorRowNum() {
-        errorNum = 0;
-    }
-
-    public void incrementErrorRowNum() {
-        errorNum++;
-    }
-
-    public long getErrorRowNum() {
-        return errorNum;
-    }
-
-    // Closeable#close()
-    public abstract void close() throws IOException;
+    void resetErrorRowNum();
+    void incrementErrorRowNum();
+    long getErrorRowNum();
 }

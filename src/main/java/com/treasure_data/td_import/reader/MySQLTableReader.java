@@ -42,6 +42,7 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.FileWriter;
 import com.treasure_data.td_import.writer.JSONFileWriter;
+import com.treasure_data.td_import.writer.MySQLTimestampAdaptedJSONFileWriter;
 
 public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(MySQLTableReader.class.getName());
@@ -201,7 +202,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
 
             JSONFileWriter w = null;
             try {
-                w = new JSONFileWriter(conf);
+                w = new MySQLTimestampAdaptedJSONFileWriter(conf);
                 w.setColumnNames(getColumnNames());
                 w.setColumnTypes(getColumnTypes());
                 w.setSkipColumns(getSkipColumns());

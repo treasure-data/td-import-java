@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.Ignore;
 
 import com.treasure_data.td_import.model.ArrayColumnValue;
+import com.treasure_data.td_import.model.BooleanColumnValue;
 import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.FloatColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
@@ -23,7 +24,7 @@ import com.treasure_data.td_import.prepare.TaskResult;
 import com.treasure_data.td_import.writer.FileWriter;
 
 @Ignore
-public class FileWriterTestUtil extends FileWriter {
+public class FileWriterTestUtil extends AbstractFileWriter {
 
     private Map<String, Object> row = new HashMap<String, Object>();
     private List<Object> columnKeyValues = new ArrayList<Object>();
@@ -93,6 +94,11 @@ public class FileWriterTestUtil extends FileWriter {
         }
 
         write(time);
+    }
+
+    @Override
+    public void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
     }
 
     @Override

@@ -32,6 +32,7 @@ import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
 import com.treasure_data.td_import.model.ArrayColumnValue;
+import com.treasure_data.td_import.model.BooleanColumnValue;
 import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.FloatColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
@@ -45,7 +46,7 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
-public class MsgpackGZIPFileWriter extends FileWriter {
+public class MsgpackGZIPFileWriter extends AbstractFileWriter {
     static class DataSizeChecker extends FilterOutputStream {
 
         private int size = 0;
@@ -213,6 +214,11 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     }
 
     @Override
+    public void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
     public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
         String timeString = v.getString();
         long time = 0;
@@ -260,11 +266,6 @@ public class MsgpackGZIPFileWriter extends FileWriter {
     @Override
     public void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException {
         throw new PreparePartsException("not implemented method");
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v) throws PreparePartsException {
-        v.write(this);
     }
 
     @Override

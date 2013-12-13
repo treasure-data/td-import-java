@@ -28,8 +28,7 @@ import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.writer.FileWriter;
-import com.treasure_data.td_import.writer.JSONFileWriter;
-import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
+import com.treasure_data.td_import.writer.MySQLTimestampAdaptor;
 
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
 
@@ -59,7 +58,7 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
         @Override
         public void filterAndWrite(ColumnValue v, TimeColumnValue filter,
                 FileWriter with) throws PreparePartsException {
-            with.write(filter, (TimestampColumnValue) v);
+            ((MySQLTimestampAdaptor) with).write(filter, (TimestampColumnValue) v);
         }
     }
 

@@ -50,6 +50,7 @@ import com.treasure_data.td_import.reader.SyslogFileReader;
 import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.writer.FileWriter;
 import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
+import com.treasure_data.td_import.writer.MySQLTimestampAdaptedMsgpackGZIPFileWriter;
 
 public class PrepareConfiguration extends Configuration {
 
@@ -250,7 +251,11 @@ public class PrepareConfiguration extends Configuration {
         MSGPACKGZ("msgpackgz") {
             @Override
             public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
-                return new MsgpackGZIPFileWriter(conf);
+                if (!conf.getFormat().equals(Format.MYSQL)) {
+                    return new MsgpackGZIPFileWriter(conf);
+                } else {
+                    return new MySQLTimestampAdaptedMsgpackGZIPFileWriter(conf);
+                }
             }
         },
         SYSLOGMSGPACKGZ("syslogmsgpackgz") {

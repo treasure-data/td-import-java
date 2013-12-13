@@ -26,6 +26,7 @@ import java.util.Map;
 import org.json.simple.JSONValue;
 
 import com.treasure_data.td_import.model.ArrayColumnValue;
+import com.treasure_data.td_import.model.BooleanColumnValue;
 import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.FloatColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
@@ -39,7 +40,7 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
-public class JSONFileWriter extends FileWriter {
+public class JSONFileWriter extends AbstractFileWriter {
 
     private Map<String, Object> record;
     private List<Object> recordElements;
@@ -112,6 +113,11 @@ public class JSONFileWriter extends FileWriter {
     }
 
     @Override
+    public void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException {
+        throw new PreparePartsException("not implemented method");
+    }
+
+    @Override
     public void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
         v.write(this);
     }
@@ -139,11 +145,6 @@ public class JSONFileWriter extends FileWriter {
     @Override
     public void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException {
         throw new PreparePartsException("not implemented method");
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v) throws PreparePartsException {
-        v.write(this);
     }
 
     @Override
