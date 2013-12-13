@@ -1,3 +1,5 @@
+Release 0.4.5 - 20XX/XX/XX
+
 Release 0.4.4 - 2013/12/12
 added new feature to 'mysql' table reader: it can translate values of datetime type into unix times of long type automatically
   NEW FEATURES
