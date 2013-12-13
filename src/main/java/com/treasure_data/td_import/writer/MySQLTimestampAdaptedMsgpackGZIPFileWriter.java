@@ -31,6 +31,6 @@ public class MySQLTimestampAdaptedMsgpackGZIPFileWriter
 
     public void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v)
             throws PreparePartsException {
-        // TODO FIXME #MN
+        writeUnixtime(v.getLong());
     }
 }

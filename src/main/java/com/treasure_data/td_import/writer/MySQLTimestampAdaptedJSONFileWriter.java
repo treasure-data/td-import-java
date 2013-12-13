@@ -31,7 +31,7 @@ public class MySQLTimestampAdaptedJSONFileWriter extends JSONFileWriter
 
     public void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v)
             throws PreparePartsException {
-        // TODO FIXME #MN
+        writeUnixtime(v.getLong());
     }
 
 }

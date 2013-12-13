@@ -168,12 +168,24 @@ public class MsgpackGZIPFileWriter extends AbstractFileWriter {
     }
 
     @Override
+    public void writeUnixtime(int v) throws PreparePartsException {
+        validateUnixtime(v);
+        write(v);
+    }
+
+    @Override
     public void write(long v) throws PreparePartsException {
         try {
             packer.write(v);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
+    }
+
+    @Override
+    public void writeUnixtime(long v) throws PreparePartsException {
+        validateUnixtime(v);
+        write(v);
     }
 
     @Override
@@ -234,22 +246,22 @@ public class MsgpackGZIPFileWriter extends AbstractFileWriter {
             }
         }
 
-        write(time);
+        writeUnixtime(time);
     }
 
     @Override
     public void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
-        v.write(this);
+        writeUnixtime(v.getInt());
     }
 
     @Override
     public void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
-        v.write(this);
+        writeUnixtime(v.getLong());
     }
 
     @Override
     public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
-        write((long) v.getDouble());
+        writeUnixtime((long) v.getDouble());
     }
 
     @Override

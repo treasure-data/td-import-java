@@ -69,12 +69,22 @@ public class JSONFileWriter extends AbstractFileWriter {
     }
 
     @Override
+    public void writeUnixtime(int v) throws PreparePartsException {
+        recordElements.add(v);
+    }
+
+    @Override
     public void write(int v) throws PreparePartsException {
         recordElements.add(v);
     }
 
     @Override
     public void write(long v) throws PreparePartsException {
+        recordElements.add(v);
+    }
+
+    @Override
+    public void writeUnixtime(long v) throws PreparePartsException {
         recordElements.add(v);
     }
 

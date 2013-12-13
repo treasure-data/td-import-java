@@ -56,7 +56,17 @@ public class FileWriterTestUtil extends AbstractFileWriter {
     }
 
     @Override
+    public void writeUnixtime(int v) throws PreparePartsException {
+        columnKeyValues.add(v);
+    }
+
+    @Override
     public void write(long v) throws PreparePartsException {
+        columnKeyValues.add(v);
+    }
+
+    @Override
+    public void writeUnixtime(long v) throws PreparePartsException {
         columnKeyValues.add(v);
     }
 

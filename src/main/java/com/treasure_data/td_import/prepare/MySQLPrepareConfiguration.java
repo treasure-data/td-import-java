@@ -77,6 +77,10 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
             }
         }
 
+        public long getLong() {
+            return v;
+        }
+
         @Override
         public void parse(String v) throws PreparePartsException {
             throw new UnsupportedOperationException();

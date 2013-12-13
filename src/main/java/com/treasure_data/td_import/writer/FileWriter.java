@@ -51,7 +51,9 @@ public interface FileWriter extends Closeable {
     void writeNil() throws PreparePartsException;
     void write(String v) throws PreparePartsException;
     void write(int v) throws PreparePartsException;
+    void writeUnixtime(int v) throws PreparePartsException;
     void write(long v) throws PreparePartsException;
+    void writeUnixtime(long v) throws PreparePartsException;
     void write(double v) throws PreparePartsException;
     void write(List<Object> v) throws PreparePartsException;
     void write(Map<Object, Object> v) throws PreparePartsException;

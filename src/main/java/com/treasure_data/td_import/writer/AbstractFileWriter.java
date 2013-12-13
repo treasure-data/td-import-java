@@ -85,6 +85,17 @@ public abstract class AbstractFileWriter implements FileWriter {
         this.timeColumnValue = timeColumnValue;
     }
 
+    protected void validateUnixtime(int v) throws PreparePartsException {
+        validateUnixtime((long) v);
+    }
+
+    protected void validateUnixtime(long v) throws PreparePartsException {
+        if (v > Configuration.MAX_LOG_TIME) {
+            throw new PreparePartsException(String.format(
+                    "values of 'time' column must be less than 9999/12/31: %d", v));
+        }
+    }
+
     public void configure(Task task, TaskResult result)
             throws PreparePartsException {
         this.task = task;
@@ -93,38 +104,54 @@ public abstract class AbstractFileWriter implements FileWriter {
 
     public void next(Row row) throws PreparePartsException {
         int size = row.getValues().length;
+        int actualSize = 0;
+        int offset = 0;
 
-        // begin writing
-        if (needAdditionalTimeColumn) {
-            // if the row doesn't have 'time' column, new 'time' column needs
-            // to be appended to it.
-            writeBeginRow(size - skipColumns.size() + 1);
-        } else {
-            writeBeginRow(size - skipColumns.size());
-        }
-
-        // write columns
-        for (int i = 0; i < size; i++) {
-            if (skipColumns.contains(columnNames[i])) {
-                continue;
-            }
-
-            write(columnNames[i]);
-            if (i == timeColumnIndex) {
-                timeColumnValue.write(row.getValue(i), this);
+        try {
+            // begin writing
+            if (needAdditionalTimeColumn) {
+                // if the row doesn't have 'time' column, new 'time' column
+                // needs to be appended to it.
+                actualSize = size - skipColumns.size() + 1;
             } else {
-                row.getValue(i).write(this);
+                actualSize = size - skipColumns.size();
             }
-        }
+            writeBeginRow(actualSize);
 
-        if (needAdditionalTimeColumn) {
-            write(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-            TimeColumnValue tcValue = timeColumnValue;
-            tcValue.write(row.getValue(tcValue.getIndex()), this);
-        }
+            // write columns
+            for (int i = 0; i < size; i++) {
+                if (skipColumns.contains(columnNames[i])) {
+                    continue;
+                }
 
-        // end
-        writeEndRow();
+                write(columnNames[i]);
+                offset++;
+
+                if (i == timeColumnIndex) {
+                    timeColumnValue.write(row.getValue(i), this);
+                } else {
+                    row.getValue(i).write(this);
+                }
+                offset++;
+            }
+
+            if (needAdditionalTimeColumn) {
+                write(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
+                TimeColumnValue tcValue = timeColumnValue;
+                tcValue.write(row.getValue(tcValue.getIndex()), this);
+            }
+        } catch (PreparePartsException e) {
+            // fill nil values TODO FIXME we should roll back though,..
+            int rest = actualSize * 2 - offset;
+            for (int i = 0; i < rest; i++) {
+                writeNil();
+            }
+
+            throw e;
+        } finally {
+            // end
+            writeEndRow();
+        }
     }
 
     public abstract void writeBeginRow(int size) throws PreparePartsException;
