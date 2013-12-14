@@ -2,6 +2,8 @@ package com.treasure_data.td_import.upload;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
 
@@ -16,7 +18,10 @@ import com.treasure_data.td_import.upload.UploadTask;
 public class UploadProcessorTestUtil {
 
     public static UploadTask createTask(int i) {
-        return new UploadTask("sess" + i, new LocalFileSource("file" + i));
+        LocalFileSource s = new LocalFileSource("file" + i);
+        s = spy(s);
+        doReturn(1L).when(s).getSize();
+        return new UploadTask("sess" + i, s);
     }
 
     public static void executeTaskNormally(UploadProcessor proc,
