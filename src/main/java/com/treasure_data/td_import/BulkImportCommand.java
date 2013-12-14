@@ -20,6 +20,7 @@ package com.treasure_data.td_import;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.treasure_data.client.TreasureDataClient;
@@ -195,8 +196,7 @@ public final class BulkImportCommand extends BulkImport {
             try {
                 MultiThreadUploadProcessor.addFinishTask(uploadConf);
             } catch (Throwable t) {
-                LOG.severe("Error occurred During 'addFinishTask' method call");
-                LOG.throwing("Main", "addFinishTask", t);
+                LOG.log(Level.SEVERE, "error occurred during 'addFinishTask' method call", t);
             }
 
             hasNoPrepareError = hasNoPrepareError(results);
