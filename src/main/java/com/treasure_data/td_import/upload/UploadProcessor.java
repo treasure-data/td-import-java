@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.treasure_data.client.ClientException;
@@ -51,6 +52,14 @@ public class UploadProcessor extends UploadProcessorBase {
         TaskResult result = new TaskResult();
         result.task = task;
 
+        if (task.size == 0) {
+            String msg = String.format(
+                    "Uploaded file is 0 bytes or not exist: %s", task.fileName);
+            LOG.severe(msg);
+            result.error = new IOException(msg);
+            return result;
+        }
+
         try {
             System.out.println(String.format("Uploading %s (%d bytes)...", task.fileName, task.size));
             LOG.info(String.format("Uploading %s (%d bytes) to session %s as part %s",
@@ -65,10 +74,10 @@ public class UploadProcessor extends UploadProcessorBase {
                     "Uploaded file %s (%d bytes) to session %s as part %s (time: %d sec.)", 
                     task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
         } catch (ClientException e) {
-            LOG.severe(e.getMessage());
+            LOG.log(Level.SEVERE, e.getMessage(), e);
             result.error = new IOException(e);
         } catch (IOException e) {
-            LOG.severe(e.getMessage());
+            LOG.log(Level.SEVERE, e.getMessage(), e);
             result.error = e;
         }
         return result;
