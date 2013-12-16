@@ -22,14 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.treasure_data.td_import.model.ArrayColumnValue;
-import com.treasure_data.td_import.model.BooleanColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.DoubleColumnValue;
-import com.treasure_data.td_import.model.FloatColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
-import com.treasure_data.td_import.model.MapColumnValue;
 import com.treasure_data.td_import.model.Row;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
@@ -57,14 +53,10 @@ public interface FileWriter extends Closeable {
     void write(Map<Object, Object> v) throws PreparePartsException;
     void writeEndRow() throws PreparePartsException;
 
-    void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException;
     void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
     void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
     void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
     void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException;
-    void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException;
-    void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException;
-    void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException;
 
     void validate(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
     void validate(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;

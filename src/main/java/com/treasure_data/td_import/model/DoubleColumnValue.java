@@ -69,4 +69,13 @@ public class DoubleColumnValue extends AbstractColumnValue {
             with.write(v);
         }
     }
+
+    public void writeAsLong(FileWriter with) throws PreparePartsException{
+        if (isNullString) {
+            with.writeNil();
+            isNullString = false;
+        } else {
+            with.write((long) v);
+        }
+    }
 }

@@ -25,14 +25,10 @@ import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
-import com.treasure_data.td_import.model.ArrayColumnValue;
-import com.treasure_data.td_import.model.BooleanColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.DoubleColumnValue;
-import com.treasure_data.td_import.model.FloatColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
-import com.treasure_data.td_import.model.MapColumnValue;
 import com.treasure_data.td_import.model.Row;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
@@ -157,14 +153,67 @@ public abstract class AbstractFileWriter implements FileWriter {
     public abstract void write(List<Object> v) throws PreparePartsException;
     public abstract void write(Map<Object, Object> v) throws PreparePartsException;
 
-    public abstract void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException;
-    public abstract void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException;
+    public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
+        String timeString = v.getString();
+        long time = 0;
+
+        if (filter.getTimeFormat() != null) {
+            time = filter.getTimeFormat().getTime(timeString);
+        }
+
+        if (time == 0) {
+            try {
+                time = Long.parseLong(timeString);
+            } catch (Throwable t) {
+                ;
+            }
+        }
+
+        write(time);
+    }
+
+    public void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
+        v.write(this);
+    }
+
+    public void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
+        v.write(this);
+    }
+
+    public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        v.writeAsLong(this);
+    }
+
+    public void validate(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
+        String timeString = v.getString();
+        long time = 0;
+
+        if (filter.getTimeFormat() != null) {
+            time = filter.getTimeFormat().getTime(timeString);
+        }
+
+        if (time == 0) {
+            try {
+                time = Long.parseLong(timeString);
+            } catch (Throwable t) {
+                ;
+            }
+        }
+
+        filter.validateUnixtime(time);
+    }
+
+    public void validate(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getInt());
+    }
+
+    public void validate(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getLong());
+    }
+
+    public void validate(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime((long) v.getDouble());
+    }
 
     public abstract void writeEndRow() throws PreparePartsException;
 

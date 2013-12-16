@@ -25,15 +25,6 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
-import com.treasure_data.td_import.model.ArrayColumnValue;
-import com.treasure_data.td_import.model.BooleanColumnValue;
-import com.treasure_data.td_import.model.DoubleColumnValue;
-import com.treasure_data.td_import.model.FloatColumnValue;
-import com.treasure_data.td_import.model.IntColumnValue;
-import com.treasure_data.td_import.model.LongColumnValue;
-import com.treasure_data.td_import.model.MapColumnValue;
-import com.treasure_data.td_import.model.StringColumnValue;
-import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
@@ -93,61 +84,6 @@ public class JSONFileWriter extends AbstractFileWriter {
     }
 
     @Override
-    public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
-        String timeString = v.getString();
-        long time = 0;
-
-        if (filter.getTimeFormat() != null) {
-            time = filter.getTimeFormat().getTime(timeString);
-        }
-
-        if (time == 0) {
-            try {
-                time = Long.parseLong(timeString);
-            } catch (Throwable t) {
-                ;
-            }
-        }
-
-        write(time);
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, BooleanColumnValue v) throws PreparePartsException {
-        throw new PreparePartsException("not implemented method");
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
-        v.write(this);
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
-        v.write(this);
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
-        write((long) v.getDouble());
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, FloatColumnValue v) throws PreparePartsException {
-        throw new PreparePartsException("not implemented method");
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, ArrayColumnValue v) throws PreparePartsException {
-        throw new PreparePartsException("not implemented method");
-    }
-
-    @Override
-    public void write(TimeColumnValue filter, MapColumnValue v) throws PreparePartsException {
-        throw new PreparePartsException("not implemented method");
-    }
-
-    @Override
     public void writeNil() throws PreparePartsException {
         recordElements.add(null);
     }
@@ -160,41 +96,6 @@ public class JSONFileWriter extends AbstractFileWriter {
             Object val = recordElements.get(2 * i + 1);
             record.put(key, val);
         }
-    }
-
-    @Override
-    public void validate(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
-        String timeString = v.getString();
-        long time = 0;
-
-        if (filter.getTimeFormat() != null) {
-            time = filter.getTimeFormat().getTime(timeString);
-        }
-
-        if (time == 0) {
-            try {
-                time = Long.parseLong(timeString);
-            } catch (Throwable t) {
-                ;
-            }
-        }
-
-        filter.validateUnixtime(time);
-    }
-
-    @Override
-    public void validate(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
-        filter.validateUnixtime(v.getInt());
-    }
-
-    @Override
-    public void validate(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
-        filter.validateUnixtime(v.getLong());
-    }
-
-    @Override
-    public void validate(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
-        filter.validateUnixtime((long) v.getDouble());
     }
 
     public String toJSONString() {
