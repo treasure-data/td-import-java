@@ -42,4 +42,9 @@ public class MapColumnType extends AbstractColumnType {
             throws PreparePartsException {
         with.write(filter, (MapColumnValue) v);
     }
+
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+            throws PreparePartsException {
+        throw new UnsupportedOperationException("This method is not needed");
+    }
 }

@@ -42,4 +42,9 @@ public class ArrayColumnType extends AbstractColumnType {
             throws PreparePartsException {
         with.write(filter, (ArrayColumnValue) v);
     }
+
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+            throws PreparePartsException {
+        throw new UnsupportedOperationException("This method is not needed");
+    }
 }

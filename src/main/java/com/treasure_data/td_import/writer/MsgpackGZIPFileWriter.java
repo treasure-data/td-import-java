@@ -168,24 +168,12 @@ public class MsgpackGZIPFileWriter extends AbstractFileWriter {
     }
 
     @Override
-    public void writeUnixtime(int v) throws PreparePartsException {
-        validateUnixtime(v);
-        write(v);
-    }
-
-    @Override
     public void write(long v) throws PreparePartsException {
         try {
             packer.write(v);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
-    }
-
-    @Override
-    public void writeUnixtime(long v) throws PreparePartsException {
-        validateUnixtime(v);
-        write(v);
     }
 
     @Override
@@ -246,22 +234,22 @@ public class MsgpackGZIPFileWriter extends AbstractFileWriter {
             }
         }
 
-        writeUnixtime(time);
+        write(time);
     }
 
     @Override
     public void write(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
-        writeUnixtime(v.getInt());
+        write(v.getInt());
     }
 
     @Override
     public void write(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
-        writeUnixtime(v.getLong());
+        write(v.getLong());
     }
 
     @Override
     public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
-        writeUnixtime((long) v.getDouble());
+        write((long) v.getDouble());
     }
 
     @Override
@@ -298,6 +286,41 @@ public class MsgpackGZIPFileWriter extends AbstractFileWriter {
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
+        String timeString = v.getString();
+        long time = 0;
+
+        if (filter.getTimeFormat() != null) {
+            time = filter.getTimeFormat().getTime(timeString);
+        }
+
+        if (time == 0) {
+            try {
+                time = Long.parseLong(timeString);
+            } catch (Throwable t) {
+                ;
+            }
+        }
+
+        filter.validateUnixtime(time);
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getInt());
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getLong());
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime((long) v.getDouble());
     }
 
     @Override

@@ -17,6 +17,7 @@
 //
 package com.treasure_data.td_import.model;
 
+import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Strftime;
 import com.treasure_data.td_import.writer.FileWriter;
@@ -40,5 +41,20 @@ public class TimeColumnValue {
 
     public void write(ColumnValue v, FileWriter with) throws PreparePartsException {
         v.getColumnType().filterAndWrite(v, this, with);
+    }
+
+    public void validate(ColumnValue v, FileWriter with) throws PreparePartsException {
+        v.getColumnType().filterAndValidate(v, this, with);
+    }
+
+    public void validateUnixtime(int v) throws PreparePartsException {
+        validateUnixtime((long) v);
+    }
+
+    public void validateUnixtime(long v) throws PreparePartsException {
+        if (v > Configuration.MAX_LOG_TIME) {
+            throw new PreparePartsException(String.format(
+                    "values of 'time' column must be less than 9999/12/31: %d", v));
+        }
     }
 }

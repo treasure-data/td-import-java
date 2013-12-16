@@ -42,4 +42,9 @@ public class DoubleColumnType extends AbstractColumnType {
             throws PreparePartsException {
         with.write(filter, (DoubleColumnValue) v);
     }
+
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+            throws PreparePartsException {
+        with.validate(filter, (DoubleColumnValue) v);
+    }
 }

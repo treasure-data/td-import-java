@@ -21,7 +21,6 @@ import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
-import com.treasure_data.td_import.writer.FileWriter;
 
 @Ignore
 public class FileWriterTestUtil extends AbstractFileWriter {
@@ -56,17 +55,7 @@ public class FileWriterTestUtil extends AbstractFileWriter {
     }
 
     @Override
-    public void writeUnixtime(int v) throws PreparePartsException {
-        columnKeyValues.add(v);
-    }
-
-    @Override
     public void write(long v) throws PreparePartsException {
-        columnKeyValues.add(v);
-    }
-
-    @Override
-    public void writeUnixtime(long v) throws PreparePartsException {
         columnKeyValues.add(v);
     }
 
@@ -154,6 +143,42 @@ public class FileWriterTestUtil extends AbstractFileWriter {
             Object val = columnKeyValues.get(2 * i + 1);
             row.put(key, val);
         }
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
+        String timeString = v.getString();
+        long time = 0;
+
+        if (filter.getTimeFormat() != null) {
+            time = filter.getTimeFormat().getTime(timeString);
+        }
+
+        if (time == 0) {
+            try {
+                time = Long.parseLong(timeString);
+            } catch (Throwable t) {
+                throw new PreparePartsException(String.format(
+                        "'%s' could not be parsed as long type", timeString));
+            }
+        }
+
+        filter.validateUnixtime(time);
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getInt());
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getLong());
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime((long) v.getDouble());
     }
 
     @Override

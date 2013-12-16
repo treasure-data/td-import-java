@@ -44,4 +44,9 @@ public class IntColumnType extends AbstractColumnType {
             throws PreparePartsException {
         with.write(filter, (IntColumnValue) v);
     }
+
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+            throws PreparePartsException {
+        with.validate(filter, (IntColumnValue) v);
+    }
 }

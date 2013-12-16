@@ -16,6 +16,7 @@ import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
+import com.treasure_data.td_import.prepare.TaskResult;
 import com.treasure_data.td_import.reader.FileReader;
 import com.treasure_data.td_import.source.LocalFileSource;
 import com.treasure_data.td_import.writer.FileWriterTestUtil;
@@ -117,12 +118,17 @@ public class TestErrorRecordsHandling {
     }
 
     private void createCSVFileReader(Task task) throws Exception {
+        TaskResult result = new TaskResult();
+        result.task = task;
+
         writer = new FileWriterTestUtil(conf);
+        writer.configure(task, result);
         reader = PrepareConfiguration.Format.CSV.createFileReader(conf, writer);
         reader.configure(task);
         writer.setColumnNames(reader.getColumnNames());
         writer.setColumnTypes(reader.getColumnTypes());
         writer.setSkipColumns(reader.getSkipColumns());
+        writer.setTimeColumnValue(reader.getTimeColumnValue());
     }
 
     private void doRead() throws Exception {

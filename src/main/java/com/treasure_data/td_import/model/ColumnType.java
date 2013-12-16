@@ -43,6 +43,7 @@ public interface ColumnType {
     void convertType(String v, ColumnValue into) throws PreparePartsException;
     void setColumnValue(Object v, ColumnValue cv) throws PreparePartsException;
     void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with) throws PreparePartsException;
+    void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with) throws PreparePartsException;
 
     public static class Conv {
         private static final Map<Integer, ColumnType> REVERSE_INTS = new HashMap<Integer, ColumnType>();

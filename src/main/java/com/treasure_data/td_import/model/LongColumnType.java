@@ -44,4 +44,9 @@ public class LongColumnType extends AbstractColumnType {
             throws PreparePartsException {
         with.write(filter, (LongColumnValue) v);
     }
+
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+            throws PreparePartsException {
+        with.validate(filter, (LongColumnValue) v);
+    }
 }

@@ -37,6 +37,10 @@ public class TimeValueTimeColumnValue extends TimeColumnValue {
     }
 
     public void write(ColumnValue v, FileWriter with) throws PreparePartsException {
-        this.write(with); // v is ignore
+        write(with); // v is ignore
+    }
+
+    public void validate(ColumnValue v, FileWriter with) throws PreparePartsException {
+        validateUnixtime(timeValue);
     }
 }

@@ -60,6 +60,12 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
                 FileWriter with) throws PreparePartsException {
             ((MySQLTimestampAdaptor) with).write(filter, (TimestampColumnValue) v);
         }
+
+        @Override
+        public void filterAndValidate(ColumnValue v, TimeColumnValue filter,
+                FileWriter with) throws PreparePartsException {
+            ((MySQLTimestampAdaptor) with).validate(filter, (TimestampColumnValue) v);
+        }
     }
 
     public static class TimestampColumnValue extends AbstractColumnValue {

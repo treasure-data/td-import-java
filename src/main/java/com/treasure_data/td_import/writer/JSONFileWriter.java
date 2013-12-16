@@ -34,7 +34,6 @@ import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.MapColumnValue;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
@@ -69,22 +68,12 @@ public class JSONFileWriter extends AbstractFileWriter {
     }
 
     @Override
-    public void writeUnixtime(int v) throws PreparePartsException {
-        recordElements.add(v);
-    }
-
-    @Override
     public void write(int v) throws PreparePartsException {
         recordElements.add(v);
     }
 
     @Override
     public void write(long v) throws PreparePartsException {
-        recordElements.add(v);
-    }
-
-    @Override
-    public void writeUnixtime(long v) throws PreparePartsException {
         recordElements.add(v);
     }
 
@@ -102,6 +91,7 @@ public class JSONFileWriter extends AbstractFileWriter {
     public void write(Map<Object, Object> v) throws PreparePartsException {
         recordElements.add(v);
     }
+
     @Override
     public void write(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
         String timeString = v.getString();
@@ -139,7 +129,7 @@ public class JSONFileWriter extends AbstractFileWriter {
 
     @Override
     public void write(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
-        throw new PreparePartsException("not implemented method");
+        write((long) v.getDouble());
     }
 
     @Override
@@ -170,6 +160,41 @@ public class JSONFileWriter extends AbstractFileWriter {
             Object val = recordElements.get(2 * i + 1);
             record.put(key, val);
         }
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, StringColumnValue v) throws PreparePartsException {
+        String timeString = v.getString();
+        long time = 0;
+
+        if (filter.getTimeFormat() != null) {
+            time = filter.getTimeFormat().getTime(timeString);
+        }
+
+        if (time == 0) {
+            try {
+                time = Long.parseLong(timeString);
+            } catch (Throwable t) {
+                ;
+            }
+        }
+
+        filter.validateUnixtime(time);
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, IntColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getInt());
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, LongColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime(v.getLong());
+    }
+
+    @Override
+    public void validate(TimeColumnValue filter, DoubleColumnValue v) throws PreparePartsException {
+        filter.validateUnixtime((long) v.getDouble());
     }
 
     public String toJSONString() {

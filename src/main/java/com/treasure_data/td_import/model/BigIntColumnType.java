@@ -40,6 +40,11 @@ public class BigIntColumnType extends AbstractColumnType {
 
     public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
             throws PreparePartsException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("This method is not needed");
+    }
+
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+            throws PreparePartsException {
+        throw new UnsupportedOperationException("This method is not needed");
     }
 }

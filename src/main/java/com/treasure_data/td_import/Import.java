@@ -64,6 +64,7 @@ public abstract class Import {
             SourceDesc desc = SourceDesc.create(srcName);
             return Source.Factory.createSources(desc);
         } catch (Throwable t) {
+            // TODO FIXME #MN this error handling is no good. 
             LOG.info("create source as LocalFileSource: " + srcName);
             List<Source> srcs = new ArrayList<Source>();
             srcs.add(new LocalFileSource(srcName));

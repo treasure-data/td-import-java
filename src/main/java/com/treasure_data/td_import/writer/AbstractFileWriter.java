@@ -85,17 +85,6 @@ public abstract class AbstractFileWriter implements FileWriter {
         this.timeColumnValue = timeColumnValue;
     }
 
-    protected void validateUnixtime(int v) throws PreparePartsException {
-        validateUnixtime((long) v);
-    }
-
-    protected void validateUnixtime(long v) throws PreparePartsException {
-        if (v > Configuration.MAX_LOG_TIME) {
-            throw new PreparePartsException(String.format(
-                    "values of 'time' column must be less than 9999/12/31: %d", v));
-        }
-    }
-
     public void configure(Task task, TaskResult result)
             throws PreparePartsException {
         this.task = task;
@@ -107,8 +96,14 @@ public abstract class AbstractFileWriter implements FileWriter {
         int actualSize = 0;
         int offset = 0;
 
+        // validate time column
+        if (needAdditionalTimeColumn) {
+            timeColumnValue.validate(row.getValue(timeColumnValue.getIndex()), this);
+        } else {
+            timeColumnValue.validate(row.getValue(timeColumnIndex), this);
+        }
+
         try {
-            // begin writing
             if (needAdditionalTimeColumn) {
                 // if the row doesn't have 'time' column, new 'time' column
                 // needs to be appended to it.
@@ -116,9 +111,9 @@ public abstract class AbstractFileWriter implements FileWriter {
             } else {
                 actualSize = size - skipColumns.size();
             }
-            writeBeginRow(actualSize);
 
-            // write columns
+            // write columns as map data
+            writeBeginRow(actualSize);
             for (int i = 0; i < size; i++) {
                 if (skipColumns.contains(columnNames[i])) {
                     continue;
@@ -137,8 +132,7 @@ public abstract class AbstractFileWriter implements FileWriter {
 
             if (needAdditionalTimeColumn) {
                 write(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE);
-                TimeColumnValue tcValue = timeColumnValue;
-                tcValue.write(row.getValue(tcValue.getIndex()), this);
+                timeColumnValue.write(row.getValue(timeColumnValue.getIndex()), this);
             }
         } catch (PreparePartsException e) {
             // fill nil values TODO FIXME we should roll back though,..

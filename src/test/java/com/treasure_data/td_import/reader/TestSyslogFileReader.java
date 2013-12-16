@@ -52,6 +52,7 @@ public class TestSyslogFileReader {
         writer.setColumnNames(reader.getColumnNames());
         writer.setColumnTypes(reader.getColumnTypes());
         writer.setSkipColumns(reader.getSkipColumns());
+        writer.setTimeColumnValue(reader.getTimeColumnValue());
 
         try {
             reader.next();
