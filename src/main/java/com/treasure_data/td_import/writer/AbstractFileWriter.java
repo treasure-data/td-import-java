@@ -30,6 +30,7 @@ import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.Row;
+import com.treasure_data.td_import.model.SkippedTimeColumnValue;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
@@ -51,9 +52,12 @@ public abstract class AbstractFileWriter implements FileWriter {
     protected ColumnType[] columnTypes;
 
     protected Set<String> skipColumns;
+
     protected boolean needAdditionalTimeColumn = false;
     protected TimeColumnValue timeColumnValue;
     protected int timeColumnIndex = -1;
+
+    protected boolean hasPrimaryKey;
 
     protected AbstractFileWriter(PrepareConfiguration conf) {
         this.conf = conf;
@@ -76,7 +80,11 @@ public abstract class AbstractFileWriter implements FileWriter {
                 timeColumnValue instanceof AliasTimeColumnValue ||
                 timeColumnValue instanceof TimeValueTimeColumnValue;
         if (!needAdditionalTimeColumn) {
-            timeColumnIndex = ((TimeColumnValue) timeColumnValue).getIndex();
+            if (!(timeColumnValue instanceof SkippedTimeColumnValue)) {
+                timeColumnIndex = ((TimeColumnValue) timeColumnValue).getIndex();
+            } else {
+                hasPrimaryKey = true;
+            }
         }
         this.timeColumnValue = timeColumnValue;
     }
@@ -96,7 +104,9 @@ public abstract class AbstractFileWriter implements FileWriter {
         if (needAdditionalTimeColumn) {
             timeColumnValue.validate(row.getValue(timeColumnValue.getIndex()), this);
         } else {
-            timeColumnValue.validate(row.getValue(timeColumnIndex), this);
+            if (!hasPrimaryKey) {
+                timeColumnValue.validate(row.getValue(timeColumnIndex), this);
+            }
         }
 
         try {
@@ -118,7 +128,7 @@ public abstract class AbstractFileWriter implements FileWriter {
                 write(columnNames[i]);
                 offset++;
 
-                if (i == timeColumnIndex) {
+                if (!hasPrimaryKey && i == timeColumnIndex) {
                     timeColumnValue.write(row.getValue(i), this);
                 } else {
                     row.getValue(i).write(this);

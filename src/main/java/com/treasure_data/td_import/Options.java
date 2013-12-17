@@ -76,6 +76,12 @@ public class Options {
                 .withRequiredArg()
                 .describedAs("TIME")
                 .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_PRIMARY_KEY),
+                Configuration.BI_PREPARE_PARTS_PRIMARY_KEY_DESC)
+                .withRequiredArg()
+                .describedAs("NAME:TYPE")
+                .ofType(String.class);
         op.acceptsAll(Arrays.asList("o",
                 Configuration.BI_PREPARE_PARTS_OUTPUTDIR),
                 Configuration.BI_PREPARE_PARTS_OUTPUTDIR_DESC)

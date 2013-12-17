@@ -415,9 +415,15 @@ public class PrepareConfiguration extends Configuration {
     protected CompressionType compressionType;
     protected CharsetDecoder charsetDecoder;
     protected int numOfPrepareThreads;
+
     protected String aliasTimeColumn;
     protected long timeValue = -1;
     protected String timeFormat;
+
+    protected boolean hasPrimaryKey = false;
+    protected String primaryKey = null;
+    protected ColumnType primaryKeyType = null;
+
     protected String errorRecordOutputDirName;
     protected ErrorRecordsHandling errorRecordsHandling;
     protected boolean dryRun = false;
@@ -458,6 +464,9 @@ public class PrepareConfiguration extends Configuration {
 
         // encoding
         setEncoding(); // depends on error-records-handling
+
+        // primary key
+        setPrimaryKey();
 
         // alias time column
         setAliasTimeColumn();
@@ -683,8 +692,54 @@ public class PrepareConfiguration extends Configuration {
         return charsetDecoder;
     }
 
+    public void setPrimaryKey() {
+        if (!optionSet.has(BI_PREPARE_PARTS_PRIMARY_KEY)) {
+            return;
+        }
+
+        // if 'primary-key' option appears, ....
+        String pair = (String) optionSet.valueOf(BI_PREPARE_PARTS_PRIMARY_KEY);
+        if (pair.indexOf(":") <= 0) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid 'primary-key' option: %s", pair));
+        }
+
+        String[] nameAndType = pair.split(":");
+        if (nameAndType.length != 2) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid 'primary-key' option: %s", pair));
+        }
+
+        String name = nameAndType[0];
+        ColumnType type = ColumnType.Conv.fromString(nameAndType[1]);
+        if (type == null || !(type.equals(ColumnType.INT) || type.equals(ColumnType.STRING))) {
+            throw new IllegalArgumentException(String.format(
+                    "primary-key's type must be 'int' or 'string' only: %s", pair));
+        }
+
+        primaryKey = name;
+        primaryKeyType = type;
+        hasPrimaryKey = true;
+    }
+
+    public boolean hasPrimaryKey() {
+        return hasPrimaryKey;
+    }
+
+    public String getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public ColumnType getPrimaryKeyType() {
+        return primaryKeyType;
+    }
+
     public void setAliasTimeColumn() {
         if (optionSet.has(BI_PREPARE_PARTS_TIMECOLUMN)) {
+            if (hasPrimaryKey()) {
+                throw new IllegalArgumentException(
+                        "cannot specify both of 'time-column' and 'primary-key' options");
+            }
             aliasTimeColumn = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMECOLUMN);
         }
     }
@@ -694,11 +749,16 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setTimeValue() {
-        String v = null;
-        if (optionSet.has(BI_PREPARE_PARTS_TIMEVALUE)) {
-            v = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMEVALUE);
+        if (!optionSet.has(BI_PREPARE_PARTS_TIMEVALUE)) {
+            return;
         }
 
+        if (hasPrimaryKey()) {
+            throw new IllegalArgumentException(
+                    "cannot specify both of 'time-value' and 'primary-key' options");
+        }
+
+        String v = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMEVALUE);
         if (v != null) {
             try {
                 timeValue = Long.parseLong(v);
@@ -716,6 +776,10 @@ public class PrepareConfiguration extends Configuration {
 
     public void setTimeFormat() {
         if (optionSet.has(BI_PREPARE_PARTS_TIMEFORMAT)) {
+            if (hasPrimaryKey()) {
+                throw new IllegalArgumentException(
+                        "cannot specify both of 'time-format' and 'primary-key' options");
+            }
             timeFormat = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMEFORMAT);
         }
     }
@@ -929,10 +993,18 @@ public class PrepareConfiguration extends Configuration {
         } else {
             excludeColumns = optionSet.valuesOf(BI_PREPARE_PARTS_EXCLUDE_COLUMNS).toArray(new String[0]);
             for (String c : excludeColumns) {
-                if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                    throw new IllegalArgumentException(String.format(
-                            "'time' column cannot be included in '%s'",
-                            BI_PREPARE_PARTS_EXCLUDE_COLUMNS));
+                if (!hasPrimaryKey()) {
+                    if (c.equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+                        throw new IllegalArgumentException(String.format(
+                                "'time' column cannot be included in '%s'",
+                                BI_PREPARE_PARTS_EXCLUDE_COLUMNS));
+                    }
+                } else {
+                    if (c.equals(getPrimaryKey())) {
+                        throw new IllegalArgumentException(String.format(
+                                "'primary-key' column cannot be included in '%s'",
+                                BI_PREPARE_PARTS_EXCLUDE_COLUMNS));
+                    }
                 }
             }
         }
