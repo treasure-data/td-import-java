@@ -97,9 +97,11 @@ public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration>
         int primaryKeyIndex = -1;
 
         for (int i = 0; i < columnNames.length; i++) {
-            if (conf.hasPrimaryKey() && columnNames[i].equals(conf.getPrimaryKey())) {
-                primaryKeyIndex = i;
-                break;
+            if (conf.hasPrimaryKey()) {
+                if (columnNames[i].equals(conf.getPrimaryKey())) {
+                    primaryKeyIndex = i;
+                    break;
+                }
             } else {
                 if (columnNames[i].equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
                     timeColumnIndex = i;
