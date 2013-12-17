@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
+import com.treasure_data.td_import.model.SkippedTimeColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
@@ -93,25 +94,39 @@ public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration>
     public void setTimeColumnValue() throws PreparePartsException {
         int timeColumnIndex = -1;
         int aliasTimeColumnIndex = -1;
+        int primaryKeyIndex = -1;
+
         for (int i = 0; i < columnNames.length; i++) {
-            if (columnNames[i].equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
-                timeColumnIndex = i;
+            if (conf.hasPrimaryKey() && columnNames[i].equals(conf.getPrimaryKey())) {
+                primaryKeyIndex = i;
                 break;
-            }
-            if (aliasTimeColumnName != null && columnNames[i].equals(aliasTimeColumnName)) {
-                aliasTimeColumnIndex = i;
+            } else {
+                if (columnNames[i].equals(Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
+                    timeColumnIndex = i;
+                    break;
+                }
+                if (aliasTimeColumnName != null && columnNames[i].equals(aliasTimeColumnName)) {
+                    aliasTimeColumnIndex = i;
+                }
             }
         }
 
-        if (timeColumnIndex >= 0) {
-            timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat());
-        } else if (aliasTimeColumnIndex >= 0) {
-            timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat());
-        } else if (conf.getTimeValue() >= 0) {
-            timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+        if (conf.hasPrimaryKey()) {
+            if (primaryKeyIndex >= 0) {
+                timeColumnValue = new SkippedTimeColumnValue();
+            } else {
+                throw new PreparePartsException("the row doesn't have 'primary-key' column");
+            }
         } else {
-            // TODO should change message more user-friendly
-            throw new PreparePartsException("the row doesn't have time column");
+            if (timeColumnIndex >= 0) {
+                timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat());
+            } else if (aliasTimeColumnIndex >= 0) {
+                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat());
+            } else if (conf.getTimeValue() >= 0) {
+                timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+            } else {
+                throw new PreparePartsException("the row doesn't have 'time' column");
+            }
         }
     }
 
