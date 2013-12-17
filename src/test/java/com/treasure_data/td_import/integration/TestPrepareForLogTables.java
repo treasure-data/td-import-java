@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.treasure_data.td_import.prepare.PrepareConfiguration.Format;
 
-public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
+public class TestPrepareForLogTables extends PreparePartsIntegrationTestUtil {
     @Before
     public void createResources() throws Exception {
         super.createResources();
@@ -22,16 +22,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromCSVWithTimeColumn() throws Exception {
         setOptions(Format.CSV.format(), true, null, null, null, null, null);
         preparePartsFromCSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromCSVWithTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), true, null, null, null, "timestamp", null);
         preparePartsFromCSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromCSVWithTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), true, null, null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromCSVWithTimeColumn();
     }
@@ -40,16 +36,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromCSVWithAlasTimeColumn() throws Exception {
         setOptions(Format.CSV.format(), true, "timestamp", null, null, null, null);
         preparePartsFromCSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromCSVWithAlasTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), true, "timestamp", null, null, "timestamp", null);
         preparePartsFromCSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromCSVWithAlasTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), true, "timestamp", null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromCSVWithAlasTimeColumn();
     }
@@ -58,22 +50,16 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromCSVWithTimeFormat() throws Exception {
         setOptions(Format.CSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, null);
         preparePartsFromCSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromCSVWithTimeFormatAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, "timeformat", null);
         preparePartsFromCSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromCSVWithSuggestedTimeFormat() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), true, "suggested-timeformat", null, null, null, null);
         preparePartsFromCSVWithSuggestedTimeFormat();
-    }
 
-    @Test
-    public void writeFromCSVWithTimeFormatAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
         preparePartsFromCSVWithTimeFormat();
     }
@@ -82,16 +68,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromHeaderlessCSVWithTimeColumn() throws Exception {
         setOptions(Format.CSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, null);
         preparePartsFromHeaderlessCSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessCSVWithTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", "timestamp", null);
         preparePartsFromHeaderlessCSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessCSVWithTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, "string-value,int-value,double-value,time");
         preparePartsFromHeaderlessCSVWithTimeColumn();
     }
@@ -100,16 +82,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromHeaderlessCSVWithAlasTimeColumn() throws Exception {
         setOptions(Format.CSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, null);
         preparePartsFromHeaderlessCSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessCSVWithAlasTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", "timestamp", null);
         preparePartsFromHeaderlessCSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessCSVWithAlasTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, "string-value,int-value,double-value,time");
         preparePartsFromHeaderlessCSVWithAlasTimeColumn();
     }
@@ -118,22 +96,16 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromHeaderlessCSVWithTimeFormat() throws Exception {
         setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, null);
         preparePartsFromHeaderlessCSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromHeaderlessCSVWithTimeFormatAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", "timeformat", null);
         preparePartsFromHeaderlessCSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromHeaderlessCSVWithTimeFormatAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, "string-value,int-value,double-value,time");
         preparePartsFromHeaderlessCSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromHeaderlessCSVWithSuggestedTimeFormat() throws Exception {
+        refleshOptions();
         setOptions(Format.CSV.format(), false, "suggested-timeformat", null, "string-value,int-value,double-value,suggested-timeformat", null, null);
         preparePartsFromHeaderlessCSVWithSuggestedTimeFormat();
     }
@@ -142,16 +114,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromTSVWithTimeColumn() throws Exception {
         setOptions(Format.TSV.format(), true, null, null, null, null, null);
         preparePartsFromTSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromTSVWithTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), true, null, null, null, "timestamp", null);
         preparePartsFromTSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromTSVWithTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), true, null, null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromTSVWithTimeColumn();
     }
@@ -160,16 +128,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromTSVWithAlasTimeColumn() throws Exception {
         setOptions(Format.TSV.format(), true, "timestamp", null, null, null, null);
         preparePartsFromTSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromTSVWithAlasTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), true, "timestamp", null, null, "timestamp", null);
         preparePartsFromTSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromTSVWithAlasTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), true, "timestamp", null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromTSVWithAlasTimeColumn();
     }
@@ -178,16 +142,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromTSVWithTimeFormat() throws Exception {
         setOptions(Format.TSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, null);
         preparePartsFromTSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromTSVWithTimeFormatAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, "timeformat", null);
         preparePartsFromTSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromTSVWithTimeFormatAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
         preparePartsFromTSVWithTimeFormat();
     }
@@ -196,16 +156,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromHeaderlessTSVWithTimeColumn() throws Exception {
         setOptions(Format.TSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, null);
         preparePartsFromHeaderlessTSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessTSVWithTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", "timestamp", null);
         preparePartsFromHeaderlessTSVWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessTSVWithTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, "string-value,int-value,double-value,time");
         preparePartsFromHeaderlessTSVWithTimeColumn();
     }
@@ -214,16 +170,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromHeaderlessTSVWithAlasTimeColumn() throws Exception {
         setOptions(Format.TSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, null);
         preparePartsFromHeaderlessTSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessTSVWithAlasTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", "timestamp", null);
         preparePartsFromHeaderlessTSVWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromHeaderlessTSVWithAlasTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, "string-value,int-value,double-value,time");
         preparePartsFromHeaderlessTSVWithAlasTimeColumn();
     }
@@ -232,16 +184,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromHeaderlessTSVWithTimeFormat() throws Exception {
         setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, null);
         preparePartsFromHeaderlessTSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromHeaderlessTSVWithTimeFormatAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", "timeformat", null);
         preparePartsFromHeaderlessTSVWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromHeaderlessTSVWithTimeFormatAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, "string-value,int-value,double-value,time");
         preparePartsFromHeaderlessTSVWithTimeFormat();
     }
@@ -262,16 +210,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromJSONWithTimeColumn() throws Exception {
         setOptions(Format.JSON.format(), false, null, null, null, null, null);
         preparePartsFromJSONWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromJSONWithTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.JSON.format(), false, null, null, null, "timestamp", null);
         preparePartsFromJSONWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromJSONWithTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.JSON.format(), false, null, null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromJSONWithTimeColumn();
     }
@@ -280,16 +224,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromJSONWithAlasTimeColumn() throws Exception {
         setOptions(Format.JSON.format(), false, "timestamp", null, null, null, null);
         preparePartsFromJSONWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromJSONWithAlasTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.JSON.format(), false, "timestamp", null, null, "timestamp", null);
         preparePartsFromJSONWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromJSONWithAlasTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.JSON.format(), false, "timestamp", null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromJSONWithAlasTimeColumn();
     }
@@ -298,16 +238,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromJSONWithTimeFormat() throws Exception {
         setOptions(Format.JSON.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, null);
         preparePartsFromJSONWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromJSONWithTimeFormatAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.JSON.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, "timeformat", null);
         preparePartsFromJSONWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromJSONWithTimeFormatAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.JSON.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
         preparePartsFromJSONWithTimeFormat();
     }
@@ -316,16 +252,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromMessagePackWithTimeColumn() throws Exception {
         setOptions(Format.MSGPACK.format(), false, null, null, null, null, null);
         preparePartsFromMessagePackWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromMessagePackWithTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.MSGPACK.format(), false, null, null, null, "timestamp", null);
         preparePartsFromMessagePackWithTimeColumn();
-    }
 
-    @Test
-    public void writeFromMessagePackWithTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.MSGPACK.format(), false, null, null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromMessagePackWithTimeColumn();
     }
@@ -334,16 +266,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromMessagePackWithAlasTimeColumn() throws Exception {
         setOptions(Format.MSGPACK.format(), false, "timestamp", null, null, null, null);
         preparePartsFromMessagePackWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromMessagePackWithAlasTimeColumnAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.MSGPACK.format(), false, "timestamp", null, null, "timestamp", null);
         preparePartsFromMessagePackWithAlasTimeColumn();
-    }
 
-    @Test
-    public void writeFromMessagePackWithAlasTimeColumnAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.MSGPACK.format(), false, "timestamp", null, null, null, "string-value,int-value,double-value,time");
         preparePartsFromMessagePackWithAlasTimeColumn();
     }
@@ -352,16 +280,12 @@ public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
     public void writeFromMessagePackWithTimeFormat() throws Exception {
         setOptions(Format.MSGPACK.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, null);
         preparePartsFromMessagePackWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromMessagePackWithTimeFormatAndExcludeColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.MSGPACK.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, "timeformat", null);
         preparePartsFromMessagePackWithTimeFormat();
-    }
 
-    @Test
-    public void writeFromMessagePackWithTimeFormatAndOnlyColumns() throws Exception {
+        refleshOptions();
         setOptions(Format.MSGPACK.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
         preparePartsFromMessagePackWithTimeFormat();
     }
