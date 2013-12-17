@@ -146,6 +146,8 @@ public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration>
         } catch (PreparePartsException e) {
             writer.incrementErrorRowNum();
 
+            // the untokenized raw row is written to error rows file
+            writeErrorRecord(getCurrentRow());
             // the row data should be written to error rows file
             String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRow());
             LOG.log(Level.WARNING, msg, e);
