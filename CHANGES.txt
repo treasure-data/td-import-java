@@ -1,3 +1,5 @@
+Release 0.4.6 - 20XX/XX/XX
+
 Release 0.4.5 - 2013/12/17
   NEW FEATURES
     Adds feature for outputing error records. Users can specify the directory as 'error-records-output'.
