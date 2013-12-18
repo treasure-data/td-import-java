@@ -33,7 +33,7 @@ import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
-import com.treasure_data.td_import.model.Row;
+import com.treasure_data.td_import.model.Record;
 import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
@@ -51,7 +51,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
     protected T conf;
     protected RecordWriter writer;
-    protected Row convertedRow;
+    protected Record convertedRecord;
 
     //protected String name;
     protected Source source;
@@ -239,7 +239,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         for (int i = 0; i < columnTypes.length; i++) {
             values[i] = columnTypes[i].createColumnValue();
         }
-        convertedRow = new Row(values);
+        convertedRecord = new Record(values);
     }
 
     public boolean next() throws PreparePartsException {
@@ -253,7 +253,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
             convertTypesOfColumns();
 
             // write each column value
-            writer.next(convertedRow);
+            writer.next(convertedRecord);
 
             writer.incrementRowNum();
         } catch (IOException e) {

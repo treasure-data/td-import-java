@@ -438,7 +438,7 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                 // convert each column in row
                 convertTypesOfColumns();
                 // write each column value
-                w.next(convertedRow);
+                w.next(convertedRecord);
                 String ret = w.toJSONString();
                 String msg = null;
                 if (ret != null) {
@@ -497,7 +497,7 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
         for (int i = 0; i < this.row.size(); i++) {
-            columnTypes[i].convertType(this.row.get(i), convertedRow.getValue(i));
+            columnTypes[i].convertType(this.row.get(i), convertedRecord.getValue(i));
         }
     }
 

@@ -31,13 +31,13 @@ import org.msgpack.unpacker.UnpackerIterator;
 
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
-import com.treasure_data.td_import.model.Row;
+import com.treasure_data.td_import.model.Record;
 import com.treasure_data.td_import.prepare.MessagePackPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.RecordWriter;
 
-public class MessagePackRecordReader extends DynamicColumnsFileReader<MessagePackPrepareConfiguration> {
+public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<MessagePackPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(MessagePackRecordReader.class.getName());
 
     protected MessagePack msgpack;
@@ -128,7 +128,7 @@ public class MessagePackRecordReader extends DynamicColumnsFileReader<MessagePac
             columnTypes[i].setColumnValue(values[i], columnValues[i]);
         }
 
-        convertedRow = new Row(columnValues);
+        convertedRecord = new Record(columnValues);
     }
 
     @Override

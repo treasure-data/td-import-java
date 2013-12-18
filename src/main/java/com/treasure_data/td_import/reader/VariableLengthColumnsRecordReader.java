@@ -34,12 +34,12 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.RecordWriter;
 
-public abstract class DynamicColumnsFileReader<T extends PrepareConfiguration> extends AbstractRecordReader<T> {
-    private static final Logger LOG = Logger.getLogger(DynamicColumnsFileReader.class.getName());
+public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfiguration> extends AbstractRecordReader<T> {
+    private static final Logger LOG = Logger.getLogger(VariableLengthColumnsRecordReader.class.getName());
 
     protected String aliasTimeColumnName = null;
 
-    public DynamicColumnsFileReader(T conf, RecordWriter writer) {
+    public VariableLengthColumnsRecordReader(T conf, RecordWriter writer) {
         super(conf, writer);
     }
 
@@ -135,7 +135,7 @@ public abstract class DynamicColumnsFileReader<T extends PrepareConfiguration> e
             convertTypesOfColumns();
 
             // write each column value
-            writer.next(convertedRow);
+            writer.next(convertedRecord);
 
             writer.incrementRowNum();
         } catch (IOException e) {

@@ -29,7 +29,7 @@ import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
-import com.treasure_data.td_import.model.Row;
+import com.treasure_data.td_import.model.Record;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
@@ -87,7 +87,7 @@ public abstract class AbstractRecordWriter implements RecordWriter {
         this.result = result;
     }
 
-    public void next(Row row) throws PreparePartsException {
+    public void next(Record row) throws PreparePartsException {
         int size = row.getValues().length;
         int actualSize = 0;
         int offset = 0;

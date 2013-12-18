@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.treasure_data.td_import.prepare.PrepareConfiguration.Format;
 
-public class TestPrepareParts extends PreparePartsIntegrationTestUtil {
+public class TestPrepareParts extends PrepareIntegrationTestUtil {
     @Before
     public void createResources() throws Exception {
         super.createResources();

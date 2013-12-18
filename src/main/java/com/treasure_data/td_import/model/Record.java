@@ -17,10 +17,10 @@
 //
 package com.treasure_data.td_import.model;
 
-public class Row {
+public class Record {
     private ColumnValue[] values;
 
-    public Row(ColumnValue[] values) {
+    public Record(ColumnValue[] values) {
         this.values = values;
     }
 

@@ -210,7 +210,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
                 // convert each column in row
                 convertTypesOfColumns();
                 // write each column value
-                w.next(convertedRow);
+                w.next(convertedRecord);
                 String ret = w.toJSONString();
                 String msg = null;
                 if (ret != null) {
@@ -296,7 +296,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
         for (int i = 0; i < row.size(); i++) {
-            columnTypes[i].setColumnValue(row.get(i), convertedRow.getValue(i));
+            columnTypes[i].setColumnValue(row.get(i), convertedRecord.getValue(i));
         }
     }
 

@@ -29,14 +29,14 @@ import org.json.simple.parser.ParseException;
 
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
-import com.treasure_data.td_import.model.Row;
+import com.treasure_data.td_import.model.Record;
 import com.treasure_data.td_import.prepare.JSONPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.RecordWriter;
 import com.treasure_data.td_import.writer.JSONRecordWriter;
 
-public class JSONRecordReader extends DynamicColumnsFileReader<JSONPrepareConfiguration> {
+public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(JSONRecordReader.class.getName());
 
     protected BufferedReader reader;
@@ -111,7 +111,7 @@ public class JSONRecordReader extends DynamicColumnsFileReader<JSONPrepareConfig
                 // convert each column in row
                 convertTypesOfColumns();
                 // write each column value
-                w.next(convertedRow);
+                w.next(convertedRecord);
                 String ret = w.toJSONString();
                 String msg = null;
                 if (ret != null) {
@@ -185,7 +185,7 @@ public class JSONRecordReader extends DynamicColumnsFileReader<JSONPrepareConfig
             columnTypes[i].setColumnValue(row.get(columnNames[i]), columnValues[i]);
         }
 
-        convertedRow = new Row(columnValues);
+        convertedRecord = new Record(columnValues);
     }
 
     @Override

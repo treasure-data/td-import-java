@@ -26,7 +26,7 @@ import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.DoubleColumnValue;
 import com.treasure_data.td_import.model.IntColumnValue;
 import com.treasure_data.td_import.model.LongColumnValue;
-import com.treasure_data.td_import.model.Row;
+import com.treasure_data.td_import.model.Record;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.prepare.PreparePartsException;
@@ -41,7 +41,7 @@ public interface RecordWriter extends Closeable {
     void setTimeColumnValue(TimeColumnValue timeColumnValue);
 
     void configure(Task task, TaskResult result) throws PreparePartsException;
-    void next(Row row) throws PreparePartsException;
+    void next(Record row) throws PreparePartsException;
 
     void writeBeginRow(int size) throws PreparePartsException;
     void writeNil() throws PreparePartsException;
