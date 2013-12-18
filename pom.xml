@@ -232,25 +232,6 @@
 
       </plugin>
 
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>${maven-antrun-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>echo</id>
-            <phase>package</phase>
-            <configuration>
-              <tasks>
-                <copy file="target/td-import-${project.version}-jar-with-dependencies.jar" tofile="src/test/resources/java/td-import.jar" />
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- include jars for msgpack -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
