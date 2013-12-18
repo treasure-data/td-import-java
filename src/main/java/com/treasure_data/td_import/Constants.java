@@ -60,6 +60,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)\n" +
             "    -t, --time-column NAME           name of the time column\n" +
             "    --time-value TIME                long value of the time column\n" +
+            "    --primary-key NAME:TYPE          pair of name and type of primary key declared in your item table\n" +
             "    --prepare-parallel NUM           prepare in parallel (default: 2; max 8)\n" +
             "    --only-columns NAME,NAME,...     only columns\n" +
             "    --exclude-columns NAME,NAME,...  exclude columns\n" +
@@ -267,6 +268,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_ONLY_COLUMNS = "only-columns";
     String BI_PREPARE_ONLY_COLUMNS_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ONLY_COLUMNS;
     String BI_PREPARE_PARTS_ONLY_COLUMNS_DESC = "only columns";
+
+    // primary-key
+    String BI_PREPARE_PARTS_PRIMARY_KEY = "primary-key";
+    String BI_PREPARE_PARTS_PRIMARY_KEY_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_PRIMARY_KEY;
+    String BI_PREPARE_PARTS_PRIMARY_KEY_DESC = "pair of name and type of primary key declared in your item table";
 
     // time-column NAME; default='time'
     String BI_PREPARE_PARTS_TIMECOLUMN = "time-column";

@@ -91,14 +91,8 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
             // time column is ignore.
             int aliasTimeColumnIndex = getAliasTimeColumnIndex(timeColumnIndex);
 
-            // if 'time' and the alias columns don't exist, ...
-            if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
-                if (conf.getTimeValue() >= 0) {
-                } else {
-                    throw new PreparePartsException(
-                            "Time column not found. --time-column or --time-value option is required");
-                }
-            }
+            // if 'time' and the alias columns or 'primary-key' column don't exist, ...
+            validateTimeAndPrimaryColumn(timeColumnIndex, aliasTimeColumnIndex);
 
             boolean isFirstRow = true;
             List<String> firstRow = new ArrayList<String>();
@@ -165,6 +159,7 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
                 w.setColumnTypes(getColumnTypes());
                 w.setSkipColumns(getSkipColumns());
                 w.setTimeColumnValue(getTimeColumnValue());
+
                 this.row.addAll(firstRow);
 
                 // convert each column in row
