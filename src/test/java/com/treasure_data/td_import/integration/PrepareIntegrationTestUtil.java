@@ -53,59 +53,96 @@ public class PrepareIntegrationTestUtil {
     public void destroyResources() throws Exception {
     }
 
-    public void setOptions(String format, boolean columnHeader,
-            String aliasTimeColumn, String timeFormat, String columnNames, String exclude, String only) {
+    public void setItemTableOptions(String format, boolean columnHeader,
+            String primaryKey, String columnNames, String exclude, String only) {
         // format
         if (format != null && !format.isEmpty()) {
             opts.add("--format");
             opts.add(format);
-            //props.setProperty(Configuration.BI_PREPARE_PARTS_FORMAT, format);
         }
 
         // output dir
         opts.add("--output");
         opts.add(OUTPUT_DIR);
-        //props.setProperty(Configuration.BI_PREPARE_PARTS_OUTPUTDIR, OUTPUT_DIR);
 
         // column header
         if (columnHeader) {
             opts.add("--column-header");
-            //props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNHEADER, columnHeader);
         }
 
-        // alias time column
-        if (aliasTimeColumn != null && !aliasTimeColumn.isEmpty()) {
-            opts.add("--time-column");
-            opts.add(aliasTimeColumn);
-            //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMECOLUMN, aliasTimeColumn);
-        }
-
-        // time format
-        if (timeFormat != null && !timeFormat.isEmpty()) {
-            opts.add("--time-format");
-            opts.add(timeFormat);
-            //props.setProperty(Configuration.BI_PREPARE_PARTS_TIMEFORMAT, timeFormat);
-        }
+        // primary-key
+        opts.add("--primary-key");
+        opts.add(primaryKey);
 
         // column names
         if (columnNames != null && !columnNames.isEmpty()) {
             opts.add("--columns");
             opts.add(columnNames);
-            //props.setProperty(Configuration.BI_PREPARE_PARTS_COLUMNS, columnNames);
         }
 
         // exclude columns
         if (exclude != null && !exclude.isEmpty()) {
             opts.add("--exclude-columns");
             opts.add(exclude);
-            //props.setProperty(Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS, exclude);
         }
 
         // only columns
         if (only != null && !only.isEmpty()) {
             opts.add("--only-columns");
             opts.add(only);
-            //props.setProperty(Configuration.BI_PREPARE_PARTS_ONLY_COLUMNS, only);
+        }
+    }
+
+    public void refleshOptions() {
+        opts.clear();
+        props.clear();
+        args.clear();
+    }
+    public void setOptions(String format, boolean columnHeader,
+            String aliasTimeColumn, String timeFormat, String columnNames, String exclude, String only) {
+        // format
+        if (format != null && !format.isEmpty()) {
+            opts.add("--format");
+            opts.add(format);
+        }
+
+        // output dir
+        opts.add("--output");
+        opts.add(OUTPUT_DIR);
+
+        // column header
+        if (columnHeader) {
+            opts.add("--column-header");
+        }
+
+        // alias time column
+        if (aliasTimeColumn != null && !aliasTimeColumn.isEmpty()) {
+            opts.add("--time-column");
+            opts.add(aliasTimeColumn);
+        }
+
+        // time format
+        if (timeFormat != null && !timeFormat.isEmpty()) {
+            opts.add("--time-format");
+            opts.add(timeFormat);
+        }
+
+        // column names
+        if (columnNames != null && !columnNames.isEmpty()) {
+            opts.add("--columns");
+            opts.add(columnNames);
+        }
+
+        // exclude columns
+        if (exclude != null && !exclude.isEmpty()) {
+            opts.add("--exclude-columns");
+            opts.add(exclude);
+        }
+
+        // only columns
+        if (only != null && !only.isEmpty()) {
+            opts.add("--only-columns");
+            opts.add(only);
         }
     }
 

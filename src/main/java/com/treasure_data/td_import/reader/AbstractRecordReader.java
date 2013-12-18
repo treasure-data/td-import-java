@@ -34,6 +34,7 @@ import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
 import com.treasure_data.td_import.model.Record;
+import com.treasure_data.td_import.model.SkippedTimeColumnValue;
 import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
@@ -53,11 +54,13 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
     protected RecordWriter writer;
     protected Record convertedRecord;
 
-    //protected String name;
     protected Source source;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected Set<String> skipColumns = new HashSet<String>();
+
+    protected String primaryKey;
+    protected ColumnType primaryKeyType;
     protected TimeColumnValue timeColumnValue;
 
     protected long lineNum = 0;
@@ -148,6 +151,11 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
     public int getTimeColumnIndex() {
         int index = -1;
+
+        if (conf.hasPrimaryKey()) {
+            return index;
+        }
+
         for (int i = 0; i < columnNames.length; i++) {
             if (columnNames[i].equals(
                     Configuration.BI_PREPARE_PARTS_TIMECOLUMN_DEFAULTVALUE)) {
@@ -160,6 +168,11 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
     public int getAliasTimeColumnIndex(int timeColumnIndex) {
         int index = -1;
+
+        if (conf.hasPrimaryKey()) {
+            return index;
+        }
+
         if (timeColumnIndex < 0 && conf.getAliasTimeColumn() != null) {
             for (int i = 0; i < columnNames.length; i++) {
                 if (columnNames[i].equals(conf.getAliasTimeColumn())) {
@@ -171,10 +184,43 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         return index;
     }
 
+    public void validateTimeAndPrimaryColumn(int timeColumnIndex, int aliasTimeColumnIndex)
+            throws PreparePartsException {
+        // check primary key
+        if (conf.hasPrimaryKey()) {
+            boolean has = false;
+            for (String cname : columnNames) {
+                if (cname.equals(conf.getPrimaryKey())) {
+                    has = true;
+                    break;
+                }
+            }
+            if (!has) {
+                throw new PreparePartsException(
+                        "Primary key column not found. Please check your data");
+            }
+            return;
+        }
+
+        // check time and the alias column
+        if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
+            if (conf.getTimeValue() >= 0) {
+            } else {
+                throw new PreparePartsException(
+                        "Time column not found. --time-column or --time-value option is required");
+            }
+        }
+    }
+
     public void initializeColumnTypes(TimeColumnSampling[] sampleColumnValues) {
         if (columnTypes == null || columnTypes.length == 0) {
             columnTypes = new ColumnType[columnNames.length];
             for (int i = 0; i < columnTypes.length; i++) {
+                if (conf.hasPrimaryKey() && conf.getPrimaryKey().equals(columnNames[i])) {
+                    columnTypes[i] = conf.getPrimaryKeyType();
+                    continue;
+                }
+
                 if (conf.getColumnTypeMap().containsKey(columnNames[i])) {
                     columnTypes[i] = conf.getColumnTypeMap().get(columnNames[i]);
                     continue;
@@ -200,7 +246,10 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         int index = -1;
         boolean isAlias = false;
 
-        if (timeColumnIndex >= 0) {
+        if (conf.hasPrimaryKey()) {
+            timeColumnValue = new SkippedTimeColumnValue();
+            return;
+        } else if (timeColumnIndex >= 0) {
             index = timeColumnIndex;
             isAlias = false;
         } else if (aliasTimeColumnIndex >= 0) {
