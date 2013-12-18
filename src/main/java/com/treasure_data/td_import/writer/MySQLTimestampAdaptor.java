@@ -21,7 +21,7 @@ import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 
-public interface MySQLTimestampAdaptor extends FileWriter {
+public interface MySQLTimestampAdaptor extends RecordWriter {
 
     void write(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v) throws PreparePartsException;
     void validate(TimeColumnValue filter, MySQLPrepareConfiguration.TimestampColumnValue v) throws PreparePartsException;

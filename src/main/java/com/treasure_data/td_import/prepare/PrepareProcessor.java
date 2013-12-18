@@ -22,8 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.reader.FileReader;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.reader.RecordReader;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class PrepareProcessor {
 
@@ -45,7 +45,7 @@ public class PrepareProcessor {
         result.task = task;
 
         // create and initialize file writer
-        FileWriter w = null;
+        RecordWriter w = null;
         try {
             w = conf.getOutputFormat().createFileWriter(conf);
             w.configure(task, result);
@@ -56,7 +56,7 @@ public class PrepareProcessor {
         }
 
         // create and initialize file reader
-        FileReader r = null;
+        RecordReader r = null;
         try {
             r = conf.getFormat().createFileReader(conf, w);
             r.configure(task);

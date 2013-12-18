@@ -22,10 +22,10 @@ import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 
-public class MySQLTimestampAdaptedJSONFileWriter extends JSONFileWriter
-        implements MySQLTimestampAdaptor {
+public class MySQLTimestampAdaptedMsgpackGZIPRecordWriter
+        extends MsgpackGZIPRecordWriter implements MySQLTimestampAdaptor {
 
-    public MySQLTimestampAdaptedJSONFileWriter(PrepareConfiguration conf) {
+    public MySQLTimestampAdaptedMsgpackGZIPRecordWriter(PrepareConfiguration conf) {
         super(conf);
     }
 

@@ -12,8 +12,8 @@ import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.reader.FileReader;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.reader.RecordReader;
+import com.treasure_data.td_import.writer.RecordWriter;
 import com.treasure_data.td_import.writer.FileWriterTestUtil;
 
 @Ignore
@@ -24,8 +24,8 @@ public class FileReaderTestUtil<T extends PrepareConfiguration> {
     protected Options options;
     protected T conf;
 
-    protected FileReader<T> reader;
-    protected FileWriter writer;
+    protected RecordReader<T> reader;
+    protected RecordWriter writer;
 
     protected Task task;
     protected String[] columnNames;

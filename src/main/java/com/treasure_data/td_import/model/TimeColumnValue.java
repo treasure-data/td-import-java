@@ -20,7 +20,7 @@ package com.treasure_data.td_import.model;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Strftime;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class TimeColumnValue {
     protected int index;
@@ -39,11 +39,11 @@ public class TimeColumnValue {
         return timeFormat;
     }
 
-    public void write(ColumnValue v, FileWriter with) throws PreparePartsException {
+    public void write(ColumnValue v, RecordWriter with) throws PreparePartsException {
         v.getColumnType().filterAndWrite(v, this, with);
     }
 
-    public void validate(ColumnValue v, FileWriter with) throws PreparePartsException {
+    public void validate(ColumnValue v, RecordWriter with) throws PreparePartsException {
         v.getColumnType().filterAndValidate(v, this, with);
     }
 

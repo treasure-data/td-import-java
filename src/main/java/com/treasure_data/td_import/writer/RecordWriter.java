@@ -33,7 +33,7 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
-public interface FileWriter extends Closeable {
+public interface RecordWriter extends Closeable {
 
     void setColumnNames(String[] columnNames);
     void setColumnTypes(ColumnType[] columnTypes);

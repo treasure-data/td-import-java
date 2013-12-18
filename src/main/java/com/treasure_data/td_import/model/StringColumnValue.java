@@ -18,7 +18,7 @@
 package com.treasure_data.td_import.model;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class StringColumnValue extends AbstractColumnValue {
     private String v;
@@ -41,7 +41,7 @@ public class StringColumnValue extends AbstractColumnValue {
     }
 
     @Override
-    public void write(FileWriter with) throws PreparePartsException {
+    public void write(RecordWriter with) throws PreparePartsException {
         if (v != null) {
             with.write(v);
         } else {

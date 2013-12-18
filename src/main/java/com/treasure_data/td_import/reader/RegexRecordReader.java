@@ -26,21 +26,15 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.treasure_data.td_import.Configuration;
-import com.treasure_data.td_import.model.AliasTimeColumnValue;
-import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.TimeColumnSampling;
-import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.RegexPrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
-import com.treasure_data.td_import.writer.JSONFileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
+import com.treasure_data.td_import.writer.JSONRecordWriter;
 
-public class RegexFileReader<T extends RegexPrepareConfiguration> extends FixnumColumnsFileReader<T> {
-    private static final Logger LOG = Logger.getLogger(RegexFileReader.class.getName());
+public class RegexRecordReader<T extends RegexPrepareConfiguration> extends FixedColumnsRecordReader<T> {
+    private static final Logger LOG = Logger.getLogger(RegexRecordReader.class.getName());
 
     protected BufferedReader reader;
     protected Pattern pat;
@@ -48,7 +42,7 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
     protected String line;
     protected List<String> row = new ArrayList<String>();
 
-    public RegexFileReader(T conf, FileWriter writer)
+    public RegexRecordReader(T conf, RecordWriter writer)
             throws PreparePartsException {
         super(conf, writer);
     }
@@ -158,9 +152,9 @@ public class RegexFileReader<T extends RegexPrepareConfiguration> extends Fixnum
             setSkipColumns();
 
             // print first sample row
-            JSONFileWriter w = null;
+            JSONRecordWriter w = null;
             try {
-                w = new JSONFileWriter(conf);
+                w = new JSONRecordWriter(conf);
                 w.setColumnNames(getColumnNames());
                 w.setColumnTypes(getColumnTypes());
                 w.setSkipColumns(getSkipColumns());

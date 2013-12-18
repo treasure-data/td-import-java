@@ -18,7 +18,7 @@ import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.reader.FileReader;
+import com.treasure_data.td_import.reader.RecordReader;
 import com.treasure_data.td_import.source.LocalFileSource;
 
 public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguration> {
@@ -277,7 +277,7 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
     @Override
     public void createFileReader() throws Exception {
         super.createFileReader();
-        reader = (FileReader<CSVPrepareConfiguration>)
+        reader = (RecordReader<CSVPrepareConfiguration>)
                 conf.getFormat().createFileReader(conf, writer);
     }
 

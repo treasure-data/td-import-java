@@ -19,7 +19,6 @@ package com.treasure_data.td_import.prepare;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -39,18 +38,18 @@ import joptsimple.OptionSet;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.ColumnType;
-import com.treasure_data.td_import.reader.ApacheFileReader;
-import com.treasure_data.td_import.reader.CSVFileReader;
-import com.treasure_data.td_import.reader.FileReader;
-import com.treasure_data.td_import.reader.JSONFileReader;
-import com.treasure_data.td_import.reader.MessagePackFileReader;
+import com.treasure_data.td_import.reader.ApacheRecordReader;
+import com.treasure_data.td_import.reader.CSVRecordReader;
+import com.treasure_data.td_import.reader.RecordReader;
+import com.treasure_data.td_import.reader.JSONRecordReader;
+import com.treasure_data.td_import.reader.MessagePackRecordReader;
 import com.treasure_data.td_import.reader.MySQLTableReader;
-import com.treasure_data.td_import.reader.RegexFileReader;
-import com.treasure_data.td_import.reader.SyslogFileReader;
+import com.treasure_data.td_import.reader.RegexRecordReader;
+import com.treasure_data.td_import.reader.SyslogRecordReader;
 import com.treasure_data.td_import.source.Source;
-import com.treasure_data.td_import.writer.FileWriter;
-import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
-import com.treasure_data.td_import.writer.MySQLTimestampAdaptedMsgpackGZIPFileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
+import com.treasure_data.td_import.writer.MsgpackGZIPRecordWriter;
+import com.treasure_data.td_import.writer.MySQLTimestampAdaptedMsgpackGZIPRecordWriter;
 
 public class PrepareConfiguration extends Configuration {
 
@@ -98,10 +97,10 @@ public class PrepareConfiguration extends Configuration {
     public static enum Format {
         CSV("csv") {
             @Override
-            public FileReader<CSVPrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<CSVPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
-                return new CSVFileReader((CSVPrepareConfiguration) conf, writer);
+                return new CSVRecordReader((CSVPrepareConfiguration) conf, writer);
             }
 
             @Override
@@ -111,10 +110,10 @@ public class PrepareConfiguration extends Configuration {
         },
         TSV("tsv") {
             @Override
-            public FileReader<CSVPrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<CSVPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
-                return new CSVFileReader((CSVPrepareConfiguration) conf, writer);
+                return new CSVRecordReader((CSVPrepareConfiguration) conf, writer);
             }
 
             @Override
@@ -124,8 +123,8 @@ public class PrepareConfiguration extends Configuration {
         },
         MYSQL("mysql") {
             @Override
-            public FileReader<MySQLPrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<MySQLPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
                 return new MySQLTableReader((MySQLPrepareConfiguration) conf,
                         writer);
@@ -138,10 +137,10 @@ public class PrepareConfiguration extends Configuration {
         },
         JSON("json") {
             @Override
-            public FileReader<JSONPrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<JSONPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
-                return new JSONFileReader((JSONPrepareConfiguration) conf,
+                return new JSONRecordReader((JSONPrepareConfiguration) conf,
                         writer);
             }
 
@@ -152,10 +151,10 @@ public class PrepareConfiguration extends Configuration {
         },
         REGEX("regex") {
             @Override
-            public FileReader<RegexPrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<RegexPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
-                return new RegexFileReader<RegexPrepareConfiguration>(
+                return new RegexRecordReader<RegexPrepareConfiguration>(
                         (RegexPrepareConfiguration) conf, writer);
             }
 
@@ -166,10 +165,10 @@ public class PrepareConfiguration extends Configuration {
         },
         APACHE("apache") {
             @Override
-            public FileReader<ApachePrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<ApachePrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
-                return new ApacheFileReader((ApachePrepareConfiguration) conf,
+                return new ApacheRecordReader((ApachePrepareConfiguration) conf,
                         writer);
             }
 
@@ -180,10 +179,10 @@ public class PrepareConfiguration extends Configuration {
         },
         SYSLOG("syslog") {
             @Override
-            public FileReader<SyslogPrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<SyslogPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
-                return new SyslogFileReader((SyslogPrepareConfiguration) conf,
+                return new SyslogRecordReader((SyslogPrepareConfiguration) conf,
                         writer);
             }
 
@@ -194,10 +193,10 @@ public class PrepareConfiguration extends Configuration {
         },
         MSGPACK("msgpack") {
             @Override
-            public FileReader<MessagePackPrepareConfiguration> createFileReader(
-                    PrepareConfiguration conf, FileWriter writer)
+            public RecordReader<MessagePackPrepareConfiguration> createFileReader(
+                    PrepareConfiguration conf, RecordWriter writer)
                     throws PreparePartsException {
-                return new MessagePackFileReader(
+                return new MessagePackRecordReader(
                         (MessagePackPrepareConfiguration) conf, writer);
             }
 
@@ -219,8 +218,8 @@ public class PrepareConfiguration extends Configuration {
 
         public abstract PrepareConfiguration createPrepareConfiguration();
 
-        public FileReader<? extends PrepareConfiguration> createFileReader(
-                PrepareConfiguration conf, FileWriter writer)
+        public RecordReader<? extends PrepareConfiguration> createFileReader(
+                PrepareConfiguration conf, RecordWriter writer)
                 throws PreparePartsException {
             throw new PreparePartsException(
                     new UnsupportedOperationException("format: " + this));
@@ -250,18 +249,18 @@ public class PrepareConfiguration extends Configuration {
     public static enum OutputFormat {
         MSGPACKGZ("msgpackgz") {
             @Override
-            public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+            public RecordWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
                 if (!conf.getFormat().equals(Format.MYSQL)) {
-                    return new MsgpackGZIPFileWriter(conf);
+                    return new MsgpackGZIPRecordWriter(conf);
                 } else {
-                    return new MySQLTimestampAdaptedMsgpackGZIPFileWriter(conf);
+                    return new MySQLTimestampAdaptedMsgpackGZIPRecordWriter(conf);
                 }
             }
         },
         SYSLOGMSGPACKGZ("syslogmsgpackgz") {
             @Override
-            public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
-                return new SyslogFileReader.ExtFileWriter(conf);
+            public RecordWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+                return new SyslogRecordReader.ExtFileWriter(conf);
             }
         };
 
@@ -275,7 +274,7 @@ public class PrepareConfiguration extends Configuration {
             return outputFormat;
         }
 
-        public FileWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
+        public RecordWriter createFileWriter(PrepareConfiguration conf) throws PreparePartsException {
             throw new PreparePartsException(
                     new UnsupportedOperationException("output format: " + this));
         }

@@ -20,7 +20,7 @@ package com.treasure_data.td_import.model;
 import java.util.Map;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class MapColumnValue extends AbstractColumnValue {
     private Map v;
@@ -42,7 +42,7 @@ public class MapColumnValue extends AbstractColumnValue {
     }
 
     @Override
-    public void write(FileWriter with) throws PreparePartsException {
+    public void write(RecordWriter with) throws PreparePartsException {
         with.write(v);
     }
 }

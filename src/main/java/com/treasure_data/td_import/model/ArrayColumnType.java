@@ -18,7 +18,7 @@
 package com.treasure_data.td_import.model;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class ArrayColumnType extends AbstractColumnType {
 
@@ -38,12 +38,12 @@ public class ArrayColumnType extends AbstractColumnType {
         cv.set(v);
     }
 
-    public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
+    public void filterAndWrite(ColumnValue v, TimeColumnValue filter, RecordWriter with)
             throws PreparePartsException {
         throw new UnsupportedOperationException("This method is not needed");
     }
 
-    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, RecordWriter with)
             throws PreparePartsException {
         throw new UnsupportedOperationException("This method is not needed");
     }

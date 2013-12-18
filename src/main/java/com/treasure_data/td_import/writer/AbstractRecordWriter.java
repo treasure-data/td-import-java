@@ -38,8 +38,8 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
-public abstract class AbstractFileWriter implements FileWriter {
-    private static final Logger LOG = Logger.getLogger(AbstractFileWriter.class.getName());
+public abstract class AbstractRecordWriter implements RecordWriter {
+    private static final Logger LOG = Logger.getLogger(AbstractRecordWriter.class.getName());
 
     protected PrepareConfiguration conf;
     protected Task task;
@@ -55,7 +55,7 @@ public abstract class AbstractFileWriter implements FileWriter {
     protected TimeColumnValue timeColumnValue;
     protected int timeColumnIndex = -1;
 
-    protected AbstractFileWriter(PrepareConfiguration conf) {
+    protected AbstractRecordWriter(PrepareConfiguration conf) {
         this.conf = conf;
     }
 

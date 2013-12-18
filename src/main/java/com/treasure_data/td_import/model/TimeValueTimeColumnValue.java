@@ -18,7 +18,7 @@
 package com.treasure_data.td_import.model;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class TimeValueTimeColumnValue extends TimeColumnValue {
     private long timeValue;
@@ -32,15 +32,15 @@ public class TimeValueTimeColumnValue extends TimeColumnValue {
         return timeValue;
     }
 
-    public void write(FileWriter with) throws PreparePartsException {
+    public void write(RecordWriter with) throws PreparePartsException {
         with.write(timeValue);
     }
 
-    public void write(ColumnValue v, FileWriter with) throws PreparePartsException {
+    public void write(ColumnValue v, RecordWriter with) throws PreparePartsException {
         write(with); // v is ignore
     }
 
-    public void validate(ColumnValue v, FileWriter with) throws PreparePartsException {
+    public void validate(ColumnValue v, RecordWriter with) throws PreparePartsException {
         validateUnixtime(timeValue);
     }
 }

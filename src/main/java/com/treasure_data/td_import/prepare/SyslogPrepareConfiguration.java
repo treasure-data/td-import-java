@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.model.ColumnType;
-import com.treasure_data.td_import.reader.SyslogFileReader;
+import com.treasure_data.td_import.reader.SyslogRecordReader;
 
 public class SyslogPrepareConfiguration extends RegexPrepareConfiguration {
     private static final Logger LOG = Logger
@@ -37,7 +37,7 @@ public class SyslogPrepareConfiguration extends RegexPrepareConfiguration {
 
     @Override
     public void setRegexPattern() {
-        regexPattern = SyslogFileReader.syslogPatString;
+        regexPattern = SyslogRecordReader.syslogPatString;
     }
 
     @Override

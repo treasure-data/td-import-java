@@ -27,7 +27,7 @@ import com.treasure_data.td_import.model.AbstractColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
 import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 import com.treasure_data.td_import.writer.MySQLTimestampAdaptor;
 
 public class MySQLPrepareConfiguration extends PrepareConfiguration {
@@ -57,13 +57,13 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
 
         @Override
         public void filterAndWrite(ColumnValue v, TimeColumnValue filter,
-                FileWriter with) throws PreparePartsException {
+                RecordWriter with) throws PreparePartsException {
             ((MySQLTimestampAdaptor) with).write(filter, (TimestampColumnValue) v);
         }
 
         @Override
         public void filterAndValidate(ColumnValue v, TimeColumnValue filter,
-                FileWriter with) throws PreparePartsException {
+                RecordWriter with) throws PreparePartsException {
             ((MySQLTimestampAdaptor) with).validate(filter, (TimestampColumnValue) v);
         }
     }
@@ -93,7 +93,7 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
         }
 
         @Override
-        public void write(FileWriter with) throws PreparePartsException {
+        public void write(RecordWriter with) throws PreparePartsException {
             with.write(v);
         }
     }

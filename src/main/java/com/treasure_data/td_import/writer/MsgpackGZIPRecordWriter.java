@@ -36,7 +36,7 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
-public class MsgpackGZIPFileWriter extends AbstractFileWriter {
+public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     static class DataSizeChecker extends FilterOutputStream {
 
         private int size = 0;
@@ -63,7 +63,7 @@ public class MsgpackGZIPFileWriter extends AbstractFileWriter {
     }
 
     private static final Logger LOG = Logger
-            .getLogger(MsgpackGZIPFileWriter.class.getName());
+            .getLogger(MsgpackGZIPRecordWriter.class.getName());
 
     protected MessagePack msgpack;
     protected Packer packer;
@@ -76,7 +76,7 @@ public class MsgpackGZIPFileWriter extends AbstractFileWriter {
     private String outputFilePrefix;
     private File outputFile;
 
-    public MsgpackGZIPFileWriter(PrepareConfiguration conf) {
+    public MsgpackGZIPRecordWriter(PrepareConfiguration conf) {
         super(conf);
     }
 

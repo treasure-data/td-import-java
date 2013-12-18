@@ -20,7 +20,7 @@ package com.treasure_data.td_import.model;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class BooleanColumnValue extends AbstractColumnValue {
     private static final Logger LOG = Logger.getLogger(BooleanColumnValue.class.getName());
@@ -44,7 +44,7 @@ public class BooleanColumnValue extends AbstractColumnValue {
     }
 
     @Override
-    public void write(FileWriter with) throws PreparePartsException {
+    public void write(RecordWriter with) throws PreparePartsException {
         if (isNullString) {
             with.writeNil();
             isNullString = false;

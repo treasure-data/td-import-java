@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.model.ColumnType;
-import com.treasure_data.td_import.reader.ApacheFileReader;
+import com.treasure_data.td_import.reader.ApacheRecordReader;
 
 public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
     private static final Logger LOG = Logger
@@ -37,7 +37,7 @@ public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
 
     @Override
     public void setRegexPattern() {
-        regexPattern = ApacheFileReader.commonLogPatString;
+        regexPattern = ApacheRecordReader.commonLogPatString;
     }
 
     @Override

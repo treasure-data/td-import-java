@@ -30,12 +30,12 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
-public class JSONFileWriter extends AbstractFileWriter {
+public class JSONRecordWriter extends AbstractRecordWriter {
 
     private Map<String, Object> record;
     private List<Object> recordElements;
 
-    public JSONFileWriter(PrepareConfiguration conf) {
+    public JSONRecordWriter(PrepareConfiguration conf) {
         super(conf);
     }
 

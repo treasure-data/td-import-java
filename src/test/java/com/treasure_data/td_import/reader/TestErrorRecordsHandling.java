@@ -17,7 +17,7 @@ import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
-import com.treasure_data.td_import.reader.FileReader;
+import com.treasure_data.td_import.reader.RecordReader;
 import com.treasure_data.td_import.source.LocalFileSource;
 import com.treasure_data.td_import.writer.FileWriterTestUtil;
 
@@ -27,7 +27,7 @@ public class TestErrorRecordsHandling {
     protected Options options;
     protected PrepareConfiguration conf;
     protected FileWriterTestUtil writer;
-    protected FileReader reader;
+    protected RecordReader reader;
 
     @Before
     public void createResources() throws Exception {

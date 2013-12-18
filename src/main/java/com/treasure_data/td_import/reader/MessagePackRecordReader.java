@@ -35,10 +35,10 @@ import com.treasure_data.td_import.model.Row;
 import com.treasure_data.td_import.prepare.MessagePackPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
-public class MessagePackFileReader extends NonFixnumColumnsFileReader<MessagePackPrepareConfiguration> {
-    private static final Logger LOG = Logger.getLogger(MessagePackFileReader.class.getName());
+public class MessagePackRecordReader extends DynamicColumnsFileReader<MessagePackPrepareConfiguration> {
+    private static final Logger LOG = Logger.getLogger(MessagePackRecordReader.class.getName());
 
     protected MessagePack msgpack;
     protected InputStream in;
@@ -47,7 +47,7 @@ public class MessagePackFileReader extends NonFixnumColumnsFileReader<MessagePac
     protected String[] keys;
     protected Object[] values;
 
-    public MessagePackFileReader(MessagePackPrepareConfiguration conf, FileWriter writer) {
+    public MessagePackRecordReader(MessagePackPrepareConfiguration conf, RecordWriter writer) {
         super(conf, writer);
         msgpack = new MessagePack();
     }

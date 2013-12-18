@@ -32,19 +32,16 @@ import java.util.logging.Logger;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
-import com.treasure_data.td_import.model.ColumnValue;
-import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.td_import.prepare.HHmmssStrftime;
 import com.treasure_data.td_import.prepare.MySQLPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
-import com.treasure_data.td_import.writer.JSONFileWriter;
-import com.treasure_data.td_import.writer.MySQLTimestampAdaptedJSONFileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
+import com.treasure_data.td_import.writer.JSONRecordWriter;
+import com.treasure_data.td_import.writer.MySQLTimestampAdaptedJSONRecordWriter;
 
-public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
+public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(MySQLTableReader.class.getName());
 
     private static final String QUERY_SAMPLE = "SELECT * FROM %s LIMIT 1;";
@@ -55,7 +52,7 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
     protected int numColumns;
     protected ResultSet resultSet;
 
-    public MySQLTableReader(MySQLPrepareConfiguration conf, FileWriter writer) {
+    public MySQLTableReader(MySQLPrepareConfiguration conf, RecordWriter writer) {
         super(conf, writer);
     }
 
@@ -200,9 +197,9 @@ public class MySQLTableReader extends FileReader<MySQLPrepareConfiguration> {
             // check properties of exclude/only columns
             setSkipColumns();
 
-            JSONFileWriter w = null;
+            JSONRecordWriter w = null;
             try {
-                w = new MySQLTimestampAdaptedJSONFileWriter(conf);
+                w = new MySQLTimestampAdaptedJSONRecordWriter(conf);
                 w.setColumnNames(getColumnNames());
                 w.setColumnTypes(getColumnTypes());
                 w.setSkipColumns(getSkipColumns());

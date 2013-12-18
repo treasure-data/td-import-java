@@ -18,44 +18,33 @@
 package com.treasure_data.td_import.reader;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.treasure_data.td_import.model.ColumnType;
-import com.treasure_data.td_import.model.DoubleColumnValue;
-import com.treasure_data.td_import.model.IntColumnValue;
-import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.model.StringColumnValue;
 import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.prepare.ApachePrepareConfiguration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Strftime;
 import com.treasure_data.td_import.prepare.SyslogPrepareConfiguration;
-import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
-import com.treasure_data.td_import.writer.MsgpackGZIPFileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
+import com.treasure_data.td_import.writer.MsgpackGZIPRecordWriter;
 
-public class SyslogFileReader extends RegexFileReader<SyslogPrepareConfiguration> {
+public class SyslogRecordReader extends RegexRecordReader<SyslogPrepareConfiguration> {
 
-    private static final Logger LOG = Logger.getLogger(SyslogFileReader.class
-            .getName());
+    private static final Logger LOG = Logger.getLogger(SyslogRecordReader.class.getName());
 
     public static final String syslogPatString =
             "^([^ ]* [^ ]* [^ ]*) ([^ ]*) ([a-zA-Z0-9_\\/\\.\\-]*)(?:\\([a-zA-Z0-9_\\/\\.\\-]*\\))(?:\\[([0-9]+)\\])?[^\\:]*\\: *(.*)$";
 
-    public static class ExtFileWriter extends MsgpackGZIPFileWriter {
+    public static class ExtFileWriter extends MsgpackGZIPRecordWriter {
         protected long currentYear;
 
         public ExtFileWriter(PrepareConfiguration conf) {
@@ -89,7 +78,7 @@ public class SyslogFileReader extends RegexFileReader<SyslogPrepareConfiguration
     protected String line;
     protected List<String> row = new ArrayList<String>();
 
-    public SyslogFileReader(SyslogPrepareConfiguration conf, FileWriter writer)
+    public SyslogRecordReader(SyslogPrepareConfiguration conf, RecordWriter writer)
             throws PreparePartsException {
         super(conf, writer);
     }

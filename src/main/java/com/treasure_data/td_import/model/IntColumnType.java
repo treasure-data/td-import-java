@@ -18,7 +18,7 @@
 package com.treasure_data.td_import.model;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class IntColumnType extends AbstractColumnType {
 
@@ -40,12 +40,12 @@ public class IntColumnType extends AbstractColumnType {
         cv.set(v);
     }
 
-    public void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with)
+    public void filterAndWrite(ColumnValue v, TimeColumnValue filter, RecordWriter with)
             throws PreparePartsException {
         with.write(filter, (IntColumnValue) v);
     }
 
-    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with)
+    public void filterAndValidate(ColumnValue v, TimeColumnValue filter, RecordWriter with)
             throws PreparePartsException {
         with.validate(filter, (IntColumnValue) v);
     }

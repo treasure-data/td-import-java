@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public interface ColumnType {
 
@@ -42,8 +42,8 @@ public interface ColumnType {
     ColumnValue createColumnValue();
     void convertType(String v, ColumnValue into) throws PreparePartsException;
     void setColumnValue(Object v, ColumnValue cv) throws PreparePartsException;
-    void filterAndWrite(ColumnValue v, TimeColumnValue filter, FileWriter with) throws PreparePartsException;
-    void filterAndValidate(ColumnValue v, TimeColumnValue filter, FileWriter with) throws PreparePartsException;
+    void filterAndWrite(ColumnValue v, TimeColumnValue filter, RecordWriter with) throws PreparePartsException;
+    void filterAndValidate(ColumnValue v, TimeColumnValue filter, RecordWriter with) throws PreparePartsException;
 
     public static class Conv {
         private static final Map<Integer, ColumnType> REVERSE_INTS = new HashMap<Integer, ColumnType>();

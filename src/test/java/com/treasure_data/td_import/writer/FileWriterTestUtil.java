@@ -14,7 +14,7 @@ import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
 
 @Ignore
-public class FileWriterTestUtil extends AbstractFileWriter {
+public class FileWriterTestUtil extends AbstractRecordWriter {
 
     private Map<String, Object> row = new HashMap<String, Object>();
     private List<Object> columnKeyValues = new ArrayList<Object>();

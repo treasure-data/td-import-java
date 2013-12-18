@@ -17,7 +17,6 @@
 //
 package com.treasure_data.td_import.reader;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -44,13 +43,14 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Strftime;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.source.Source;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
-public abstract class FileReader<T extends PrepareConfiguration> implements Closeable {
-    private static final Logger LOG = Logger.getLogger(FileReader.class.getName());
+public abstract class AbstractRecordReader<T extends PrepareConfiguration>
+        implements RecordReader<T> {
+    private static final Logger LOG = Logger.getLogger(AbstractRecordReader.class.getName());
 
     protected T conf;
-    protected FileWriter writer;
+    protected RecordWriter writer;
     protected Row convertedRow;
 
     //protected String name;
@@ -67,7 +67,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
     protected Writer errWriter;
     protected File errFile;
 
-    protected FileReader(T conf, FileWriter writer) {
+    protected AbstractRecordReader(T conf, RecordWriter writer) {
         this.conf = conf;
         this.writer = writer;
     }
@@ -292,7 +292,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         closeErrWriter();
     }
 
-    protected void writeErrorRecord(String record) {
+    public void writeErrorRecord(String record) {
         if (!errWriterCreated) {
             createErrWriter();
         }
@@ -306,7 +306,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         }
     }
 
-    private void createErrWriter() {
+    public void createErrWriter() {
         String srcName = source.getPath();
         int lastSepIndex = srcName.lastIndexOf(File.separatorChar);
         String prefix = srcName.substring(lastSepIndex + 1, srcName.length()).replace('.', '_');
@@ -336,7 +336,7 @@ public abstract class FileReader<T extends PrepareConfiguration> implements Clos
         }
     }
 
-    protected void closeErrWriter() {
+    public void closeErrWriter() {
         if (errWriterCreated) {
             if (errWriter != null) {
                 try {

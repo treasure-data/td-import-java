@@ -33,11 +33,11 @@ import com.treasure_data.td_import.model.TimeColumnSampling;
 import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
-import com.treasure_data.td_import.writer.JSONFileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
+import com.treasure_data.td_import.writer.JSONRecordWriter;
 
-public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfiguration> {
-    private static final Logger LOG = Logger.getLogger(CSVFileReader.class.getName());
+public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfiguration> {
+    private static final Logger LOG = Logger.getLogger(CSVRecordReader.class.getName());
 
     static class Tokenizer extends org.supercsv.io.AbstractTokenizer {
         private static final char NEWLINE = '\n';
@@ -270,7 +270,7 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
     private Tokenizer tokenizer;
     protected List<String> row = new ArrayList<String>();
 
-    public CSVFileReader(CSVPrepareConfiguration conf, FileWriter writer)
+    public CSVRecordReader(CSVPrepareConfiguration conf, RecordWriter writer)
             throws PreparePartsException {
         super(conf, writer);
     }
@@ -425,9 +425,9 @@ public class CSVFileReader extends FixnumColumnsFileReader<CSVPrepareConfigurati
             setSkipColumns();
 
             // print first sample row
-            JSONFileWriter w = null;
+            JSONRecordWriter w = null;
             try {
-                w = new JSONFileWriter(conf);
+                w = new JSONRecordWriter(conf);
                 w.setColumnNames(getColumnNames());
                 w.setColumnTypes(getColumnTypes());
                 w.setSkipColumns(getSkipColumns());

@@ -22,10 +22,10 @@ import java.io.IOException;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
-public abstract class FixnumColumnsFileReader<T extends PrepareConfiguration> extends FileReader<T> {
-    public FixnumColumnsFileReader(T conf, FileWriter writer) throws PreparePartsException {
+public abstract class FixedColumnsRecordReader<T extends PrepareConfiguration> extends AbstractRecordReader<T> {
+    public FixedColumnsRecordReader(T conf, RecordWriter writer) throws PreparePartsException {
         super(conf, writer);
     }
 

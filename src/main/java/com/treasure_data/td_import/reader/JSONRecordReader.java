@@ -33,11 +33,11 @@ import com.treasure_data.td_import.model.Row;
 import com.treasure_data.td_import.prepare.JSONPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
-import com.treasure_data.td_import.writer.JSONFileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
+import com.treasure_data.td_import.writer.JSONRecordWriter;
 
-public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfiguration> {
-    private static final Logger LOG = Logger.getLogger(JSONFileReader.class.getName());
+public class JSONRecordReader extends DynamicColumnsFileReader<JSONPrepareConfiguration> {
+    private static final Logger LOG = Logger.getLogger(JSONRecordReader.class.getName());
 
     protected BufferedReader reader;
     protected JSONParser parser;
@@ -45,7 +45,7 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
     protected String line;
     protected Map<String, Object> row;
 
-    public JSONFileReader(JSONPrepareConfiguration conf, FileWriter writer) {
+    public JSONRecordReader(JSONPrepareConfiguration conf, RecordWriter writer) {
         super(conf, writer);
     }
 
@@ -96,9 +96,9 @@ public class JSONFileReader extends NonFixnumColumnsFileReader<JSONPrepareConfig
             }
 
             // print first sample row
-            JSONFileWriter w = null;
+            JSONRecordWriter w = null;
             try {
-                w = new JSONFileWriter(conf);
+                w = new JSONRecordWriter(conf);
                 setColumnNames();
                 w.setColumnNames(getColumnNames());
                 setColumnTypes();

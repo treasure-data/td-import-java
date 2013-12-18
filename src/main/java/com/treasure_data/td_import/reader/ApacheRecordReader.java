@@ -17,8 +17,6 @@
 //
 package com.treasure_data.td_import.reader;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -27,19 +25,17 @@ import com.treasure_data.td_import.model.TimeColumnValue;
 import com.treasure_data.td_import.prepare.ApachePrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Strftime;
-import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
-public class ApacheFileReader extends RegexFileReader<ApachePrepareConfiguration> {
+public class ApacheRecordReader extends RegexRecordReader<ApachePrepareConfiguration> {
 
-    private static final Logger LOG = Logger.getLogger(ApacheFileReader.class
-            .getName());
+    private static final Logger LOG = Logger.getLogger(ApacheRecordReader.class.getName());
 
     // 127.0.0.1 user-identifier frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
     public static final String commonLogPatString =
           "^([^ ]*) [^ ]* ([^ ]*) \\[([^\\]]*)\\] \"(\\S+)(?: +([^ ]*) +\\S*)?\" ([^ ]*) ([^ ]*)(?: \"([^\\\"]*)\" \"([^\\\"]*)\")?$";
 
-    public ApacheFileReader(ApachePrepareConfiguration conf, FileWriter writer)
+    public ApacheRecordReader(ApachePrepareConfiguration conf, RecordWriter writer)
             throws PreparePartsException {
         super(conf, writer);
     }

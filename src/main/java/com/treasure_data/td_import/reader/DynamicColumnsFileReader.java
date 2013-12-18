@@ -32,14 +32,14 @@ import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
-public abstract class NonFixnumColumnsFileReader<T extends PrepareConfiguration> extends FileReader<T> {
-    private static final Logger LOG = Logger.getLogger(NonFixnumColumnsFileReader.class.getName());
+public abstract class DynamicColumnsFileReader<T extends PrepareConfiguration> extends AbstractRecordReader<T> {
+    private static final Logger LOG = Logger.getLogger(DynamicColumnsFileReader.class.getName());
 
     protected String aliasTimeColumnName = null;
 
-    public NonFixnumColumnsFileReader(T conf, FileWriter writer) {
+    public DynamicColumnsFileReader(T conf, RecordWriter writer) {
         super(conf, writer);
     }
 

@@ -18,7 +18,7 @@
 package com.treasure_data.td_import.model;
 
 import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public interface ColumnValue {
     ColumnType getColumnType();
@@ -27,5 +27,5 @@ public interface ColumnValue {
 
     void parse(String v) throws PreparePartsException;
 
-    void write(FileWriter with) throws PreparePartsException;
+    void write(RecordWriter with) throws PreparePartsException;
 }

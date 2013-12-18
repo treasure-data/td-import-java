@@ -11,14 +11,14 @@ import org.junit.Test;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
-import com.treasure_data.td_import.writer.FileWriter;
+import com.treasure_data.td_import.writer.RecordWriter;
 
 public class TestMsgpackGZIPFileWriter {
 
     protected Properties props;
     protected Options options;
     protected PrepareConfiguration conf;
-    protected FileWriter writer;
+    protected RecordWriter writer;
 
     @Before
     public void createResources() throws Exception {
