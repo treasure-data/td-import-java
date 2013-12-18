@@ -110,41 +110,46 @@ public class BulkImport extends Import {
         // get and extract uploaded sources from command-line arguments
         Source[] srcs = getSources(uploadConf, filePos);
 
-        MultiThreadUploadProcessor uploadProc =
-                createAndStartUploadProcessor(uploadConf);
-
         List<com.treasure_data.td_import.TaskResult<?>> results =
                 new ArrayList<com.treasure_data.td_import.TaskResult<?>>();
-
         boolean hasNoPrepareError = true;
-        if (!uploadConf.hasPrepareOptions()) {
-            // create upload tasks
-            com.treasure_data.td_import.upload.UploadTask[] tasks =
-                    createUploadTasks(sessionName, srcs);
+        MultiThreadUploadProcessor uploadProc =
+                createAndStartUploadProcessor(uploadConf);
+        try {
+            if (!uploadConf.hasPrepareOptions()) {
+                // create upload tasks
+                com.treasure_data.td_import.upload.UploadTask[] tasks =
+                        createUploadTasks(sessionName, srcs);
 
-            // start upload tasks. the method call puts upload tasks and
-            // *finish* tasks on task queue
-            startUploadTasks(uploadConf, tasks);
-        } else {
-            // create configuration for 'prepare' processing
-            PrepareConfiguration prepareConf = createPrepareConf(args, true);
+                // start upload tasks. the method call puts upload tasks and
+                // *finish* tasks on task queue
+                startUploadTasks(uploadConf, tasks);
+            } else {
+                // create configuration for 'prepare' processing
+                PrepareConfiguration prepareConf = createPrepareConf(args, true);
 
-            MultiThreadPrepareProcessor prepareProc =
-                    createAndStartPrepareProcessor(prepareConf);
+                MultiThreadPrepareProcessor prepareProc =
+                        createAndStartPrepareProcessor(prepareConf);
 
-            // create sequential upload (prepare) tasks
-            com.treasure_data.td_import.prepare.Task[] tasks = createSequentialUploadTasks(
-                    sessionName, srcs);
+                // create sequential upload (prepare) tasks
+                com.treasure_data.td_import.prepare.Task[] tasks =
+                        createSequentialUploadTasks(sessionName, srcs);
 
-            // start sequential upload (prepare) tasks. the method call puts
-            // prepare tasks and *finish* prepare tasks on prepare task queue.
-            // after those prepare tasks are finished, automatically the upload
-            // tasks are put on upload task queue.
-            startPrepareTasks(prepareConf, tasks);
+                // start sequential upload (prepare) tasks. the method call puts
+                // prepare tasks and *finish* prepare tasks on prepare task
+                // queue.
+                // after those prepare tasks are finished, automatically the
+                // upload
+                // tasks are put on upload task queue.
+                startPrepareTasks(prepareConf, tasks);
 
-            // wait for finishing all prepare tasks by using *finish* prepare tasks.
-            results.addAll(stopPrepareProcessor(prepareProc));
+                // wait for finishing all prepare tasks by using *finish*
+                // prepare tasks.
+                results.addAll(stopPrepareProcessor(prepareProc));
 
+                hasNoPrepareError = hasNoPrepareError(results);
+            }
+        } finally {
             // put *finish* upload tasks on upload task queue
             try {
                 MultiThreadUploadProcessor.addFinishTask(uploadConf);
@@ -152,7 +157,6 @@ public class BulkImport extends Import {
                 LOG.log(Level.SEVERE, "error occurred during 'addFinishTask' method call", t);
             }
 
-            hasNoPrepareError = hasNoPrepareError(results);
         }
 
         // wait for finishing all upload tasks by using *finish* tasks.
@@ -208,27 +212,15 @@ public class BulkImport extends Import {
         return tasks;
     }
 
-    protected void startUploadTasks(
-            final UploadConfiguration conf,
+    protected void startUploadTasks(final UploadConfiguration conf,
             final com.treasure_data.td_import.upload.UploadTask[] tasks) {
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < tasks.length; i++) {
-                    try {
-                        MultiThreadUploadProcessor.addTask(tasks[i]);
-                    } catch (Throwable t) {
-                        LOG.log(Level.SEVERE, "error occurred during 'addTask' method call", t);
-                    }
-                }
-
-                // end of file list
-                try {
-                    MultiThreadUploadProcessor.addFinishTask(conf);
-                } catch (Throwable t) {
-                    LOG.log(Level.SEVERE, "error occurred during 'addFinishTask' method call", t);
-                }
+        for (int i = 0; i < tasks.length; i++) {
+            try {
+                MultiThreadUploadProcessor.addTask(tasks[i]);
+            } catch (Throwable t) {
+                LOG.log(Level.SEVERE, "error occurred during 'addTask' method call", t);
             }
-        }).start();
+        }
     }
 
     protected String createBulkImportSessionName(UploadConfiguration conf,
