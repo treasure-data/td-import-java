@@ -80,29 +80,25 @@ public abstract class Import {
         return proc;
     }
 
-    protected void startPrepareTasks(
-            final PrepareConfiguration conf,
+    protected void startPrepareTasks(final PrepareConfiguration conf,
             final com.treasure_data.td_import.prepare.Task[] tasks) {
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < tasks.length; i++) {
-                    try {
-                        MultiThreadPrepareProcessor.addTask(tasks[i]);
-                    } catch (Throwable t) {
-                        LOG.severe("Error occurred During 'addTask' method call");
-                        LOG.throwing("Main", "addTask", t);
-                    }
-                }
-
-                // end of file list
-                try {
-                    MultiThreadPrepareProcessor.addFinishTask(conf);
-                } catch (Throwable t) {
-                    LOG.severe("Error occurred During 'addFinishTask' method call");
-                    LOG.throwing("Main", "addFinishTask", t);
-                }
+        for (int i = 0; i < tasks.length; i++) {
+            try {
+                MultiThreadPrepareProcessor.addTask(tasks[i]);
+            } catch (Throwable t) {
+                LOG.severe("Error occurred During 'addTask' method call");
+                LOG.throwing("Main", "addTask", t);
             }
-        }).start();
+        }
+    }
+
+    protected void setPrepareFinishTasks(final PrepareConfiguration conf) {
+        try {
+            MultiThreadPrepareProcessor.addFinishTask(conf);
+        } catch (Throwable t) {
+            LOG.severe("Error occurred During 'addFinishTask' method call");
+            LOG.throwing("Main", "addFinishTask", t);
+        }
     }
 
     protected List<com.treasure_data.td_import.TaskResult<?>> stopPrepareProcessor(

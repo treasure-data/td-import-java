@@ -86,9 +86,11 @@ public final class BulkImportCommand extends BulkImport {
         com.treasure_data.td_import.prepare.Task[] tasks =
                 createPrepareTasks(prepareConf, srcs);
 
-        // start prepare tasks. the method call puts prepare tasks and
-        // *finish* tasks on task queue.
+        // start prepare tasks. the method call puts prepare tasks
         startPrepareTasks(prepareConf, tasks);
+
+        // set *finish* tasks on task queue.
+        setPrepareFinishTasks(prepareConf);
 
         // wait for finishing prepare processing
         // extract task results of each prepare processing
@@ -165,8 +167,7 @@ public final class BulkImportCommand extends BulkImport {
                 com.treasure_data.td_import.upload.UploadTask[] tasks =
                         createUploadTasks(sessionName, srcs);
 
-                // start upload tasks. the method call puts upload tasks and
-                // *finish* tasks on task queue
+                // start upload tasks. the method call puts upload tasks
                 startUploadTasks(uploadConf, tasks);
             } else {
                 // create configuration for 'prepare' processing
@@ -180,10 +181,13 @@ public final class BulkImportCommand extends BulkImport {
                         createSequentialUploadTasks(sessionName, srcs);
 
                 // start sequential upload (prepare) tasks. the method call puts
-                // prepare tasks and *finish* prepare tasks on prepare task queue.
+                // prepare tasks.
+                startPrepareTasks(prepareConf, tasks);
+
+                // set *finish* prepare tasks on prepare task queue.
                 // after those prepare tasks are finished, automatically the
                 // upload tasks are put on upload task queue.
-                startPrepareTasks(prepareConf, tasks);
+                setPrepareFinishTasks(prepareConf);
 
                 // wait for finishing all prepare tasks by using *finish* prepare tasks.
                 results.addAll(stopPrepareProcessor(prepareProc));
@@ -194,12 +198,8 @@ public final class BulkImportCommand extends BulkImport {
                 hasNoPrepareError = hasNoPrepareError(results);
             }
         } finally {
-            // put *finish* upload tasks on upload task queue.
-            try {
-                MultiThreadUploadProcessor.addFinishTask(uploadConf);
-            } catch (Throwable t) {
-                LOG.log(Level.SEVERE, "error occurred during 'addFinishTask' method call", t);
-            }
+            // put *finish* upload tasks on upload task queue
+            setUploadFinishTasks(uploadConf);
         }
 
         // wait for finishing all upload tasks by using *finish* tasks.

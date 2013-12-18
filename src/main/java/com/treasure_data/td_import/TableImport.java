@@ -74,6 +74,8 @@ public class TableImport extends Import {
         // start sequential upload (prepare) tasks
         startPrepareTasks(importConf, tasks);
 
+        setPrepareFinishTasks(importConf);
+
         results.addAll(stopPrepareProcessor(prepareProc));
         if (!hasNoPrepareError(results)) {
             return results;
