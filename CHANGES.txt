@@ -1,6 +1,7 @@
 Release 0.4.6 - 20XX/XX/XX
   NEW FEATURES
     Supports item tables. To use bulk import for item tables, new 'primary-key' option is required.
+    Adds retry-count to upload command.
 
   BUG FIXED
     Fixes bug: livelock occurs when upload command receives unexpected combinations of some options.
