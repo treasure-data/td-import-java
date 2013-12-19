@@ -45,8 +45,7 @@ public class TableImport extends Import {
                 createTableImportConfiguration(args);
 
         // create TreasureDataClient object
-        TreasureDataClient tdClient =
-                new TreasureDataClient(importConf.getProperties());
+        TreasureDataClient tdClient = importConf.createTreasureDataClient();
 
         TaskResult<?> r = null;
         String databaseName = getDatabaseName(importConf); // database exists? TODO

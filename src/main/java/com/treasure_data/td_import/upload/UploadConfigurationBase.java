@@ -19,6 +19,9 @@ package com.treasure_data.td_import.upload;
 
 import java.util.Properties;
 
+import com.treasure_data.client.TreasureDataClient;
+import com.treasure_data.client.bulkimport.BulkImportClient;
+import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 
@@ -35,23 +38,25 @@ public class UploadConfigurationBase extends PrepareConfiguration {
         throw new UnsupportedOperationException();
     }
 
+    public TreasureDataClient createTreasureDataClient() {
+        Properties props = getProperties();
+        props.setProperty(Configuration.TD_CLIENT_RETRY_COUNT, "" + getRetryCount());
+        return new TreasureDataClient(props);
+    }
+
+    public BulkImportClient createBulkImportClient(
+            TreasureDataClient tdClient) {
+        return new BulkImportClient(tdClient);
+    }
+
     public void configure(Properties props, Options options) {
         super.configure(props, options);
 
+        // retry-count
+        setRetryCount();
+
         // parallel
         setNumOfUploadThreads();
-
-        // retryCount
-        String rcount = props.getProperty(BI_UPLOAD_PARTS_RETRYCOUNT,
-                BI_UPLOAD_PARTS_RETRYCOUNT_DEFAULTVALUE);
-        try {
-            retryCount = Integer.parseInt(rcount);
-        } catch (NumberFormatException e) {
-            String msg = String.format(
-                    "'int' value is required as 'retry count' option e.g. -D%s=5",
-                    BI_UPLOAD_PARTS_RETRYCOUNT);
-            throw new IllegalArgumentException(msg, e);
-        }
 
         // waitSec
         String wsec = props.getProperty(BI_UPLOAD_PARTS_WAITSEC,
@@ -94,6 +99,21 @@ public class UploadConfigurationBase extends PrepareConfiguration {
 
     public int getNumOfUploadThreads() {
         return numOfUploadThreads;
+    }
+
+    public void setRetryCount() {
+        String num;
+        if (!optionSet.has(BI_UPLOAD_RETRY_COUNT)) {
+            num = Configuration.TD_CLIENT_RETRY_COUNT_DEFAULTVALUE;
+        } else {
+            num = (String) optionSet.valueOf(BI_UPLOAD_RETRY_COUNT);
+        }
+        try {
+            retryCount = Integer.parseInt(num);
+        } catch (NumberFormatException e) {
+            String msg = "retry-count option requires 'int' value";
+            throw new IllegalArgumentException(msg, e);
+        }
     }
 
     public int getRetryCount() {

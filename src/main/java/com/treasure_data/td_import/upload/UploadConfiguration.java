@@ -19,13 +19,9 @@ package com.treasure_data.td_import.upload;
 
 import java.util.Properties;
 
-import joptsimple.OptionSet;
-
-import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
-import com.treasure_data.td_import.prepare.PrepareConfiguration;
 
 public class UploadConfiguration extends UploadConfigurationBase {
 
@@ -54,7 +50,6 @@ public class UploadConfiguration extends UploadConfigurationBase {
     protected boolean autoPerform = false;
     protected boolean autoCommit = false;
     protected boolean autoDelete = false;
-    protected int retryCount;
     protected long waitSec;
 
     public UploadConfiguration() {
@@ -63,7 +58,7 @@ public class UploadConfiguration extends UploadConfigurationBase {
 
     @Override
     public UploadProcessorBase createNewUploadProcessor() {
-        BulkImportClient c = new BulkImportClient(new TreasureDataClient(getProperties()));
+        BulkImportClient c = createBulkImportClient(createTreasureDataClient());
         return new UploadProcessor(c, this);
     }
 
@@ -123,9 +118,6 @@ public class UploadConfiguration extends UploadConfigurationBase {
 
         // auto-commit
         setAutoCommit();
-
-        // parallel
-        setNumOfUploadThreads();
 
         // auto-delete-session
         setAutoDelete();
@@ -208,10 +200,6 @@ public class UploadConfiguration extends UploadConfigurationBase {
                     BI_UPLOAD_PARTS_PARALLEL);
             throw new IllegalArgumentException(msg, e);
         }
-    }
-
-    public int getRetryCount() {
-        return retryCount;
     }
 
     public long getWaitSec() {

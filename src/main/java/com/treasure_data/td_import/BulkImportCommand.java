@@ -110,8 +110,8 @@ public final class BulkImportCommand extends BulkImport {
         UploadConfiguration uploadConf = createUploadConf(args);
 
         // create TreasureDataClient and BulkImportClient objects
-        TreasureDataClient tdClient = new TreasureDataClient(uploadConf.getProperties());
-        BulkImportClient biClient = new BulkImportClient(tdClient);
+        TreasureDataClient tdClient = uploadConf.createTreasureDataClient();
+        BulkImportClient biClient = uploadConf.createBulkImportClient(tdClient);
 
         // configure session name
         TaskResult<?> e = null;

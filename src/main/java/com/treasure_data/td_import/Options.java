@@ -203,6 +203,12 @@ public class Options {
     public void initUploadOptionParser(Properties props) {
         this.initPrepareOptionParser(props);
         op.acceptsAll(Arrays.asList(
+                Configuration.BI_UPLOAD_RETRY_COUNT),
+                Configuration.BI_UPLOAD_RETRY_COUNT_DESC)
+                .withRequiredArg()
+                .describedAs("NUM")
+                .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
                 Configuration.BI_UPLOAD_PARTS_AUTO_CREATE),
                 Configuration.BI_UPLOAD_PARTS_AUTO_CREATE_DESC)
                 .withRequiredArg()

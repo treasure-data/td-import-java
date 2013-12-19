@@ -19,7 +19,6 @@ package com.treasure_data.td_import.upload;
 
 import java.util.Properties;
 
-import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 
@@ -53,8 +52,7 @@ public class TableImportConfiguration extends UploadConfigurationBase {
 
     @Override
     public UploadProcessorBase createNewUploadProcessor() {
-        TreasureDataClient c = new TreasureDataClient(getProperties());
-        return new ImportProcessor(c, this);
+        return new ImportProcessor(createTreasureDataClient(), this);
     }
 
     @Override

@@ -24,9 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.client.bulkimport.BulkImportClient;
-
 public class MultiThreadUploadProcessor {
     static class Worker extends Thread {
         private MultiThreadUploadProcessor parent;
@@ -111,10 +108,6 @@ public class MultiThreadUploadProcessor {
 
     protected UploadProcessorBase createUploadProcessor(UploadConfigurationBase conf) {
         return conf.createNewUploadProcessor();
-    }
-
-    protected BulkImportClient createBulkImportClient(UploadConfigurationBase conf) {
-        return new BulkImportClient(new TreasureDataClient(conf.getProperties()));
     }
 
     public void startWorkers() {
