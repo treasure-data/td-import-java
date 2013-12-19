@@ -56,12 +56,19 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
     public void configure(Task task) throws PreparePartsException {
         super.configure(task);
 
+        sample(task);
+
         try {
             in = task.createInputStream(conf.getCompressionType());
+            iterator = msgpack.createUnpacker(in).iterator();
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
-        iterator = msgpack.createUnpacker(in).iterator();
+    }
+
+    @Override
+    protected void sample(Task task) throws PreparePartsException {
+        // TODO FIXME #MN
     }
 
     @Override
@@ -78,7 +85,7 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
     }
 
     @Override
-    public boolean readRow() throws IOException {
+    public boolean readRecord() throws IOException {
         if (!iterator.hasNext()) {
             return false;
         }

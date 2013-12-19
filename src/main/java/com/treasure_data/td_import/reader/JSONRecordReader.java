@@ -59,14 +59,14 @@ public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrep
             reader = new BufferedReader(new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
                     conf.getCharsetDecoder()));
+            // create parser
+            parser = new JSONParser();
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
-
-        // create parser
-        parser = new JSONParser();
     }
 
+    @Override
     public void sample(Task task) throws PreparePartsException {
         BufferedReader sampleReader = null;
         try {
@@ -95,37 +95,8 @@ public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrep
                 throw new PreparePartsException(e);
             }
 
-            // print first sample row
-            JSONRecordWriter w = null;
-            try {
-                w = new JSONRecordWriter(conf);
-                setColumnNames();
-                w.setColumnNames(getColumnNames());
-                setColumnTypes();
-                w.setColumnTypes(getColumnTypes());
-                setSkipColumns();
-                w.setSkipColumns(getSkipColumns());
-                setTimeColumnValue();
-                w.setTimeColumnValue(getTimeColumnValue());
-
-                // convert each column in row
-                convertTypesOfColumns();
-                // write each column value
-                w.next(convertedRecord);
-                String ret = w.toJSONString();
-                String msg = null;
-                if (ret != null) {
-                    msg = "sample row: " + ret;
-                } else  {
-                    msg = "cannot get sample row";
-                }
-                System.out.println(msg);
-                LOG.info(msg);
-            } finally {
-                if (w != null) {
-                    w.close();
-                }
-            }
+            // print first sample record
+            printSample();
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "during sample method execution", e);
             throw new PreparePartsException(e);
@@ -161,7 +132,7 @@ public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrep
     }
 
     @Override
-    public boolean readRow() throws IOException {
+    public boolean readRecord() throws IOException {
         try {
             line = reader.readLine();
             if (line == null) {

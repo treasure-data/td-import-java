@@ -18,13 +18,18 @@
 package com.treasure_data.td_import.reader;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
+import com.treasure_data.td_import.writer.JSONRecordWriter;
 import com.treasure_data.td_import.writer.RecordWriter;
 
 public abstract class FixedColumnsRecordReader<T extends PrepareConfiguration> extends AbstractRecordReader<T> {
+
+    private static final Logger LOG = Logger.getLogger(FixedColumnsRecordReader.class.getName());
+
     public FixedColumnsRecordReader(T conf, RecordWriter writer) throws PreparePartsException {
         super(conf, writer);
     }
@@ -34,8 +39,39 @@ public abstract class FixedColumnsRecordReader<T extends PrepareConfiguration> e
         super.configure(task);
     }
 
+    protected abstract void sample(Task task) throws PreparePartsException;
+
+    protected void printSample() throws IOException, PreparePartsException {
+        JSONRecordWriter w = null;
+        try {
+            w = new JSONRecordWriter(conf);
+            w.setColumnNames(getColumnNames());
+            w.setColumnTypes(getColumnTypes());
+            w.setSkipColumns(getSkipColumns());
+            w.setTimeColumnValue(getTimeColumnValue());
+
+            // convert each column in row
+            convertTypesOfColumns();
+            // write each column value
+            w.next(convertedRecord);
+            String ret = w.toJSONString();
+            String msg = null;
+            if (ret != null) {
+                msg = "sample row: " + ret;
+            } else  {
+                msg = "cannot get sample row";
+            }
+            System.out.println(msg);
+            LOG.info(msg);
+        } finally {
+            if (w != null) {
+                w.close();
+            }
+        }
+    }
+
     @Override
-    public boolean readRow() throws IOException, PreparePartsException {
+    public boolean readRecord() throws IOException, PreparePartsException {
         throw new UnsupportedOperationException();
     }
 

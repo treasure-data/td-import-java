@@ -51,7 +51,7 @@ public interface RecordReader<T extends PrepareConfiguration> extends Closeable 
     void initializeConvertedRow();
 
     boolean next() throws PreparePartsException;
-    boolean readRow() throws IOException, PreparePartsException;
+    boolean readRecord() throws IOException, PreparePartsException;
     void convertTypesOfColumns() throws PreparePartsException;
     String getCurrentRow();
 

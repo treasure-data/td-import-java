@@ -294,7 +294,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
     public boolean next() throws PreparePartsException {
         try {
             // if reader got EOF, it returns false.
-            if (!readRow()) {
+            if (!readRecord()) {
                 return false;
             }
 
@@ -324,7 +324,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         return true;
     }
 
-    public abstract boolean readRow() throws IOException, PreparePartsException;
+    public abstract boolean readRecord() throws IOException, PreparePartsException;
 
     public abstract void convertTypesOfColumns() throws PreparePartsException;
 

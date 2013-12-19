@@ -34,7 +34,6 @@ import com.treasure_data.td_import.prepare.CSVPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.RecordWriter;
-import com.treasure_data.td_import.writer.JSONRecordWriter;
 
 public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(CSVRecordReader.class.getName());
@@ -55,7 +54,8 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
         private final CommentMatcher commentMatcher;
 
         /**
-         * Enumeration of tokenizer states. QUOTE_MODE is activated between quotes.
+         * Enumeration of tokenizer states. QUOTE_MODE is activated between
+         * quotes.
          */
         private enum TokenizerState {
             NORMAL, QUOTE_MODE;
@@ -63,12 +63,9 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
         /**
          * Constructs a new <tt>Tokenizer</tt>, which reads the CSV file, line by line.
          *
-         * @param reader
-         *            the reader
-         * @param preferences
-         *            the CSV preferences
-         * @throws NullPointerException
-         *             if reader or preferences is null
+         * @param reader                the reader
+         * @param preferences           the CSV preferences
+         * @throws NullPointerException if reader or preferences is null
          */
         public Tokenizer(final Reader reader, final CsvPreference preferences) {
             super(reader, preferences);
@@ -79,9 +76,6 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             this.commentMatcher = preferences.getCommentMatcher();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean readColumns(final List<String> columns) throws IOException {
             if (columns == null) {
                 throw new NullPointerException("columns should not be null");
@@ -114,14 +108,9 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             int potentialSpaces = 0; // keep track of spaces (so leading/trailing space can be removed if required)
             int charIndex = 0;
             while (true) {
-
                 final char c = line.charAt(charIndex);
 
-                if (TokenizerState.NORMAL.equals(state)) {
-                    /*
-                     * NORMAL mode (not within quotes).
-                     */
-
+                if (TokenizerState.NORMAL.equals(state)) { // NORMAL mode (not within quotes).
                     if (c == delimeterChar) {
                         /*
                          * Delimiter. Save the column (trim trailing space if
@@ -179,19 +168,18 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                         currentColumn.append(c);
                     }
 
-                } else {
-                    /*
-                     * QUOTE_MODE (within quotes).
-                     */
-
+                } else { // QUOTE_MODE (within quotes).
                     if (c == NEWLINE) {
-
                         /*
-                         * Newline. Doesn't count as newline while in QUOTESCOPE. Add the newline char, reset the charIndex
-                         * (will update to 0 for next iteration), read in the next line, then then continue to next
-                         * character. For a large file with an unterminated quoted section (no trailing quote), this could
-                         * cause memory issues as it will keep reading lines looking for the trailing quote. Maybe there
-                         * should be a configurable limit on max lines to read in quoted mode?
+                         * Newline. Doesn't count as newline while in
+                         * QUOTESCOPE. Add the newline char, reset the charIndex
+                         * (will update to 0 for next iteration), read in the
+                         * next line, then then continue to next character. For
+                         * a large file with an unterminated quoted section (no
+                         * trailing quote), this could cause memory issues as it
+                         * will keep reading lines looking for the trailing
+                         * quote. Maybe there should be a configurable limit on
+                         * max lines to read in quoted mode?
                          */
                         currentColumn.append(NEWLINE);
                         currentRow.append(NEWLINE); // specific line terminator lost, \n will have to suffice
@@ -199,11 +187,9 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                         charIndex = -1;
                         line = readLine();
                         if (line == null) {
-                            throw new SuperCsvException(
-                                    String.format(
-                                            "unexpected end of file while reading quoted column beginning on line %d and ending on line %d",
-                                            quoteScopeStartingLine,
-                                            getLineNumber()));
+                            throw new SuperCsvException(String.format(
+                                    "unexpected end of file while reading quoted column beginning on line %d and ending on line %d",
+                                    quoteScopeStartingLine, getLineNumber()));
                         }
 
                         currentRow.append(line); // update untokenized CSV row
@@ -211,7 +197,6 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                     } else if (c == quoteChar) {
                         if (charIndex > 2 && line.charAt(charIndex - 2) == '\\'
                                 && line.charAt(charIndex - 1) == '\\') {
-                            // TODO FIXME it's monkey patch
                             state = TokenizerState.NORMAL;
                             quoteScopeStartingLine = -1;
                         } else if (charIndex > 1 && line.charAt(charIndex - 1) == '\\') {
@@ -219,22 +204,26 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                             //charIndex++;
                         } else if (line.charAt(charIndex + 1) == quoteChar) {
                             /*
-                             * An escaped quote (""). Add a single quote, then move the cursor so the next iteration of the
-                             * loop will read the character following the escaped quote.
+                             * An escaped quote (""). Add a single quote, then
+                             * move the cursor so the next iteration of the loop
+                             * will read the character following the escaped
+                             * quote.
                              */
                             currentColumn.append(c);
                             charIndex++;
                         } else {
                             /*
-                             * A single quote ("). Update to NORMAL (but don't save quote), then continue to next character.
+                             * A single quote ("). Update to NORMAL (but don't
+                             * save quote), then continue to next character.
                              */
                             state = TokenizerState.NORMAL;
                             quoteScopeStartingLine = -1; // reset ready for next multi-line cell
                         }
                     } else {
                         /*
-                         * Just a normal character, delimiter (they don't count in QUOTESCOPE) or space. Add the character,
-                         * then continue to next character.
+                         * Just a normal character, delimiter (they don't count
+                         * in QUOTESCOPE) or space. Add the character, then
+                         * continue to next character.
                          */
                         currentColumn.append(c);
                     }
@@ -247,10 +236,8 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
         /**
          * Appends the required number of spaces to the StringBuilder.
          *
-         * @param sb
-         *            the StringBuilder
-         * @param spaces
-         *            the required number of spaces to append
+         * @param sb        the StringBuilder
+         * @param spaces    the required number of spaces to append
          */
         private static void appendSpaces(final StringBuilder sb, final int spaces) {
             for( int i = 0; i < spaces; i++ ) {
@@ -258,9 +245,6 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public String getUntokenizedRow() {
             return currentRow.toString();
         }
@@ -268,7 +252,7 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
 
     protected CsvPreference csvPref;
     private Tokenizer tokenizer;
-    protected List<String> row = new ArrayList<String>();
+    protected List<String> record = new ArrayList<String>();
 
     public CSVRecordReader(CSVPrepareConfiguration conf, RecordWriter writer)
             throws PreparePartsException {
@@ -295,37 +279,25 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                     task.createInputStream(conf.getCompressionType()),
                     conf.getCharsetDecoder()), csvPref);
         } catch (IOException e) {
-            LOG.log(Level.SEVERE,
-                    String.format("Cannot create CSV file reader [] %s",
-                            task.getSource()), e);
+            LOG.log(Level.SEVERE, String.format("Cannot create CSV file reader [] %s",
+                    task.getSource()), e);
             throw new PreparePartsException(e);
         }
+
+        // if column header exists, the line should be skipped
         if (conf.hasColumnHeader()) {
             try {
-                // header line is skipped
                 incrementLineNum();
                 tokenizer.readColumns(new ArrayList<String>());
             } catch (IOException e) {
-                LOG.log(Level.SEVERE,
-                        String.format("Column header is not read or EOF [line: 1] %s",
-                                task.getSource()), e);
+                LOG.log(Level.SEVERE, String.format("Column header is not read or EOF [line: 1] %s",
+                        task.getSource()), e);
                 throw new PreparePartsException(e);
             }
         }
     }
 
-    // TODO FIXME this method is bad design
-    private void setColumnNamesWithColumnHeader(Tokenizer tokenizer) throws IOException {
-        List<String> sampleRow = new ArrayList<String>();
-        if (conf.hasColumnHeader()) {
-            tokenizer.readColumns(sampleRow);
-            if (columnNames == null || columnNames.length == 0) {
-                columnNames = sampleRow.toArray(new String[0]);
-                conf.setColumnNames(columnNames);
-            }
-        }
-    }
-
+    @Override
     public void sample(Task task) throws PreparePartsException {
         Tokenizer sampleTokenizer = null;
 
@@ -340,7 +312,13 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             // 1) [ "time", "name", "price" ]
             // 2) [ "timestamp", "name", "price" ]
             // 3) [ "name", "price" ]
-            setColumnNamesWithColumnHeader(sampleTokenizer);
+            if (conf.hasColumnHeader()) {
+                sampleTokenizer.readColumns(record);
+                if (columnNames == null || columnNames.length == 0) {
+                    columnNames = record.toArray(new String[0]);
+                    conf.setColumnNames(columnNames);
+                }
+            }
 
             // get index of 'time' column
             // [ "time", "name", "price" ] as all columns is given,
@@ -366,44 +344,35 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                 sampleColumnValues[i] = new TimeColumnSampling(sampleRowSize);
             }
 
-            // read some rows
-            List<String> sampleRow = new ArrayList<String>();
+            // read some records
             for (int i = 0; i < sampleRowSize; i++) {
-                int lineNum = i + 1;
+                int lineNum = conf.hasColumnHeader() ? i + 2 : i + 1;
                 if (!isFirstRow && (columnTypes == null || columnTypes.length == 0)) {
                     break;
                 }
 
                 try {
-                    sampleTokenizer.readColumns(sampleRow);
+                    sampleTokenizer.readColumns(record);
                 } catch (IOException e) {
-                    LOG.log(Level.SEVERE, String.format(
-                            "Anything is not read or EOF [line: %d] %s",
+                    LOG.log(Level.SEVERE, String.format("Anything is not read or EOF [line: %d] %s",
                             lineNum, task.getSource()), e);
                     throw new PreparePartsException(e);
                 }
 
-                if (sampleRow == null || sampleRow.isEmpty()) {
+                if (record == null || record.isEmpty()) {
                     break;
                 }
 
                 if (isFirstRow) {
-                    firstRow.addAll(sampleRow);
+                    firstRow.addAll(record);
                     isFirstRow = false;
                 }
 
-                if (sampleColumnValues.length != sampleRow.size()) {
-                    throw new PreparePartsException(String.format(
-                            "The number of columns to be processed (%d) must " +
-                            "match the number of column types (%d): check that the " +
-                            "number of column types you have defined matches the " +
-                            "expected number of columns being read/written [line: %d] %s",
-                            sampleRow.size(), sampleColumnValues.length, lineNum, sampleRow));
-                }
+                validateSampleRecords(sampleColumnValues, i);
 
                 // sampling
                 for (int j = 0; j < sampleColumnValues.length; j++) {
-                    sampleColumnValues[j].parse(sampleRow.get(j));
+                    sampleColumnValues[j].parse(record.get(j));
                 }
             }
 
@@ -418,35 +387,11 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             // check properties of exclude/only columns
             setSkipColumns();
 
-            // print first sample row
-            JSONRecordWriter w = null;
-            try {
-                w = new JSONRecordWriter(conf);
-                w.setColumnNames(getColumnNames());
-                w.setColumnTypes(getColumnTypes());
-                w.setSkipColumns(getSkipColumns());
-                w.setTimeColumnValue(getTimeColumnValue());
+            record.clear();
+            record.addAll(firstRow);
 
-                this.row.addAll(firstRow);
-
-                // convert each column in row
-                convertTypesOfColumns();
-                // write each column value
-                w.next(convertedRecord);
-                String ret = w.toJSONString();
-                String msg = null;
-                if (ret != null) {
-                    msg = "sample row: " + ret;
-                } else  {
-                    msg = "cannot get sample row";
-                }
-                System.out.println(msg);
-                LOG.info(msg);
-            } finally {
-                if (w != null) {
-                    w.close();
-                }
-            }
+            // print first sample record
+            printSample();
         } catch (IOException e) {
             LOG.throwing(this.getClass().getName(), "sample", e);
             throw new PreparePartsException(e);
@@ -462,11 +407,22 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
         }
     }
 
+    private void validateSampleRecords(TimeColumnSampling[] sampleColumnValues, int lineNum)
+            throws PreparePartsException {
+        if (sampleColumnValues.length != record.size()) {
+            throw new PreparePartsException(
+                    String.format("The number of columns to be processed (%d) must " +
+                                  "match the number of column types (%d): check that the " +
+                                  "number of column types you have defined matches the " +
+                                  "expected number of columns being read/written [line: %d] %s",
+                            record.size(), columnTypes.length, lineNum, record));
+        }
+    }
+
     @Override
-    public boolean readRow() throws IOException, PreparePartsException {
-        row.clear();
+    public boolean readRecord() throws IOException, PreparePartsException {
         try {
-            if (!tokenizer.readColumns(row)) {
+            if (!tokenizer.readColumns(record)) {
                 return false;
             }
         } catch (IOException e) {
@@ -475,23 +431,26 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
 
         incrementLineNum();
 
-        int rawRowSize = row.size();
-        if (rawRowSize != columnTypes.length) {
+        validateRecords();
+
+        return true;
+    }
+
+    private void validateRecords() throws PreparePartsException {
+        if (record.size() != columnTypes.length) {
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
                     "match the number of column types (%d): check that the " +
                     "number of column types you have defined matches the " +
                     "expected number of columns being read/written [line: %d]",
-                    rawRowSize, columnTypes.length, getLineNum()));
+                    record.size(), columnTypes.length, getLineNum()));
         }
-
-        return true;
     }
 
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
-        for (int i = 0; i < this.row.size(); i++) {
-            columnTypes[i].convertType(this.row.get(i), convertedRecord.getValue(i));
+        for (int i = 0; i < record.size(); i++) {
+            columnTypes[i].convertType(record.get(i), convertedRecord.getValue(i));
         }
     }
 

@@ -33,9 +33,11 @@ import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
+import com.treasure_data.td_import.writer.JSONRecordWriter;
 import com.treasure_data.td_import.writer.RecordWriter;
 
 public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfiguration> extends AbstractRecordReader<T> {
+
     private static final Logger LOG = Logger.getLogger(VariableLengthColumnsRecordReader.class.getName());
 
     protected String aliasTimeColumnName = null;
@@ -59,31 +61,43 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
         timeColumnValue = new TimeColumnValue(-1, null);
     }
 
-    public void setColumnNames() {
-        throw new UnsupportedOperationException();
-    }
+    protected abstract void sample(Task task) throws PreparePartsException;
 
-    public void setColumnTypes() {
-        throw new UnsupportedOperationException();
-    }
+    protected void printSample() throws IOException, PreparePartsException {
+        JSONRecordWriter w = null;
+        try {
+            w = new JSONRecordWriter(conf);
+            setColumnNames();
+            w.setColumnNames(getColumnNames());
+            setColumnTypes();
+            w.setColumnTypes(getColumnTypes());
+            setSkipColumns();
+            w.setSkipColumns(getSkipColumns());
+            setTimeColumnValue();
+            w.setTimeColumnValue(getTimeColumnValue());
 
-    public ColumnType toColumnType(Object value) {
-        if (value instanceof Integer) {
-            return ColumnType.INT;
-        } else if (value instanceof Double) {
-            return ColumnType.DOUBLE;
-        } else if (value instanceof String) {
-            return ColumnType.STRING;
-        } else if (value instanceof Long) {
-            return ColumnType.LONG;
-        } else if (value instanceof List) {
-            return ColumnType.ARRAY;
-        } else if (value instanceof Map) {
-            return ColumnType.MAP;
-        } else {
-            throw new UnsupportedOperationException("During toColumnType() execution");
+            // convert each column in row
+            convertTypesOfColumns();
+            // write each column value
+            w.next(convertedRecord);
+            String ret = w.toJSONString();
+            String msg = null;
+            if (ret != null) {
+                msg = "sample row: " + ret;
+            } else  {
+                msg = "cannot get sample row";
+            }
+            System.out.println(msg);
+            LOG.info(msg);
+        } finally {
+            if (w != null) {
+                w.close();
+            }
         }
     }
+
+    protected abstract void setColumnNames();
+    protected abstract void setColumnTypes();
 
     @Override
     public void setSkipColumns() {
@@ -132,10 +146,28 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
         }
     }
 
+    protected ColumnType toColumnType(Object value) {
+        if (value instanceof Integer) {
+            return ColumnType.INT;
+        } else if (value instanceof Double) {
+            return ColumnType.DOUBLE;
+        } else if (value instanceof String) {
+            return ColumnType.STRING;
+        } else if (value instanceof Long) {
+            return ColumnType.LONG;
+        } else if (value instanceof List) {
+            return ColumnType.ARRAY;
+        } else if (value instanceof Map) {
+            return ColumnType.MAP;
+        } else {
+            throw new UnsupportedOperationException("During toColumnType() execution");
+        }
+    }
+
     @Override
     public boolean next() throws PreparePartsException {
         try {
-            if (!readRow()) {
+            if (!readRecord()) {
                 return false;
             }
 
@@ -174,7 +206,7 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
     }
 
     @Override
-    public boolean readRow() throws IOException {
+    public boolean readRecord() throws IOException {
         throw new UnsupportedOperationException();
     }
 

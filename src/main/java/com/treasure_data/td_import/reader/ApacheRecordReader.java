@@ -17,7 +17,6 @@
 //
 package com.treasure_data.td_import.reader;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import com.treasure_data.td_import.model.TimeColumnSampling;
@@ -41,8 +40,8 @@ public class ApacheRecordReader extends RegexRecordReader<ApachePrepareConfigura
     }
 
     @Override
-    public void validateRowSize(TimeColumnSampling[] sampleColumnValues,
-            List<String> row, int lineNum) throws PreparePartsException {
+    public void validateSampleRecords(TimeColumnSampling[] sampleColumnValues,
+            int lineNum) throws PreparePartsException {
         // ignore
     }
 

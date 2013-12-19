@@ -275,7 +275,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
     }
 
     @Override
-    public boolean readRow() throws IOException {
+    public boolean readRecord() throws IOException {
         row.clear();
         try {
             boolean hasNext = resultSet.next();

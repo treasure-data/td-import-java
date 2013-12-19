@@ -84,8 +84,8 @@ public class SyslogRecordReader extends RegexRecordReader<SyslogPrepareConfigura
     }
 
     @Override
-    public void validateRowSize(TimeColumnSampling[] sampleColumnValues,
-            List<String> row, int lineNum) throws PreparePartsException {
+    public void validateSampleRecords(TimeColumnSampling[] sampleColumnValues,
+            int lineNum) throws PreparePartsException {
         // ignore
     }
 

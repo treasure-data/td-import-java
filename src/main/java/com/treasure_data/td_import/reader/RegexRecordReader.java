@@ -40,7 +40,7 @@ public class RegexRecordReader<T extends RegexPrepareConfiguration> extends Fixe
     protected Pattern pat;
 
     protected String line;
-    protected List<String> row = new ArrayList<String>();
+    protected List<String> record = new ArrayList<String>();
 
     public RegexRecordReader(T conf, RecordWriter writer)
             throws PreparePartsException {
@@ -96,48 +96,47 @@ public class RegexRecordReader<T extends RegexPrepareConfiguration> extends Fixe
                 sampleColumnValues[i] = new TimeColumnSampling(sampleRowSize);
             }
 
-            // read some rows
-            List<String> sampleRow = new ArrayList<String>();
+            // read some records
             for (int i = 0; i < sampleRowSize; i++) {
                 if (!isFirstRow && (columnTypes == null || columnTypes.length == 0)) {
                     break;
                 }
 
-                String sampleLine = sampleReader.readLine();
+                record.clear();
+                line = sampleReader.readLine();
 
-                if (sampleLine == null) {
+                if (line == null) {
                     break;
                 }
 
                 Pattern samplePat = Pattern.compile(conf.getRegexPattern());
-                Matcher sampleMat = samplePat.matcher(sampleLine);
+                Matcher sampleMat = samplePat.matcher(line);
 
                 if (!sampleMat.matches()) {
                     throw new PreparePartsException("Don't match");
                 }
 
                 for (int j = 1; j < (columnNames.length + 1); j++) { // extract groups
-                    sampleRow.add(sampleMat.group(j));
+                    record.add(sampleMat.group(j));
                 }
 
                 if (isFirstRow) {
-                    firstRow.addAll(sampleRow);
+                    firstRow.addAll(record);
                     isFirstRow = false;
                 }
 
-                validateRowSize(sampleColumnValues, sampleRow, i);
+                validateSampleRecords(sampleColumnValues, i);
 
                 // sampling
                 for (int j = 0; j < sampleColumnValues.length; j++) {
-                    sampleColumnValues[j].parse(sampleRow.get(j));
+                    sampleColumnValues[j].parse(record.get(j));
                 }
-
-                sampleRow.clear();
             }
 
             // initialize types of all columns
             initializeColumnTypes(sampleColumnValues);
 
+            // initialize time column value
             setTimeColumnValue(sampleColumnValues, timeColumnIndex, aliasTimeColumnIndex);
 
             initializeConvertedRow();
@@ -145,35 +144,11 @@ public class RegexRecordReader<T extends RegexPrepareConfiguration> extends Fixe
             // check properties of exclude/only columns
             setSkipColumns();
 
-            // print first sample row
-            JSONRecordWriter w = null;
-            try {
-                w = new JSONRecordWriter(conf);
-                w.setColumnNames(getColumnNames());
-                w.setColumnTypes(getColumnTypes());
-                w.setSkipColumns(getSkipColumns());
-                w.setTimeColumnValue(getTimeColumnValue());
+            record.clear();
+            record.addAll(firstRow);
 
-                this.row.addAll(firstRow);
-
-                // convert each column in row
-                convertTypesOfColumns();
-                // write each column value
-                w.next(convertedRecord);
-                String ret = w.toJSONString();
-                String msg = null;
-                if (ret != null) {
-                    msg = "sample row: " + ret;
-                } else {
-                    msg = "cannot get sample row";
-                }
-                System.out.println(msg);
-                LOG.info(msg);
-            } finally {
-                if (w != null) {
-                    w.close();
-                }
-            }
+            // print first sample record
+            printSample();
         } catch (IOException e) {
             throw new PreparePartsException(e);
         } finally {
@@ -187,22 +162,21 @@ public class RegexRecordReader<T extends RegexPrepareConfiguration> extends Fixe
         }
     }
 
-    public void validateRowSize(TimeColumnSampling[] sampleColumnValues,
-            List<String> row, int lineNum) throws PreparePartsException {
-        if (sampleColumnValues.length != row.size()) {
+    protected void validateSampleRecords(TimeColumnSampling[] sampleColumnValues, int lineNum)
+            throws PreparePartsException {
+        if (sampleColumnValues.length != record.size()) {
             throw new PreparePartsException(
                     String.format("The number of columns to be processed (%d) must " +
                                   "match the number of column types (%d): check that the " +
                                   "number of column types you have defined matches the " +
                                   "expected number of columns being read/written [line: %d] %s",
-                            row.size(), columnTypes.length, lineNum, row));
+                            record.size(), columnTypes.length, lineNum, record));
         }
     }
 
     @Override
-    public boolean readRow() throws IOException, PreparePartsException {
-        row.clear();
-
+    public boolean readRecord() throws IOException, PreparePartsException {
+        record.clear();
         if ((line = reader.readLine()) == null) {
             return false;
         }
@@ -220,27 +194,29 @@ public class RegexRecordReader<T extends RegexPrepareConfiguration> extends Fixe
 
         // extract groups
         for (int i = 1; i < (columnNames.length + 1); i++) {
-            row.add(mat.group(i));
+            record.add(mat.group(i));
         }
 
-        int rawRowSize = row.size();
-        if (rawRowSize != columnTypes.length) {
-            writer.incrementErrorRowNum();
+        validateRecords();
+
+        return true;
+    }
+
+    private void validateRecords() throws PreparePartsException {
+        if (record.size() != columnTypes.length) {
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
                     "match the number of column types (%d): check that the " +
                     "number of column types you have defined matches the " +
                     "expected number of columns being read/written [line: %d]",
-                    rawRowSize, columnTypes.length, getLineNum()));
-        }
-
-        return true;
+                    record.size(), columnTypes.length, getLineNum()));
+        } 
     }
 
     @Override
     public void convertTypesOfColumns() throws PreparePartsException {
-        for (int i = 0; i < this.row.size(); i++) {
-            columnTypes[i].convertType(this.row.get(i), convertedRecord.getValue(i));
+        for (int i = 0; i < this.record.size(); i++) {
+            columnTypes[i].convertType(this.record.get(i), convertedRecord.getValue(i));
         }
     }
 
