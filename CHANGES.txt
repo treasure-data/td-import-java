@@ -1,4 +1,4 @@
-Release 0.4.6 - 20XX/XX/XX
+Release 0.4.6 - 2013/12/20
   NEW FEATURES
     Supports item tables. To use bulk import for item tables, new 'primary-key' option is required.
     Adds retry-count to upload command.
