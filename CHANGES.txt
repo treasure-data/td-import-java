@@ -5,6 +5,7 @@ Release 0.4.6 - 20XX/XX/XX
 
   BUG FIXED
     Fixes bug: livelock occurs when upload command receives unexpected combinations of some options.
+    Fixes bug: prepare processor never stops when EOFException occurs.
 
 Release 0.4.5 - 2013/12/17
   NEW FEATURES
