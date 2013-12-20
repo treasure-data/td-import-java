@@ -17,9 +17,11 @@
 //
 package com.treasure_data.td_import.reader;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -425,13 +427,19 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             if (!tokenizer.readColumns(record)) {
                 return false;
             }
-        } catch (IOException e) {
+        } catch (CharacterCodingException e) {
+            // MalformedInputException, UnmappableCharacterException
             throw new PreparePartsException(e);
+        } catch (EOFException e) {
+            // unexpected EOF
+            throw e;
+        } catch (IOException e) {
+            throw e;
         }
 
         incrementLineNum();
 
-        validateRecords();
+        validateRecords(); // throw PreparePartsException
 
         return true;
     }
