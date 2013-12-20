@@ -308,7 +308,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         } catch (IOException e) {
             // if reader throw I/O error, parseRow throws PreparePartsException.
             String msg = String.format("Cannot read raw data: line %d in %s", lineNum, source);
-            LOG.log(Level.WARNING, msg, e);
+            LOG.log(Level.SEVERE, msg, e);
             throw new PreparePartsException(e);
         } catch (PreparePartsException e) {
             writer.incrementErrorRowNum();
