@@ -77,9 +77,9 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
             w.setTimeColumnValue(getTimeColumnValue());
 
             // convert each column in row
-            convertTypesOfColumns();
+            convertTypes();
             // write each column value
-            w.next(convertedRecord);
+            w.next(writtenRecord);
             String ret = w.toJSONString();
             String msg = null;
             if (ret != null) {
@@ -181,10 +181,10 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
             writer.setTimeColumnValue(getTimeColumnValue());
 
             // convert each column in row
-            convertTypesOfColumns();
+            convertTypes();
 
             // write each column value
-            writer.next(convertedRecord);
+            writer.next(writtenRecord);
 
             writer.incrementRowNum();
         } catch (IOException e) {
@@ -196,9 +196,9 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
             writer.incrementErrorRowNum();
 
             // the untokenized raw row is written to error rows file
-            writeErrorRecord(getCurrentRow());
+            writeErrorRecord(getCurrentRecord());
             // the row data should be written to error rows file
-            String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRow());
+            String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRecord());
             LOG.log(Level.WARNING, msg, e);
             handleError(e);
         }
@@ -211,7 +211,7 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
     }
 
     @Override
-    public void convertTypesOfColumns() throws PreparePartsException {
+    public void convertTypes() throws PreparePartsException {
         throw new UnsupportedOperationException();
     }
 

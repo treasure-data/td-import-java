@@ -192,7 +192,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
             // initialize time column value
             setTimeColumnValue(timeColumnIndex, aliasTimeColumnIndex);
 
-            initializeConvertedRow();
+            initializeWrittenRecord();
 
             // check properties of exclude/only columns
             setSkipColumns();
@@ -208,9 +208,9 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
                 this.row.addAll(firstRow);
 
                 // convert each column in row
-                convertTypesOfColumns();
+                convertTypes();
                 // write each column value
-                w.next(convertedRecord);
+                w.next(writtenRecord);
                 String ret = w.toJSONString();
                 String msg = null;
                 if (ret != null) {
@@ -294,14 +294,14 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
     }
 
     @Override
-    public void convertTypesOfColumns() throws PreparePartsException {
+    public void convertTypes() throws PreparePartsException {
         for (int i = 0; i < row.size(); i++) {
-            columnTypes[i].setColumnValue(row.get(i), convertedRecord.getValue(i));
+            columnTypes[i].setColumnValue(row.get(i), writtenRecord.getValue(i));
         }
     }
 
     @Override
-    public String getCurrentRow() {
+    public String getCurrentRecord() {
         return row.toString();
     }
 

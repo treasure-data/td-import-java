@@ -51,9 +51,9 @@ public abstract class FixedColumnsRecordReader<T extends PrepareConfiguration> e
             w.setTimeColumnValue(getTimeColumnValue());
 
             // convert each column in row
-            convertTypesOfColumns();
+            convertTypes();
             // write each column value
-            w.next(convertedRecord);
+            w.next(writtenRecord);
             String ret = w.toJSONString();
             String msg = null;
             if (ret != null) {
@@ -76,7 +76,7 @@ public abstract class FixedColumnsRecordReader<T extends PrepareConfiguration> e
     }
 
     @Override
-    public void convertTypesOfColumns() throws PreparePartsException {
+    public void convertTypes() throws PreparePartsException {
         throw new UnsupportedOperationException();
     }
 

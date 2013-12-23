@@ -128,18 +128,18 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
     }
 
     @Override
-    public void convertTypesOfColumns() throws PreparePartsException {
+    public void convertTypes() throws PreparePartsException {
         ColumnValue[] columnValues = new ColumnValue[columnNames.length];
         for (int i = 0; i < columnNames.length; i++) {
             columnValues[i] = columnTypes[i].createColumnValue();
             columnTypes[i].setColumnValue(values[i], columnValues[i]);
         }
 
-        convertedRecord = new Record(columnValues);
+        writtenRecord = new Record(columnValues);
     }
 
     @Override
-    public String getCurrentRow() {
+    public String getCurrentRecord() {
         return "";
     }
 

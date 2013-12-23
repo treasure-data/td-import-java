@@ -52,7 +52,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
     protected T conf;
     protected RecordWriter writer;
-    protected Record convertedRecord;
+    protected Record writtenRecord;
 
     protected Source source;
     protected String[] columnNames;
@@ -65,10 +65,9 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
     protected long lineNum = 0;
 
-    protected String errFileDirName;
+    // fields for writing invalid records
+    private Writer errWriter;
     private boolean errWriterCreated = false;
-    protected Writer errWriter;
-    protected File errFile;
 
     protected AbstractRecordReader(T conf, RecordWriter writer) {
         this.conf = conf;
@@ -79,9 +78,6 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         source = task.getSource();
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
-
-        // error records output
-        this.errFileDirName = conf.getErrorRecordsOutputDirName();
 
         // check compression type of the file
         conf.checkCompressionType(source);
@@ -283,12 +279,12 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         }
     }
 
-    public void initializeConvertedRow() {
+    public void initializeWrittenRecord() {
         ColumnValue[] values = new ColumnValue[columnTypes.length];
         for (int i = 0; i < columnTypes.length; i++) {
             values[i] = columnTypes[i].createColumnValue();
         }
-        convertedRecord = new Record(values);
+        writtenRecord = new Record(values);
     }
 
     public boolean next() throws PreparePartsException {
@@ -299,10 +295,10 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
             }
 
             // convert each column in row
-            convertTypesOfColumns();
+            convertTypes();
 
             // write each column value
-            writer.next(convertedRecord);
+            writer.next(writtenRecord);
 
             writer.incrementRowNum();
         } catch (IOException e) {
@@ -314,9 +310,9 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
             writer.incrementErrorRowNum();
 
             // the untokenized raw row is written to error rows file
-            writeErrorRecord(getCurrentRow());
+            writeErrorRecord(getCurrentRecord());
             // the untokenized raw row is written to LOG
-            String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRow());
+            String msg = String.format("line %d in %s: %s", lineNum, source, getCurrentRecord());
             LOG.log(Level.WARNING, msg, e);
 
             handleError(e);
@@ -326,9 +322,9 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
     public abstract boolean readRecord() throws IOException, PreparePartsException;
 
-    public abstract void convertTypesOfColumns() throws PreparePartsException;
+    public abstract void convertTypes() throws PreparePartsException;
 
-    public abstract String getCurrentRow();
+    public abstract String getCurrentRecord();
 
     public void handleError(PreparePartsException e) throws PreparePartsException {
         conf.getErrorRecordsHandling().handleError(e);
@@ -356,17 +352,18 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
     }
 
     public void createErrWriter() {
+        String errDirName = conf.getErrorRecordsOutputDirName();
         String srcName = source.getPath();
         int lastSepIndex = srcName.lastIndexOf(File.separatorChar);
         String prefix = srcName.substring(lastSepIndex + 1, srcName.length()).replace('.', '_');
         String errFileName = prefix + ".error-records.txt";
 
-        File dir = new File(errFileDirName);
+        File dir = new File(errDirName);
         if (dir.exists()) {
             dir.mkdirs();
         }
 
-        errFile = new File(errFileDirName, errFileName);
+        File errFile = new File(errDirName, errFileName);
         if (errFile.exists()) {
             errFile.delete();
         }

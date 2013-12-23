@@ -139,7 +139,7 @@ public class RegexRecordReader<T extends RegexPrepareConfiguration> extends Fixe
             // initialize time column value
             setTimeColumnValue(sampleColumnValues, timeColumnIndex, aliasTimeColumnIndex);
 
-            initializeConvertedRow();
+            initializeWrittenRecord();
 
             // check properties of exclude/only columns
             setSkipColumns();
@@ -214,14 +214,14 @@ public class RegexRecordReader<T extends RegexPrepareConfiguration> extends Fixe
     }
 
     @Override
-    public void convertTypesOfColumns() throws PreparePartsException {
+    public void convertTypes() throws PreparePartsException {
         for (int i = 0; i < this.record.size(); i++) {
-            columnTypes[i].convertType(this.record.get(i), convertedRecord.getValue(i));
+            columnTypes[i].convertType(this.record.get(i), writtenRecord.getValue(i));
         }
     }
 
     @Override
-    public String getCurrentRow() {
+    public String getCurrentRecord() {
         return line;
     }
 

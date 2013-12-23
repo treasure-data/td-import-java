@@ -48,16 +48,20 @@ public interface RecordReader<T extends PrepareConfiguration> extends Closeable 
             int timeColumnIndex, int aliasTimeColumnIndex);
 
     void initializeColumnTypes(TimeColumnSampling[] sampleColumnValues);
-    void initializeConvertedRow();
+    void initializeWrittenRecord();
 
     boolean next() throws PreparePartsException;
-    boolean readRecord() throws IOException, PreparePartsException;
-    void convertTypesOfColumns() throws PreparePartsException;
-    String getCurrentRow();
 
+    boolean readRecord() throws IOException, PreparePartsException;
+
+    void convertTypes() throws PreparePartsException;
+
+    // get latest untokenized record
+    String getCurrentRecord();
+
+    // handle PreparePartsException
     void handleError(PreparePartsException e) throws PreparePartsException;
 
+    // write untokenized records that are invalid records to err-records.txt
     void writeErrorRecord(String record);
-    void createErrWriter();
-    void closeErrWriter();
 }

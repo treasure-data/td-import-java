@@ -19,7 +19,15 @@ package com.treasure_data.td_import.model;
 
 public class ItemTable extends Table {
 
-    public ItemTable(String databaseName, String tableName, TableSchema schema) {
+    protected String primaryKey;
+    protected ColumnType primaryKeyType;
+
+    public ItemTable(String databaseName, String tableName, TableSchema schema,
+            String primaryKey, ColumnType primaryKeyType) {
         super(databaseName, tableName, Table.Type.ITEM, schema);
+        this.primaryKey = primaryKey;
+        this.primaryKeyType = primaryKeyType;
     }
+
+
 }

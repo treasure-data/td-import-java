@@ -253,8 +253,8 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
     }
 
     protected CsvPreference csvPref;
-    private Tokenizer tokenizer;
-    protected List<String> record = new ArrayList<String>();
+    protected Tokenizer tokenizer;
+    protected List<String> readRecord = new ArrayList<String>();
 
     public CSVRecordReader(CSVPrepareConfiguration conf, RecordWriter writer)
             throws PreparePartsException {
@@ -315,9 +315,9 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             // 2) [ "timestamp", "name", "price" ]
             // 3) [ "name", "price" ]
             if (conf.hasColumnHeader()) {
-                sampleTokenizer.readColumns(record);
+                sampleTokenizer.readColumns(readRecord);
                 if (columnNames == null || columnNames.length == 0) {
-                    columnNames = record.toArray(new String[0]);
+                    columnNames = readRecord.toArray(new String[0]);
                     conf.setColumnNames(columnNames);
                 }
             }
@@ -354,19 +354,19 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                 }
 
                 try {
-                    sampleTokenizer.readColumns(record);
+                    sampleTokenizer.readColumns(readRecord);
                 } catch (IOException e) {
                     LOG.log(Level.SEVERE, String.format("Anything is not read or EOF [line: %d] %s",
                             lineNum, task.getSource()), e);
                     throw new PreparePartsException(e);
                 }
 
-                if (record == null || record.isEmpty()) {
+                if (readRecord == null || readRecord.isEmpty()) {
                     break;
                 }
 
                 if (isFirstRow) {
-                    firstRow.addAll(record);
+                    firstRow.addAll(readRecord);
                     isFirstRow = false;
                 }
 
@@ -374,7 +374,7 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
 
                 // sampling
                 for (int j = 0; j < sampleColumnValues.length; j++) {
-                    sampleColumnValues[j].parse(record.get(j));
+                    sampleColumnValues[j].parse(readRecord.get(j));
                 }
             }
 
@@ -384,13 +384,13 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
             // initialize time column value
             setTimeColumnValue(sampleColumnValues, timeColumnIndex, aliasTimeColumnIndex);
 
-            initializeConvertedRow();
+            initializeWrittenRecord();
 
             // check properties of exclude/only columns
             setSkipColumns();
 
-            record.clear();
-            record.addAll(firstRow);
+            readRecord.clear();
+            readRecord.addAll(firstRow);
 
             // print first sample record
             printSample();
@@ -411,20 +411,20 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
 
     private void validateSampleRecords(TimeColumnSampling[] sampleColumnValues, int lineNum)
             throws PreparePartsException {
-        if (sampleColumnValues.length != record.size()) {
+        if (sampleColumnValues.length != readRecord.size()) {
             throw new PreparePartsException(
                     String.format("The number of columns to be processed (%d) must " +
                                   "match the number of column types (%d): check that the " +
                                   "number of column types you have defined matches the " +
                                   "expected number of columns being read/written [line: %d] %s",
-                            record.size(), columnTypes.length, lineNum, record));
+                            readRecord.size(), columnTypes.length, lineNum, readRecord));
         }
     }
 
     @Override
     public boolean readRecord() throws IOException, PreparePartsException {
         try {
-            if (!tokenizer.readColumns(record)) {
+            if (!tokenizer.readColumns(readRecord)) {
                 return false;
             }
         } catch (CharacterCodingException e) {
@@ -445,25 +445,25 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
     }
 
     private void validateRecords() throws PreparePartsException {
-        if (record.size() != columnTypes.length) {
+        if (readRecord.size() != columnTypes.length) {
             throw new PreparePartsException(String.format(
                     "The number of columns to be processed (%d) must " +
                     "match the number of column types (%d): check that the " +
                     "number of column types you have defined matches the " +
                     "expected number of columns being read/written [line: %d]",
-                    record.size(), columnTypes.length, getLineNum()));
+                    readRecord.size(), columnTypes.length, getLineNum()));
         }
     }
 
     @Override
-    public void convertTypesOfColumns() throws PreparePartsException {
-        for (int i = 0; i < record.size(); i++) {
-            columnTypes[i].convertType(record.get(i), convertedRecord.getValue(i));
+    public void convertTypes() throws PreparePartsException {
+        for (int i = 0; i < readRecord.size(); i++) {
+            columnTypes[i].convertType(readRecord.get(i), writtenRecord.getValue(i));
         }
     }
 
     @Override
-    public String getCurrentRow() {
+    public String getCurrentRecord() {
         return tokenizer.getUntokenizedRow();
     }
 
