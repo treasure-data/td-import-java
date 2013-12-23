@@ -26,6 +26,14 @@ public class CommandHelper {
     public CommandHelper() {
     }
 
+    public void printLine(String message) {
+        System.out.printf(message + "\n");
+    }
+
+    public void printLine(String format, Object ... args) {
+        System.out.printf(format + "\n", args);
+    }
+
     public void showPrepare(Source[] sources, String outputDirName) {
         System.out.println();
         System.out.println("Preparing sources");
