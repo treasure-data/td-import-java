@@ -44,6 +44,27 @@ public final class BulkImportCommand extends BulkImport {
         commandHelper = new CommandHelper();
     }
 
+    public void doMain(final String[] args) throws Exception {
+        try {
+            if (args.length < 1) {
+                throw new IllegalArgumentException("Command not specified");
+            }
+
+            String cmdName = args[0].toLowerCase();
+            Configuration.Command cmd = Configuration.Command.fromString(cmdName);
+            if (cmd == null) {
+                throw new IllegalArgumentException(String.format("Command not support: %s", cmdName));
+            }
+
+            Properties props = System.getProperties();
+            new BulkImportCommand(props).doCommand(cmd, args);
+        } catch (IllegalArgumentException e) {
+            String msg = String.format("Cannot execute your command: %s", e.getMessage());
+            commandHelper.printLine(msg);
+            LOG.log(Level.SEVERE, msg, e);
+        }
+    }
+
     public void doCommand(final Configuration.Command cmd, final String[] args) throws Exception {
         if (cmd.equals(Configuration.Command.PREPARE)) {
             doPrepareCommand(args);
@@ -224,17 +245,6 @@ public final class BulkImportCommand extends BulkImport {
     }
 
     public static void main(final String[] args) throws Exception {
-        if (args.length < 1) {
-            throw new IllegalArgumentException("Command not specified");
-        }
-
-        String cmdName = args[0].toLowerCase();
-        Configuration.Command cmd = Configuration.Command.fromString(cmdName);
-        if (cmd == null) {
-            throw new IllegalArgumentException(String.format("Command not support: %s", cmdName));
-        }
-
-        Properties props = System.getProperties();
-        new BulkImportCommand(props).doCommand(cmd, args);
+        new BulkImportCommand(System.getProperties()).doMain(args);;
     }
 }
