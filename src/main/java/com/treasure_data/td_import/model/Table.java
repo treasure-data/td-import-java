@@ -17,6 +17,55 @@
 //
 package com.treasure_data.td_import.model;
 
-public class Table {
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+public abstract class Table {
+
+    public static enum Type {
+        LOG("log"), ITEM("item");
+
+        private String type;
+
+        Type(String type) {
+            this.type = type;
+        }
+
+        public String type() {
+            return type;
+        }
+
+        public static Type fromString(String type) {
+            return StringToType.get(type);
+        }
+
+        private static class StringToType {
+            private static final Map<String, Type> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, Type> map = new HashMap<String, Type>();
+                for (Type elem : Type.values()) {
+                    map.put(elem.type(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static Type get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
+
+    protected String databaseName;
+    protected String tableName;
+    protected Type type;
+    protected TableSchema schema;
+
+    public Table(String databaseName, String tableName, Type type, TableSchema schema) {
+        this.databaseName = databaseName;
+        this.tableName = tableName;
+        this.type = type;
+        this.schema = schema;
+    }
 }

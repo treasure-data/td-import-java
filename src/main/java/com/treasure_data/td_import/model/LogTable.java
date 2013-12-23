@@ -17,9 +17,9 @@
 //
 package com.treasure_data.td_import.model;
 
-public class TableSchema {
+public class LogTable extends Table {
 
-    protected String columnNames;
-    protected ColumnType[] columnTypes;
-
+    public LogTable(String databaseName, String tableName, TableSchema schema) {
+        super(databaseName, tableName, Table.Type.LOG, schema);
+    }
 }

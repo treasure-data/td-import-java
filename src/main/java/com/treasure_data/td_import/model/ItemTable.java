@@ -17,9 +17,9 @@
 //
 package com.treasure_data.td_import.model;
 
-public class TableSchema {
+public class ItemTable extends Table {
 
-    protected String columnNames;
-    protected ColumnType[] columnTypes;
-
+    public ItemTable(String databaseName, String tableName, TableSchema schema) {
+        super(databaseName, tableName, Table.Type.ITEM, schema);
+    }
 }
