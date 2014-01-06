@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 
-public class CSVPrepareConfiguration extends PrepareConfiguration {
+public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
 
     public static enum Quote {
         DOUBLE("\""), SINGLE("'"), NONE("\u0000");
@@ -58,7 +58,6 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
     protected char delimiterChar;
     protected Quote quoteChar;
     protected NewLine newline;
-    protected boolean hasColumnHeader;
     protected String typeErrorMode;
 
     public CSVPrepareConfiguration() {
@@ -155,6 +154,7 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
         this.columnNames = columnNames;
     }
 
+    @Override
     public void setColumnHeader() {
         hasColumnHeader = optionSet.has("column-header");
     }
@@ -166,9 +166,5 @@ public class CSVPrepareConfiguration extends PrepareConfiguration {
         } else if (!hasColumnHeader()) {
             throw new IllegalArgumentException("Column names not set");
         }
-    }
-
-    public boolean hasColumnHeader() {
-        return hasColumnHeader;
     }
 }

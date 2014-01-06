@@ -22,38 +22,25 @@ import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Options;
 
-public class RegexPrepareConfiguration extends FixedColumnsPrepareConfiguration {
-    private static final Logger LOG = Logger
-            .getLogger(RegexPrepareConfiguration.class.getName());
+public class FixedColumnsPrepareConfiguration extends PrepareConfiguration {
+    private static final Logger LOG = Logger.getLogger(FixedColumnsPrepareConfiguration.class.getName());
 
-    protected String regexPattern;
+    protected boolean hasColumnHeader;
 
-    public RegexPrepareConfiguration() {
+    public FixedColumnsPrepareConfiguration() {
+        super();
     }
 
     @Override
     public void configure(Properties props, Options options) {
         super.configure(props, options);
-
-        setColumnNames();
-        setColumnTypes();
-        setRegexPattern();
     }
 
-    public void setRegexPattern() {
-        if (!optionSet.has(BI_PREPARE_PARTS_REGEX_PATTERN)) {
-            throw new IllegalArgumentException(String.format(
-                    "Not specify regex pattern. '%s' option is required", BI_PREPARE_PARTS_REGEX_PATTERN));
-        } else {
-            regexPattern = (String) optionSet.valueOf(BI_PREPARE_PARTS_REGEX_PATTERN);
-        }
-    }
-    public String getRegexPattern() {
-        return regexPattern;
-    }
-
-    @Override
     public void setColumnHeader() {
-        hasColumnHeader = false;
+        throw new UnsupportedOperationException("this method is implemented in sub-classes");
+    }
+
+    public boolean hasColumnHeader() {
+        return hasColumnHeader;
     }
 }

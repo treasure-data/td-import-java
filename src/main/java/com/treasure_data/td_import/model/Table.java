@@ -62,10 +62,7 @@ public abstract class Table {
     protected Type type;
     protected TableSchema schema;
 
-    public Table(String databaseName, String tableName, Type type, TableSchema schema) {
-        this.databaseName = databaseName;
-        this.tableName = tableName;
+    public Table(Type type) {
         this.type = type;
-        this.schema = schema;
     }
 }

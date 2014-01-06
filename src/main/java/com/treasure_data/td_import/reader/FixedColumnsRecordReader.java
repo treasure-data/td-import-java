@@ -20,13 +20,13 @@ package com.treasure_data.td_import.reader;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasure_data.td_import.prepare.FixedColumnsPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.JSONRecordWriter;
 import com.treasure_data.td_import.writer.RecordWriter;
 
-public abstract class FixedColumnsRecordReader<T extends PrepareConfiguration> extends AbstractRecordReader<T> {
+public abstract class FixedColumnsRecordReader<T extends FixedColumnsPrepareConfiguration> extends AbstractRecordReader<T> {
 
     private static final Logger LOG = Logger.getLogger(FixedColumnsRecordReader.class.getName());
 
@@ -70,9 +70,26 @@ public abstract class FixedColumnsRecordReader<T extends PrepareConfiguration> e
         }
     }
 
+    public void readHeader() throws IOException, PreparePartsException {
+        throw new UnsupportedOperationException("this method should be implemented in sub-classes");
+    }
+
     @Override
     public boolean readRecord() throws IOException, PreparePartsException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("this method should be implemented in sub-classes");
+    }
+
+    public void validateRecord(int expected, int actual) throws PreparePartsException {
+        if (expected == actual) {
+            return;
+        }
+
+        throw new PreparePartsException(String.format(
+                "The number of columns to be processed (%d) must " +
+                        "match the number of column types (%d): check that the " +
+                        "number of column types you have defined matches the " +
+                        "expected number of columns being read/written [line: %d]",
+                        actual, expected, getLineNum()));
     }
 
     @Override

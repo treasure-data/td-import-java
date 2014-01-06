@@ -19,7 +19,7 @@ package com.treasure_data.td_import.model;
 
 public class LogTable extends Table {
 
-    public LogTable(String databaseName, String tableName, TableSchema schema) {
-        super(databaseName, tableName, Table.Type.LOG, schema);
+    public LogTable() {
+        super(Table.Type.LOG);
     }
 }
