@@ -1,3 +1,8 @@
+Release 0.4.7 - 20XX/XX/XX
+  BUG FIXED
+    Fixes bug: prepare processor stops if it cannot parse invalid records during pre-execution (sampling) time.
+
+
 Release 0.4.6 - 2013/12/20
   NEW FEATURES
     Supports item tables. To use bulk import for item tables, new 'primary-key' option is required.
