@@ -371,6 +371,10 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                     LOG.log(Level.SEVERE, String.format("Anything is not read or EOF [line: %d] %s",
                             getLineNum(), task.getSource()), e);
                     throw new PreparePartsException(e);
+                } catch (PreparePartsException e) {
+                    String msg = String.format("line %d in %s: %s", getLineNum(), source, getCurrentRecord());
+                    LOG.log(Level.WARNING, msg, e);
+                    continue;
                 }
 
                 if (isFirstRow) {
