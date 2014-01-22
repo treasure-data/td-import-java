@@ -198,18 +198,8 @@ public class UploadProcessor extends UploadProcessorBase {
             return err;
         }
 
-        // commit
-        err = commitSession(client, conf, sessName);
-        if (err.error != null) {
-            return err;
-        }
-
-        if (!conf.autoDelete()) {
-            return new TaskResult();
-        }
-
-        // wait committing
-        err = waitCommit(client, conf, sessName);
+        // commit and wait commit
+        err = commitAndWaitCommit(client, conf, sessName);
         if (err.error != null) {
             return err;
         }
@@ -310,6 +300,44 @@ public class UploadProcessor extends UploadProcessorBase {
         }
 
         return err;
+    }
+
+    public static TaskResult commitAndWaitCommit(final BulkImportClient client,
+            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+        TaskResult err = new TaskResult();
+        boolean firstRequest = true;
+        int retryCount = 0;
+
+        while (true) {
+            if (!firstRequest) {
+                if (retryCount > 8) {
+                    return err;
+                }
+
+                try {
+                    summary = client.showSession(sessionName);
+                } catch (ClientException e) {
+                    LOG.severe(e.getMessage());
+                    err.error = new IOException(e);
+                }
+
+                if (summary.getStatus().equals("committed")) {
+                    return err;
+                } else {
+                    retryCount++;
+                }
+            }
+
+            // commit
+            err = commitSession(client, conf, sessionName);
+            firstRequest = false;
+            if (err.error != null) {
+                return err;
+            }
+
+            // wait commit
+            err = waitCommit(client, conf, sessionName);
+        }
     }
 
     public static TaskResult commitSession(final BulkImportClient client,
