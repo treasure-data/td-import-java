@@ -1,7 +1,9 @@
 Release 0.4.7 - 20XX/XX/XX
+  IMPROVEMENTS
+    Changes behavior of auto-commit option: if a user executes upload command with auto-commit, he waits to finish commit process.
+
   BUG FIXED
     Fixes bug: prepare processor stops if it cannot parse invalid records during pre-execution (sampling) time.
-
 
 Release 0.4.6 - 2013/12/20
   NEW FEATURES
