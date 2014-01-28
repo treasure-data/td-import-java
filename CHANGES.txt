@@ -4,6 +4,7 @@ Release 0.4.7 - 20XX/XX/XX
 
   BUG FIXED
     Fixes bug: prepare processor stops if it cannot parse invalid records during pre-execution (sampling) time.
+    Fixes bug: JSON file reader cannot read and parse nil values.
 
 Release 0.4.6 - 2013/12/20
   NEW FEATURES

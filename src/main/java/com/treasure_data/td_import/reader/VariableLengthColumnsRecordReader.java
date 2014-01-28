@@ -147,6 +147,10 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
     }
 
     protected ColumnType toColumnType(Object value) {
+        if (value == null) {
+            return ColumnType.NIL;
+        }
+
         if (value instanceof Integer) {
             return ColumnType.INT;
         } else if (value instanceof Double) {

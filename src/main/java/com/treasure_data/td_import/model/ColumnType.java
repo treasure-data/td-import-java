@@ -26,6 +26,7 @@ import com.treasure_data.td_import.writer.RecordWriter;
 
 public interface ColumnType {
 
+    ColumnType NIL = new NilColumnType(); // special column type for JSON files
     ColumnType BOOLEAN = new BooleanColumnType();
     ColumnType DOUBLE = new DoubleColumnType();
     ColumnType FLOAT = new FloatColumnType();
