@@ -127,6 +127,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             + "If you want 'auto-create' option, you explicitly must declare it as command options.\n";
 
     String CMD_AUTO_OPTIONS =
+            "    --retry-count NUM                upload process will automatically retry at specified time; default: 10\n" +
             "    --auto-create DATABASE.TABLE     create automatically bulk import session by specified database and table names\n" +
             "                                     If you use 'auto-create' option, you MUST not specify any session name as first argument.\n" +
             "    --parallel NUM                   upload in parallel (default: 2; max 8)\n" +
