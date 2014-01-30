@@ -67,8 +67,8 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
             "    --error-records-output DIR       write error records; default directory is directory specified as 'output' option\n" +
             "    --columns NAME,NAME,...          column names (use --column-header instead if the first line has column names)\n" +
-            "    --column-types TYPE,TYPE,...     column types [string, int, long]\n" +
-            "    --column-type NAME:TYPE          column type [string, int, long]. A pair of column name and type can be specified like 'age:int'\n" +
+            "    --column-types TYPE,TYPE,...     column types [string, int, long, double]\n" +
+            "    --column-type NAME:TYPE          column type [string, int, long, double]. A pair of column name and type can be specified like 'age:int'\n" +
             "    -S, --all-string                 disable automatic type conversion\n" +
             "\n" +
             "    CSV/TSV specific options:\n" +
@@ -259,10 +259,10 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_COLUMNS_DESC = "column names (use --column-header instead if the first line has column names)";
     String BI_PREPARE_PARTS_COLUMNTYPES = "column-types";
     String BI_PREPARE_COLUMNTYPES_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNTYPES;
-    String BI_PREPARE_PARTS_COLUMNTYPES_DESC = "column types [string, int, long]";
+    String BI_PREPARE_PARTS_COLUMNTYPES_DESC = "column types [string, int, long, double]";
     String BI_PREPARE_COLUMNTYPE = "column-type";
     String BI_PREPARE_COLUMNTYPE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_COLUMNTYPE;
-    String BI_PREPARE_COLUMNTYPE_DESC = "column type [string, int, long]. A pair of column name and type can be specified like 'age:int'";
+    String BI_PREPARE_COLUMNTYPE_DESC = "column type [string, int, long, double]. A pair of column name and type can be specified like 'age:int'";
 
     // all-string
     String BI_PREPARE_ALL_STRING = "all-string";
