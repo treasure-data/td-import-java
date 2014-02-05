@@ -1,4 +1,4 @@
-Release 0.4.7 - 20XX/XX/XX
+Release 0.4.7 - 2014/02/04
   IMPROVEMENTS
     Changes behavior of auto-commit option: if a user executes upload command with auto-commit, he waits to finish commit process.
 
