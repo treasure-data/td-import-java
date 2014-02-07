@@ -43,6 +43,7 @@ public abstract class FixedColumnsRecordReader<T extends FixedColumnsPrepareConf
 
     protected void printSample() throws IOException, PreparePartsException {
         JSONRecordWriter w = null;
+        String ret = null;
         try {
             w = new JSONRecordWriter(conf);
             w.setColumnNames(getColumnNames());
@@ -54,20 +55,23 @@ public abstract class FixedColumnsRecordReader<T extends FixedColumnsPrepareConf
             convertTypes();
             // write each column value
             w.next(writtenRecord);
-            String ret = w.toJSONString();
-            String msg = null;
-            if (ret != null) {
-                msg = "sample row: " + ret;
-            } else  {
-                msg = "cannot get sample row";
-            }
-            System.out.println(msg);
-            LOG.info(msg);
+            ret = w.toJSONString();
+        } catch (PreparePartsException e) {
+            // ignore
         } finally {
             if (w != null) {
                 w.close();
             }
         }
+
+        String msg = null;
+        if (ret != null) {
+            msg = "sample row: " + ret;
+        } else  {
+            msg = "cannot get sample row";
+        }
+        System.out.println(msg);
+        LOG.info(msg);
     }
 
     public void readHeader() throws IOException, PreparePartsException {
