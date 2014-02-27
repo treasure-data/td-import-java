@@ -1,3 +1,7 @@
+Release 0.4.9 - 20XX/XX/XX
+  IMPROVEMENTS
+    Changes JDK logging with append mode
+
 Release 0.4.8 - 2014/02/14
   IMPROVEMENTS
     Updates td-client 0.3.5.
