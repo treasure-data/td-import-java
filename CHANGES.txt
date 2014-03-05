@@ -1,6 +1,7 @@
-Release 0.4.9 - 20XX/XX/XX
+Release 0.4.9 - 2014/03/04
   IMPROVEMENTS
     Changes JDK logging with append mode
+    Changes upper limit of prepare-parallel option: 8 to 96
 
 Release 0.4.8 - 2014/02/14
   IMPROVEMENTS
