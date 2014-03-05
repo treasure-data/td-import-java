@@ -1,3 +1,5 @@
+Release 0.4.10 - 20XX/XX/XX
+
 Release 0.4.9 - 2014/03/04
   IMPROVEMENTS
     Changes JDK logging with append mode
