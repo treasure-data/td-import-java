@@ -61,7 +61,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    -t, --time-column NAME           name of the time column\n" +
             "    --time-value TIME                long value of the time column\n" +
             "    --primary-key NAME:TYPE          pair of name and type of primary key declared in your item table\n" +
-            "    --prepare-parallel NUM           prepare in parallel (default: 2; max 8)\n" +
+            "    --prepare-parallel NUM           prepare in parallel (default: 2; max 96)\n" +
             "    --only-columns NAME,NAME,...     only columns\n" +
             "    --exclude-columns NAME,NAME,...  exclude columns\n" +
             "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
@@ -246,7 +246,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_PARALLEL = "prepare-parallel";
     String BI_PREPARE_PARALLEL_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_PARALLEL;
     String BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE = "1";
-    String BI_PREPARE_PARTS_PARALLEL_DESC = "prepare in parallel (default: 2; max 8)";
+    String BI_PREPARE_PARTS_PARALLEL_DESC = "prepare in parallel (default: 2; max 96)";
 
     // encoding [utf-8,...]
     String BI_PREPARE_PARTS_ENCODING = "encoding";

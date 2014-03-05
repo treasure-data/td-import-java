@@ -645,8 +645,8 @@ public class PrepareConfiguration extends Configuration {
             int n = Integer.parseInt(num);
             if (n < 0) {
                 numOfPrepareThreads = 2;
-            } else if (n > 9){
-                numOfPrepareThreads = 8;
+            } else if (n > 96) {
+                numOfPrepareThreads = 96;
             } else {
                 numOfPrepareThreads = n;
             }
