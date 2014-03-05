@@ -19,6 +19,7 @@ package com.treasure_data.td_import.reader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.msgpack.MessagePack;
@@ -27,6 +28,7 @@ import org.msgpack.type.IntegerValue;
 import org.msgpack.type.MapValue;
 import org.msgpack.type.RawValue;
 import org.msgpack.type.Value;
+import org.msgpack.type.ValueFactory;
 import org.msgpack.unpacker.UnpackerIterator;
 
 import com.treasure_data.td_import.model.ColumnType;
@@ -68,7 +70,40 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
 
     @Override
     protected void sample(Task task) throws PreparePartsException {
-        // TODO FIXME #MN
+        InputStream sampleIn = null;
+        try {
+            sampleIn = task.createInputStream(conf.getCompressionType());
+            UnpackerIterator sampleIter = msgpack.createUnpacker(sampleIn).iterator();
+
+            if (!sampleIter.hasNext()) {
+                String msg = String.format("Anything is not read or EOF [line: 1] %s", task.getSource());
+                LOG.severe(msg);
+                throw new PreparePartsException(msg);
+            }
+
+            Value v = sampleIter.next();
+            String msg = null;
+            if (v != null) {
+                msg = "sample row: " + v.toString();
+            } else {
+                msg = "cannot get sample row";
+            }
+
+            System.out.println(msg);
+            LOG.info(msg);
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "during sample method execution", e);
+            throw new PreparePartsException(e);
+        } finally {
+            if (sampleIn != null) {
+                try {
+                    sampleIn.close();
+                } catch (IOException e) {
+                    LOG.log(Level.SEVERE, "sampling reader cannot be closed", e);
+                    throw new PreparePartsException(e);
+                }
+            }
+        }
     }
 
     @Override
