@@ -47,6 +47,7 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     String CMD_PREPARE_EXAMPLE =
             "  $ td import:prepare logs/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
+            "  $ td import:prepare logs/*.csv --format csv --columns date_code,uid,price,count --time-value 1394409600,10 -o parts/\n" +
             "  $ td import:prepare mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
 
     String CMD_PREPARE_DESC = "  Convert files into part file format\n";

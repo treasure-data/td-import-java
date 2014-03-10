@@ -767,16 +767,15 @@ public class PrepareConfiguration extends Configuration {
                 } else {
                     String[] vv = v.split(",");
                     if (vv.length != 2) {
-                        throw new IllegalArgumentException(); // TODO
+                        throw new IllegalArgumentException(
+                                "'time-value' option requires a pair argument of long typed unix time and hours sorted periodically <unixtime>,<hours> like 1394409600,10");
                     }
                     timeValue = new TimeValueTimeColumnValue(
                             Long.parseLong(vv[0]), Long.parseLong(vv[1]));
                 }
             } catch (NumberFormatException e) {
-                // TODO
-                String msg = String.format(
-                        "'%s' is required as long type (unix timestamp)", BI_PREPARE_PARTS_TIMEVALUE);
-                throw new IllegalArgumentException(msg, e);
+                throw new IllegalArgumentException(
+                        "'time-value option requires the long type argument'", e);
             }
         }
     }
