@@ -41,7 +41,6 @@ public class TimeValueTimeColumnValue extends TimeColumnValue {
     }
 
     public void write(RecordWriter with) throws PreparePartsException {
-        System.out.println("currentTimeValue: " + currentTimeValue);
         with.write(currentTimeValue);
         if (hours > 0) {
             currentTimeValue++;
