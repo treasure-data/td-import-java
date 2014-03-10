@@ -21,11 +21,19 @@ import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
 public class TimeValueTimeColumnValue extends TimeColumnValue {
-    private long timeValue;
+    private final long timeValue;
+    private final long hours;
+    private long currentTimeValue;
 
     public TimeValueTimeColumnValue(long timeValue) {
+        this(timeValue, 0);
+    }
+
+    public TimeValueTimeColumnValue(long timeValue, long hours) {
         super(0, null);
         this.timeValue = timeValue;
+        this.currentTimeValue = timeValue;
+        this.hours = hours * 60 * 60;
     }
 
     public long getTimeValue() {
@@ -33,7 +41,14 @@ public class TimeValueTimeColumnValue extends TimeColumnValue {
     }
 
     public void write(RecordWriter with) throws PreparePartsException {
-        with.write(timeValue);
+        System.out.println("currentTimeValue: " + currentTimeValue);
+        with.write(currentTimeValue);
+        if (hours > 0) {
+            currentTimeValue++;
+            if (currentTimeValue > timeValue + hours) {
+                currentTimeValue = timeValue;
+            }
+        }
     }
 
     public void write(ColumnValue v, RecordWriter with) throws PreparePartsException {

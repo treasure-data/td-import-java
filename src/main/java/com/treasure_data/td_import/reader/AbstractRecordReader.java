@@ -200,7 +200,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
         // check time and the alias column
         if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
-            if (conf.getTimeValue() >= 0) {
+            if (conf.getTimeValue().getTimeValue() >= 0) {
             } else {
                 throw new PreparePartsException(
                         "Time column not found. --time-column or --time-value option is required");
@@ -254,7 +254,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         }
 
         if (index < 0) {
-            timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+            timeColumnValue = conf.getTimeValue();
         } else if (conf.getTimeFormat() != null) {
             timeColumnValue = createTimeColumnValue(index, isAlias, conf.getTimeFormat());
         } else {

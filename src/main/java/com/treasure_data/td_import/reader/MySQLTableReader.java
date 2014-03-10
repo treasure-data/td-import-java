@@ -127,7 +127,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
         }
 
         if (index < 0) {
-            timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+            timeColumnValue = conf.getTimeValue();
         } else {
             if (!isAlias) {
                 timeColumnValue = new TimeColumnValue(index, conf.getTimeFormat());
@@ -166,7 +166,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
 
             // if 'time' and the alias columns don't exist, ...
             if (timeColumnIndex < 0 && aliasTimeColumnIndex < 0) {
-                if (conf.getTimeValue() >= 0) {
+                if (conf.getTimeValue().getTimeValue() >= 0) {
                 } else {
                     throw new PreparePartsException(
                             "Time column not found. --time-column or --time-value option is required");

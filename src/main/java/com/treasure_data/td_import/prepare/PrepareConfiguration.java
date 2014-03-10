@@ -38,6 +38,7 @@ import joptsimple.OptionSet;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.ColumnType;
+import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
 import com.treasure_data.td_import.reader.ApacheRecordReader;
 import com.treasure_data.td_import.reader.CSVRecordReader;
 import com.treasure_data.td_import.reader.RecordReader;
@@ -416,7 +417,7 @@ public class PrepareConfiguration extends Configuration {
     protected int numOfPrepareThreads;
 
     protected String aliasTimeColumn;
-    protected long timeValue = -1;
+    protected TimeValueTimeColumnValue timeValue = new TimeValueTimeColumnValue(-1);
     protected String timeFormat;
 
     protected boolean hasPrimaryKey = false;
@@ -759,9 +760,20 @@ public class PrepareConfiguration extends Configuration {
 
         String v = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMEVALUE);
         if (v != null) {
+            boolean periodicallySorted = v.indexOf(',') >= 0;
             try {
-                timeValue = Long.parseLong(v);
+                if (!periodicallySorted) {
+                    timeValue = new TimeValueTimeColumnValue(Long.parseLong(v));
+                } else {
+                    String[] vv = v.split(",");
+                    if (vv.length != 2) {
+                        throw new IllegalArgumentException(); // TODO
+                    }
+                    timeValue = new TimeValueTimeColumnValue(
+                            Long.parseLong(vv[0]), Long.parseLong(vv[1]));
+                }
             } catch (NumberFormatException e) {
+                // TODO
                 String msg = String.format(
                         "'%s' is required as long type (unix timestamp)", BI_PREPARE_PARTS_TIMEVALUE);
                 throw new IllegalArgumentException(msg, e);
@@ -769,7 +781,7 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
-    public long getTimeValue() {
+    public TimeValueTimeColumnValue getTimeValue() {
         return timeValue;
     }
 

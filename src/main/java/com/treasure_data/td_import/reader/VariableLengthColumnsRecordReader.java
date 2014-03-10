@@ -142,8 +142,8 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
                 timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat());
             } else if (aliasTimeColumnIndex >= 0) {
                 timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat());
-            } else if (conf.getTimeValue() >= 0) {
-                timeColumnValue = new TimeValueTimeColumnValue(conf.getTimeValue());
+            } else if (conf.getTimeValue().getTimeValue() >= 0) {
+                timeColumnValue = conf.getTimeValue();
             } else {
                 throw new PreparePartsException("the row doesn't have 'time' column");
             }
