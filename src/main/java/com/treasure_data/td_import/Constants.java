@@ -60,7 +60,13 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    -o, --output DIR                 output directory\n" +
             "    -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)\n" +
             "    -t, --time-column NAME           name of the time column\n" +
-            "    --time-value TIME                long value of the time column\n" +
+            "    --time-value TIME,HOURS          time column's value. If the data don't have time columns,\n" +
+            "                                     users can specify time column value with 2 ways; one is\n" +
+            "                                     'time-value TIME' like 'time-value 1394409600'. It can specify\n" +
+            "                                     the specified fixed value as time column value. another way is\n" +
+            "                                     'time-value TIME,HOURS' like 'time-value 1394409600,10'. It can\n" +
+            "                                     automatically generate time column values that are periodically\n" +
+            "                                     sorted by 'hours' specified by users.\n" +
             "    --primary-key NAME:TYPE          pair of name and type of primary key declared in your item table\n" +
             "    --prepare-parallel NUM           prepare in parallel (default: 2; max 96)\n" +
             "    --only-columns NAME,NAME,...     only columns\n" +
