@@ -1,4 +1,4 @@
-Release 0.4.10 - 20XX/XX/XX
+Release 0.4.10 - 2014/03/11
   IMPROVEMENTS
     Improves time-value option. It automatically allows generating and setting time values that are periodically sorted by hours specified by users.
 
