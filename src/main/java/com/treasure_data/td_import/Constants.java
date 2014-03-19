@@ -1,7 +1,7 @@
 //
 // Treasure Data Bulk-Import Tool in Java
 //
-// Copyright (C) 2012 - 2013 Muga Nishizawa
+// Copyright (C) 2012 - 2014 Muga Nishizawa
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -60,13 +60,27 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    -o, --output DIR                 output directory\n" +
             "    -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)\n" +
             "    -t, --time-column NAME           name of the time column\n" +
-            "    --time-value TIME,HOURS          time column's value. If the data don't have time columns,\n" +
-            "                                     users can specify time column value with 2 ways; one is\n" +
-            "                                     'time-value TIME' like 'time-value 1394409600'. It can specify\n" +
-            "                                     the specified fixed value as time column value. another way is\n" +
-            "                                     'time-value TIME,HOURS' like 'time-value 1394409600,10'. It can\n" +
-            "                                     automatically generate time column values that are periodically\n" +
-            "                                     sorted by 'hours' specified by users.\n" +
+            "    --time-value TIME,HOURS          time column's value. If the data doesn't have a time column,\n" +
+            "                                     users can auto-generate the time column's value in 2 ways:\n" +
+            "                                      * Fixed time value with --time-value TIME:\n" +
+            "                                        where TIME is a Unix time in seconds since Epoch. The time\n" +
+            "                                        column value is constant and equal to TIME seconds.\n" +
+            "                                        E.g. '--time-value 1394409600' assigns the equivalent of\n" +
+            "                                        timestamp 2014-03-10T00:00:00 to all records imported.\n" +
+            "                                      * Incremental time value with --time-value TIME,HOURS:\n" +
+            "                                        where TIME is the Unix time in seconds since Epoch and\n" +
+            "                                        HOURS is the maximum range of the timestamps in hours.\n" +
+            "                                        This mode can be used to assign incremental timestamps to\n" +
+            "                                        subsequent records. Timestmaps will be incremented by 1 second\n" +
+            "                                        each record. If the number of records causes the timestamp to\n" +
+            "                                        overflow the range (timestamp >= TIME + HOURS * 3600), the\n" +
+            "                                        next timestamp will restart at TIME and continue from there.\n" +
+            "                                        E.g. '--time-value 1394409600,10' will assign timestamp 1394409600\n" +
+            "                                        to the first record, timestamp 1394409601 to the second, 1394409602\n" +
+            "                                        to the third, and so on until the 36000th record which will have\n" +
+            "                                        timestmap 1394445600 (1394409600 + 10 * 3600). The timestamp assigned\n" +
+            "                                        to the 36001th record will be 1394409600 again and the timestamp\n" +
+            "                                        will restart from there.\n" +
             "    --primary-key NAME:TYPE          pair of name and type of primary key declared in your item table\n" +
             "    --prepare-parallel NUM           prepare in parallel (default: 2; max 96)\n" +
             "    --only-columns NAME,NAME,...     only columns\n" +
