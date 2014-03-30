@@ -23,6 +23,12 @@ import java.util.List;
 import com.treasure_data.td_import.source.Source;
 
 public class CommandHelper {
+    private long prepareStartTime;
+    private long prepareElapsedTime;
+
+    private long uploadStartTime;
+    private long uploadElapsedTime;
+
     public CommandHelper() {
     }
 
@@ -32,6 +38,22 @@ public class CommandHelper {
 
     public void printLine(String format, Object ... args) {
         System.out.printf(format + "\n", args);
+    }
+
+    public void startPrepare() {
+        this.prepareStartTime = System.currentTimeMillis();
+    }
+
+    public void finishPrepare() {
+        this.prepareElapsedTime = System.currentTimeMillis() - prepareStartTime;
+    }
+
+    public void startUpload() {
+        this.uploadStartTime = System.currentTimeMillis();
+    }
+
+    public void finishUpload() {
+        this.uploadElapsedTime = System.currentTimeMillis() - prepareStartTime;
     }
 
     public void showPrepare(Source[] sources, String outputDirName) {
@@ -61,6 +83,7 @@ public class CommandHelper {
     public void showPrepareResults(List<com.treasure_data.td_import.TaskResult<?>> results) {
         System.out.println();
         System.out.println("Prepare status:");
+        System.out.println("  Elapsed time: " + (prepareElapsedTime / 1000) + " sec.");
         for (com.treasure_data.td_import.TaskResult<?> r : results) {
             if (! (r instanceof com.treasure_data.td_import.prepare.TaskResult)) {
                 continue;
@@ -137,6 +160,7 @@ public class CommandHelper {
     public void showUploadResults(List<com.treasure_data.td_import.TaskResult<?>> results) {
         System.out.println();
         System.out.println("Upload status:");
+        System.out.println("  Elapsed time: " + (uploadElapsedTime / 1000) + " sec.");
         for (com.treasure_data.td_import.TaskResult<?> r : results) {
             if (! (r instanceof com.treasure_data.td_import.upload.TaskResult)) {
                 continue;

@@ -111,6 +111,7 @@ public final class BulkImportCommand extends BulkImport {
                 createPrepareTasks(prepareConf, srcs);
 
         // start prepare tasks. the method call puts prepare tasks
+        commandHelper.startPrepare();
         startPrepareTasks(prepareConf, tasks);
 
         // set *finish* tasks on task queue.
@@ -121,6 +122,7 @@ public final class BulkImportCommand extends BulkImport {
         List<com.treasure_data.td_import.TaskResult<?>> prepareResults =
                 stopPrepareProcessor(prepareProc);
 
+        commandHelper.finishPrepare();
         commandHelper.showPrepareResults(prepareResults);
         commandHelper.listNextStepOfPrepareProc(prepareResults);
 
@@ -192,6 +194,7 @@ public final class BulkImportCommand extends BulkImport {
                         createUploadTasks(sessionName, srcs);
 
                 // start upload tasks. the method call puts upload tasks
+                commandHelper.startUpload();
                 startUploadTasks(uploadConf, tasks);
             } else {
                 // create configuration for 'prepare' processing
@@ -206,6 +209,8 @@ public final class BulkImportCommand extends BulkImport {
 
                 // start sequential upload (prepare) tasks. the method call puts
                 // prepare tasks.
+                commandHelper.startPrepare();
+                commandHelper.startUpload();
                 startPrepareTasks(prepareConf, tasks);
 
                 // set *finish* prepare tasks on prepare task queue.
@@ -216,6 +221,7 @@ public final class BulkImportCommand extends BulkImport {
                 // wait for finishing all prepare tasks by using *finish* prepare tasks.
                 results.addAll(stopPrepareProcessor(prepareProc));
 
+                commandHelper.finishPrepare();
                 commandHelper.showPrepareResults(results);
                 commandHelper.listNextStepOfPrepareProc(results);
 
@@ -229,6 +235,7 @@ public final class BulkImportCommand extends BulkImport {
         // wait for finishing all upload tasks by using *finish* tasks.
         results.addAll(stopUploadProcessor(uploadProc));
 
+        commandHelper.finishUpload();
         commandHelper.showUploadResults(results);
         commandHelper.listNextStepOfUploadProc(results, sessionName);
 
