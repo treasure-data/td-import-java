@@ -66,6 +66,9 @@ public final class BulkImportCommand extends BulkImport {
     }
 
     public void doCommand(final Configuration.Command cmd, final String[] args) throws Exception {
+        LOG.info(String.format("Use td-import-java: " + Configuration.getTDImportVersion()));
+        LOG.info(String.format("Use td-client-java: " + Configuration.getTDClientVersion()));
+
         if (cmd.equals(Configuration.Command.PREPARE)) {
             doPrepareCommand(args);
         } else if (cmd.equals(Configuration.Command.UPLOAD)) {

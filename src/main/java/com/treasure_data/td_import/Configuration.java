@@ -17,11 +17,16 @@
 //
 package com.treasure_data.td_import;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
+import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.td_import.Constants;
 
 public class Configuration extends com.treasure_data.client.Config implements
@@ -70,5 +75,43 @@ public class Configuration extends com.treasure_data.client.Config implements
 
     public String showHelp(Properties props) {
         throw new UnsupportedOperationException();
+    }
+
+    public static String getVersion() {
+        return getTDImportVersion();
+    }
+
+    public static String getTDImportVersion() {
+        return getVersion("TD-Import-Version");
+    }
+
+    public static String getTDClientVersion() {
+        return getVersion("TD-Client-Version");
+    }
+
+    static String getVersion(String tag) {
+        String version = "";
+
+        Class<BulkImportCommand> c = BulkImportCommand.class;
+        String className = c.getSimpleName() + ".class";
+        String classPath = c.getResource(className).toString();
+
+        if (!classPath.startsWith("jar")) {
+            return version;
+        }
+
+        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+                "/META-INF/MANIFEST.MF";
+        try {
+            Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+            Attributes attr = manifest.getMainAttributes();
+            if ((version = attr.getValue(tag)) != null) {
+                return version;
+            } else {
+                return "";
+            }
+        } catch (IOException e) {
+            return version;
+        }
     }
 }
