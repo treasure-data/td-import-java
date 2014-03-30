@@ -1,3 +1,7 @@
+Release 0.4.11 - 20XX/XX/XX
+  IMPROVEMENTS
+    Adds info. of td-client-java and td-import-java versions to log file.
+
 Release 0.4.10 - 2014/03/11
   IMPROVEMENTS
     Improves time-value option. It automatically allows generating and setting time values that are periodically sorted by hours specified by users.
