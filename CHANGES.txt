@@ -1,4 +1,4 @@
-Release 0.4.11 - 20XX/XX/XX
+Release 0.4.11 - 2014/04/01
   IMPROVEMENTS
     Adds info. of td-client-java and td-import-java versions to log file.
 
