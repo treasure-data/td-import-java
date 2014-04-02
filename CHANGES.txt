@@ -1,6 +1,7 @@
 Release 0.4.11 - 2014/04/01
   IMPROVEMENTS
     Adds info. of td-client-java and td-import-java versions to log file.
+    Adds time that each step takes to log file.
 
 Release 0.4.10 - 2014/03/11
   IMPROVEMENTS
