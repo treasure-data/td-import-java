@@ -826,10 +826,25 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setErrorRecordsOutputDirName() {
-        if (optionSet.has(Configuration.BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT)) {
+        if (optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT)) {
             errorRecordsOutputDirName = (String) optionSet.valueOf(BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT);
+        }
+
+        File errorRecordsOutputDir = null;
+        if (errorRecordsOutputDirName == null || errorRecordsOutputDirName.isEmpty()) {
+            errorRecordsOutputDir = new File(new File("."), BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUTDIR_DEFAULTVALUE);
+            errorRecordsOutputDirName = errorRecordsOutputDir.getName();
         } else {
-            errorRecordsOutputDirName = outputDirName;
+            errorRecordsOutputDir = new File(errorRecordsOutputDirName);
+        }
+
+        // validate dir
+        if (!errorRecordsOutputDir.isDirectory()) {
+            if (!errorRecordsOutputDir.mkdir()) {
+                throw new IllegalArgumentException(String.format(
+                        "Cannot create '%s' directory '%s'",
+                        BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT, errorRecordsOutputDirName));
+            }
         }
     }
 

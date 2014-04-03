@@ -57,7 +57,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    -C, --compress TYPE              compressed type [gzip, none, auto]; default=auto detect\n" +
             "    -T, --time-format FORMAT         STRF_FORMAT; strftime(3) format of the time column\n" +
             "    -e, --encoding TYPE              encoding type [utf-8]\n" +
-            "    -o, --output DIR                 output directory\n" +
+            "    -o, --output DIR                 output directory. default directory is 'out'.\n" +
             "    -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)\n" +
             "    -t, --time-column NAME           name of the time column\n" +
             "    --time-value TIME,HOURS          time column's value. If the data doesn't have a time column,\n" +
@@ -86,7 +86,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --only-columns NAME,NAME,...     only columns\n" +
             "    --exclude-columns NAME,NAME,...  exclude columns\n" +
             "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
-            "    --error-records-output DIR       write error records; default directory is directory specified as 'output' option\n" +
+            "    --error-records-output DIR       write error records; default directory is 'error-records'.\n" +
             "    --columns NAME,NAME,...          column names (use --column-header instead if the first line has column names)\n" +
             "    --column-types TYPE,TYPE,...     column types [string, int, long, double]\n" +
             "    --column-type NAME:TYPE          column type [string, int, long, double]. A pair of column name and type can be specified like 'age:int'\n" +
@@ -334,8 +334,9 @@ public interface Constants extends com.treasure_data.client.Constants {
 
     // error records output
     String BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT = "error-records-output";
+    String BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUTDIR_DEFAULTVALUE = "error-records";
     String BI_PREPARE_ERROR_RECORDS_OUTPUT_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT;
-    String BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT_DESC = "write error records; default directory is directory specified as 'output' option";
+    String BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT_DESC = "write error records; default directory is 'error-records'.";
 
     // dry-run; show samples as JSON and exit
     String BI_PREPARE_PARTS_DRYRUN = "td.bulk_import.prepare_parts.dry-run";
