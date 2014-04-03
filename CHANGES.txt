@@ -1,3 +1,7 @@
+Release 0.4.12 - 20XX/XX/XX
+  IMPROVEMENTS
+    Changes default directory for outputting error-records: 'out' to 'error-records'
+
 Release 0.4.11 - 2014/04/01
   IMPROVEMENTS
     Adds info. of td-client-java and td-import-java versions to log file.
