@@ -47,7 +47,6 @@ public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
         public void convertType(String v, ColumnValue into)
                 throws PreparePartsException {
             if (v.equals("-")) {
-                System.out.println("### convert");
                 into.parse("0");
             } else {
                 into.parse(v);
