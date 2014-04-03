@@ -22,11 +22,59 @@ import java.util.logging.Logger;
 
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.model.ColumnType;
+import com.treasure_data.td_import.model.ColumnValue;
+import com.treasure_data.td_import.model.IntColumnType;
+import com.treasure_data.td_import.model.IntColumnValue;
+import com.treasure_data.td_import.model.LongColumnType;
+import com.treasure_data.td_import.model.LongColumnValue;
 import com.treasure_data.td_import.reader.ApacheRecordReader;
 
 public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
     private static final Logger LOG = Logger
             .getLogger(ApachePrepareConfiguration.class.getName());
+
+    public static class ApacheLongColumnType extends LongColumnType {
+        public ApacheLongColumnType() {
+            super();
+        }
+
+        @Override
+        public ColumnValue createColumnValue() {
+            return new LongColumnValue(this);
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            if (v.equals("-")) {
+                System.out.println("### convert");
+                into.parse("0");
+            } else {
+                into.parse(v);
+            }
+        }
+    }
+
+    public static class ApacheIntColumnType extends IntColumnType {
+        public ApacheIntColumnType() {
+            super();
+        }
+
+        @Override
+        public ColumnValue createColumnValue() {
+            return new IntColumnValue(this);
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            if (v.equals("-")) {
+                into.parse("0");
+            } else {
+                into.parse(v);
+            }
+        }
+    }
 
     public ApachePrepareConfiguration() {
     }
@@ -50,7 +98,7 @@ public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
     public void setColumnTypes() {
         columnTypes = new ColumnType[] { ColumnType.STRING, ColumnType.STRING,
                 ColumnType.STRING, ColumnType.STRING, ColumnType.STRING,
-                ColumnType.INT, ColumnType.LONG, ColumnType.STRING,
+                new ApacheIntColumnType(), new ApacheLongColumnType(), ColumnType.STRING,
                 ColumnType.STRING, };
     }
 }
