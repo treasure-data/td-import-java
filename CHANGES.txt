@@ -1,4 +1,4 @@
-Release 0.4.12 - 20XX/XX/XX
+Release 0.4.12 - 2014/04/09
   IMPROVEMENTS
     Changes default directory for outputting error-records: 'out' to 'error-records'
     Changes apache record reader.
