@@ -86,7 +86,9 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
 
         Statement stat = null;
         try {
-            stat = conn.createStatement();
+            stat = conn.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY,
+                    java.sql.ResultSet.CONCUR_READ_ONLY);
+            stat.setFetchSize(Integer.MIN_VALUE);
             // TODO optimize the query string
             resultSet = stat.executeQuery(String.format(QUERY, table));
         } catch (SQLException e) {
