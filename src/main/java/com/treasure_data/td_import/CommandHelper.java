@@ -59,7 +59,7 @@ public class CommandHelper {
     public void showPrepare(Source[] sources, String outputDirName) {
         System.out.println();
         System.out.println("Preparing sources");
-        System.out.println(String.format("  Output dir   : %s", outputDirName));
+        System.out.println(String.format("  Output dir : %s", outputDirName));
         showSources(sources);
         System.out.println();
     }
@@ -67,7 +67,7 @@ public class CommandHelper {
     public void showUpload(Source[] sources, String sessionName) {
         System.out.println();
         System.out.println("Uploading prepared sources");
-        System.out.println(String.format("  Session name : %s", sessionName));
+        System.out.println(String.format("  Session    : %s", sessionName));
         showSources(sources);
         System.out.println();
     }
@@ -92,7 +92,7 @@ public class CommandHelper {
             com.treasure_data.td_import.prepare.TaskResult result =
                     (com.treasure_data.td_import.prepare.TaskResult) r;
             String status = result.error == null ? Configuration.STAT_SUCCESS : Configuration.STAT_ERROR;
-            System.out.println(String.format("  Source    : %s", result.task.getSource().getPath()));
+            System.out.println(String.format("  Source     : %s", result.task.getSource().getPath()));
             System.out.println(String.format("    Status          : %s", status));
             System.out.println(String.format("    Read lines      : %d", result.readLines));
             System.out.println(String.format("    Valid rows      : %d", result.convertedRows));
