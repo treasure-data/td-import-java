@@ -1,7 +1,8 @@
-Release 0.4.12 - 2014/04/15
+Release 0.4.12 - 2014/04/23
   IMPROVEMENTS
     Changes default directory for outputting error-records: 'out' to 'error-records'
     Changes apache record reader.
+    Upgrades td-client 0.4.0
 
   BUG FIXED
     Fixes bug: OOM error occurs when MySQLTableReader reads large table.
