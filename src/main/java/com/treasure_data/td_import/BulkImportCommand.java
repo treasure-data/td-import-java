@@ -66,6 +66,7 @@ public final class BulkImportCommand extends BulkImport {
     }
 
     public void doCommand(final Configuration.Command cmd, final String[] args) throws Exception {
+        // dump td-import and td-client versions in the log file
         LOG.info(String.format("Use td-import-java: " + Configuration.getTDImportVersion()));
         LOG.info(String.format("Use td-client-java: " + Configuration.getTDClientVersion()));
 
@@ -110,11 +111,12 @@ public final class BulkImportCommand extends BulkImport {
         com.treasure_data.td_import.prepare.Task[] tasks =
                 createPrepareTasks(prepareConf, srcs);
 
-        // start prepare tasks. the method call puts prepare tasks
+        // start elapsed time timer
         commandHelper.startPrepare();
+        // creates the prepare tasks
         startPrepareTasks(prepareConf, tasks);
 
-        // set *finish* tasks on task queue.
+        // set *finish* tasks on task queue
         setPrepareFinishTasks(prepareConf);
 
         // wait for finishing prepare processing
@@ -127,6 +129,11 @@ public final class BulkImportCommand extends BulkImport {
         commandHelper.listNextStepOfPrepareProc(prepareResults);
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_PREPARE));
+
+        // handle exit codes
+        if (!hasNoPrepareError(prepareResults)) {
+            throw new RuntimeException();
+        }
     }
 
     public void doUploadCommand(final String[] args) throws Exception {
@@ -240,7 +247,7 @@ public final class BulkImportCommand extends BulkImport {
         commandHelper.listNextStepOfUploadProc(results, sessionName);
 
         if (!hasNoUploadError(results) || !hasNoPrepareError) {
-            return;
+            throw new RuntimeException();
         }
 
         // 'auto-perform' and 'auto-commit'
@@ -255,6 +262,12 @@ public final class BulkImportCommand extends BulkImport {
     }
 
     public static void main(final String[] args) throws Exception {
-        new BulkImportCommand(System.getProperties()).doMain(args);;
+        try {
+            new BulkImportCommand(System.getProperties()).doMain(args);
+        } catch (Exception e) {
+            System.exit(1);
+        }
+
+        System.exit(0);
     }
 }
