@@ -114,7 +114,8 @@ public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrep
 
     @Override
     public void setColumnNames() {
-        columnNames = row.keySet().toArray(new String[0]);
+        conf.setColumnNames(row.keySet().toArray(new String[0]));
+        columnNames = conf.getColumnNames();
     }
 
     @Override

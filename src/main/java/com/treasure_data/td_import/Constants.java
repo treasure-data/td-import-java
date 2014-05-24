@@ -86,6 +86,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --only-columns NAME,NAME,...     only columns\n" +
             "    --exclude-columns NAME,NAME,...  exclude columns\n" +
             "    --error-records-handling MODE    error records handling mode [skip, abort]; default=skip\n" +
+            "    --invalid-columns-handling MODE  invalid columns handling mode [autofix, abort]; default=abort\n" +
             "    --error-records-output DIR       write error records; default directory is 'error-records'.\n" +
             "    --columns NAME,NAME,...          column names (use --column-header instead if the first line has column names)\n" +
             "    --column-types TYPE,TYPE,...     column types [string, int, long, double]\n" +
@@ -331,6 +332,12 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_ERROR_RECORDS_HANDLING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING;
     String BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DEFAULTVALUE= "skip";
     String BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING_DESC = "error records handling mode [skip, abort]; default=skip";
+
+    // invalid columns handling
+    String BI_PREPARE_INVALID_COLUMNS_HANDLING = "invalid-columns-handling";
+    String BI_PREPARE_INVALID_COLUMNS_HANDLING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_INVALID_COLUMNS_HANDLING;
+    String BI_PREPARE_INVALID_COLUMNS_HANDLING_DEFAULTVALUE = "abort";
+    String BI_PREPARE_INVALID_COLUMNS_HANDLING_DESC = "invalid columns handling mode [autofix, abort]; default=abort";
 
     // error records output
     String BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT = "error-records-output";

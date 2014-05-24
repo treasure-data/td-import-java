@@ -150,10 +150,6 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
         return newline;
     }
 
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
-    }
-
     @Override
     public void setColumnHeader() {
         hasColumnHeader = optionSet.has("column-header");
@@ -161,8 +157,9 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
 
     @Override
     public void setColumnNames() {
-        if (optionSet.has("columns")) {
-            columnNames = optionSet.valuesOf("columns").toArray(new String[0]);
+        if (optionSet.has(BI_PREPARE_PARTS_COLUMNS)) {
+            String[] cnames = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNS).toArray(new String[0]);
+            setColumnNames(cnames);
         } else if (!hasColumnHeader()) {
             throw new IllegalArgumentException("Column names not set");
         }

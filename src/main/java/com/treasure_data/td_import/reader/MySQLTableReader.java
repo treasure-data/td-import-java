@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.treasure_data.client.Config;
 import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.model.AliasTimeColumnValue;
 import com.treasure_data.td_import.model.ColumnType;
@@ -109,10 +110,12 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
         }
 
         if (columnNames == null || columnNames.length == 0) {
-            columnNames = new String[numColumns];
+            String[] cnames = new String[numColumns];
             for (int i = 0; i < numColumns; i++) {
-                columnNames[i] = metadata.getColumnName(i + 1);
+                cnames[i] = metadata.getColumnName(i + 1);
             }
+            conf.setColumnNames(cnames);
+            columnNames = conf.getColumnNames();
         }
     }
 

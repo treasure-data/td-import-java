@@ -108,7 +108,8 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
 
     @Override
     public void setColumnNames() {
-        columnNames = keys;
+        conf.setColumnNames(keys);
+        columnNames = conf.getColumnNames();
     }
 
     @Override

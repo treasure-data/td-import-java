@@ -107,6 +107,12 @@ public class Options {
                 .describedAs("MODE")
                 .ofType(String.class);
         op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_INVALID_COLUMNS_HANDLING),
+                Configuration.BI_PREPARE_INVALID_COLUMNS_HANDLING_DESC)
+                .withRequiredArg()
+                .describedAs("MODE")
+                .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
                 Configuration.BI_PREPARE_PARTS_DELIMITER),
                 Configuration.BI_PREPARE_PARTS_DELIMITER_DESC)
                 .withRequiredArg()

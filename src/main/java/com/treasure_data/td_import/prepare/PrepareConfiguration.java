@@ -402,6 +402,72 @@ public class PrepareConfiguration extends Configuration {
         }
     }
 
+    public static enum InvalidColumnsHandling {
+        SKIP("skip") {
+            @Override
+            public String handleInvalidColumn(String column)
+                    throws PreparePartsException {
+                // ignore
+                return column;
+            }
+        },
+        AUTOFIX("autofix") {
+            @Override
+            public String handleInvalidColumn(String column)
+                    throws PreparePartsException {
+                return fixColumnFormat(column);
+            }
+        },
+        ABORT(BI_PREPARE_INVALID_COLUMNS_HANDLING_DEFAULTVALUE) {
+            @Override
+            public String handleInvalidColumn(String column)
+                    throws PreparePartsException {
+                throw new PreparePartsException("invalid column: " + column);
+            }
+        };
+
+        private String mode;
+
+        InvalidColumnsHandling(String mode) {
+            this.mode = mode;
+        }
+
+        public String mode() {
+            return mode;
+        }
+
+        public abstract String handleInvalidColumn(String column)
+                throws PreparePartsException;
+
+        public static boolean validColumnFormat(String column) {
+            return true; // TODO
+        }
+
+        public static String fixColumnFormat(String column) {
+            return column; // TODO
+        }
+
+        public static InvalidColumnsHandling fromString(String mode) {
+            return StringToInvalidColumnsHandling.get(mode);
+        }
+
+        private static class StringToInvalidColumnsHandling {
+            private static final Map<String, InvalidColumnsHandling> REVERSE_DICTIONARY;
+
+            static {
+                Map<String, InvalidColumnsHandling> map = new HashMap<String, InvalidColumnsHandling>();
+                for (InvalidColumnsHandling elem : InvalidColumnsHandling.values()) {
+                    map.put(elem.mode(), elem);
+                }
+                REVERSE_DICTIONARY = Collections.unmodifiableMap(map);
+            }
+
+            static InvalidColumnsHandling get(String key) {
+                return REVERSE_DICTIONARY.get(key);
+            }
+        }
+    }
+
     private static final Logger LOG = Logger
             .getLogger(PrepareConfiguration.class.getName());
 
@@ -426,6 +492,7 @@ public class PrepareConfiguration extends Configuration {
 
     protected String errorRecordOutputDirName;
     protected ErrorRecordsHandling errorRecordsHandling;
+    protected InvalidColumnsHandling invalidColumnsHandling;
     protected boolean dryRun = false;
     protected String outputDirName;
     protected String errorRecordsOutputDirName;
@@ -461,6 +528,9 @@ public class PrepareConfiguration extends Configuration {
 
         // error handling
         setErrorRecordsHandling();
+
+        // invalid columns handling
+        setInvalidColumnsHandling();
 
         // encoding
         setEncoding(); // depends on error-records-handling
@@ -868,6 +938,26 @@ public class PrepareConfiguration extends Configuration {
         return errorRecordsHandling;
     }
 
+    public void setInvalidColumnsHandling() {
+        String mode;
+        if (!optionSet.has(BI_PREPARE_INVALID_COLUMNS_HANDLING)) {
+            mode = BI_PREPARE_INVALID_COLUMNS_HANDLING_DEFAULTVALUE;
+        } else {
+            mode = (String) optionSet.valueOf(BI_PREPARE_INVALID_COLUMNS_HANDLING);
+        }
+
+        invalidColumnsHandling = InvalidColumnsHandling.fromString(mode);
+        if (invalidColumnsHandling == null) {
+            throw new IllegalArgumentException(String.format(
+                    "unsupported '%s' mode '%s'",
+                    BI_PREPARE_INVALID_COLUMNS_HANDLING, mode));
+        }
+    }
+
+    public InvalidColumnsHandling getInvalidColumnsHandling() {
+        return invalidColumnsHandling;
+    }
+
     public void setDryRun() {
         if (optionSet.has("dry-run")) {
             String drun = (String) optionSet.valueOf("dry-run");
@@ -931,12 +1021,24 @@ public class PrepareConfiguration extends Configuration {
         if (!optionSet.has(BI_PREPARE_PARTS_COLUMNS)) {
             columnNames = new String[0];
         } else {
-            columnNames = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNS).toArray(new String[0]);
+            String[] cnames = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNS).toArray(new String[0]);
+            setColumnNames(cnames);
         }
     }
 
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
+    public void setColumnNames(String[] cnames) {
+        for (int i = 0; i < cnames.length; i++) {
+            if (InvalidColumnsHandling.validColumnFormat(cnames[i])) {
+                cnames[i] = cnames[i];
+            } else {
+                try {
+                    cnames[i] = invalidColumnsHandling.handleInvalidColumn(cnames[i]);
+                } catch (PreparePartsException e) {
+                    throw new IllegalArgumentException(e.getMessage(), e);
+                }
+            }
+        }
+        this.columnNames = cnames;
     }
 
     public String[] getColumnNames() {
