@@ -440,11 +440,61 @@ public class PrepareConfiguration extends Configuration {
                 throws PreparePartsException;
 
         public static boolean validColumnFormat(String column) {
-            return true; // TODO
+            if (column == null || column.isEmpty()) {
+                return false;
+            }
+
+            for (int i = 0; i < column.length(); i++) {
+                int c = column.charAt(i);
+
+                if (i == 0) {
+                    if (!isLetter(c) && c != '_') {
+                        return false;
+                    }
+                }
+
+                if (!isDigit(c) && !isLetter(c) && c != '_') {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static String fixColumnFormat(String column) {
-            return column; // TODO
+            if (column == null) {
+                return "_";
+            }
+
+            if (column.isEmpty()) {
+                return "_";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < column.length(); i++) {
+                int c = column.charAt(i);
+
+                if (isDigit(c) || isLetter(c) || c == '_') {
+                    sb.append((char)c);
+                } else if (isUpperLetter(c)) {
+                    sb.append((char)(c + 32));
+                } else {
+                    // skip
+                }
+            }
+            return sb.toString();
+        }
+
+        private static boolean isDigit(int c) {
+            return '0' <= c && c <= '9';
+        }
+
+        private static boolean isLetter(int c) {
+            return 'a' <= c && c <= 'z';
+        }
+
+        private static boolean isUpperLetter(int c) {
+            return 'A' <= c && c <= 'Z';
         }
 
         public static InvalidColumnsHandling fromString(String mode) {
