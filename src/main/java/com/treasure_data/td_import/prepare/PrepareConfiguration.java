@@ -422,7 +422,9 @@ public class PrepareConfiguration extends Configuration {
             @Override
             public String handleInvalidColumn(String column)
                     throws PreparePartsException {
-                throw new PreparePartsException("invalid column: " + column);
+                throw new PreparePartsException(
+                        "invalid column name: column must contain only " +
+                        "lowercase letters, digits, and '_': " + column);
             }
         };
 
@@ -477,9 +479,10 @@ public class PrepareConfiguration extends Configuration {
                 if (isDigit(c) || isLetter(c) || c == '_') {
                     sb.append((char)c);
                 } else if (isUpperLetter(c)) {
+                    // if upper letter, it is translated into the lower case.
                     sb.append((char)(c + 32));
                 } else {
-                    // skip
+                    // other characters are not appended
                 }
             }
             return sb.toString();
