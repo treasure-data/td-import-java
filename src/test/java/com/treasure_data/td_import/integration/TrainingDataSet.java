@@ -59,13 +59,13 @@ public class TrainingDataSet {
 
     private void createRow(Map<String, Object> row, long i) {
         for (int j = 0; j < availableHeader.length; j++) {
-            if (availableHeader[j].startsWith("string-")) {
+            if (availableHeader[j].startsWith("string_")) {
                 row.put(availableHeader[j], "muga西澤" + rand.nextInt(100));
-            } else if (availableHeader[j].startsWith("int-")) {
+            } else if (availableHeader[j].startsWith("int_")) {
                 row.put(availableHeader[j], Math.abs(rand.nextInt()));
-            } else if (availableHeader[j].startsWith("double-")) {
+            } else if (availableHeader[j].startsWith("double_")) {
                 row.put(availableHeader[j], Math.abs(rand.nextDouble()));
-            } else if (availableHeader[j].startsWith("long-")) {
+            } else if (availableHeader[j].startsWith("long_")) {
                 row.put(availableHeader[j], Math.abs(rand.nextInt()));
             } else if (availableHeader[j].equals("time")) {
                 row.put(availableHeader[j], baseTime + 60 * i);
@@ -78,7 +78,7 @@ public class TrainingDataSet {
                     s = format.format(new Date(t));
                 }
                 row.put(availableHeader[j], s);
-            } else if (availableHeader[j].equals("suggested-timeformat")) {
+            } else if (availableHeader[j].equals("suggested_timeformat")) {
                 long t = (long)((baseTime + 60 * i) * 1000);
                 String s = null;
                 synchronized (lock) {
@@ -86,7 +86,7 @@ public class TrainingDataSet {
                 }
                 row.put(availableHeader[j], s);
             } else {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("availableHeader[" + j + "]=" + availableHeader[j]);
             }
         }
     }

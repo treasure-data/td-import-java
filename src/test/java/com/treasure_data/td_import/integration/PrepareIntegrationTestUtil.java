@@ -26,9 +26,9 @@ import com.treasure_data.td_import.Configuration;
 
 @Ignore
 public class PrepareIntegrationTestUtil {
-    private static Value STRING_VALUE = ValueFactory.createRawValue("string-value");
-    private static Value INT_VALUE = ValueFactory.createRawValue("int-value");
-    private static Value DOUBLE_VALUE = ValueFactory.createRawValue("double-value");
+    private static Value STRING_VALUE = ValueFactory.createRawValue("string_value");
+    private static Value INT_VALUE = ValueFactory.createRawValue("int_value");
+    private static Value DOUBLE_VALUE = ValueFactory.createRawValue("double_value");
     private static Value TIME = ValueFactory.createRawValue("time");
 
     static final String INPUT_DIR = "./src/test/resources/in/";

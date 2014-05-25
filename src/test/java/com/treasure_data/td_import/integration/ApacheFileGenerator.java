@@ -39,27 +39,27 @@ public class ApacheFileGenerator extends FileGenerator {
     public void write(Map<String, Object> map) throws IOException {
         StringBuilder sbuf = new StringBuilder();
         //127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
-        sbuf.append(map.get("string-value")) // host
+        sbuf.append(map.get("string_value")) // host
             .append(SPACE)
             .append("-")
             .append(SPACE)
-            .append(map.get("string-value")) // user
+            .append(map.get("string_value")) // user
             .append(SPACE)
             .append("[")
             .append(dateFormat.format(new Date(((long) ((Long) map.get("time"))) * 1000)))
             .append("]")
             .append(SPACE)
             .append("\"")
-            .append(map.get("string-value")) // method
+            .append(map.get("string_value")) // method
             .append(SPACE)
-            .append(map.get("string-value")) // path
+            .append(map.get("string_value")) // path
             .append(SPACE)
             .append("xxxx") // protocol
             .append("\"")
             .append(SPACE)
-            .append(map.get("int-value")) // code
+            .append(map.get("int_value")) // code
             .append(SPACE)
-            .append(map.get("int-value")); // size
+            .append(map.get("int_value")); // size
         
         out.write(sbuf.toString().getBytes());
         out.write(LF.getBytes());

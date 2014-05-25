@@ -28,7 +28,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromCSVWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), true, null, null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.CSV.format(), true, null, null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromCSVWithTimeColumn();
     }
 
@@ -42,7 +42,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromCSVWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), true, "timestamp", null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.CSV.format(), true, "timestamp", null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromCSVWithAlasTimeColumn();
     }
 
@@ -56,57 +56,57 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromCSVWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), true, "suggested-timeformat", null, null, null, null);
+        setOptions(Format.CSV.format(), true, "suggested_timeformat", null, null, null, null);
         preparePartsFromCSVWithSuggestedTimeFormat();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.CSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string_value,int_value,double_value,time");
         preparePartsFromCSVWithTimeFormat();
     }
 
     @Test
     public void writeFromHeaderlessCSVWithTimeColumn() throws Exception {
-        setOptions(Format.CSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, null);
+        setOptions(Format.CSV.format(), false, null, null, "string_value,int_value,double_value,timestamp,time", null, null);
         preparePartsFromHeaderlessCSVWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", "timestamp", null);
+        setOptions(Format.CSV.format(), false, null, null, "string_value,int_value,double_value,timestamp,time", "timestamp", null);
         preparePartsFromHeaderlessCSVWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, "string-value,int-value,double-value,time");
+        setOptions(Format.CSV.format(), false, null, null, "string_value,int_value,double_value,timestamp,time", null, "string_value,int_value,double_value,time");
         preparePartsFromHeaderlessCSVWithTimeColumn();
     }
 
     @Test
     public void writeFromHeaderlessCSVWithAlasTimeColumn() throws Exception {
-        setOptions(Format.CSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, null);
+        setOptions(Format.CSV.format(), false, "timestamp", null, "string_value,int_value,double_value,timestamp", null, null);
         preparePartsFromHeaderlessCSVWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", "timestamp", null);
+        setOptions(Format.CSV.format(), false, "timestamp", null, "string_value,int_value,double_value,timestamp", "timestamp", null);
         preparePartsFromHeaderlessCSVWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, "string-value,int-value,double-value,time");
+        setOptions(Format.CSV.format(), false, "timestamp", null, "string_value,int_value,double_value,timestamp", null, "string_value,int_value,double_value,time");
         preparePartsFromHeaderlessCSVWithAlasTimeColumn();
     }
 
     @Test
     public void writeFromHeaderlessCSVWithTimeFormat() throws Exception {
-        setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, null);
+        setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string_value,int_value,double_value,timeformat", null, null);
         preparePartsFromHeaderlessCSVWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", "timeformat", null);
+        setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string_value,int_value,double_value,timeformat", "timeformat", null);
         preparePartsFromHeaderlessCSVWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, "string-value,int-value,double-value,time");
+        setOptions(Format.CSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string_value,int_value,double_value,timeformat", null, "string_value,int_value,double_value,time");
         preparePartsFromHeaderlessCSVWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.CSV.format(), false, "suggested-timeformat", null, "string-value,int-value,double-value,suggested-timeformat", null, null);
+        setOptions(Format.CSV.format(), false, "suggested_timeformat", null, "string_value,int_value,double_value,suggested_timeformat", null, null);
         preparePartsFromHeaderlessCSVWithSuggestedTimeFormat();
     }
 
@@ -120,7 +120,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromTSVWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), true, null, null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.TSV.format(), true, null, null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromTSVWithTimeColumn();
     }
 
@@ -134,7 +134,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromTSVWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), true, "timestamp", null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.TSV.format(), true, "timestamp", null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromTSVWithAlasTimeColumn();
     }
 
@@ -148,49 +148,49 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromTSVWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.TSV.format(), true, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string_value,int_value,double_value,time");
         preparePartsFromTSVWithTimeFormat();
     }
 
     @Test
     public void writeFromHeaderlessTSVWithTimeColumn() throws Exception {
-        setOptions(Format.TSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, null);
+        setOptions(Format.TSV.format(), false, null, null, "string_value,int_value,double_value,timestamp,time", null, null);
         preparePartsFromHeaderlessTSVWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", "timestamp", null);
+        setOptions(Format.TSV.format(), false, null, null, "string_value,int_value,double_value,timestamp,time", "timestamp", null);
         preparePartsFromHeaderlessTSVWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), false, null, null, "string-value,int-value,double-value,timestamp,time", null, "string-value,int-value,double-value,time");
+        setOptions(Format.TSV.format(), false, null, null, "string_value,int_value,double_value,timestamp,time", null, "string_value,int_value,double_value,time");
         preparePartsFromHeaderlessTSVWithTimeColumn();
     }
 
     @Test
     public void writeFromHeaderlessTSVWithAlasTimeColumn() throws Exception {
-        setOptions(Format.TSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, null);
+        setOptions(Format.TSV.format(), false, "timestamp", null, "string_value,int_value,double_value,timestamp", null, null);
         preparePartsFromHeaderlessTSVWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", "timestamp", null);
+        setOptions(Format.TSV.format(), false, "timestamp", null, "string_value,int_value,double_value,timestamp", "timestamp", null);
         preparePartsFromHeaderlessTSVWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), false, "timestamp", null, "string-value,int-value,double-value,timestamp", null, "string-value,int-value,double-value,time");
+        setOptions(Format.TSV.format(), false, "timestamp", null, "string_value,int_value,double_value,timestamp", null, "string_value,int_value,double_value,time");
         preparePartsFromHeaderlessTSVWithAlasTimeColumn();
     }
 
     @Test
     public void writeFromHeaderlessTSVWithTimeFormat() throws Exception {
-        setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, null);
+        setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string_value,int_value,double_value,timeformat", null, null);
         preparePartsFromHeaderlessTSVWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", "timeformat", null);
+        setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string_value,int_value,double_value,timeformat", "timeformat", null);
         preparePartsFromHeaderlessTSVWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string-value,int-value,double-value,timeformat", null, "string-value,int-value,double-value,time");
+        setOptions(Format.TSV.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", "string_value,int_value,double_value,timeformat", null, "string_value,int_value,double_value,time");
         preparePartsFromHeaderlessTSVWithTimeFormat();
     }
 
@@ -216,7 +216,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromJSONWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.JSON.format(), false, null, null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.JSON.format(), false, null, null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromJSONWithTimeColumn();
     }
 
@@ -230,7 +230,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromJSONWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.JSON.format(), false, "timestamp", null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.JSON.format(), false, "timestamp", null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromJSONWithAlasTimeColumn();
     }
 
@@ -244,7 +244,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromJSONWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.JSON.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.JSON.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string_value,int_value,double_value,time");
         preparePartsFromJSONWithTimeFormat();
     }
 
@@ -258,7 +258,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromMessagePackWithTimeColumn();
 
         refleshOptions();
-        setOptions(Format.MSGPACK.format(), false, null, null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.MSGPACK.format(), false, null, null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromMessagePackWithTimeColumn();
     }
 
@@ -272,7 +272,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromMessagePackWithAlasTimeColumn();
 
         refleshOptions();
-        setOptions(Format.MSGPACK.format(), false, "timestamp", null, null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.MSGPACK.format(), false, "timestamp", null, null, null, "string_value,int_value,double_value,time");
         preparePartsFromMessagePackWithAlasTimeColumn();
     }
 
@@ -286,7 +286,7 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
         preparePartsFromMessagePackWithTimeFormat();
 
         refleshOptions();
-        setOptions(Format.MSGPACK.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string-value,int-value,double-value,time");
+        setOptions(Format.MSGPACK.format(), false, "timeformat", "%Y-%m-%d %H:%M:%S %z", null, null, "string_value,int_value,double_value,time");
         preparePartsFromMessagePackWithTimeFormat();
     }
 

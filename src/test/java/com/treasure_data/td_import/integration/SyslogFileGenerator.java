@@ -38,10 +38,10 @@ public class SyslogFileGenerator extends FileGenerator {
         StringBuilder sbuf = new StringBuilder();
 
         sbuf.append(dateFormat.format(new Date(((Long) map.get("time")) * 1000))).append(SPACE);
-        sbuf.append(map.get("string-value")).append(SPACE);
-        sbuf.append(map.get("string-value")).append("(").append(map.get("string-value")).append(")");
-        sbuf.append("[").append(map.get("int-value")).append("]");
-        sbuf.append(":").append(SPACE).append(map.get("string-value"));
+        sbuf.append(map.get("string_value")).append(SPACE);
+        sbuf.append(map.get("string_value")).append("(").append(map.get("string_value")).append(")");
+        sbuf.append("[").append(map.get("int_value")).append("]");
+        sbuf.append(":").append(SPACE).append(map.get("string_value"));
         
         out.write(sbuf.toString().getBytes());
         out.write(LF.getBytes());
