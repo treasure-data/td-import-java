@@ -98,6 +98,72 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
         }
     }
 
+    public static class DateColumnType extends AbstractColumnType {
+
+        public DateColumnType() {
+            super("date", 51);
+        }
+
+        @Override
+        public ColumnValue createColumnValue() {
+            return new DateColumnValue(this);
+        }
+
+        @Override
+        public void convertType(String v, ColumnValue into)
+                throws PreparePartsException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setColumnValue(Object v, ColumnValue cv)
+                throws PreparePartsException {
+            cv.set(v);
+        }
+
+        @Override
+        public void filterAndWrite(ColumnValue v, TimeColumnValue filter,
+                RecordWriter with) throws PreparePartsException {
+            ((MySQLTimestampAdaptor) with).write(filter, (DateColumnValue) v);
+        }
+
+        @Override
+        public void filterAndValidate(ColumnValue v, TimeColumnValue filter,
+                RecordWriter with) throws PreparePartsException {
+            ((MySQLTimestampAdaptor) with).validate(filter, (DateColumnValue) v);
+        }
+    }
+
+    public static class DateColumnValue extends AbstractColumnValue {
+        private long v;
+
+        public DateColumnValue(ColumnType columnType) {
+            super(columnType);
+        }
+
+        public void set(Object v) throws PreparePartsException {
+            if (v == null) {
+                this.v = 0L;
+            } else {
+                this.v = ((java.sql.Date) v).getTime() / 1000;
+            }
+        }
+
+        public long getLong() {
+            return v;
+        }
+
+        @Override
+        public void parse(String v) throws PreparePartsException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void write(RecordWriter with) throws PreparePartsException {
+            with.write(v);
+        }
+    }
+
     protected String jdbcUrl;
     protected String user;
     protected String password;
