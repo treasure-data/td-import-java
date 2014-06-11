@@ -1,3 +1,7 @@
+Release 0.4.13 - 2014/06/10
+  IMPROVEMENTS
+    Supports and can read from MySQL DATE, TIMESTAMP, and DATETIME columns.
+
 Release 0.4.12 - 2014/04/23
   IMPROVEMENTS
     Changes default directory for outputting error-records: 'out' to 'error-records'

@@ -5,7 +5,7 @@
   <artifactId>td-import</artifactId>
   <name>Treasure Data Import Tool in Java</name>
   <description>Treasure Data Import Tool in Java.</description>
-  <version>0.4.13-SNAPSHOT</version>
+  <version>0.4.13</version>
   <packaging>jar</packaging>
   <url>https://github.com/treasure-data/td-import-java</url>
 
@@ -56,7 +56,7 @@
     <jopt-simple.version>4.5</jopt-simple.version>
     <msgpack.version>0.6.7</msgpack.version>
     <super-csv.version>2.1.0</super-csv.version>
-    <td-client.version>0.4.0</td-client.version>
+    <td-client.version>0.4.2-SNAPSHOT</td-client.version>
     <aws-java-sdk.version>1.3.22</aws-java-sdk.version>
     <junit.version>4.8.2</junit.version>
     <mockito.version>1.9.5</mockito.version>
@@ -247,7 +247,7 @@
           <includes>
             <include>**/Test*.class</include>
           </includes>
-          <!-- 
+          <!--
           <excludes>
             <exclude>**/integration/**/IntegrationTest*.class</exclude>
           </excludes>
