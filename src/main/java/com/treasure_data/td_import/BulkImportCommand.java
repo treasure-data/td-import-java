@@ -61,8 +61,9 @@ public final class BulkImportCommand extends BulkImport {
             new BulkImportCommand(props).doCommand(cmd, args);
         } catch (IllegalArgumentException e) {
             String msg = String.format("Cannot execute your command: %s", e.getMessage());
-            commandHelper.printLine(msg);
+            commandHelper.printErrorLine(msg);
             LOG.log(Level.SEVERE, msg, e);
+            System.exit(2);
         }
     }
 
@@ -276,6 +277,10 @@ public final class BulkImportCommand extends BulkImport {
         try {
             new BulkImportCommand(System.getProperties()).doMain(args);
         } catch (Exception e) {
+            String msg = String.format("Cannot execute your command: %s (%s)", 
+                e.getMessage(), e.getClass().getName());
+            LOG.log(Level.SEVERE, msg);
+            System.err.println(msg);
             System.exit(1);
         }
 
