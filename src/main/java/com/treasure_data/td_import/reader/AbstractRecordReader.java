@@ -55,6 +55,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
     protected Record writtenRecord;
 
     protected Source source;
+    protected String[] actualColumnNames;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected Set<String> skipColumns = new HashSet<String>();
@@ -76,6 +77,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
     public void configure(Task task) throws PreparePartsException {
         source = task.getSource();
+        actualColumnNames = conf.getActualColumnNames();
         columnNames = conf.getColumnNames();
         columnTypes = conf.getColumnTypes();
 
@@ -95,6 +97,10 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         return lineNum;
     }
 
+    public String[] getActualColumnNames() {
+        return actualColumnNames;
+    }
+
     public String[] getColumnNames() {
         return columnNames;
     }
@@ -110,18 +116,18 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
     public void setSkipColumns() {
         String[] excludeColumns = conf.getExcludeColumns();
         String[] onlyColumns = conf.getOnlyColumns();
-        for (int i = 0; i < columnNames.length; i++) {
+        for (int i = 0; i < actualColumnNames.length; i++) {
             // check exclude columns
             boolean isExcluded = false;
             for (String excludeColumn : excludeColumns) {
-                if (columnNames[i].equals(excludeColumn)) {
+                if (actualColumnNames[i].equals(excludeColumn)) {
                     isExcluded = true;
                     break;
                 }
             }
 
             if (isExcluded) {
-                skipColumns.add(columnNames[i]);
+                skipColumns.add(actualColumnNames[i]);
                 continue;
             }
 
@@ -132,14 +138,14 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
 
             boolean isOnly = false;
             for (String onlyColumn : onlyColumns) {
-                if (columnNames[i].equals(onlyColumn)) {
+                if (actualColumnNames[i].equals(onlyColumn)) {
                     isOnly = true;
                     break;
                 }
             }
 
             if (!isOnly) {
-                skipColumns.add(columnNames[i]);
+                skipColumns.add(actualColumnNames[i]);
                 continue; // not needed though,..
             }
         }

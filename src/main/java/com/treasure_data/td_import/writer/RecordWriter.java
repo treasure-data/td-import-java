@@ -35,6 +35,7 @@ import com.treasure_data.td_import.prepare.TaskResult;
 
 public interface RecordWriter extends Closeable {
 
+    void setActualColumnNames(String[] columnNames);
     void setColumnNames(String[] columnNames);
     void setColumnTypes(ColumnType[] columnTypes);
     void setSkipColumns(Set<String> skipColumns);

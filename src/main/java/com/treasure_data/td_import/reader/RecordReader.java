@@ -36,6 +36,7 @@ public interface RecordReader<T extends PrepareConfiguration> extends Closeable 
     void incrementLineNum();
     long getLineNum();
 
+    String[] getActualColumnNames();
     String[] getColumnNames();
     ColumnType[] getColumnTypes();
     Set<String> getSkipColumns();

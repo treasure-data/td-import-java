@@ -403,28 +403,25 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public static enum InvalidColumnsHandling {
-        SKIP("skip") {
-            @Override
-            public String handleInvalidColumn(String column)
-                    throws PreparePartsException {
-                // ignore
-                return column;
-            }
-        },
         AUTOFIX("autofix") {
             @Override
-            public String handleInvalidColumn(String column)
-                    throws PreparePartsException {
-                return fixColumnFormat(column);
+            public String handleInvalidColumn(String column) {
+                String fixed = fixColumnFormat(column);
+                String msg = "fixed invalid column name: column must contain only lowercase letters, digits, and '_': "
+                        + "'" + column + "' is replaced into '" + fixed + "'.";
+                LOG.warning(msg);
+                System.out.println(msg);
+                return fixed;
             }
         },
-        ABORT(BI_PREPARE_INVALID_COLUMNS_HANDLING_DEFAULTVALUE) {
+        WARN(BI_PREPARE_INVALID_COLUMNS_HANDLING_DEFAULTVALUE) {
             @Override
-            public String handleInvalidColumn(String column)
-                    throws PreparePartsException {
-                throw new PreparePartsException(
-                        "invalid column name: column must contain only " +
-                        "lowercase letters, digits, and '_': " + column);
+            public String handleInvalidColumn(String column) {
+                String msg = "detected invalid column name: column must contain only lowercase letters, digits, and '_': "
+                        + "'" + column + "' cannot be used within query strings.";
+                LOG.warning(msg);
+                System.out.println(msg);
+                return column;
             }
         };
 
@@ -438,11 +435,10 @@ public class PrepareConfiguration extends Configuration {
             return mode;
         }
 
-        public abstract String handleInvalidColumn(String column)
-                throws PreparePartsException;
+        public abstract String handleInvalidColumn(String column);
 
         public static boolean validColumnFormat(String column) {
-            if (column == null || column.isEmpty()) {
+            if (column == null || column.length() < 2) {
                 return false;
             }
 
@@ -465,11 +461,7 @@ public class PrepareConfiguration extends Configuration {
 
         public static String fixColumnFormat(String column) {
             if (column == null) {
-                return "_";
-            }
-
-            if (column.isEmpty()) {
-                return "_";
+                return "__";
             }
 
             StringBuilder sb = new StringBuilder();
@@ -482,9 +474,15 @@ public class PrepareConfiguration extends Configuration {
                     // if upper letter, it is translated into the lower case.
                     sb.append((char)(c + 32));
                 } else {
-                    // other characters are not appended
+                    // otherwise, '_' is appended
+                    sb.append('_');
                 }
             }
+
+            while (sb.length() < 2) {
+                sb.append('_');
+            }
+
             return sb.toString();
         }
 
@@ -552,6 +550,7 @@ public class PrepareConfiguration extends Configuration {
     protected int splitSize;
     protected int sampleRowSize;
 
+    protected String[] actualColumnNames;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected Map<String, ColumnType> columnTypeMap = new HashMap<String, ColumnType>();
@@ -1072,6 +1071,7 @@ public class PrepareConfiguration extends Configuration {
 
     public void setColumnNames() {
         if (!optionSet.has(BI_PREPARE_PARTS_COLUMNS)) {
+            actualColumnNames = new String[0];
             columnNames = new String[0];
         } else {
             String[] cnames = optionSet.valuesOf(BI_PREPARE_PARTS_COLUMNS).toArray(new String[0]);
@@ -1080,18 +1080,20 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setColumnNames(String[] cnames) {
+        this.actualColumnNames = cnames;
+        String[] cnames0 = new String[cnames.length];
         for (int i = 0; i < cnames.length; i++) {
             if (InvalidColumnsHandling.validColumnFormat(cnames[i])) {
-                cnames[i] = cnames[i];
+                cnames0[i] = cnames[i];
             } else {
-                try {
-                    cnames[i] = invalidColumnsHandling.handleInvalidColumn(cnames[i]);
-                } catch (PreparePartsException e) {
-                    throw new IllegalArgumentException(e.getMessage(), e);
-                }
+                cnames0[i] = invalidColumnsHandling.handleInvalidColumn(cnames[i]);
             }
         }
-        this.columnNames = cnames;
+        this.columnNames = cnames0;
+    }
+
+    public String[] getActualColumnNames() {
+        return actualColumnNames;
     }
 
     public String[] getColumnNames() {

@@ -55,6 +55,7 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
             aliasTimeColumnName = conf.getAliasTimeColumn();
         }
 
+        actualColumnNames = new String[0];
         columnNames = new String[0];
         columnTypes = new ColumnType[0];
         skipColumns = new HashSet<String>();
@@ -69,6 +70,7 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
         try {
             w = new JSONRecordWriter(conf);
             setColumnNames();
+            w.setActualColumnNames(getActualColumnNames());
             w.setColumnNames(getColumnNames());
             setColumnTypes();
             w.setColumnTypes(getColumnTypes());

@@ -46,6 +46,7 @@ public abstract class FixedColumnsRecordReader<T extends FixedColumnsPrepareConf
         String ret = null;
         try {
             w = new JSONRecordWriter(conf);
+            w.setActualColumnNames(getActualColumnNames());
             w.setColumnNames(getColumnNames());
             w.setColumnTypes(getColumnTypes());
             w.setSkipColumns(getSkipColumns());

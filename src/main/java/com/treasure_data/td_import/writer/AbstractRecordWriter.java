@@ -48,6 +48,7 @@ public abstract class AbstractRecordWriter implements RecordWriter {
     protected long rowNum = 0;
     protected long errorNum = 0;
 
+    protected String[] actualColumnNames;
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
 
@@ -61,6 +62,10 @@ public abstract class AbstractRecordWriter implements RecordWriter {
 
     protected AbstractRecordWriter(PrepareConfiguration conf) {
         this.conf = conf;
+    }
+
+    public void setActualColumnNames(String[] actualColumnNames) {
+        this.actualColumnNames = actualColumnNames;
     }
 
     public void setColumnNames(String[] columnNames) {
@@ -121,7 +126,7 @@ public abstract class AbstractRecordWriter implements RecordWriter {
             // write columns as map data
             writeBeginRow(actualSize);
             for (int i = 0; i < size; i++) {
-                if (skipColumns.contains(columnNames[i])) {
+                if (skipColumns.contains(actualColumnNames[i])) {
                     continue;
                 }
 

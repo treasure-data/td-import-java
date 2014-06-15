@@ -67,6 +67,7 @@ public class PrepareProcessor {
         }
 
         if (w != null && r != null) {
+            w.setActualColumnNames(r.getActualColumnNames());
             w.setColumnNames(r.getColumnNames());
             w.setColumnTypes(r.getColumnTypes());
             w.setSkipColumns(r.getSkipColumns());

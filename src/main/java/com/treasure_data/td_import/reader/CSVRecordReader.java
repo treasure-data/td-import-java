@@ -328,8 +328,9 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
 
                 // set column names
                 if (columnNames == null || columnNames.length == 0) {
-                    columnNames = readRecord.toArray(new String[0]);
-                    conf.setColumnNames(columnNames);
+                    conf.setColumnNames(readRecord.toArray(new String[0]));
+                    columnNames = conf.getColumnNames();
+                    actualColumnNames = conf.getActualColumnNames();
                 }
             }
 
