@@ -48,7 +48,8 @@ public interface Constants extends com.treasure_data.client.Constants {
     String CMD_PREPARE_EXAMPLE =
             "  $ td import:prepare logs/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
             "  $ td import:prepare logs/*.csv --format csv --columns date_code,uid,price,count --time-value 1394409600,10 -o parts/\n" +
-            "  $ td import:prepare mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
+            "  $ td import:prepare mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n" +
+            "  $ td import:prepare \"s3://<s3_access_key>:<s3_secret_key>@/my_bucket/path/to/*.csv\" --format csv --column-header --time-column date_time -o parts/\n";
 
     String CMD_PREPARE_DESC = "  Convert files into part file format\n";
 
@@ -116,7 +117,9 @@ public interface Constants extends com.treasure_data.client.Constants {
             "  $ td import:upload mysess parts/* --parallel 4\n" +
             "  $ td import:upload mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
             "  $ td import:upload parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
-            "  $ td import:upload mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
+            "  $ td import:upload mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n" +
+            "  $ td import:upload \"s3://<s3_access_key>:<s3_secret_key>@/my_bucket/path/to/*.csv\" --format csv --column-header --time-column date_time -o parts/\n";
+
 
     String CMD_UPLOAD_DESC = "  Upload or re-upload files into a bulk import session";
 
@@ -141,7 +144,9 @@ public interface Constants extends com.treasure_data.client.Constants {
             "  $ td import:auto mysess parts/* --parallel 4\n" +
             "  $ td import:auto mysess parts/*.csv --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
             "  $ td import:auto parts/*.csv --auto-create mydb.mytbl --format csv --columns time,uid,price,count --time-column time -o parts/\n" +
-            "  $ td import:auto mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n";
+            "  $ td import:auto mysess mytable --format mysql --db-url jdbc:mysql://localhost/mydb --db-user myuser --db-password mypass\n" +
+            "  $ td import:auto \"s3://<s3_access_key>:<s3_secret_key>@/my_bucket/path/to/*.csv\" --format csv --column-header --time-column date_time -o parts/\n";
+
 
     String CMD_AUTO_DESC = "  Automatically upload or re-upload files into a bulk import session. "
             + "It's functional equivalent of 'upload' command with 'auto-perform', 'auto-commit' and 'auto-delete' options. "

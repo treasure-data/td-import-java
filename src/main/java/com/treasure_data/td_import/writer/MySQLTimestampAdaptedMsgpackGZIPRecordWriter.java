@@ -38,4 +38,14 @@ public class MySQLTimestampAdaptedMsgpackGZIPRecordWriter
             throws PreparePartsException {
         filter.validateUnixtime(v.getLong());
     }
+
+    public void write(TimeColumnValue filter, MySQLPrepareConfiguration.DateColumnValue v)
+            throws PreparePartsException {
+        write(v.getLong());
+    }
+
+    public void validate(TimeColumnValue filter, MySQLPrepareConfiguration.DateColumnValue v)
+            throws PreparePartsException {
+        filter.validateUnixtime(v.getLong());
+    }
 }

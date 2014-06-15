@@ -272,8 +272,10 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
         case Types.DOUBLE:
             return ColumnType.DOUBLE;
         case Types.TIME:
-        case Types.TIMESTAMP: // DATETIME
+        case Types.TIMESTAMP: // DATETIME, TIMESTAMP
             return new MySQLPrepareConfiguration.TimestampColumnType();
+        case Types.DATE: // DATE
+            return new MySQLPrepareConfiguration.DateColumnType();
         default:
             throw new PreparePartsException("unsupported jdbc type: " + jdbcType);
         }
