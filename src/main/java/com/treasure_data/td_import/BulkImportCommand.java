@@ -29,6 +29,7 @@ import com.treasure_data.model.bulkimport.SessionSummary;
 import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasure_data.td_import.prepare.PrepareConfiguration.Format;
 import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
@@ -60,8 +61,9 @@ public final class BulkImportCommand extends BulkImport {
             new BulkImportCommand(props).doCommand(cmd, args);
         } catch (IllegalArgumentException e) {
             String msg = String.format("Cannot execute your command: %s", e.getMessage());
-            commandHelper.printLine(msg);
+            commandHelper.printErrorLine(msg);
             LOG.log(Level.SEVERE, msg, e);
+            System.exit(2);
         }
     }
 
@@ -97,7 +99,11 @@ public final class BulkImportCommand extends BulkImport {
 
         // extract and get source names from command-line arguments
         Source[] srcs = getSources(prepareConf, 1);
-
+        if (srcs.length == 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Cannot prepare with no content. Please check your command to ensure " +
+                    prepareConf.getSourceTargetDescr() + " is provided."));
+        }
         List<String> srcNames = new ArrayList<String>();
         for (Source src : srcs) {
             srcNames.add(src.getPath());
@@ -150,7 +156,7 @@ public final class BulkImportCommand extends BulkImport {
         TaskResult<?> e = null;
         String sessionName;
         int srcPos;
-        if (uploadConf.autoCreate()) { // 'auto-create-session'
+        if (uploadConf.autoCreate()) { // '--auto-create my_db.my_tbl' option
             // create session automatically
             sessionName = createBulkImportSessionName(uploadConf, tdClient, biClient);
 
@@ -176,13 +182,19 @@ public final class BulkImportCommand extends BulkImport {
         // if session is already freezed, exception is thrown.
         if (sess.uploadFrozen()) {
             throw new IllegalArgumentException(String.format(
-                    "Bulk import session %s is already freezed. Please check it with 'td import:show %s'",
+                    "Bulk import session '%s' is already freezed. Please check it with 'td import:show %s'",
                     sessionName, sessionName));
         }
 
         // get and extract uploaded sources from command-line arguments
         Source[] srcs = getSources(uploadConf, srcPos);
-
+        if (srcs.length == 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Cannot upload empty content to bulk import session '%s'. " + 
+                    "Please check your command to ensure "  +
+                    uploadConf.getSourceTargetDescr() + " is provided. ",
+                    sessionName));
+        }
         List<String> srcNames = new ArrayList<String>();
         for (Source src : srcs) {
             srcNames.add(src.getPath());
@@ -265,6 +277,10 @@ public final class BulkImportCommand extends BulkImport {
         try {
             new BulkImportCommand(System.getProperties()).doMain(args);
         } catch (Exception e) {
+            String msg = String.format("Cannot execute your command: %s (%s)", 
+                e.getMessage(), e.getClass().getName());
+            LOG.log(Level.SEVERE, msg);
+            System.err.println(msg);
             System.exit(1);
         }
 
