@@ -240,21 +240,6 @@ public class BulkImport extends Import {
                 databaseName, tableName, timestamp, d.getTime());
 
         TaskResult<?> e = null;
-        // validate that database is live or not
-        e = UploadProcessor.checkDatabase(tdClient, conf,
-                sessionName, databaseName);
-        if (e.error != null) {
-            throw new IllegalArgumentException(e.error);
-        }
-
-        // validate that table is live or not
-        e = UploadProcessor.checkTable(tdClient, conf,
-                sessionName, databaseName, tableName);
-        if (e.error != null) {
-            // TODO FIXME #MN should create table automatically if
-            // it is not found.
-            throw new IllegalArgumentException(e.error);
-        }
 
         // create bulk import session
         e = UploadProcessor.createSession(biClient, conf, sessionName, databaseName, tableName);
