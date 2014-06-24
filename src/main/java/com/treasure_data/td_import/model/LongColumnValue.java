@@ -28,8 +28,8 @@ public class LongColumnValue extends AbstractColumnValue {
 
     private long v;
 
-    public LongColumnValue(ColumnType columnType) {
-        super(columnType);
+    public LongColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

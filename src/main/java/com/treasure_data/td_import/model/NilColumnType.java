@@ -26,8 +26,8 @@ public class NilColumnType extends AbstractColumnType {
         super("null", -1);
     }
 
-    public ColumnValue createColumnValue() {
-        return new NilColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new NilColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into)

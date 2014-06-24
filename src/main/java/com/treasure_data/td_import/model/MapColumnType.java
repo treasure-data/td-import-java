@@ -26,8 +26,8 @@ public class MapColumnType extends AbstractColumnType {
         super("map", 7);
     }
 
-    public ColumnValue createColumnValue() {
-        return new MapColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new MapColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into) throws PreparePartsException {

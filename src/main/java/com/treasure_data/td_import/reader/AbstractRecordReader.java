@@ -282,7 +282,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
     public void initializeWrittenRecord() {
         ColumnValue[] values = new ColumnValue[columnTypes.length];
         for (int i = 0; i < columnTypes.length; i++) {
-            values[i] = columnTypes[i].createColumnValue();
+            values[i] = columnTypes[i].createColumnValue(i);
         }
         writtenRecord = new Record(values);
     }

@@ -25,8 +25,8 @@ import com.treasure_data.td_import.writer.RecordWriter;
 public class MapColumnValue extends AbstractColumnValue {
     private Map v;
 
-    public MapColumnValue(ColumnType columnType) {
-        super(columnType);
+    public MapColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

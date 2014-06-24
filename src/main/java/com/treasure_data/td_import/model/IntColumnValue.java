@@ -28,8 +28,8 @@ public class IntColumnValue extends AbstractColumnValue {
 
     private int v;
 
-    public IntColumnValue(ColumnType columnType) {
-        super(columnType);
+    public IntColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

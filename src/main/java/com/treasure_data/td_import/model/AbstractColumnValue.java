@@ -31,9 +31,11 @@ public abstract class AbstractColumnValue implements ColumnValue {
 
     protected boolean isNullString = false;
 
+    protected int index;
     protected ColumnType columnType;
 
-    public AbstractColumnValue(ColumnType columnType) {
+    public AbstractColumnValue(int index, ColumnType columnType) {
+        this.index = index;
         this.columnType = columnType;
     }
 

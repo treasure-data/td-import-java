@@ -26,8 +26,8 @@ public class BooleanColumnType extends AbstractColumnType {
         super("boolean", 51);
     }
 
-    public ColumnValue createColumnValue() {
-        return new BooleanColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new BooleanColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into)

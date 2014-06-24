@@ -166,7 +166,7 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
     public void convertTypes() throws PreparePartsException {
         ColumnValue[] columnValues = new ColumnValue[columnNames.length];
         for (int i = 0; i < columnNames.length; i++) {
-            columnValues[i] = columnTypes[i].createColumnValue();
+            columnValues[i] = columnTypes[i].createColumnValue(i);
             columnTypes[i].setColumnValue(values[i], columnValues[i]);
         }
 

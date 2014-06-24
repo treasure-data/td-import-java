@@ -26,8 +26,8 @@ public class ArrayColumnType extends AbstractColumnType {
         super("array", 6);
     }
 
-    public ColumnValue createColumnValue() {
-        return new ArrayColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new ArrayColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into) throws PreparePartsException {

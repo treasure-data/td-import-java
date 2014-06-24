@@ -26,8 +26,8 @@ public class StringColumnType extends AbstractColumnType {
         super("string", 0);
     }
 
-    public ColumnValue createColumnValue() {
-        return new StringColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new StringColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into)

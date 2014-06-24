@@ -28,8 +28,8 @@ public class DoubleColumnValue extends AbstractColumnValue {
 
     private double v;
 
-    public DoubleColumnValue(ColumnType columnType) {
-        super(columnType);
+    public DoubleColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

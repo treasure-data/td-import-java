@@ -26,8 +26,8 @@ public class DoubleColumnType extends AbstractColumnType {
         super("double", 2);
     }
 
-    public ColumnValue createColumnValue() {
-        return new DoubleColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new DoubleColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into) throws PreparePartsException {

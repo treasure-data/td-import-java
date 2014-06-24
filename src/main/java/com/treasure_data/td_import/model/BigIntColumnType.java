@@ -26,7 +26,7 @@ public class BigIntColumnType extends AbstractColumnType {
         super("bigint", 3);
     }
 
-    public ColumnValue createColumnValue() {
+    public ColumnValue createColumnValue(int index) {
         throw new UnsupportedOperationException();
     }
 

@@ -28,8 +28,8 @@ public class FloatColumnValue extends AbstractColumnValue {
 
     private float v;
 
-    public FloatColumnValue(ColumnType columnType) {
-        super(columnType);
+    public FloatColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {
