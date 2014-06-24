@@ -49,6 +49,9 @@ public class FloatColumnValue extends AbstractColumnValue {
 
         try {
             this.v = Float.parseFloat(v);
+        } catch (NumberFormatException e) {
+            String cause = "Column[" + index + "] value cannot be converted to Float type: " + e.getMessage();
+            throw new PreparePartsException(cause, e);
         } catch (Exception e) {
             LOG.log(Level.WARNING, String.format(
                     "Cannot parse '%s' to float type", v), e);

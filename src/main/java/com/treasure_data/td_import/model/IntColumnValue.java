@@ -49,6 +49,9 @@ public class IntColumnValue extends AbstractColumnValue {
 
         try {
             this.v = Integer.parseInt(v);
+        } catch (NumberFormatException e) {
+            String cause = "Column[" + index + "] value cannot be converted to Int type: " + e.getMessage();
+            throw new PreparePartsException(cause, e);
         } catch (Exception e) {
             LOG.log(Level.WARNING, String.format(
                     "Cannot parse '%s' to int type", v), e);

@@ -49,6 +49,9 @@ public class DoubleColumnValue extends AbstractColumnValue {
 
         try {
             this.v = Double.parseDouble(v);
+        } catch (NumberFormatException e) {
+            String cause = "Column[" + index + "] value cannot be converted to Double type: " + e.getMessage();
+            throw new PreparePartsException(cause, e);
         } catch (Exception e) {
             LOG.log(Level.WARNING, String.format(
                     "Cannot parse '%s' to double type", v), e);
