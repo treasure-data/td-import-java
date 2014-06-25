@@ -18,7 +18,7 @@ public class TestIntColumnValue extends ColumnValueTestUtil<Integer> {
     @Before
     public void createResources() throws Exception {
         super.createResources();
-        columnValue = new IntColumnValue(ColumnType.INT);
+        columnValue = new IntColumnValue(0, ColumnType.INT);
 
     }
 
