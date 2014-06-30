@@ -112,7 +112,7 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
     }
 
     @Override
-    public void setColumnTypes() {
+    public void setColumnTypes() throws PreparePartsException {
         columnTypes = new ColumnType[values.length];
         for (int i = 0; i < columnTypes.length; i++) {
             columnTypes[i] = toColumnType(values[i]);

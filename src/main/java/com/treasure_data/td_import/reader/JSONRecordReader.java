@@ -118,7 +118,7 @@ public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrep
     }
 
     @Override
-    public void setColumnTypes() {
+    public void setColumnTypes() throws PreparePartsException {
         columnTypes = new ColumnType[columnNames.length];
         for (int i = 0; i < columnNames.length; i++) {
             Object v = row.get(columnNames[i]);
