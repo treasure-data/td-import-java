@@ -157,6 +157,8 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
 
         if (value instanceof Integer) {
             return ColumnType.INT;
+        } else if (value instanceof Boolean) {
+            return ColumnType.BOOLEAN;
         } else if (value instanceof Double) {
             return ColumnType.DOUBLE;
         } else if (value instanceof String) {
