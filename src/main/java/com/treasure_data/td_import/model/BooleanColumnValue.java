@@ -27,8 +27,8 @@ public class BooleanColumnValue extends AbstractColumnValue {
 
     private String v;
 
-    public BooleanColumnValue(ColumnType columnType) {
-        super(columnType);
+    public BooleanColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

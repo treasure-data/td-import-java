@@ -676,6 +676,19 @@ public class PrepareConfiguration extends Configuration {
     public Format getFormat() {
         return format;
     }
+    
+    public String getSourceTargetDescr() {
+    	if(format == Format.MYSQL)
+    		return "the source MySQL table";
+    	
+    	String out = "at least one source ";
+        if (format == Format.TSV)
+    		return out + "TSV file";
+    	else if (format == Format.JSON)
+    		return out + "JSON file";
+    	else // Format.CSV
+    		return out + "CSV file";
+    }
 
     public void setOutputFormat() {
         if (format == null) {

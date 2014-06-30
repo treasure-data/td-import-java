@@ -25,8 +25,8 @@ import com.treasure_data.td_import.writer.RecordWriter;
 public class NilColumnValue extends AbstractColumnValue {
     private static final Logger LOG = Logger.getLogger(NilColumnValue.class.getName());
 
-    public NilColumnValue(ColumnType columnType) {
-        super(columnType);
+    public NilColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

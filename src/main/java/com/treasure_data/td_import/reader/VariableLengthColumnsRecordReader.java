@@ -103,7 +103,7 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
     }
 
     protected abstract void setColumnNames();
-    protected abstract void setColumnTypes();
+    protected abstract void setColumnTypes() throws PreparePartsException;
 
     @Override
     public void setSkipColumns() {
@@ -152,13 +152,15 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
         }
     }
 
-    protected ColumnType toColumnType(Object value) {
+    protected ColumnType toColumnType(Object value) throws PreparePartsException {
         if (value == null) {
             return ColumnType.NIL;
         }
 
         if (value instanceof Integer) {
             return ColumnType.INT;
+        } else if (value instanceof Boolean) {
+            return ColumnType.BOOLEAN;
         } else if (value instanceof Double) {
             return ColumnType.DOUBLE;
         } else if (value instanceof String) {
@@ -170,7 +172,8 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
         } else if (value instanceof Map) {
             return ColumnType.MAP;
         } else {
-            throw new UnsupportedOperationException("During toColumnType() execution");
+            throw new PreparePartsException("Text reader found invalid column type: "
+                    + value.getClass().getName() + "(" + value.toString() + ")");
         }
     }
 

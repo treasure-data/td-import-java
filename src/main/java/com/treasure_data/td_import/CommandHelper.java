@@ -35,6 +35,10 @@ public class CommandHelper {
     public void printLine(String message) {
         System.out.printf(message + "\n");
     }
+    
+    public void printErrorLine(String message) {
+        System.err.printf(message + "\n");
+    }
 
     public void printLine(String format, Object ... args) {
         System.out.printf(format + "\n", args);

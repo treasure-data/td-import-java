@@ -23,8 +23,8 @@ import com.treasure_data.td_import.writer.RecordWriter;
 public class StringColumnValue extends AbstractColumnValue {
     private String v;
 
-    public StringColumnValue(ColumnType columnType) {
-        super(columnType);
+    public StringColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

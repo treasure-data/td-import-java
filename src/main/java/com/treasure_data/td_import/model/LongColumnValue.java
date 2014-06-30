@@ -28,8 +28,8 @@ public class LongColumnValue extends AbstractColumnValue {
 
     private long v;
 
-    public LongColumnValue(ColumnType columnType) {
-        super(columnType);
+    public LongColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {
@@ -49,6 +49,9 @@ public class LongColumnValue extends AbstractColumnValue {
 
         try {
             this.v = Long.parseLong(v);
+        } catch (NumberFormatException e) {
+            String cause = "Column[" + index + "] value cannot be converted to Long type: " + e.getMessage();
+            throw new PreparePartsException(cause, e);
         } catch (Exception e) {
             LOG.log(Level.WARNING, String.format(
                     "Cannot parse '%s' to long type", v), e);

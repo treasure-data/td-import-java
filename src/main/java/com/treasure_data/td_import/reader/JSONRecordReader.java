@@ -120,7 +120,7 @@ public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrep
     }
 
     @Override
-    public void setColumnTypes() {
+    public void setColumnTypes() throws PreparePartsException {
         columnTypes = new ColumnType[columnNames.length];
         for (int i = 0; i < columnNames.length; i++) {
             Object v = row.get(actualColumnNames[i]);
@@ -154,7 +154,7 @@ public class JSONRecordReader extends VariableLengthColumnsRecordReader<JSONPrep
     public void convertTypes() throws PreparePartsException {
         ColumnValue[] columnValues = new ColumnValue[columnNames.length];
         for (int i = 0; i < columnNames.length; i++) {
-            columnValues[i] = columnTypes[i].createColumnValue();
+            columnValues[i] = columnTypes[i].createColumnValue(i);
             columnTypes[i].setColumnValue(row.get(actualColumnNames[i]), columnValues[i]);
         }
 

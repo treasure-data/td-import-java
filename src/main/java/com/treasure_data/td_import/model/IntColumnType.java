@@ -26,8 +26,8 @@ public class IntColumnType extends AbstractColumnType {
         super("int", 4);
     }
 
-    public ColumnValue createColumnValue() {
-        return new IntColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new IntColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into)

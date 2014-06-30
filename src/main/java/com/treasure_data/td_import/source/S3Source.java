@@ -51,6 +51,8 @@ public class S3Source extends Source {
         String bucket = elm[0];
         String basePath = rawPath.substring(bucket.length() + 1, rawPath.length());
 
+        System.setProperty("com.amazonaws.sdk.disableCertChecking", "1");
+
         AmazonS3Client client = createAmazonS3Client(desc);
         List<S3ObjectSummary> s3objects = getSources(client, bucket, basePath);
         List<Source> srcs = new ArrayList<Source>();

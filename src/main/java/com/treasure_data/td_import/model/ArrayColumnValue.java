@@ -25,8 +25,8 @@ import com.treasure_data.td_import.writer.RecordWriter;
 public class ArrayColumnValue extends AbstractColumnValue {
     private List v;
 
-    public ArrayColumnValue(ColumnType columnType) {
-        super(columnType);
+    public ArrayColumnValue(int index, ColumnType columnType) {
+        super(index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

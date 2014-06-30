@@ -26,8 +26,8 @@ public class FloatColumnType extends AbstractColumnType {
         super("float", 1);
     }
 
-    public ColumnValue createColumnValue() {
-        return new FloatColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new FloatColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into)

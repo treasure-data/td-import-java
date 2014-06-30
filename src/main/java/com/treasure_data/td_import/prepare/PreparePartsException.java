@@ -20,6 +20,10 @@ package com.treasure_data.td_import.prepare;
 @SuppressWarnings("serial")
 public class PreparePartsException extends Exception {
 
+    public PreparePartsException(String cause, Throwable t) {
+        super(cause, t);
+    }
+
     public PreparePartsException(Throwable t) {
         super(t);
     }

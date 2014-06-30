@@ -26,8 +26,8 @@ public class LongColumnType extends AbstractColumnType {
         super("long", 5);
     }
 
-    public ColumnValue createColumnValue() {
-        return new LongColumnValue(this);
+    public ColumnValue createColumnValue(int index) {
+        return new LongColumnValue(index, this);
     }
 
     public void convertType(String v, ColumnValue into)

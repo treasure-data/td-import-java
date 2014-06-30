@@ -1,3 +1,11 @@
+Release 0.4.14 - 2014/06/17
+  IMPROVEMENTS
+    Updates td-client 0.4.2.
+
+  BUG FIXED
+    Fixes bug: import:auto from S3 doesn't work by causing upgrading td-client 0.4.2-SNAPSHOT.
+    Fixes bug: import:auto runs without messages when no input files are given.
+
 Release 0.4.13 - 2014/06/10
   IMPROVEMENTS
     Supports and can read from MySQL DATE, TIMESTAMP, and DATETIME columns.

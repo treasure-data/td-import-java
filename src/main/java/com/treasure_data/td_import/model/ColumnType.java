@@ -40,7 +40,7 @@ public interface ColumnType {
     String getName();
     int getIndex();
 
-    ColumnValue createColumnValue();
+    ColumnValue createColumnValue(int index);
     void convertType(String v, ColumnValue into) throws PreparePartsException;
     void setColumnValue(Object v, ColumnValue cv) throws PreparePartsException;
     void filterAndWrite(ColumnValue v, TimeColumnValue filter, RecordWriter with) throws PreparePartsException;

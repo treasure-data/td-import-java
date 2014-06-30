@@ -22,7 +22,7 @@ public class TestStringColumnValue extends ColumnValueTestUtil<String> {
     @Before
     public void createResources() throws Exception {
         super.createResources();
-        columnValue = new StringColumnValue(ColumnType.STRING);
+        columnValue = new StringColumnValue(0, ColumnType.STRING);
     }
 
     @After
