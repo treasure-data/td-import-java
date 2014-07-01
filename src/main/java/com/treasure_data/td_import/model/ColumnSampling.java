@@ -34,12 +34,12 @@ public class ColumnSampling {
         }
 
         // value looks like String object?
-        scores[ColumnType.STRING.getIndex()] += 1;
+        scores[ColumnType.STRING.getOrderIndex()] += 1;
 
         // value looks like Double object?
         try {
             Double.parseDouble((String) value);
-            scores[ColumnType.DOUBLE.getIndex()] += 1;
+            scores[ColumnType.DOUBLE.getOrderIndex()] += 1;
         } catch (NumberFormatException e) {
             // ignore
         }
@@ -47,7 +47,7 @@ public class ColumnSampling {
         // value looks like Float object?
         try {
             Float.parseFloat((String) value);
-            scores[ColumnType.FLOAT.getIndex()] += 1;
+            scores[ColumnType.FLOAT.getOrderIndex()] += 1;
         } catch (NumberFormatException e) {
             // ignore
         }
@@ -55,7 +55,7 @@ public class ColumnSampling {
         // value looks like BigInteger object?
         try {
             new BigInteger((String) value);
-            scores[ColumnType.BIGINT.getIndex()] += 1;
+            scores[ColumnType.BIGINT.getOrderIndex()] += 1;
         } catch (NumberFormatException e) {
             // ignore
         }
@@ -63,7 +63,7 @@ public class ColumnSampling {
         // value looks like Long object?
         try {
             Long.parseLong((String) value);
-            scores[ColumnType.LONG.getIndex()] += 1;
+            scores[ColumnType.LONG.getOrderIndex()] += 1;
         } catch (NumberFormatException e) {
             // ignore
         }
@@ -71,7 +71,7 @@ public class ColumnSampling {
         // value looks like Integer object?
         try {
             Integer.parseInt((String) value);
-            scores[ColumnType.INT.getIndex()] += 1;
+            scores[ColumnType.INT.getOrderIndex()] += 1;
         } catch (NumberFormatException e) {
             // ignore
         }
