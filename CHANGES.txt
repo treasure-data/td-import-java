@@ -1,3 +1,12 @@
+Release 0.4.15 - 2014/07/01
+  IMPROVEMENTS
+    Updates td-client 0.4.3.
+    Improves error message by JSON file reader for boolean values.
+    Improves error message by CSV file reader for type convertion failure.
+
+  BUG FIXED
+    Users with import_only access cannot import data by BulkImport.
+
 Release 0.4.14 - 2014/06/17
   IMPROVEMENTS
     Updates td-client 0.4.2.
