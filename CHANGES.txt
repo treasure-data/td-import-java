@@ -1,4 +1,6 @@
 Release 0.4.16 - 2014/XX/XX
+  BUG FIXED
+    When the columns specified with time-format are null or empty string, CSV/TSV reader throws NPE.
 
 Release 0.4.15 - 2014/07/01
   IMPROVEMENTS
