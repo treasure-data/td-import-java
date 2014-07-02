@@ -56,7 +56,10 @@ public interface Constants extends com.treasure_data.client.Constants {
     String CMD_PREPARE_OPTIONS =
             "    -f, --format FORMAT              source file format [csv, tsv, json, msgpack, apache, regex, mysql]; default=csv\n" +
             "    -C, --compress TYPE              compressed type [gzip, none, auto]; default=auto detect\n" +
-            "    -T, --time-format FORMAT         STRF_FORMAT; strftime(3) format of the time column\n" +
+            "    -T, --time-format FORMAT         specifies the format of the time column according to Java's\n" +
+            "                                       java.text.SimpleDateFormat class. Note that SimpleDateFormat slightly differs\n" +
+            "                                       from Ruby's Time#strftime format in that the '%:z' and '%::z' timezone options\n" +
+            "                                       are not supported.\n" +
             "    -e, --encoding TYPE              encoding type [utf-8]\n" +
             "    -o, --output DIR                 output directory. default directory is 'out'.\n" +
             "    -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)\n" +
@@ -323,7 +326,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     // time-format STRF_FORMAT; default=auto detect
     String BI_PREPARE_PARTS_TIMEFORMAT = "time-format";
     String BI_PREPARE_TIMEFORMAT_HYPHEN_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_TIMEFORMAT;
-    String BI_PREPARE_PARTS_TIMEFORMAT_DESC = "STRF_FORMAT; strftime(3) format of the time column";
+    String BI_PREPARE_PARTS_TIMEFORMAT_DESC =
+            "specifies the format of the time column according to Java's\n" +
+            "  java.text.SimpleDateFormat class. Note that SimpleDateFormat slightly differs\n" +
+            "  from Ruby's Time#strftime format in that the '%:z' and '%::z' timezone options\n" +
+            "  are not supported.\n" +
 
     // output DIR
     String BI_PREPARE_PARTS_OUTPUTDIR = "output";
