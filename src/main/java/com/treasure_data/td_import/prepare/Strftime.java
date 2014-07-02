@@ -94,6 +94,10 @@ public class Strftime {
     }
 
     public long getTime(String t) {
+        if (t == null || t.isEmpty()) {
+            return 0;
+        }
+
         try {
             return formats.get().parse(t).getTime() / 1000;
         } catch (ParseException e) {
