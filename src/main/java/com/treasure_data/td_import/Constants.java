@@ -74,14 +74,14 @@ public interface Constants extends com.treasure_data.client.Constants {
             "                                        where TIME is the Unix time in seconds since Epoch and\n" +
             "                                        HOURS is the maximum range of the timestamps in hours.\n" +
             "                                        This mode can be used to assign incremental timestamps to\n" +
-            "                                        subsequent records. Timestmaps will be incremented by 1 second\n" +
+            "                                        subsequent records. Timestamps will be incremented by 1 second\n" +
             "                                        each record. If the number of records causes the timestamp to\n" +
             "                                        overflow the range (timestamp >= TIME + HOURS * 3600), the\n" +
             "                                        next timestamp will restart at TIME and continue from there.\n" +
             "                                        E.g. '--time-value 1394409600,10' will assign timestamp 1394409600\n" +
             "                                        to the first record, timestamp 1394409601 to the second, 1394409602\n" +
             "                                        to the third, and so on until the 36000th record which will have\n" +
-            "                                        timestmap 1394445600 (1394409600 + 10 * 3600). The timestamp assigned\n" +
+            "                                        timestamp 1394445600 (1394409600 + 10 * 3600). The timestamp assigned\n" +
             "                                        to the 36001th record will be 1394409600 again and the timestamp\n" +
             "                                        will restart from there.\n" +
             "    --primary-key NAME:TYPE          pair of name and type of primary key declared in your item table\n" +
