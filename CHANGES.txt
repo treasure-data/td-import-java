@@ -1,3 +1,22 @@
+Release 0.5.1 - 2014/XX/XX
+
+Release 0.5.0 - 2014/07/08
+  IMPROVEMENTS
+    Changes group ID for the artifact: 'com.treasure_data' to 'com.treasuredata'
+
+Release 0.4.16 - 2014/07/02
+  BUG FIXED
+    When the columns specified with time-format are null or empty string, CSV/TSV reader throws NPE.
+
+Release 0.4.15 - 2014/07/01
+  IMPROVEMENTS
+    Updates td-client 0.4.3.
+    Improves error message by JSON file reader for boolean values.
+    Improves error message by CSV file reader for type convertion failure.
+
+  BUG FIXED
+    Users with import_only access cannot import data by BulkImport.
+
 Release 0.4.14 - 2014/06/17
   IMPROVEMENTS
     Updates td-client 0.4.2.

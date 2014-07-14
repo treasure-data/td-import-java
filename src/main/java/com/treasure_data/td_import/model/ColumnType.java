@@ -38,7 +38,7 @@ public interface ColumnType {
     ColumnType MAP = new MapColumnType();
 
     String getName();
-    int getIndex();
+    int getOrderIndex();
 
     ColumnValue createColumnValue(int index);
     void convertType(String v, ColumnValue into) throws PreparePartsException;
@@ -52,7 +52,7 @@ public interface ColumnType {
 
         static {
             for (ColumnType t : Arrays.asList(BOOLEAN, DOUBLE, FLOAT, INT, BIGINT, LONG, STRING, ARRAY, MAP)) {
-                REVERSE_INTS.put(t.getIndex(), t);
+                REVERSE_INTS.put(t.getOrderIndex(), t);
                 REVERSE_STRINGS.put(t.getName(), t);
             }
         }

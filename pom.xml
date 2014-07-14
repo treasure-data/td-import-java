@@ -1,13 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.treasure_data</groupId>
+  <groupId>com.treasuredata</groupId>
   <artifactId>td-import</artifactId>
   <name>Treasure Data Import Tool in Java</name>
   <description>Treasure Data Import Tool in Java.</description>
-  <version>0.4.15-SNAPSHOT</version>
+  <version>0.5.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <url>https://github.com/treasure-data/td-import-java</url>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>9</version>
+  </parent>
 
   <licenses>
     <license>
@@ -20,7 +26,7 @@
   <scm>
     <connection>scm:git:git://github.com/treasure-data/td-import-java.git</connection>
     <developerConnection>scm:git:git@github.com:treasure-data/td-import-java.git</developerConnection>
-    <url>scm:git:git://github.com/treasure-data/td-import-java.git</url>
+    <url>https://github.com/treasure-data/td-import-java.git</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -37,27 +43,12 @@
     </developer>
   </developers>
 
-  <distributionManagement>
-      <repository>
-          <uniqueVersion>false</uniqueVersion>
-          <id>maven.treasure-data.com</id>
-          <name>Repository at maven.treasure-data.com</name>
-          <url>dav:http://maven.treasure-data.com</url>
-      </repository>
-      <snapshotRepository>
-          <uniqueVersion>false</uniqueVersion>
-          <id>maven.treasure-data.com</id>
-          <name>Snapshot Repository at maven.treasure-data.com</name>
-          <url>dav:http://maven.treasure-data.com/snapshot</url>
-      </snapshotRepository>
-  </distributionManagement>
-
   <properties>
     <!--  version properties for dependencies -->
     <jopt-simple.version>4.5</jopt-simple.version>
     <msgpack.version>0.6.7</msgpack.version>
     <super-csv.version>2.1.0</super-csv.version>
-    <td-client.version>0.4.3-SNAPSHOT</td-client.version>
+    <td-client.version>0.4.3</td-client.version>
     <aws-java-sdk.version>1.3.22</aws-java-sdk.version>
     <junit.version>4.8.2</junit.version>
     <mockito.version>1.9.5</mockito.version>
@@ -68,7 +59,7 @@
     <maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
     <maven-eclipse-plugin.version>2.5.1</maven-eclipse-plugin.version>
     <maven-surefire-plugin.version>2.13</maven-surefire-plugin.version>
-    <maven-shade-plugin.version>1.5</maven-shade-plugin.version>
+    <maven-shade-plugin.version>2.3</maven-shade-plugin.version>
     <maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
     <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
     <wagon-webdav-jackrabbit.version>1.0-beta-7</wagon-webdav-jackrabbit.version>
@@ -257,7 +248,6 @@
 
       </plugin>
 
-      <!-- include jars for msgpack -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -284,24 +274,7 @@
           </execution>
         </executions>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-plugin</artifactId>
-        <version>${maven-scm-plugin.version}</version>
-        <configuration>
-          <pushChanges>false</pushChanges>
-        </configuration>
-      </plugin>
     </plugins>
-
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>${wagon-webdav-jackrabbit.version}</version>
-      </extension>
-    </extensions>
   </build>
 
   <reporting>

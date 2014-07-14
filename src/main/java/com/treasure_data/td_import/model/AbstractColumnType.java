@@ -20,18 +20,18 @@ package com.treasure_data.td_import.model;
 public abstract class AbstractColumnType implements ColumnType {
 
     protected String name;
-    protected int index;
+    protected int orderIndex;
 
-    protected AbstractColumnType(String name, int index) {
+    protected AbstractColumnType(String name, int orderIndex) {
         this.name = name;
-        this.index = index;
+        this.orderIndex = orderIndex;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getIndex() {
-        return index;
+    public int getOrderIndex() {
+        return orderIndex;
     }
 }
