@@ -26,10 +26,12 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
@@ -405,27 +407,42 @@ public class PrepareConfiguration extends Configuration {
     public static enum InvalidColumnsHandling {
         AUTOFIX("autofix") {
             @Override
-            public String handleInvalidColumn(String column) {
-                String fixed = fixColumnFormat(column);
-                String msg = "fixed invalid column name: column must contain only lowercase letters, digits, and '_': "
-                        + "'" + column + "' is replaced into '" + fixed + "'.";
-                LOG.warning(msg);
-                System.out.println(msg);
+            public String handleInvalidColumn(String column, int index) {
+                String fixed = fixColumnFormat(column, index);
+                if (!alreadyHandled(column)) {
+                    String msg = "fixed invalid column name: column must contain only lowercase letters, digits, and '_': "
+                            + "'" + column + "' is replaced into '" + fixed + "'.";
+                    LOG.warning(msg);
+                    System.out.println(msg);
+                    handleNow(column);
+                }
                 return fixed;
             }
         },
         WARN(BI_PREPARE_INVALID_COLUMNS_HANDLING_DEFAULTVALUE) {
             @Override
-            public String handleInvalidColumn(String column) {
-                String msg = "detected invalid column name: column must contain only lowercase letters, digits, and '_': "
-                        + "'" + column + "' cannot be used within query strings.";
-                LOG.warning(msg);
-                System.out.println(msg);
+            public String handleInvalidColumn(String column, int index) {
+                if (!alreadyHandled(column)) {
+                    String msg = "detected invalid column name: column must contain only lowercase letters, digits, and '_': "
+                            + "'" + column + "' cannot be used within query strings.";
+                    LOG.warning(msg);
+                    System.out.println(msg);
+                    handleNow(column);
+                }
                 return column;
             }
         };
 
         private String mode;
+        protected Set<String> cache = new HashSet<String>();
+
+        boolean alreadyHandled(String column) {
+            return cache.contains(column);
+        }
+
+        void handleNow(String column) {
+            cache.add(column);
+        }
 
         InvalidColumnsHandling(String mode) {
             this.mode = mode;
@@ -435,10 +452,10 @@ public class PrepareConfiguration extends Configuration {
             return mode;
         }
 
-        public abstract String handleInvalidColumn(String column);
+        public abstract String handleInvalidColumn(String column, int index);
 
         public static boolean validColumnFormat(String column) {
-            if (column == null || column.length() < 2) {
+            if (column == null || column.isEmpty()) {
                 return false;
             }
 
@@ -459,9 +476,9 @@ public class PrepareConfiguration extends Configuration {
             return true;
         }
 
-        public static String fixColumnFormat(String column) {
-            if (column == null) {
-                return "__";
+        public static String fixColumnFormat(String column, int index) {
+            if (column == null || column.isEmpty()) {
+                return "_c" + index;
             }
 
             StringBuilder sb = new StringBuilder();
@@ -477,10 +494,6 @@ public class PrepareConfiguration extends Configuration {
                     // otherwise, '_' is appended
                     sb.append('_');
                 }
-            }
-
-            while (sb.length() < 2) {
-                sb.append('_');
             }
 
             return sb.toString();
@@ -1099,7 +1112,7 @@ public class PrepareConfiguration extends Configuration {
             if (InvalidColumnsHandling.validColumnFormat(cnames[i])) {
                 cnames0[i] = cnames[i];
             } else {
-                cnames0[i] = invalidColumnsHandling.handleInvalidColumn(cnames[i]);
+                cnames0[i] = invalidColumnsHandling.handleInvalidColumn(cnames[i], i);
             }
         }
         this.columnNames = cnames0;
