@@ -1,4 +1,6 @@
 machine:
+  java:
+    version: oraclejdk6
   maven:
     version: 3.0.5
 
