@@ -185,6 +185,7 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
             }
 
             setColumnNames();
+            writer.setActualColumnNames(getActualColumnNames());
             writer.setColumnNames(getColumnNames());
             setColumnTypes();
             writer.setColumnTypes(getColumnTypes());
