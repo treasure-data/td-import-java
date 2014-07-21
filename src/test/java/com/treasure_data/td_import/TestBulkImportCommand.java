@@ -8,24 +8,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestBulkImportCommand {
-    @Test
-    public void testPrepareParts00() throws Exception {
-        Properties props = System.getProperties();
-
-        List<String> opts = new ArrayList<String>();
-        opts.add("--format");
-        opts.add("json");
-        opts.add("--invalid-columns-handling");
-        opts.add("warn");
-        opts.add("--exclude-columns");
-        opts.add("order");
-        List<String> args = new ArrayList<String>();
-        args.add("prepare");
-        args.add("./in/input.json");
-        args.addAll(opts);
-
-        new BulkImportCommand(props).doPrepareCommand(args.toArray(new String[0]));
-    }
 
     @Test @Ignore
     public void testPrepareParts01() throws Exception {
