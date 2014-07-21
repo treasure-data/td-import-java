@@ -91,6 +91,8 @@ public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
     public void setColumnNames() {
         columnNames = new String[] { "host", "user", "time", "method", "path",
                 "code", "size", "referer", "agent" };
+        actualColumnNames = new String[] { "host", "user", "time", "method", "path",
+                "code", "size", "referer", "agent" };
     }
 
     @Override

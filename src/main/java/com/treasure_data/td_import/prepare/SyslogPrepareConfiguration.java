@@ -43,6 +43,7 @@ public class SyslogPrepareConfiguration extends RegexPrepareConfiguration {
     @Override
     public void setColumnNames() {
         columnNames = new String[] { "time", "host", "ident", "pid", "message" };
+        actualColumnNames = new String[] { "time", "host", "ident", "pid", "message" };
     }
 
     @Override
