@@ -49,6 +49,7 @@ public class TestSyslogFileReader {
                         + "Jul 27 09:49:38 itbsv1 su(pam_unix)[8061]: session opened for user root by root(uid=0)\n").getBytes();
 
         reader.configure(task);
+        writer.setActualColumnNames(reader.getActualColumnNames());
         writer.setColumnNames(reader.getColumnNames());
         writer.setColumnTypes(reader.getColumnTypes());
         writer.setSkipColumns(reader.getSkipColumns());

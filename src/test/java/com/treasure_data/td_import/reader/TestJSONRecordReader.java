@@ -52,6 +52,7 @@ public class TestJSONRecordReader {
                 
 
         reader.configure(task);
+        writer.setActualColumnNames(reader.getActualColumnNames());
         writer.setColumnNames(reader.getColumnNames());
         writer.setColumnTypes(reader.getColumnTypes());
         writer.setSkipColumns(reader.getSkipColumns());
