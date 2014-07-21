@@ -125,6 +125,7 @@ public class TestErrorRecordsHandling {
         writer.configure(task, result);
         reader = PrepareConfiguration.Format.CSV.createFileReader(conf, writer);
         reader.configure(task);
+        writer.setActualColumnNames(reader.getActualColumnNames());
         writer.setColumnNames(reader.getColumnNames());
         writer.setColumnTypes(reader.getColumnTypes());
         writer.setSkipColumns(reader.getSkipColumns());
