@@ -1,4 +1,6 @@
-Release 0.5.1 - 2014/XX/XX
+Release 0.5.2 - 20XX/XX/XX
+
+Release 0.5.1 - 2014/07/23
   IMPROVEMENTS
     Updates td-client 0.5.1.
 
