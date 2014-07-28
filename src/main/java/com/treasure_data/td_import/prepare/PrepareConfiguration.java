@@ -543,7 +543,7 @@ public class PrepareConfiguration extends Configuration {
     protected Format format;
     protected OutputFormat outputFormat = OutputFormat.MSGPACKGZ;
     protected CompressionType compressionType;
-    protected CharsetDecoder charsetDecoder;
+    protected String encoding;
     protected int numOfPrepareThreads;
 
     protected String aliasTimeColumn;
@@ -811,34 +811,31 @@ public class PrepareConfiguration extends Configuration {
     }
 
     public void setEncoding() {
-        String encoding;
         if (!optionSet.has(BI_PREPARE_PARTS_ENCODING)) {
             encoding = BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE;
         } else {
             encoding = (String) optionSet.valueOf(BI_PREPARE_PARTS_ENCODING);
         }
-
-        try {
-            createCharsetDecoder(encoding);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
-    }
-
-    public void createCharsetDecoder(String encoding) throws Exception {
-        charsetDecoder = Charset.forName(encoding).newDecoder();
-        if (errorRecordsHandling.equals(ErrorRecordsHandling.ABORT)) {
-            charsetDecoder.onMalformedInput(CodingErrorAction.REPORT);
-            charsetDecoder.onUnmappableCharacter(CodingErrorAction.REPORT);
-        } else { // skip
-            charsetDecoder.onMalformedInput(CodingErrorAction.REPLACE);
-            charsetDecoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-        }
     }
 
     public CharsetDecoder getCharsetDecoder() throws PreparePartsException {
-        return charsetDecoder;
+        return charsetDecoders.get();
     }
+
+    private ThreadLocal<CharsetDecoder> charsetDecoders = new ThreadLocal<CharsetDecoder>() {
+        @Override
+        protected CharsetDecoder initialValue() {
+            CharsetDecoder charsetDecoder = Charset.forName(encoding).newDecoder();
+            if (errorRecordsHandling.equals(ErrorRecordsHandling.ABORT)) {
+                charsetDecoder.onMalformedInput(CodingErrorAction.REPORT);
+                charsetDecoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+            } else { // skip
+                charsetDecoder.onMalformedInput(CodingErrorAction.REPLACE);
+                charsetDecoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+            }
+            return charsetDecoder;
+        }
+    };
 
     public void setPrimaryKey() {
         if (!optionSet.has(BI_PREPARE_PARTS_PRIMARY_KEY)) {
