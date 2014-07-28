@@ -1,4 +1,6 @@
 Release 0.5.2 - 20XX/XX/XX
+  BUG FIXED
+    Fixes CharsetDecoder objects retrival by ThreadLocal: PrepareProcessors sometimes hit IllegalStateException.
 
 Release 0.5.1 - 2014/07/23
   IMPROVEMENTS
