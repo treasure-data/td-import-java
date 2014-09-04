@@ -1,4 +1,10 @@
 Release 0.5.2 - 2014/07/29
+  IMPROVEMENTS
+    Added '--invalid-columns-handling' option to specify the behavior of the prepare process with regards to invalid
+      column names. The 'warn' option is the default and causes the processor to emit a warning message when an invalid
+      column name is encountered; the 'autofix' option makes the processor automatically fix the invalid column names by 
+      making them lowercase and substituting invalid characters with underscores (_).
+
   BUG FIXED
     Fixes CharsetDecoder objects retrival by ThreadLocal: PrepareProcessors sometimes hit IllegalStateException.
 
