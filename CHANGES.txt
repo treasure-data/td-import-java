@@ -1,3 +1,7 @@
+Release 0.5.3 - 2014/09/04
+  BUG FIXED
+    mysql: fixes bug: NPE occurs when Mysql table reader tries to create a sample record
+
 Release 0.5.2 - 2014/07/29
   IMPROVEMENTS
     Added '--invalid-columns-handling' option to specify the behavior of the prepare process with regards to invalid
