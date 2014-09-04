@@ -116,6 +116,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
             }
             conf.setColumnNames(cnames);
             columnNames = conf.getColumnNames();
+            actualColumnNames = conf.getActualColumnNames();
         }
     }
 
@@ -205,6 +206,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
             JSONRecordWriter w = null;
             try {
                 w = new MySQLTimestampAdaptedJSONRecordWriter(conf);
+                w.setActualColumnNames(getActualColumnNames());
                 w.setColumnNames(getColumnNames());
                 w.setColumnTypes(getColumnTypes());
                 w.setSkipColumns(getSkipColumns());
