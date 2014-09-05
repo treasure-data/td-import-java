@@ -57,7 +57,7 @@ public class CommandHelper {
     }
 
     public void finishUpload() {
-        this.uploadElapsedTime = System.currentTimeMillis() - prepareStartTime;
+        this.uploadElapsedTime = System.currentTimeMillis() - uploadStartTime;
     }
 
     public void showPrepare(Source[] sources, String outputDirName) {
