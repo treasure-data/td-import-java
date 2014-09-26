@@ -17,34 +17,17 @@
 //
 package com.treasure_data.td_import.reader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import com.treasure_data.td_import.Configuration;
+import com.treasure_data.td_import.model.*;
+import com.treasure_data.td_import.prepare.*;
+import com.treasure_data.td_import.source.Source;
+import com.treasure_data.td_import.writer.RecordWriter;
+
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.treasure_data.td_import.Configuration;
-import com.treasure_data.td_import.model.AliasTimeColumnValue;
-import com.treasure_data.td_import.model.ColumnType;
-import com.treasure_data.td_import.model.ColumnValue;
-import com.treasure_data.td_import.model.Record;
-import com.treasure_data.td_import.model.SkippedTimeColumnValue;
-import com.treasure_data.td_import.model.TimeColumnSampling;
-import com.treasure_data.td_import.model.TimeColumnValue;
-import com.treasure_data.td_import.model.TimeValueTimeColumnValue;
-import com.treasure_data.td_import.prepare.HHmmssStrftime;
-import com.treasure_data.td_import.prepare.PrepareConfiguration;
-import com.treasure_data.td_import.prepare.PreparePartsException;
-import com.treasure_data.td_import.prepare.Strftime;
-import com.treasure_data.td_import.prepare.Task;
-import com.treasure_data.td_import.source.Source;
-import com.treasure_data.td_import.writer.RecordWriter;
 
 public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         implements RecordReader<T> {
@@ -252,6 +235,12 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
             timeColumnValue = new SkippedTimeColumnValue();
             return;
         } else if (timeColumnIndex >= 0) {
+            // if users specify time-value option, the existing time colume values
+            // in their files are overwritten to the value specified as time-value.
+            if (conf.getTimeValue().getTimeValue() >= 0) {
+                timeColumnValue = conf.getTimeValue();
+                return;
+            }
             index = timeColumnIndex;
             isAlias = false;
         } else if (aliasTimeColumnIndex >= 0) {
