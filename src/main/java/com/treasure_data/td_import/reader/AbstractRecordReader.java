@@ -349,8 +349,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         }
 
         try {
-            errWriter.write(record);
-            errWriter.write('\n');
+            errWriter.write(String.format("(%d) %s\n", lineNum, record));
         } catch (IOException e) {
             LOG.log(Level.WARNING, String.format(
                     "error records cannot be written: %s", record), e);
