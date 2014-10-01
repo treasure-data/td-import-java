@@ -1,3 +1,8 @@
+Release 0.5.4 - 20XX/XX/XX
+  IMPROVEMENTS
+    Changed error-record file format to add line numbers of error records.
+    Improved the behavior of time-value option: time-value should overwrite existing time colume values.
+
 Release 0.5.3 - 2014/09/04
   BUG FIXED
     mysql: fixes bug: NPE occurs when Mysql table reader tries to create a sample record
