@@ -162,7 +162,7 @@ public class UploadProcessor extends UploadProcessorBase {
             summary = showSession(client, conf, sessName);
 
             StringBuilder sbuf = new StringBuilder();
-            sbuf.append(String.format("Show error records of bulk import session %s", summary.getName())).append("\n");
+            sbuf.append(String.format("Show the result of bulk import session %s", summary.getName())).append("\n");
             sbuf.append("  Performing job ID : " + summary.getJobID()).append("\n");
             sbuf.append("  Valid parts       : " + summary.getValidParts()).append("\n");
             sbuf.append("  Error parts       : " + summary.getErrorParts()).append("\n");
@@ -184,16 +184,21 @@ public class UploadProcessor extends UploadProcessorBase {
 
         if (summary.getErrorParts() != 0 || summary.getErrorRecords() != 0) {
             String msg = String.format(
-                    "Performing failed: error parts = %d, error records = %d",
-                    summary.getErrorParts(), summary.getErrorRecords());
+                    "Perform job (%s) reported %d error parts and %d error records. If you want to "
+                    + "check error records by the job, please execute command 'td import:error_records %s'.",
+                    summary.getJobID(), summary.getErrorParts(), summary.getErrorRecords(), summary.getName());
             System.out.println(msg);
             LOG.severe(msg);
 
             msg = String.format(
-                    "Check the status of bulk import session %s with 'td import:show %s' command",
+                    "If error records exist, td import command stops. If you ignore error records and want "
+                    + "to commit your performed data to your table, you manually can execute command 'td "
+                    + "import:commit %s'. If you want to delete your bulk_import session, you also can execute "
+                    + "command 'td import:delete %s'.",
                     summary.getName(), summary.getName());
             System.out.println(msg);
             LOG.severe(msg);
+
             err.error = new UploadPartsException(msg);
             return err;
         }
