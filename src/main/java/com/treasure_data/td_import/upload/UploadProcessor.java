@@ -186,12 +186,12 @@ public class UploadProcessor extends UploadProcessorBase {
             String msg;
             if (summary.getErrorRecords() != 0) {
                 msg = String.format(
-                        "All %d records are invalid by Perform job (%s).\n"
-                      + "Please check error records by the job, please execute command 'td import:error_records %s'.",
-                      summary.getErrorRecords(), summary.getJobID(), summary.getName());
+                        "The td import command stopped because the perform job (%s) reported 0 valid records.\n"
+                      + "Please execute the 'td import:error_records %s' command to check the invalid records.",
+                      summary.getJobID(), summary.getName());
             } else { // both of valid records and error records are 0.
                 msg = String.format(
-                        "Since perform job (%s) reported 0 valid records, td import command stops. Not execute commit operation.",
+                        "The td import command stopped because the perform job (%s) reported 0 valid records. Commit operation will be skipped.",
                         summary.getJobID());
             }
 
