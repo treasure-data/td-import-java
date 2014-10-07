@@ -182,20 +182,33 @@ public class UploadProcessor extends UploadProcessorBase {
             return err;
         }
 
-        if (summary.getErrorParts() != 0 || summary.getErrorRecords() != 0) {
-            String msg = String.format(
-                    "Perform job (%s) reported %d error parts and %d error records. If you want to "
-                    + "check error records by the job, please execute command 'td import:error_records %s'.",
-                    summary.getJobID(), summary.getErrorParts(), summary.getErrorRecords(), summary.getName());
+        if (summary.getValidRecords() == 0) {
+            String msg;
+            if (summary.getErrorRecords() != 0) {
+                msg = String.format(
+                        "All %d records are invalid by Perform job (%s).\n"
+                      + "Please check error records by the job, please execute command 'td import:error_records %s'.",
+                      summary.getErrorRecords(), summary.getJobID(), summary.getName());
+            } else { // both of valid records and error records are 0.
+                msg = String.format(
+                        "Since perform job (%s) reported 0 valid records, td import command stops. Not execute commit operation.",
+                        summary.getJobID());
+            }
+
             System.out.println(msg);
             LOG.severe(msg);
 
-            msg = String.format(
-                    "If error records exist, td import command stops. If you ignore error records and want "
-                    + "to commit your performed data to your table, you manually can execute command 'td "
-                    + "import:commit %s'. If you want to delete your bulk_import session, you also can execute "
-                    + "command 'td import:delete %s'.",
-                    summary.getName(), summary.getName());
+            err.error = new UploadPartsException(msg);
+            return err;
+        } else if (summary.getErrorParts() != 0 || summary.getErrorRecords() != 0) {
+            String msg = String.format(
+                    "Perform job (%s) reported %d error parts and %d error records.\n"
+                  + "If error records exist, td import command stops.\n"
+                  + "If you want to check error records by the job, please execute command 'td import:error_records %s'.\n"
+                  + "If you ignore error records and want to commit your performed data to your table, you manually can execute command 'td import:commit %s'.\n"
+                  + "If you want to delete your bulk_import session, you also can execute command 'td import:delete %s'.",
+                  summary.getJobID(), summary.getErrorParts(), summary.getErrorRecords(),
+                  summary.getName(), summary.getName(), summary.getName());
             System.out.println(msg);
             LOG.severe(msg);
 
