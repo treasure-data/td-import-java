@@ -30,6 +30,7 @@ import com.treasure_data.client.ClientException;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.model.DatabaseSummary;
+import com.treasure_data.model.NotFoundException;
 import com.treasure_data.model.TableSummary;
 import com.treasure_data.model.bulkimport.Session;
 import com.treasure_data.model.bulkimport.SessionSummary;
@@ -511,6 +512,13 @@ public class UploadProcessor extends UploadProcessorBase {
         TaskResult err = new TaskResult();
         try {
             client.createSession(sessionName, databaseName, tableName);
+        } catch (NotFoundException e) {
+            String emsg = String.format(
+                    "Cannot create bulk_import session %s Because table '%s' or database '%s' not found.",
+                    sessionName, tableName, databaseName);
+            System.out.println(emsg);
+            LOG.severe(emsg);
+            err.error = new IOException(e);
         } catch (ClientException e) {
             String emsg = String.format(
                     "Cannot create bulk_import session %s by using %s:%s, %s. ",
