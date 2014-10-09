@@ -514,8 +514,8 @@ public class UploadProcessor extends UploadProcessorBase {
             client.createSession(sessionName, databaseName, tableName);
         } catch (NotFoundException e) {
             String emsg = String.format(
-                    "Cannot create bulk_import session %s Because table '%s' or database '%s' not found.",
-                    sessionName, tableName, databaseName);
+                    "Cannot create bulk_import session %s: database '%s' or table '%s' cannot be found.",
+                    sessionName, databaseName, tableName);
             System.out.println(emsg);
             LOG.severe(emsg);
             err.error = new IOException(e);
