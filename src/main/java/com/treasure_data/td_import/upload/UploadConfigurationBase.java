@@ -80,6 +80,7 @@ public class UploadConfigurationBase extends PrepareConfiguration {
                 || optionSet.has(BI_PREPARE_PARTS_COMPRESSION)
                 || optionSet.has(BI_PREPARE_PARTS_PARALLEL)
                 || optionSet.has(BI_PREPARE_PARTS_ENCODING)
+                || optionSet.has(BI_PREPARE_PARTS_COLUMNHEADER)               // column-header
                 || optionSet.has(BI_PREPARE_PARTS_TIMECOLUMN)
                 || optionSet.has(BI_PREPARE_PARTS_TIMEFORMAT)
                 || optionSet.has(BI_PREPARE_PARTS_TIMEVALUE)
@@ -89,6 +90,11 @@ public class UploadConfigurationBase extends PrepareConfiguration {
                 || optionSet.has(BI_PREPARE_PARTS_SPLIT_SIZE)
                 || optionSet.has(BI_PREPARE_PARTS_COLUMNS)
                 || optionSet.has(BI_PREPARE_PARTS_COLUMNTYPES)
+                || optionSet.has(BI_PREPARE_COLUMNTYPE)                       // column-type
+                || optionSet.has(BI_PREPARE_ALL_STRING)                       // all-string
+                || optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT)       // error-records-output
+                || optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)     // error-records-handling
+                || optionSet.has(BI_PREPARE_INVALID_COLUMNS_HANDLING)         // invalid-columns-handling
                 || optionSet.has(BI_PREPARE_PARTS_EXCLUDE_COLUMNS)
                 || optionSet.has(BI_PREPARE_PARTS_ONLY_COLUMNS);
     }
