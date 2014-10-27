@@ -263,7 +263,8 @@ public final class BulkImportCommand extends BulkImport {
         }
 
         // 'auto-perform' and 'auto-commit'
-        results.add(UploadProcessor.processAfterUploading(biClient, uploadConf, sessionName));
+        results.add(UploadProcessor.processAfterUploading(
+                biClient, tdClient, uploadConf, sessionName));
 
         // 'auto-delete'
         if (hasNoUploadError(results) && uploadConf.autoDelete() && uploadConf.autoCommit()) {

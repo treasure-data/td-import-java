@@ -30,6 +30,8 @@ import com.treasure_data.client.ClientException;
 import com.treasure_data.client.TreasureDataClient;
 import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.model.DatabaseSummary;
+import com.treasure_data.model.Job;
+import com.treasure_data.model.JobSummary;
 import com.treasure_data.model.NotFoundException;
 import com.treasure_data.model.TableSummary;
 import com.treasure_data.model.bulkimport.Session;
@@ -102,7 +104,8 @@ public class UploadProcessor extends UploadProcessorBase {
     }
 
     public static TaskResult processAfterUploading(BulkImportClient client,
-            UploadConfiguration conf, String sessName) throws UploadPartsException {
+            TreasureDataClient tdClient, UploadConfiguration conf, String sessName)
+            throws UploadPartsException {
         TaskResult err = null;
 
         if (!conf.autoPerform()) {
@@ -152,7 +155,7 @@ public class UploadProcessor extends UploadProcessorBase {
         }
 
         // wait performing
-        err = waitPerform(client, conf, sessName);
+        err = waitPerform(client, tdClient, conf, sessName);
         if (err.error != null) {
             return err;
         }
@@ -279,7 +282,8 @@ public class UploadProcessor extends UploadProcessorBase {
     }
 
     public static TaskResult waitPerform(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+            final TreasureDataClient tdClient, final UploadConfiguration conf, final String sessionName)
+            throws UploadPartsException {
         String m = String.format("Wait %s bulk import session performing...", sessionName);
         System.out.println(m);
         LOG.info(m);
@@ -294,6 +298,16 @@ public class UploadProcessor extends UploadProcessorBase {
                     break;
                 } else if (summary.getStatus().equals("uploading")) {
                     throw new IOException("performing failed");
+                }
+
+                String jobId = summary.getJobID();
+                JobSummary.Status jobStatus = tdClient.showJobStatus(new Job(jobId));
+                if (!(jobStatus.equals(JobSummary.Status.BOOTING) ||
+                        jobStatus.equals(JobSummary.Status.QUEUED) ||
+                        jobStatus.equals(JobSummary.Status.RUNNING) ||
+                        jobStatus.equals(JobSummary.Status.SUCCESS))) {
+                    throw new IOException("performing failed: the job status was changed to "
+                            + jobStatus.toString());
                 }
 
                 try {
