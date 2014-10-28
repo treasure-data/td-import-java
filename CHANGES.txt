@@ -1,3 +1,5 @@
+Release 0.5.6 - 20XX/XX/XX
+
 Release 0.5.5 - 2014/10/28
   IMPROVEMENTS
     Added validation for checking the status of perform job to waitPerform.
