@@ -110,7 +110,7 @@ public class UploadConfigurationBase extends PrepareConfiguration {
     public void setRetryCount() {
         String num;
         if (!optionSet.has(BI_UPLOAD_RETRY_COUNT)) {
-            num = Configuration.TD_CLIENT_RETRY_COUNT_DEFAULTVALUE;
+            num = BI_UPLOAD_RETRY_COUNT_DEFAULTVALUE;
         } else {
             num = (String) optionSet.valueOf(BI_UPLOAD_RETRY_COUNT);
         }

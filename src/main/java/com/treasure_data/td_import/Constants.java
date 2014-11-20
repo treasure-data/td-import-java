@@ -126,7 +126,7 @@ public interface Constants extends com.treasure_data.client.Constants {
     String CMD_UPLOAD_DESC = "  Upload or re-upload files into a bulk import session";
 
     String CMD_UPLOAD_OPTIONS =
-            "    --retry-count NUM                upload process will automatically retry at specified time; default: 10\n" +
+            "    --retry-count NUM                upload process will automatically retry at specified time; default: 12\n" +
             "    --auto-create DATABASE.TABLE     create automatically bulk import session by specified database and table names\n" +
             "                                     If you use 'auto-create' option, you MUST not specify any session name as first argument.\n" +
             "    --auto-perform                   perform bulk import job automatically\n" +
@@ -239,13 +239,9 @@ public interface Constants extends com.treasure_data.client.Constants {
     // retry-count
     String BI_UPLOAD_RETRY_COUNT = "retry-count";
     String BI_UPLOAD_RETRY_COUNT_HYPHEN = HYPHENHYPHEN + BI_UPLOAD_RETRY_COUNT;
-    String BI_UPLOAD_RETRY_COUNT_DEFAULTVALUE = "10";
+    String BI_UPLOAD_RETRY_COUNT_DEFAULTVALUE = "12";
     String BI_UPLOAD_RETRY_COUNT_DESC =
             "upload process will automatically retry at specified time; default: 10";
-
-    // retryCount NUM
-    String BI_UPLOAD_PARTS_RETRYCOUNT = "td.bulk_import.upload_parts.retrycount";
-    String BI_UPLOAD_PARTS_RETRYCOUNT_DEFAULTVALUE = "10";
 
     // waitSec NUM
     String BI_UPLOAD_PARTS_WAITSEC = "td.bulk_import.upload_parts.waitsec";
