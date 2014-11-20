@@ -1,4 +1,6 @@
 Release 0.5.6 - 20XX/XX/XX
+  BUG FIXED
+    Changes the default value of retry-count: 8 to 10.
 
 Release 0.5.5 - 2014/10/28
   IMPROVEMENTS
