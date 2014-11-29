@@ -191,7 +191,8 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
                 // 'all-string' option is ignored
                 columnTypes = new ColumnType[numColumns];
                 for (int i = 0; i < numColumns; i++) {
-                    columnTypes[i] = toColumnType(metaData.getColumnType(i + 1));
+                    columnTypes[i] = toColumnType(metaData.getColumnType(i + 1),
+                            metaData.isSigned(i + 1));
                 }
             }
 
@@ -255,7 +256,7 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
         }
     }
 
-    private static ColumnType toColumnType(int jdbcType)
+    private static ColumnType toColumnType(int jdbcType, boolean signed)
             throws PreparePartsException {
         switch (jdbcType) {
         case Types.BIT:
@@ -266,9 +267,13 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
             return ColumnType.STRING;
         case Types.TINYINT:
         case Types.SMALLINT:
-        case Types.INTEGER: // INT
             return ColumnType.INT;
+        case Types.INTEGER: // INT
+            return !signed ? ColumnType.LONG : ColumnType.INT;
         case Types.BIGINT:
+            if (!signed) {
+                throw new PreparePartsException("UNSIGNED BIGINT is not supported.");
+            }
             return ColumnType.LONG;
         case Types.FLOAT:
         case Types.DOUBLE:
