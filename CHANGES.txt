@@ -1,3 +1,5 @@
+Release 0.5.7 - 20XX/XX/XX
+
 Release 0.5.6 - 2014/12/02
   IMPROVEMENTS
     MySQLTableReader supported the types of UNSIGNED TINYINT, UNSIGNED SMALLINT, UNSIGNED INT: it can translate those values to TreasureData type.
