@@ -191,7 +191,9 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
                 // 'all-string' option is ignored
                 columnTypes = new ColumnType[numColumns];
                 for (int i = 0; i < numColumns; i++) {
-                    columnTypes[i] = toColumnType(metaData.getColumnType(i + 1),
+                    columnTypes[i] = toColumnType(
+                            metaData.getColumnType(i + 1),
+                            metaData.getColumnTypeName(i + 1),
                             metaData.isSigned(i + 1));
                 }
             }
@@ -256,25 +258,42 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
         }
     }
 
-    private static ColumnType toColumnType(int jdbcType, boolean signed)
+    private static ColumnType toColumnType(int jdbcType, String typeName, boolean signed)
             throws PreparePartsException {
         switch (jdbcType) {
         case Types.BIT:
             return ColumnType.BOOLEAN;
+
         case Types.CHAR:
         case Types.VARCHAR:
         case Types.LONGVARCHAR:
             return ColumnType.STRING;
+
         case Types.TINYINT:
+            // 'TINYINT'
+            // 'TINYINT UNSIGNED'
         case Types.SMALLINT:
+            // 'SMALLINT'
+            // 'SMALLINT UNSIGNED'
             return ColumnType.INT;
+
         case Types.INTEGER: // INT
+            if (typeName.startsWith("MEDIUMINT")) {
+                // 'MEDIUMINT'
+                // 'MEDIUMINT UNSIGNED'
+                return ColumnType.INT;
+            }
             return !signed ? ColumnType.LONG : ColumnType.INT;
+
         case Types.BIGINT:
-            if (!signed) {
+            if (signed) {
+                // 'BIGINT'
+                return ColumnType.LONG;
+            } else {
+                // 'BIGINT UNSIGNED'
                 throw new PreparePartsException("UNSIGNED BIGINT is not supported.");
             }
-            return ColumnType.LONG;
+
         case Types.FLOAT:
         case Types.DOUBLE:
             return ColumnType.DOUBLE;
