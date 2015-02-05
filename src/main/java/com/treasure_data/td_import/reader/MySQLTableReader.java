@@ -258,7 +258,8 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
         }
     }
 
-    private static ColumnType toColumnType(int jdbcType, String typeName, boolean signed)
+    //@VisibleForTesting
+    static ColumnType toColumnType(int jdbcType, String typeName, boolean signed)
             throws PreparePartsException {
         switch (jdbcType) {
         case Types.BIT:
