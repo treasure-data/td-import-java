@@ -1,5 +1,8 @@
 package com.treasure_data.td_import.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -44,6 +47,15 @@ public class TestLongColumnValue extends ColumnValueTestUtil<Long> {
             assertColumnValueEquals(expecteds.get(i),
                     (LongColumnValue) columnValue);
         }
+    }
+
+    @Test
+    public void returnNullWithEmptyAsNull() throws Exception {
+        conf.setEmptyAsNull(true);
+        columnValue.parse(null);
+        assertEquals(0, ((LongColumnValue) columnValue).getLong());
+        assertTrue(((LongColumnValue)columnValue).isEmptyString);
+        assertFalse(((LongColumnValue) columnValue).isNullString);
     }
 
     void assertColumnValueEquals(long expected, LongColumnValue actual) {

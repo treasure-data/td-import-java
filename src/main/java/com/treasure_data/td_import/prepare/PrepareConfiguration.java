@@ -1196,6 +1196,11 @@ public class PrepareConfiguration extends Configuration {
         return hasAllString;
     }
 
+    //@ForTesting
+    public void setEmptyAsNull(boolean flag) {
+        hasEmptyasNull = flag;
+    }
+
     public void setEmptyAsNull() {
         hasEmptyasNull = optionSet.has(BI_PREPARE_PARTS_EMPTYASNULL);
     }
