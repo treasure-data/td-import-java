@@ -17,6 +17,7 @@
 //
 package com.treasure_data.td_import.model;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
@@ -26,7 +27,7 @@ public class BigIntColumnType extends AbstractColumnType {
         super("bigint", 3);
     }
 
-    public ColumnValue createColumnValue(int index) {
+    public ColumnValue createColumnValue(PrepareConfiguration config, int index) {
         throw new UnsupportedOperationException();
     }
 

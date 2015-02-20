@@ -19,6 +19,7 @@ package com.treasure_data.td_import.model;
 
 import java.util.logging.Logger;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
@@ -27,8 +28,8 @@ public class BooleanColumnValue extends AbstractColumnValue {
 
     private String v;
 
-    public BooleanColumnValue(int index, ColumnType columnType) {
-        super(index, columnType);
+    public BooleanColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+        super(config, index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {
@@ -45,7 +46,10 @@ public class BooleanColumnValue extends AbstractColumnValue {
 
     @Override
     public void write(RecordWriter with) throws PreparePartsException {
-        if (isNullString) {
+        if (isEmptyString && config.hasEmptyAsNull()) {
+            with.writeNil();
+            isEmptyString = false;
+        } else if (isNullString) {
             with.writeNil();
             isNullString = false;
         } else {

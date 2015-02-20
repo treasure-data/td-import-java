@@ -157,6 +157,9 @@ public class Options {
                 Configuration.BI_PREPARE_ALL_STRING),
                 Configuration.BI_PREPARE_ALL_STRING_DESC);
         op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_EMPTYASNULL),
+                Configuration.BI_PREPARE_PARTS_EMPTYASNULL_DESC);
+        op.acceptsAll(Arrays.asList(
                 Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS),
                 Configuration.BI_PREPARE_PARTS_EXCLUDE_COLUMNS_DESC)
                 .withRequiredArg()

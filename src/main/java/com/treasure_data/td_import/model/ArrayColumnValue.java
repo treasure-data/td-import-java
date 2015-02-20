@@ -19,14 +19,15 @@ package com.treasure_data.td_import.model;
 
 import java.util.List;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
 public class ArrayColumnValue extends AbstractColumnValue {
     private List v;
 
-    public ArrayColumnValue(int index, ColumnType columnType) {
-        super(index, columnType);
+    public ArrayColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+        super(config, index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

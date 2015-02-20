@@ -17,14 +17,15 @@
 //
 package com.treasure_data.td_import.model;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
 public class StringColumnValue extends AbstractColumnValue {
     private String v;
 
-    public StringColumnValue(int index, ColumnType columnType) {
-        super(index, columnType);
+    public StringColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+        super(config, index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

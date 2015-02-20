@@ -19,14 +19,15 @@ package com.treasure_data.td_import.model;
 
 import java.util.logging.Logger;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
 public class NilColumnValue extends AbstractColumnValue {
     private static final Logger LOG = Logger.getLogger(NilColumnValue.class.getName());
 
-    public NilColumnValue(int index, ColumnType columnType) {
-        super(index, columnType);
+    public NilColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+        super(config, index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

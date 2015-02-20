@@ -19,14 +19,15 @@ package com.treasure_data.td_import.model;
 
 import java.util.Map;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
 public class MapColumnValue extends AbstractColumnValue {
     private Map v;
 
-    public MapColumnValue(int index, ColumnType columnType) {
-        super(index, columnType);
+    public MapColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+        super(config, index, columnType);
     }
 
     public void set(Object v) throws PreparePartsException {

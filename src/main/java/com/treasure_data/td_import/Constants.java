@@ -95,6 +95,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --column-types TYPE,TYPE,...     column types [string, int, long, double]\n" +
             "    --column-type NAME:TYPE          column type [string, int, long, double]. A pair of column name and type can be specified like 'age:int'\n" +
             "    -S, --all-string                 disable automatic type conversion\n" +
+            "    --empty-as-null                  the empty string values are interpreted as null values if columns arenumerical types." +
             "\n" +
             "    CSV/TSV specific options:\n" +
             "    --column-header                  first line includes column names\n" +
@@ -294,6 +295,12 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_ALL_STRING = "all-string";
     String BI_PREPARE_ALL_STRING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_COLUMNS;
     String BI_PREPARE_ALL_STRING_DESC = "disable automatic type conversion";
+
+    // empty-as-null; default=false
+    String BI_PREPARE_PARTS_EMPTYASNULL = "empty-as-null";
+    String BI_PREPARE_EMPTYASNULL_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_EMPTYASNULL;
+    String BI_PREPARE_PARTS_EMPTYASNULL_DEFAULTVALUE = "false";
+    String BI_PREPARE_PARTS_EMPTYASNULL_DESC = "the empty string values are interpreted as null values if columns arenumerical types";
 
     // exclude-columns, only-columns
     String BI_PREPARE_PARTS_EXCLUDE_COLUMNS = "exclude-columns";

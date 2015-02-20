@@ -17,6 +17,7 @@
 //
 package com.treasure_data.td_import.model;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
@@ -26,8 +27,8 @@ public class IntColumnType extends AbstractColumnType {
         super("int", 4);
     }
 
-    public ColumnValue createColumnValue(int index) {
-        return new IntColumnValue(index, this);
+    public ColumnValue createColumnValue(PrepareConfiguration config, int index) {
+        return new IntColumnValue(config, index, this);
     }
 
     public void convertType(String v, ColumnValue into)

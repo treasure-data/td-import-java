@@ -17,6 +17,7 @@
 //
 package com.treasure_data.td_import.model;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
@@ -26,8 +27,8 @@ public class ArrayColumnType extends AbstractColumnType {
         super("array", 6);
     }
 
-    public ColumnValue createColumnValue(int index) {
-        return new ArrayColumnValue(index, this);
+    public ColumnValue createColumnValue(PrepareConfiguration config, int index) {
+        return new ArrayColumnValue(config, index, this);
     }
 
     public void convertType(String v, ColumnValue into) throws PreparePartsException {

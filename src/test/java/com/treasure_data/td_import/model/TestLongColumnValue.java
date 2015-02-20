@@ -18,7 +18,7 @@ public class TestLongColumnValue extends ColumnValueTestUtil<Long> {
     @Before
     public void createResources() throws Exception {
         super.createResources();
-        columnValue = new LongColumnValue(0, ColumnType.LONG);
+        columnValue = new LongColumnValue(conf, 0, ColumnType.LONG);
     }
 
     @After

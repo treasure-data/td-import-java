@@ -39,8 +39,8 @@ public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
         }
 
         @Override
-        public ColumnValue createColumnValue(int index) {
-            return new LongColumnValue(index, this);
+        public ColumnValue createColumnValue(PrepareConfiguration config, int index) {
+            return new LongColumnValue(config, index, this);
         }
 
         @Override
@@ -60,8 +60,8 @@ public class ApachePrepareConfiguration extends RegexPrepareConfiguration {
         }
 
         @Override
-        public ColumnValue createColumnValue(int index) {
-            return new IntColumnValue(index, this);
+        public ColumnValue createColumnValue(PrepareConfiguration config, int index) {
+            return new IntColumnValue(config, index, this);
         }
 
         @Override

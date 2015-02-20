@@ -39,8 +39,8 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
         }
 
         @Override
-        public ColumnValue createColumnValue(int index) {
-            return new TimestampColumnValue(index, this);
+        public ColumnValue createColumnValue(PrepareConfiguration config, int index) {
+            return new TimestampColumnValue(config, index, this);
         }
 
         @Override
@@ -71,8 +71,8 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
     public static class TimestampColumnValue extends AbstractColumnValue {
         private long v;
 
-        public TimestampColumnValue(int index, ColumnType columnType) {
-            super(index, columnType);
+        public TimestampColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+            super(config, index, columnType);
         }
 
         public void set(Object v) throws PreparePartsException {
@@ -105,8 +105,8 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
         }
 
         @Override
-        public ColumnValue createColumnValue(int index) {
-            return new DateColumnValue(index, this);
+        public ColumnValue createColumnValue(PrepareConfiguration config, int index) {
+            return new DateColumnValue(config, index, this);
         }
 
         @Override
@@ -137,8 +137,8 @@ public class MySQLPrepareConfiguration extends PrepareConfiguration {
     public static class DateColumnValue extends AbstractColumnValue {
         private long v;
 
-        public DateColumnValue(int index, ColumnType columnType) {
-            super(index, columnType);
+        public DateColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+            super(config, index, columnType);
         }
 
         public void set(Object v) throws PreparePartsException {

@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.writer.RecordWriter;
 
@@ -40,7 +41,7 @@ public interface ColumnType {
     String getName();
     int getOrderIndex();
 
-    ColumnValue createColumnValue(int index);
+    ColumnValue createColumnValue(PrepareConfiguration config, int index);
     void convertType(String v, ColumnValue into) throws PreparePartsException;
     void setColumnValue(Object v, ColumnValue cv) throws PreparePartsException;
     void filterAndWrite(ColumnValue v, TimeColumnValue filter, RecordWriter with) throws PreparePartsException;

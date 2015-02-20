@@ -18,6 +18,8 @@
 package com.treasure_data.td_import.model;
 
 
+import com.treasure_data.td_import.prepare.PrepareConfiguration;
+
 public abstract class AbstractColumnValue implements ColumnValue {
     private static final String NULL_LOWERCASE = "null";
     private static final String NULL_UPPERCASE = "NULL";
@@ -30,11 +32,14 @@ public abstract class AbstractColumnValue implements ColumnValue {
     }
 
     protected boolean isNullString = false;
+    protected boolean isEmptyString = false;
 
+    protected PrepareConfiguration config;
     protected int index;
     protected ColumnType columnType;
 
-    public AbstractColumnValue(int index, ColumnType columnType) {
+    public AbstractColumnValue(PrepareConfiguration config, int index, ColumnType columnType) {
+        this.config = config;
         this.index = index;
         this.columnType = columnType;
     }

@@ -18,7 +18,7 @@ public class TestDoubleColumnValue extends ColumnValueTestUtil<Double> {
     @Before
     public void createResources() throws Exception {
         super.createResources();
-        columnValue = new DoubleColumnValue(0, ColumnType.DOUBLE);
+        columnValue = new DoubleColumnValue(conf, 0, ColumnType.DOUBLE);
     }
 
     @After

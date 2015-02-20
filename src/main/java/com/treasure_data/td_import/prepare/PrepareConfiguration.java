@@ -567,6 +567,7 @@ public class PrepareConfiguration extends Configuration {
     protected String[] columnNames;
     protected ColumnType[] columnTypes;
     protected Map<String, ColumnType> columnTypeMap = new HashMap<String, ColumnType>();
+    protected boolean hasEmptyasNull = false;
     protected boolean hasAllString = false;
     protected String[] excludeColumns;
     protected String[] onlyColumns;
@@ -620,6 +621,9 @@ public class PrepareConfiguration extends Configuration {
 
         // all-string
         setAllString();
+
+        // empty-as-null
+        setEmptyAsNull();
 
         // exclude-columns
         setExcludeColumns();
@@ -1190,6 +1194,14 @@ public class PrepareConfiguration extends Configuration {
 
     public boolean hasAllString() {
         return hasAllString;
+    }
+
+    public void setEmptyAsNull() {
+        hasEmptyasNull = optionSet.has(BI_PREPARE_PARTS_EMPTYASNULL);
+    }
+
+    public boolean hasEmptyAsNull() {
+        return hasEmptyasNull;
     }
 
     public void setExcludeColumns() {
