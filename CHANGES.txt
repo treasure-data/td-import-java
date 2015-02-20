@@ -2,6 +2,7 @@ Release 0.5.7 - 20XX/XX/XX
   IMPROVEMENTS
     MySQLTableReader supported MEDIUMINT and MEDIUMINT UNSIGNED.
     Upgrades aws-java-sdk 1.7.5
+    Added new '--empty-as-null' option to 'import:prepare' command
 
 Release 0.5.6 - 2014/12/02
   IMPROVEMENTS
