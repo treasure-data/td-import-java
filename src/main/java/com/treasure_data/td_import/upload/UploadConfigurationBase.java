@@ -92,6 +92,7 @@ public class UploadConfigurationBase extends PrepareConfiguration {
                 || optionSet.has(BI_PREPARE_PARTS_COLUMNTYPES)
                 || optionSet.has(BI_PREPARE_COLUMNTYPE)                       // column-type
                 || optionSet.has(BI_PREPARE_ALL_STRING)                       // all-string
+                || optionSet.has(BI_PREPARE_PARTS_EMPTYASNULL)                // empty-as-null-if-numeric
                 || optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_OUTPUT)       // error-records-output
                 || optionSet.has(BI_PREPARE_PARTS_ERROR_RECORDS_HANDLING)     // error-records-handling
                 || optionSet.has(BI_PREPARE_INVALID_COLUMNS_HANDLING)         // invalid-columns-handling
