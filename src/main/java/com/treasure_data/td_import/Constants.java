@@ -95,7 +95,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --column-types TYPE,TYPE,...     column types [string, int, long, double]\n" +
             "    --column-type NAME:TYPE          column type [string, int, long, double]. A pair of column name and type can be specified like 'age:int'\n" +
             "    -S, --all-string                 disable automatic type conversion\n" +
-            "    --empty-as-null                  the empty string values are interpreted as null values if columns arenumerical types." +
+            "    --empty-as-null                  the empty string values are interpreted as null values if columns are numerical types." +
             "\n" +
             "    CSV/TSV specific options:\n" +
             "    --column-header                  first line includes column names\n" +
