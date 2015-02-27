@@ -20,6 +20,7 @@ package com.treasure_data.td_import;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.treasure_data.client.TreasureDataClient;
@@ -66,8 +67,8 @@ public abstract class Import {
             SourceDesc desc = SourceDesc.create(srcName);
             return Source.Factory.createSources(desc);
         } catch (Throwable t) {
-            // TODO FIXME #MN this error handling is no good. 
-            LOG.info("create source as LocalFileSource: " + srcName);
+            // TODO FIXME #MN this error handling is no good.
+            LOG.log(Level.WARNING, "fallback and create source as LocalFileSource: " + srcName, t);
             List<Source> srcs = new ArrayList<Source>();
             srcs.add(new LocalFileSource(srcName));
             return srcs;
