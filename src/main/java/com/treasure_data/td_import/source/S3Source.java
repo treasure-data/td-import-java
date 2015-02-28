@@ -59,7 +59,8 @@ public class S3Source extends Source {
         for (S3ObjectSummary s3object : s3objects) {
             LOG.info(String.format("create s3-src s3object=%s, rawPath=%s",
                     s3object.getKey(), rawPath));
-            srcs.add(new S3Source(createAmazonS3Client(desc), rawPath, s3object));
+            srcs.add(new S3Source(createAmazonS3Client(desc), rawPath,
+                    s3object.getBucketName(), s3object.getKey(), s3object.getSize()));
         }
 
         return srcs;
@@ -140,12 +141,12 @@ public class S3Source extends Source {
     protected long size;
     protected String rawPath;
 
-    S3Source(AmazonS3Client client, String rawPath, S3ObjectSummary s3object) {
-        super("s3://" + s3object.getBucketName() + "/" + s3object.getKey());
+    S3Source(AmazonS3Client client, String rawPath, String bucket, String key, long size) {
+        super("s3://"+bucket+"/"+key);
         this.client = client;
-        this.bucket = s3object.getBucketName();
-        this.key = s3object.getKey();
-        this.size = s3object.getSize();
+        this.bucket = bucket;
+        this.key = key;
+        this.size = size;
         this.rawPath = rawPath;
     }
 
