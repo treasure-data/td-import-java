@@ -74,11 +74,6 @@ public class MysqlSource extends Source {
     }
 
     @Override
-    public String getFilename() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public long getSize() {
         return 0L;
     }
