@@ -89,6 +89,11 @@ public class LocalFileSource extends Source {
     }
 
     @Override
+    public char getSeparatorChar() {
+        return File.separatorChar;
+    }
+
+    @Override
     public InputStream getInputStream() throws IOException {
         return new BufferedInputStream(new FileInputStream(getFileName()));
     }

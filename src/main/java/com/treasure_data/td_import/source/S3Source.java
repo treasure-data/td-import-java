@@ -150,6 +150,11 @@ public class S3Source extends Source {
     }
 
     @Override
+    public char getSeparatorChar() {
+        return '/';
+    }
+
+    @Override
     public long getSize() {
         return size;
     }

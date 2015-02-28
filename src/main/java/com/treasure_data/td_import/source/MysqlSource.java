@@ -17,6 +17,7 @@
 //
 package com.treasure_data.td_import.source;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -70,6 +71,11 @@ public class MysqlSource extends Source {
     MysqlSource(String path, String user, String password, String host, int port,
             String database, String table) {
         super(path);
+    }
+
+    @Override
+    public String getFilename() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
