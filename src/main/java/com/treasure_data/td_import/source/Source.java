@@ -120,6 +120,6 @@ public class Source {
         }
 
         Source other = (Source) o;
-        return path.equals(other.path);
+        return getPath().equals(other.getPath());
     }
 }
