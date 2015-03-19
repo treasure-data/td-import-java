@@ -197,14 +197,30 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                         currentRow.append(line); // update untokenized CSV row
                         line += NEWLINE; // add newline to simplify parsing
                     } else if (c == quoteChar) {
+                        /*
+                         * Removes following buggy behavior. TODO: delete this code and comment.
+                         *
+                         * - If the source CSV stream includes [\"] sequence in quoted column, it fails to detect end of column.
+                         *   ex. "abc\","def" should be parsed as [abc\], [def] but it was [abc"def...]
+                         *
+                         * New code no longer behaves like this.
+                         *
                         if (charIndex > 2 && line.charAt(charIndex - 2) == '\\'
                                 && line.charAt(charIndex - 1) == '\\') {
+                            // ****************************************************
+                            // * This means [\\"] -> [\\] and moves new column.   *
+                            // * It's the same behavior with 'else'. Unnecessary. *
+                            // ****************************************************
                             state = TokenizerState.NORMAL;
                             quoteScopeStartingLine = -1;
                         } else if (charIndex > 1 && line.charAt(charIndex - 1) == '\\') {
+                            // ********************************************
+                            // * This means [\"] -> [\"] and keep parsing *
+                            // ********************************************
                             currentColumn.append(c);
                             //charIndex++;
-                        } else if (line.charAt(charIndex + 1) == quoteChar) {
+                        } else */
+                        if (line.charAt(charIndex + 1) == quoteChar) {
                             /*
                              * An escaped quote (""). Add a single quote, then
                              * move the cursor so the next iteration of the loop

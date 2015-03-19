@@ -241,6 +241,31 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         }
     }
 
+    public static class Context07 implements Context {
+        public void createContext(TestCSVFileReader test)
+                throws Exception {
+            test.columnNames = new String[] { "time", "string1", "string2" };
+            test.columnTypes = new ColumnType[] { ColumnType.LONG, ColumnType.STRING, ColumnType.STRING };
+        }
+
+        public String generateCSVText(TestCSVFileReader test) {
+            StringBuilder sbuf = new StringBuilder();
+            sbuf.append(test.columnNames[0]).append(COMMA);
+            sbuf.append(test.columnNames[1]).append(COMMA);
+            sbuf.append(test.columnNames[2]).append(LF);
+            sbuf.append("\"12345\"").append(COMMA);
+            sbuf.append("\"str\"\"ing\\\\\"").append(COMMA);
+            sbuf.append("\"str\"\"ing\\\"").append(LF);
+            return sbuf.toString();
+        }
+
+        public void assertContextEquals(TestCSVFileReader test) {
+            assertArrayEquals(test.columnNames, test.reader.getColumnNames());
+            assertArrayEquals(test.columnTypes, test.reader.getColumnTypes());
+            assertTrue(test.reader.getSkipColumns().isEmpty());
+        }
+    }
+
     protected String fileName = "./file.csv";
     protected int numLine;
 
@@ -390,6 +415,17 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
                 "--time-format",
                 context.getSTRFTimeFormat(),
         });
+
+        createPrepareConfiguration();
+        createFileWriter();
+        createFileReader();
+
+        checkContextWhenReaderConfiguration(context);
+    }
+
+    @Test
+    public void checkContextWhenColumnEndsWithBackslash() throws Exception {
+        Context07 context = new Context07();
 
         createPrepareConfiguration();
         createFileWriter();
