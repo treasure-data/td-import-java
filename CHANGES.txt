@@ -1,6 +1,8 @@
 Release 0.5.8 - 2015/XX/XX
   IMPROVEMENTS
     Added new '--escape' option to 'import:prepare' command. default=backslash ('\')
+  BUG FIXED
+    Backslash '\' escape did not work for '\': '\\' is no longer parsed as '\\' but '\'.
 
 Release 0.5.7 - 2015/02/26
   IMPROVEMENTS
