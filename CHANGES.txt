@@ -1,4 +1,4 @@
-Release 0.5.8 - 2015/XX/XX
+Release 0.5.8 - 2015/03/19
   IMPROVEMENTS
     Added new '--escape' option to 'import:prepare' command. default=backslash ('\')
   BUG FIXED
