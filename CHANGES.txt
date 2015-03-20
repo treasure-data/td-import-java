@@ -1,3 +1,7 @@
+Release 0.5.8 - 2015/XX/XX
+  IMPROVEMENTS
+    Added new '--escape' option to 'import:prepare' command
+
 Release 0.5.7 - 2015/02/26
   IMPROVEMENTS
     MySQLTableReader supported MEDIUMINT and MEDIUMINT UNSIGNED.
