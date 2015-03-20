@@ -100,7 +100,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    CSV/TSV specific options:\n" +
             "    --column-header                  first line includes column names\n" +
             "    --delimiter CHAR                 delimiter CHAR; default=\",\" at csv, \"\\t\" at tsv\n" +
-            "    --escape CHAR                    escape CHAR; default=N/A\n" +
+            "    --escape CHAR                    escape CHAR; default=\\\n" +
             "    --newline TYPE                   newline [CRLF, LF, CR];  default=CRLF\n" +
             "    --quote CHAR                     quote [DOUBLE, SINGLE, NONE]; if csv format, default=DOUBLE. if tsv format, default=NONE\n" +
             "\n" +

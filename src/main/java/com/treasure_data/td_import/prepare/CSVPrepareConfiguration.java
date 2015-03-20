@@ -120,9 +120,12 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
     public void setEscapeChar() {
         String escape;
         if (!optionSet.has("escape")) {
-            escape = (String) "\u0000"; // default value is '\u0000'. not '"'
+            escape = "\\"; // default value is '\'. not '"'
         } else {
             escape = (String) optionSet.valueOf("escape");
+            if (escape.isEmpty()) {
+                escape = "\u0000";
+            }
         }
         escapeChar = escape.charAt(0);
     }
