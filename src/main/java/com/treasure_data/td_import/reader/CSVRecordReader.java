@@ -40,7 +40,8 @@ import com.treasure_data.td_import.writer.RecordWriter;
 public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(CSVRecordReader.class.getName());
 
-    static class Tokenizer extends org.supercsv.io.AbstractTokenizer {
+    //@VisibleForTesting
+    public static class Tokenizer extends org.supercsv.io.AbstractTokenizer {
         private static final char NEWLINE = '\n';
         private static final char SPACE = ' ';
         private static final int NONE = '\u0000';
@@ -50,6 +51,7 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
         /* the raw, untokenized CSV row (may span multiple lines) */
         private final StringBuilder currentRow = new StringBuilder();
         private final int quoteChar;
+        private final int escapeChar;
         private final boolean enableQuote;
         private final int delimeterChar;
         private final boolean surroundingSpacesNeedQuotes;
@@ -69,9 +71,10 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
          * @param preferences           the CSV preferences
          * @throws NullPointerException if reader or preferences is null
          */
-        public Tokenizer(final Reader reader, final CsvPreference preferences) {
+        public Tokenizer(final CSVPrepareConfiguration conf, final Reader reader, final CsvPreference preferences) {
             super(reader, preferences);
             this.quoteChar = preferences.getQuoteChar();
+            this.escapeChar = conf.getEscapeChar();
             this.enableQuote = this.quoteChar != NONE;
             this.delimeterChar = preferences.getDelimiterChar();
             this.surroundingSpacesNeedQuotes = preferences.isSurroundingSpacesNeedQuotes();
@@ -196,15 +199,9 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
 
                         currentRow.append(line); // update untokenized CSV row
                         line += NEWLINE; // add newline to simplify parsing
+
                     } else if (c == quoteChar) {
-                        if (charIndex > 2 && line.charAt(charIndex - 2) == '\\'
-                                && line.charAt(charIndex - 1) == '\\') {
-                            state = TokenizerState.NORMAL;
-                            quoteScopeStartingLine = -1;
-                        } else if (charIndex > 1 && line.charAt(charIndex - 1) == '\\') {
-                            currentColumn.append(c);
-                            //charIndex++;
-                        } else if (line.charAt(charIndex + 1) == quoteChar) {
+                        if (line.charAt(charIndex + 1) == quoteChar) {
                             /*
                              * An escaped quote (""). Add a single quote, then
                              * move the cursor so the next iteration of the loop
@@ -213,6 +210,7 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                              */
                             currentColumn.append(c);
                             charIndex++;
+
                         } else {
                             /*
                              * A single quote ("). Update to NORMAL (but don't
@@ -220,7 +218,16 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
                              */
                             state = TokenizerState.NORMAL;
                             quoteScopeStartingLine = -1; // reset ready for next multi-line cell
+
                         }
+
+                    } else if (c == escapeChar) {
+                        char next = line.charAt(charIndex + 1);
+                        if (next == quoteChar || next == escapeChar) {
+                            currentColumn.append(next);
+                            charIndex++;
+                        }
+
                     } else {
                         /*
                          * Just a normal character, delimiter (they don't count
@@ -305,7 +312,7 @@ public class CSVRecordReader extends FixedColumnsRecordReader<CSVPrepareConfigur
 
     private void initTokenizer(final Task task) throws PreparePartsException {
         try {
-            tokenizer = new Tokenizer(new InputStreamReader(
+            tokenizer = new Tokenizer(conf, new InputStreamReader(
                     task.createInputStream(conf.getCompressionType()),
                     conf.getCharsetDecoder()), csvPref);
         } catch (IOException e) {

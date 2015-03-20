@@ -119,6 +119,12 @@ public class Options {
                 .describedAs("CHAR")
                 .ofType(String.class);
         op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_ESCAPE),
+                Configuration.BI_PREPARE_PARTS_ESCAPE_DESC)
+                .withRequiredArg()
+                .describedAs("CHAR")
+                .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
                 Configuration.BI_PREPARE_PARTS_QUOTE),
                 Configuration.BI_PREPARE_PARTS_QUOTE_DESC)
                 .withRequiredArg()

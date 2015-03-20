@@ -95,11 +95,12 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    --column-types TYPE,TYPE,...     column types [string, int, long, double]\n" +
             "    --column-type NAME:TYPE          column type [string, int, long, double]. A pair of column name and type can be specified like 'age:int'\n" +
             "    -S, --all-string                 disable automatic type conversion\n" +
-            "    --empty-as-null-if-numeric       the empty string values are interpreted as null values if columns are numerical types." +
+            "    --empty-as-null-if-numeric       the empty string values are interpreted as null values if columns are numerical types.\n" +
             "\n" +
             "    CSV/TSV specific options:\n" +
             "    --column-header                  first line includes column names\n" +
             "    --delimiter CHAR                 delimiter CHAR; default=\",\" at csv, \"\\t\" at tsv\n" +
+            "    --escape CHAR                    escape CHAR; default=N/A\n" +
             "    --newline TYPE                   newline [CRLF, LF, CR];  default=CRLF\n" +
             "    --quote CHAR                     quote [DOUBLE, SINGLE, NONE]; if csv format, default=DOUBLE. if tsv format, default=NONE\n" +
             "\n" +
@@ -384,6 +385,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_DELIMITER_CSV_DEFAULTVALUE = ",";
     String BI_PREPARE_PARTS_DELIMITER_TSV_DEFAULTVALUE = "\t";
     String BI_PREPARE_PARTS_DELIMITER_DESC = "delimiter CHAR; default=\",\" at csv, \"\\t\" at tsv";
+
+    // escape CHAR; default=N/A
+    String BI_PREPARE_PARTS_ESCAPE = "escape";
+    String BI_PREPARE_ESCAPE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ESCAPE;
+    String BI_PREPARE_PARTS_ESCAPE_DESC = "escape CHAR; default=N/A";
 
     // newline [CRLF, LF, CR]; default=CRLF (or auto detect?)
     String BI_PREPARE_PARTS_NEWLINE = "newline";

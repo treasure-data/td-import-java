@@ -56,6 +56,7 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
     private static final Logger LOG = Logger.getLogger(CSVPrepareConfiguration.class.getName());
 
     protected char delimiterChar;
+    protected char escapeChar;
     protected Quote quoteChar;
     protected NewLine newline;
     protected String typeErrorMode;
@@ -70,6 +71,9 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
 
         // delimiter
         setDelimiterChar();
+
+        // escape
+        setEscapeChar();
 
         // quote
         setQuoteChar();
@@ -104,8 +108,32 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
         delimiterChar = delim.charAt(0);
     }
 
+    //@VisibleForTesting
+    public void setDelimiterChar(char delimiter) {
+        delimiterChar = delimiter;
+    }
+
     public char getDelimiterChar() {
         return delimiterChar;
+    }
+
+    public void setEscapeChar() {
+        String escape;
+        if (!optionSet.has("escape")) {
+            escape = (String) "\u0000"; // default value is '\u0000'. not '"'
+        } else {
+            escape = (String) optionSet.valueOf("escape");
+        }
+        escapeChar = escape.charAt(0);
+    }
+
+    //@VisibleForTesting
+    public void setEscapeChar(char escape) {
+        escapeChar = escape;
+    }
+
+    public char getEscapeChar() {
+        return escapeChar;
     }
 
     public void setQuoteChar() {
@@ -127,6 +155,11 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
         }
     }
 
+    //@VisibleForTesting
+    public void setQuoteChar(Quote quote) {
+        this.quoteChar = quote;
+    }
+
     public Quote getQuoteChar() {
         return quoteChar;
     }
@@ -144,6 +177,11 @@ public class CSVPrepareConfiguration extends FixedColumnsPrepareConfiguration {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("unsupported newline char: " + nline, e);
         }
+    }
+
+    //@VisibleForTesting
+    public void setNewline(NewLine newline) {
+        this.newline = newline;
     }
 
     public NewLine getNewline() {
