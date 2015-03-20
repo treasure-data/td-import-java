@@ -5,7 +5,7 @@
   <artifactId>td-import</artifactId>
   <name>Treasure Data Import Tool in Java</name>
   <description>Treasure Data Import Tool in Java.</description>
-  <version>0.5.8</version>
+  <version>0.5.9-SNAPSHOT</version>
   <packaging>jar</packaging>
   <url>https://github.com/treasure-data/td-import-java</url>
 
