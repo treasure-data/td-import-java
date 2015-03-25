@@ -34,7 +34,7 @@ public class UploadTask extends UploadTaskBase {
         this.sessName = sessName;
         int lastSepIndex = fileName.lastIndexOf(File.separatorChar);
         this.partName = fileName.substring(lastSepIndex + 1,
-                fileName.length()).replace('.', '_').replace(' ', '_');
+                fileName.length()).replace('.', '_');
     }
 
 //    public UploadTask(String sessName, String fileName, long size) {
