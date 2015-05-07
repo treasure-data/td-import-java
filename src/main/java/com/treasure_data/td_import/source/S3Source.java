@@ -82,7 +82,12 @@ public class S3Source extends Source {
         conf.setMaxErrorRetry(Configuration.BI_PREPARE_S3_MAX_ERRORRETRY);
         conf.setSocketTimeout(Configuration.BI_PREPARE_S3_SOCKET_TIMEOUT);
 
-        return new AmazonS3Client(credentials, conf);
+        AmazonS3Client client = new AmazonS3Client(credentials, conf);
+        if (desc.getEndpoint() != null && !desc.getEndpoint().isEmpty()) {
+            client.setEndpoint(desc.getEndpoint());
+        }
+
+        return client;
     }
 
     static List<S3ObjectSummary> getSources(AmazonS3Client client, String bucket, String basePath) {
