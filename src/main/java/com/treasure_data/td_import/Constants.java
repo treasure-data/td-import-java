@@ -59,7 +59,7 @@ public interface Constants extends com.treasure_data.client.Constants {
             "    -T, --time-format FORMAT         specifies the strftime format of the time column\n" +
             "                                      The format slightly differs from Ruby's Time#strftime format in that the\n" +
             "                                      '%:z' and '%::z' timezone options are not supported.\n" +
-            "    -e, --encoding TYPE              encoding type [utf-8]\n" +
+            "    -e, --encoding TYPE              encoding type [UTF-8, etc.]\n" +
             "    -o, --output DIR                 output directory. default directory is 'out'.\n" +
             "    -s, --split-size SIZE_IN_KB      size of each parts (default: 16384)\n" +
             "    -t, --time-column NAME           name of the time column\n" +
@@ -275,11 +275,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_PARTS_PARALLEL_DEFAULTVALUE = "1";
     String BI_PREPARE_PARTS_PARALLEL_DESC = "prepare in parallel (default: 2; max 96)";
 
-    // encoding [utf-8,...]
+    // encoding [UTF-8,...]
     String BI_PREPARE_PARTS_ENCODING = "encoding";
     String BI_PREPARE_ENCODING_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_ENCODING;
     String BI_PREPARE_PARTS_ENCODING_DEFAULTVALUE = "UTF-8";
-    String BI_PREPARE_PARTS_ENCODING_DESC = "encoding type [UTF-8]; default=UTF-8";
+    String BI_PREPARE_PARTS_ENCODING_DESC = "encoding type [UTF-8, etc.]; default=UTF-8";
 
     // columns, column-types, column-type
     String BI_PREPARE_PARTS_COLUMNS = "columns";
