@@ -348,7 +348,7 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
     public void createErrWriter() {
         String errDirName = conf.getErrorRecordsOutputDirName();
         String srcName = source.getPath();
-        int lastSepIndex = srcName.lastIndexOf(File.separatorChar);
+        int lastSepIndex = srcName.lastIndexOf(source.getSeparatorChar());
         String prefix = srcName.substring(lastSepIndex + 1, srcName.length()).replace('.', '_');
         String errFileName = prefix + ".error-records.txt";
 

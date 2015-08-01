@@ -33,6 +33,8 @@ public class LocalFileSource extends Source {
     private static final Logger LOG = Logger.getLogger(LocalFileSource.class.getName());
 
     public static List<Source> createSources(SourceDesc desc) {
+        // The following codes are not used on windows.
+
         String rawPath = File.separator + desc.getPath();
 
         List<File> files = getSources(rawPath);
@@ -50,6 +52,8 @@ public class LocalFileSource extends Source {
         if (index < 0) {
             return Arrays.asList(new File(basePath));
         }
+
+        //  The following codes are never executed.
 
         String prefix;
         String firstStar = basePath.substring(0, index);
@@ -84,8 +88,16 @@ public class LocalFileSource extends Source {
         return matched;
     }
 
+    private File file;
+
     public LocalFileSource(String fileName) {
         super(fileName);
+        this.file = new File(fileName);
+    }
+
+    @Override
+    public char getSeparatorChar() {
+        return File.separatorChar;
     }
 
     @Override
@@ -93,17 +105,22 @@ public class LocalFileSource extends Source {
         return new BufferedInputStream(new FileInputStream(getFileName()));
     }
 
+    @Override
+    public String getPath() {
+        return file.getPath();
+    }
+
     public String getFileName() {
         return getPath();
     }
 
     public File getFile() {
-        return new File(getFileName());
+        return file;
     }
 
     @Override
     public long getSize() {
-        return getFile().length();
+        return file.length();
     }
 
     @Override

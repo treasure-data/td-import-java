@@ -88,7 +88,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
 
         // outputFilePrefix
         String inName = task.getSource().getPath();
-        int lastSepIndex = inName.lastIndexOf(File.separatorChar);
+        int lastSepIndex = inName.lastIndexOf(task.getSource().getSeparatorChar());
         outputFilePrefix = inName.substring(lastSepIndex + 1, inName.length()).replace('.', '_');
 
         // outputDir

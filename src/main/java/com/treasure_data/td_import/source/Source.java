@@ -99,6 +99,10 @@ public class Source {
         return path;
     }
 
+    public char getSeparatorChar() {
+        throw new UnsupportedOperationException();
+    }
+
     public long getSize() {
         throw new UnsupportedOperationException(
                 "this method should be declared in sub-class");
@@ -116,6 +120,6 @@ public class Source {
         }
 
         Source other = (Source) o;
-        return path.equals(other.path);
+        return getPath().equals(other.getPath());
     }
 }
