@@ -200,11 +200,11 @@ public class TestPrepareForLogTables extends PrepareIntegrationTestUtil {
 //        preparePartsFromSyslog();
 //    }
 
-    @Test
-    public void writeFromApacheLog() throws Exception {
-        setOptions(Format.APACHE.format(), false, null, null, null, null, null);
-        preparePartsFromApacheLog();
-    }
+//    @Test // TODO
+//    public void writeFromApacheLog() throws Exception {
+//        setOptions(Format.APACHE.format(), false, null, null, null, null, null);
+//        preparePartsFromApacheLog();
+//    }
 
     @Test
     public void writeFromJSONWithTimeColumn() throws Exception {
