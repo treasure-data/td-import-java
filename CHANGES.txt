@@ -1,4 +1,8 @@
-Release 0.5.9 - 20XX/XX/XX
+Release 0.5.9 - 2015/08/04
+  IMPROVEMENTS
+    Improve parsing the URL of s3 source that includes s3 endpoint.
+  BUG FIXED
+    Changes parsing the URL of s3 source on Windows.
 
 Release 0.5.8 - 2015/03/19
   IMPROVEMENTS
