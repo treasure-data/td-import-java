@@ -77,6 +77,12 @@ public class Options {
                 .describedAs("TIME")
                 .ofType(String.class);
         op.acceptsAll(Arrays.asList(
+                Configuration.BI_PREPARE_PARTS_TIMEOFFSET),
+                Configuration.BI_PREPARE_PARTS_TIMEOFFSET_DESC)
+                .withRequiredArg()
+                .describedAs("TIME")
+                .ofType(String.class);
+        op.acceptsAll(Arrays.asList(
                 Configuration.BI_PREPARE_PARTS_PRIMARY_KEY),
                 Configuration.BI_PREPARE_PARTS_PRIMARY_KEY_DESC)
                 .withRequiredArg()

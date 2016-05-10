@@ -251,26 +251,26 @@ public abstract class AbstractRecordReader<T extends PrepareConfiguration>
         if (index < 0) {
             timeColumnValue = conf.getTimeValue();
         } else if (conf.getTimeFormat() != null) {
-            timeColumnValue = createTimeColumnValue(index, isAlias, conf.getTimeFormat());
+            timeColumnValue = createTimeColumnValue(index, isAlias, conf.getTimeFormat(), conf.getTimeOffset());
         } else {
             String suggested = sampleColumnValues[index].getSTRFTimeFormatRank();
             if (suggested != null) {
                 if (suggested.equals(TimeColumnSampling.HHmmss_STRF)) {
-                    timeColumnValue = createTimeColumnValue(index, isAlias, new HHmmssStrftime());
+                    timeColumnValue = createTimeColumnValue(index, isAlias, new HHmmssStrftime(), conf.getTimeOffset());
                 } else {
-                    timeColumnValue = createTimeColumnValue(index, isAlias, conf.getTimeFormat(suggested));
+                    timeColumnValue = createTimeColumnValue(index, isAlias, conf.getTimeFormat(suggested), conf.getTimeOffset());
                 }
             } else {
-                timeColumnValue = createTimeColumnValue(index, isAlias, null);
+                timeColumnValue = createTimeColumnValue(index, isAlias, null, conf.getTimeOffset());
             }
         }
     }
 
-    private TimeColumnValue createTimeColumnValue(int index, boolean isAlias, Strftime strftime) {
+    private TimeColumnValue createTimeColumnValue(int index, boolean isAlias, Strftime strftime, long offset) {
         if (!isAlias) {
-            return new TimeColumnValue(index, strftime);
+            return new TimeColumnValue(index, strftime, offset);
         } else {
-            return new AliasTimeColumnValue(index, strftime);
+            return new AliasTimeColumnValue(index, strftime, offset);
         }
     }
 

@@ -136,9 +136,9 @@ public class MySQLTableReader extends AbstractRecordReader<MySQLPrepareConfigura
             timeColumnValue = conf.getTimeValue();
         } else {
             if (!isAlias) {
-                timeColumnValue = new TimeColumnValue(index, conf.getTimeFormat());
+                timeColumnValue = new TimeColumnValue(index, conf.getTimeFormat(), conf.getTimeOffset());
             } else {
-                timeColumnValue = new AliasTimeColumnValue(index, conf.getTimeFormat());
+                timeColumnValue = new AliasTimeColumnValue(index, conf.getTimeFormat(), conf.getTimeOffset());
             }
         }
     }

@@ -327,6 +327,11 @@ public interface Constants extends com.treasure_data.client.Constants {
     String BI_PREPARE_TIMEVALUE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_TIMEVALUE;
     String BI_PREPARE_PARTS_TIMEVALUE_DESC = "long value of the time column";
 
+    // time-offset-value
+    String BI_PREPARE_PARTS_TIMEOFFSET = "time-offset";
+    String BI_PREPARE_TIMEOFFSETVALUE_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_TIMEOFFSET;
+    String BI_PREPARE_PARTS_TIMEOFFSET_DESC = "long value of the time offset";
+
     // time-format STRF_FORMAT; default=auto detect
     String BI_PREPARE_PARTS_TIMEFORMAT = "time-format";
     String BI_PREPARE_TIMEFORMAT_HYPHEN_HYPHEN = HYPHENHYPHEN + BI_PREPARE_PARTS_TIMEFORMAT;
