@@ -27,13 +27,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.Region;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.treasure_data.td_import.Configuration;
@@ -53,20 +56,25 @@ public class S3Source extends Source {
 
         System.setProperty("com.amazonaws.sdk.disableCertChecking", "1");
 
-        AmazonS3Client client = createAmazonS3Client(desc);
+        String region = getBucketLocation(desc, bucket);
+        AmazonS3 client = createAmazonS3Client(desc, region);
         List<S3ObjectSummary> s3objects = getSources(client, bucket, basePath);
         List<Source> srcs = new ArrayList<Source>();
         for (S3ObjectSummary s3object : s3objects) {
             LOG.info(String.format("create s3-src s3object=%s, rawPath=%s",
                     s3object.getKey(), rawPath));
-            srcs.add(new S3Source(createAmazonS3Client(desc), rawPath,
+            srcs.add(new S3Source(createAmazonS3Client(desc, region), rawPath,
                     s3object.getBucketName(), s3object.getKey(), s3object.getSize()));
         }
 
         return srcs;
     }
 
-    static AmazonS3Client createAmazonS3Client(SourceDesc desc) {
+    static AmazonS3 createAmazonS3Client(SourceDesc desc, String region) {
+        return createClientBuilder(desc).withRegion(region).build();
+    }
+
+    static AmazonS3ClientBuilder createClientBuilder(SourceDesc desc) {
         String accessKey = desc.getUser();
         if (accessKey == null || accessKey.isEmpty()) {
             throw new IllegalArgumentException("S3 AccessKey is null or empty.");
@@ -77,21 +85,29 @@ public class S3Source extends Source {
         }
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretAccessKey);
 
-        ClientConfiguration conf = new ClientConfiguration();
-        conf.setProtocol(Configuration.BI_PREPARE_S3_PROTOCOL);
-        conf.setMaxConnections(Configuration.BI_PREPARE_S3_MAX_CONNECTIONS);
-        conf.setMaxErrorRetry(Configuration.BI_PREPARE_S3_MAX_ERRORRETRY);
-        conf.setSocketTimeout(Configuration.BI_PREPARE_S3_SOCKET_TIMEOUT);
+        ClientConfiguration clientConfig = new ClientConfiguration()
+                .withProtocol(Configuration.BI_PREPARE_S3_PROTOCOL)
+                .withMaxConnections(Configuration.BI_PREPARE_S3_MAX_CONNECTIONS)
+                .withMaxErrorRetry(Configuration.BI_PREPARE_S3_MAX_ERRORRETRY)
+                .withSocketTimeout(Configuration.BI_PREPARE_S3_SOCKET_TIMEOUT);
 
-        AmazonS3Client client = new AmazonS3Client(credentials, conf);
-        if (desc.getEndpoint() != null && !desc.getEndpoint().isEmpty()) {
-            client.setEndpoint(desc.getEndpoint());
-        }
-
-        return client;
+        return AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withClientConfiguration(clientConfig);
     }
 
-    static List<S3ObjectSummary> getSources(AmazonS3Client client, String bucket, String basePath) {
+    static String getBucketLocation(SourceDesc desc, String bucket) {
+        AmazonS3 client = createClientBuilder(desc).build();
+        String bucketRegion = client.getBucketLocation(bucket);
+        Region region = Region.fromValue(bucketRegion);
+        if (region.equals(Region.US_Standard)) {
+            return "us-east-1";
+        } else {
+            return region.toString();
+        }
+    }
+
+    static List<S3ObjectSummary> getSources(AmazonS3 client, String bucket, String basePath) {
         String prefix;
         int index = basePath.indexOf('*');
         if (index >= 0) {
@@ -139,14 +155,14 @@ public class S3Source extends Source {
         return matched;
     }
 
-    protected AmazonS3Client client;
+    protected AmazonS3 client;
 
     protected String bucket;
     protected String key;
     protected long size;
     protected String rawPath;
 
-    S3Source(AmazonS3Client client, String rawPath, String bucket, String key, long size) {
+    S3Source(AmazonS3 client, String rawPath, String bucket, String key, long size) {
         super("s3://"+bucket+"/"+key);
         this.client = client;
         this.bucket = bucket;
