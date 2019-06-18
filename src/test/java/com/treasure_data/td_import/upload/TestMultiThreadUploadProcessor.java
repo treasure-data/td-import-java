@@ -11,20 +11,15 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
 
+import com.treasuredata.client.TDClientException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.client.ClientException;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.OptionsTestUtil;
 import com.treasure_data.td_import.source.LocalFileSource;
-import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
-import com.treasure_data.td_import.upload.TaskResult;
-import com.treasure_data.td_import.upload.UploadConfiguration;
-import com.treasure_data.td_import.upload.UploadProcessor;
-import com.treasure_data.td_import.upload.UploadTask;
 
 public class TestMultiThreadUploadProcessor {
 
@@ -112,7 +107,7 @@ public class TestMultiThreadUploadProcessor {
     public void getErrorsWhenWorkersThrowIOError() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doThrow(new IOException("dummy")).when(child).executeUpload(any(UploadTask.class));
+            doThrow(new TDClientException(TDClientException.ErrorType.CLIENT_ERROR, "dummy")).when(child).executeUpload(any(UploadTask.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();
@@ -134,7 +129,7 @@ public class TestMultiThreadUploadProcessor {
     public void getErrorsWhenWorkersThrowClientError() throws Exception {
         for (int i = 0; i < numWorkers; i++) {
             UploadProcessor child = spy(new UploadProcessor(null, conf));
-            doThrow(new ClientException("dummy")).when(child).executeUpload(any(UploadTask.class));
+            doThrow(new TDClientException(TDClientException.ErrorType.SERVER_ERROR, "dummy")).when(child).executeUpload(any(UploadTask.class));
             proc.addWorker(new MultiThreadUploadProcessor.Worker(proc, child));
         }
         proc.startWorkers();

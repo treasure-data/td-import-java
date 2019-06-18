@@ -19,9 +19,9 @@ package com.treasure_data.td_import.upload;
 
 import java.util.Properties;
 
-import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.Configuration;
+import com.treasuredata.client.TDClient;
 
 public class UploadConfiguration extends UploadConfigurationBase {
 
@@ -58,7 +58,7 @@ public class UploadConfiguration extends UploadConfigurationBase {
 
     @Override
     public UploadProcessorBase createNewUploadProcessor() {
-        BulkImportClient c = createBulkImportClient(createTreasureDataClient());
+        TDClient c = createTDClient();
         return new UploadProcessor(c, this);
     }
 

@@ -19,7 +19,7 @@ package com.treasure_data.td_import;
 
 import com.amazonaws.Protocol;
 
-public interface Constants extends com.treasure_data.client.Constants {
+public interface Constants {
     long MAX_LOG_TIME = 253402300799L;
 
     String CMD_TABLEIMPORT = "table_import";

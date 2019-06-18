@@ -23,8 +23,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.source.LocalFileSource;

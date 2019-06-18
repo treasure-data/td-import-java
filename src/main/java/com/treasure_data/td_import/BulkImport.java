@@ -25,10 +25,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.client.bulkimport.BulkImportClient;
-import com.treasure_data.model.bulkimport.SessionSummary;
-import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.source.LocalFileSource;
@@ -36,6 +32,10 @@ import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
+import com.treasuredata.client.TDClient;
+import com.treasuredata.client.model.TDBulkImportSession;
+
+import static com.treasuredata.client.model.TDBulkImportSession.ImportStatus.UPLOADING;
 
 public class BulkImport extends Import {
     private static final Logger LOG = Logger.getLogger(BulkImport.class.getName());
@@ -75,9 +75,8 @@ public class BulkImport extends Import {
         // create configuration for 'upload' processing
         UploadConfiguration uploadConf = createUploadConf(args);
 
-        // create TreasureDataClient and BulkImportClient objects
-        TreasureDataClient tdClient = uploadConf.createTreasureDataClient();
-        BulkImportClient biClient = uploadConf.createBulkImportClient(tdClient);
+        // create TDClient objects
+        TDClient tdClient = uploadConf.createTDClient();
 
         // configure session name
         TaskResult<?> r = null;
@@ -85,7 +84,7 @@ public class BulkImport extends Import {
         int filePos;
         if (uploadConf.autoCreate()) { // 'auto-create-session'
             // create session automatically
-            sessionName = createBulkImportSessionName(uploadConf, tdClient, biClient);
+            sessionName = createBulkImportSessionName(uploadConf, tdClient);
 
             filePos = 1;
         } else {
@@ -93,7 +92,7 @@ public class BulkImport extends Import {
             sessionName = getBulkImportSessionName(uploadConf);
 
             // validate that the session is live or not
-            r = UploadProcessor.checkSession(biClient, uploadConf, sessionName);
+            r = UploadProcessor.checkSession(tdClient, sessionName);
             if (r.error != null) {
                 throw new IllegalArgumentException(r.error);
             }
@@ -102,8 +101,8 @@ public class BulkImport extends Import {
         }
 
         // if session is already freezed, exception is thrown.
-        SessionSummary sess = UploadProcessor.showSession(biClient, uploadConf, sessionName);
-        if (sess.uploadFrozen()) {
+        TDBulkImportSession sess = UploadProcessor.showSession(tdClient, sessionName);
+        if (sess.isUploadFrozen()) {
             throw new IllegalArgumentException(String.format(
                     "Bulk import session %s is already freezed. Please check it with 'td import:show %s'",
                     sessionName, sessionName));
@@ -164,11 +163,11 @@ public class BulkImport extends Import {
         }
 
         // 'auto-perform' and 'auto-commit'
-        results.add(UploadProcessor.processAfterUploading(biClient, tdClient, uploadConf, sessionName));
+        results.add(UploadProcessor.processAfterUploading(tdClient, uploadConf, sessionName));
 
         // 'auto-delete'
         if (hasNoUploadError(results) && uploadConf.autoDelete() && uploadConf.autoCommit()) {
-            results.add(UploadProcessor.deleteSession(biClient, uploadConf, sessionName));
+            results.add(UploadProcessor.deleteSession(tdClient, sessionName));
         }
 
         return results;
@@ -229,8 +228,7 @@ public class BulkImport extends Import {
         }
     }
 
-    protected String createBulkImportSessionName(UploadConfiguration conf,
-            TreasureDataClient tdClient, BulkImportClient biClient) throws Exception {
+    protected String createBulkImportSessionName(UploadConfiguration conf, TDClient tdClient) throws Exception {
         String databaseName = conf.enableMake()[0];
         String tableName = conf.enableMake()[1];
         Date d = new Date();
@@ -242,7 +240,7 @@ public class BulkImport extends Import {
         TaskResult<?> e = null;
 
         // create bulk import session
-        e = UploadProcessor.createSession(biClient, conf, sessionName, databaseName, tableName);
+        e = UploadProcessor.createSession(tdClient, sessionName, databaseName, tableName);
         if (e.error != null) {
             throw new IllegalArgumentException(e.error);
         }

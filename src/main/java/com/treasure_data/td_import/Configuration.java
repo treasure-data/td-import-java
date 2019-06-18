@@ -26,11 +26,7 @@ import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.td_import.Constants;
-
-public class Configuration extends com.treasure_data.client.Config implements
-        Constants {
+public class Configuration implements Constants {
 
     public static enum Command {
         TABLEIMPORT(CMD_TABLEIMPORT),

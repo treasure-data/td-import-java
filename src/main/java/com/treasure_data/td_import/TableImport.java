@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.source.Source;
@@ -43,9 +41,6 @@ public class TableImport extends Import {
         // create configuration for 'table:import' processing
         TableImportConfiguration importConf =
                 createTableImportConfiguration(args);
-
-        // create TreasureDataClient object
-        TreasureDataClient tdClient = importConf.createTreasureDataClient();
 
         TaskResult<?> r = null;
         String databaseName = getDatabaseName(importConf); // database exists? TODO
