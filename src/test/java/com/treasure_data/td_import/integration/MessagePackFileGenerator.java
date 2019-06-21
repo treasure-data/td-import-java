@@ -4,17 +4,19 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.junit.Ignore;
-import org.msgpack.MessagePack;
-import org.msgpack.packer.Packer;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessagePacker;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 @Ignore
 public class MessagePackFileGenerator extends FileGenerator {
-    private Packer packer;
+    private MessagePacker packer;
 
     public MessagePackFileGenerator(String fileName, String[] header)
             throws IOException {
         super(fileName, header);
-        packer = new MessagePack().createPacker(out);
+        packer = MessagePack.newDefaultPacker(out);
     }
 
     public void writeHeader() throws IOException {
@@ -22,7 +24,11 @@ public class MessagePackFileGenerator extends FileGenerator {
     }
 
     public void write(Map<String, Object> map) throws IOException {
-        packer.write(map);
+        ValueFactory.MapBuilder b = ValueFactory.newMapBuilder();
+        for (Map.Entry<String, Object> e : map.entrySet()) {
+            b.put(ValueFactory.newString(e.getKey()), (Value) e.getValue());
+        }
+        packer.packValue(b.build());
     }
 
     @Override

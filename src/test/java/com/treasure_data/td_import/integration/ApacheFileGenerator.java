@@ -6,19 +6,19 @@ import java.util.Date;
 import java.util.Map;
 
 import org.junit.Ignore;
-import org.msgpack.type.Value;
-import org.msgpack.type.ValueFactory;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 @Ignore
 public class ApacheFileGenerator extends FileGenerator {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
 
-    static Value HOST_VALUE = ValueFactory.createRawValue("host");
-    static Value USER_VALUE = ValueFactory.createRawValue("user");
-    static Value METHOD_VALUE = ValueFactory.createRawValue("method");
-    static Value PATH_VALUE = ValueFactory.createRawValue("path");
-    static Value CODE_VALUE = ValueFactory.createRawValue("code");
-    static Value SIZE_VALUE = ValueFactory.createRawValue("size");
+    static Value HOST_VALUE = ValueFactory.newString("host");
+    static Value USER_VALUE = ValueFactory.newString("user");
+    static Value METHOD_VALUE = ValueFactory.newString("method");
+    static Value PATH_VALUE = ValueFactory.newString("path");
+    static Value CODE_VALUE = ValueFactory.newString("code");
+    static Value SIZE_VALUE = ValueFactory.newString("size");
 
     protected static final String SPACE = " ";
     protected static final String LF = "\n";

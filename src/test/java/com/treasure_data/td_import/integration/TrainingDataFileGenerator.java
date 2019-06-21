@@ -7,13 +7,15 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import org.junit.Ignore;
-import org.msgpack.MessagePack;
-import org.msgpack.packer.Packer;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessagePacker;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 @Ignore
 public class TrainingDataFileGenerator extends FileGenerator {
 
-    protected Packer packer;
+    protected MessagePacker packer;
 
     protected List<Object> kvs;
 
@@ -21,7 +23,7 @@ public class TrainingDataFileGenerator extends FileGenerator {
         super(fileName, header);
 
         out = new GZIPOutputStream(this.out);
-        packer = new MessagePack().createPacker(out);
+        packer = MessagePack.newDefaultPacker(out);
         this.kvs = new ArrayList<Object>();
     }
 
@@ -31,7 +33,12 @@ public class TrainingDataFileGenerator extends FileGenerator {
     }
 
     public void write(Map<String, Object> map) throws IOException {
-        packer.write(map);
+        packer.packMapHeader(map.size());
+        ValueFactory.MapBuilder b = ValueFactory.newMapBuilder();
+        for (Map.Entry<String, Object> e : map.entrySet()) {
+            b.put(ValueFactory.newString(e.getKey()), (Value) e.getValue());
+        }
+        packer.packValue(b.build());
     }
 
     @Override
