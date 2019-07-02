@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.AWSCredentials;
@@ -56,7 +57,13 @@ public class S3Source extends Source {
 
         System.setProperty("com.amazonaws.sdk.disableCertChecking", "1");
 
-        String region = getBucketLocation(desc, bucket);
+        String region = "";
+        try {
+            region = getBucketLocation(desc, bucket);
+        } catch (AmazonServiceException e) {
+            LOG.warning("Failed to get S3 bucket location. Please make sure that your account is given 's3:GetBucketLocation' role.");
+            throw e;
+        }
         AmazonS3 client = createAmazonS3Client(desc, region);
         List<S3ObjectSummary> s3objects = getSources(client, bucket, basePath);
         List<Source> srcs = new ArrayList<Source>();
