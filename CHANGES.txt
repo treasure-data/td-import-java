@@ -1,3 +1,7 @@
+Release 0.5.10 - 2019/10/15
+  IMPROVEMENTS
+    Support AWS S3 Signature v4 when importing data from AWS S3
+
 Release 0.5.9 - 2015/08/04
   IMPROVEMENTS
     Improve parsing the URL of s3 source that includes s3 endpoint.
