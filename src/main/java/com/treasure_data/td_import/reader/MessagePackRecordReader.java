@@ -22,15 +22,6 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.msgpack.MessagePack;
-import org.msgpack.type.FloatValue;
-import org.msgpack.type.IntegerValue;
-import org.msgpack.type.MapValue;
-import org.msgpack.type.RawValue;
-import org.msgpack.type.Value;
-import org.msgpack.type.ValueFactory;
-import org.msgpack.unpacker.UnpackerIterator;
-
 import com.treasure_data.td_import.model.ColumnType;
 import com.treasure_data.td_import.model.ColumnValue;
 import com.treasure_data.td_import.model.Record;
@@ -38,20 +29,25 @@ import com.treasure_data.td_import.prepare.MessagePackPrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.writer.RecordWriter;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessageUnpacker;
+import org.msgpack.value.FloatValue;
+import org.msgpack.value.IntegerValue;
+import org.msgpack.value.MapValue;
+import org.msgpack.value.RawValue;
+import org.msgpack.value.Value;
 
 public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<MessagePackPrepareConfiguration> {
     private static final Logger LOG = Logger.getLogger(MessagePackRecordReader.class.getName());
 
-    protected MessagePack msgpack;
     protected InputStream in;
-    protected UnpackerIterator iterator;
+    protected MessageUnpacker unpacker;
 
     protected String[] keys;
     protected Object[] values;
 
     public MessagePackRecordReader(MessagePackPrepareConfiguration conf, RecordWriter writer) {
         super(conf, writer);
-        msgpack = new MessagePack();
     }
 
     @Override
@@ -62,7 +58,7 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
 
         try {
             in = task.createInputStream(conf.getCompressionType());
-            iterator = msgpack.createUnpacker(in).iterator();
+            unpacker = MessagePack.newDefaultUnpacker(in);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -73,7 +69,7 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
         InputStream sampleIn = null;
         try {
             sampleIn = task.createInputStream(conf.getCompressionType());
-            UnpackerIterator sampleIter = msgpack.createUnpacker(sampleIn).iterator();
+            MessageUnpacker sampleIter = MessagePack.newDefaultUnpacker(sampleIn);
 
             if (!sampleIter.hasNext()) {
                 String msg = String.format("Anything is not read or EOF [line: 1] %s", task.getSource());
@@ -81,7 +77,7 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
                 throw new PreparePartsException(msg);
             }
 
-            Value v = sampleIter.next();
+            Value v = sampleIter.unpackValue();
             String msg = null;
             if (v != null) {
                 msg = "sample row: " + v.toString();
@@ -123,13 +119,13 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
 
     @Override
     public boolean readRecord() throws IOException {
-        if (!iterator.hasNext()) {
+        if (!unpacker.hasNext()) {
             return false;
         }
 
         incrementLineNum();
 
-        Value v = iterator.next();
+        Value v = unpacker.unpackValue();
         if (v == null || !v.isMapValue()) {
             return false;
         }
@@ -140,13 +136,13 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
         Value[] ks = row.keySet().toArray(new Value[0]);
         keys = new String[ks.length];
         for (int i = 0; i < keys.length; i++) {
-            keys[i] = ks[i].asRawValue().getString();
+            keys[i] = ks[i].asRawValue().asString();
         }
 
         // values
         values = new Object[keys.length];
         for (int i = 0; i < values.length; i++) {
-            values[i] = toObject(row.get(ks[i]));
+            values[i] = toObject(row.map().get(ks[i]));
         }
 
         return true;
@@ -154,11 +150,11 @@ public class MessagePackRecordReader extends VariableLengthColumnsRecordReader<M
 
     private Object toObject(Value value) {
         if (value instanceof IntegerValue) {
-            return value.asIntegerValue().getLong();
+            return value.asIntegerValue().asLong();
         } else if (value instanceof FloatValue) {
-            return value.asFloatValue().getDouble();
+            return value.asFloatValue().toDouble();
         } else if (value instanceof RawValue) {
-            return value.asRawValue().getString();
+            return value.asRawValue().asString();
         } else {
             throw new UnsupportedOperationException("During toColumnType() execution");
         }

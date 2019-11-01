@@ -51,7 +51,7 @@
   <properties>
     <!--  version properties for dependencies -->
     <jopt-simple.version>4.5</jopt-simple.version>
-    <msgpack.version>0.6.7</msgpack.version>
+    <msgpack.version>0.8.16</msgpack.version>
     <super-csv.version>2.1.0</super-csv.version>
     <td-client.version>0.5.5</td-client.version>
     <aws-java-sdk.version>1.11.578</aws-java-sdk.version>
@@ -100,7 +100,7 @@
     </dependency>
     <dependency>
       <groupId>org.msgpack</groupId>
-      <artifactId>msgpack</artifactId>
+      <artifactId>msgpack-core</artifactId>
       <version>${msgpack.version}</version>
     </dependency>
     <dependency>
