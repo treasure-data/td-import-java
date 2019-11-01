@@ -5,7 +5,7 @@
   <artifactId>td-import</artifactId>
   <name>Treasure Data Import Tool in Java</name>
   <description>Treasure Data Import Tool in Java.</description>
-  <version>0.5.10-SNAPSHOT</version>
+  <version>0.5.10</version>
   <packaging>jar</packaging>
   <url>https://github.com/treasure-data/td-import-java</url>
 
@@ -51,10 +51,10 @@
   <properties>
     <!--  version properties for dependencies -->
     <jopt-simple.version>4.5</jopt-simple.version>
-    <msgpack.version>0.6.7</msgpack.version>
+    <msgpack.version>0.8.16</msgpack.version>
     <super-csv.version>2.1.0</super-csv.version>
-    <td-client.version>0.8.4</td-client.version>
-    <aws-java-sdk.version>1.7.5</aws-java-sdk.version>
+    <td-client.version>0.5.5</td-client.version>
+    <aws-java-sdk.version>1.11.578</aws-java-sdk.version>
     <junit.version>4.8.2</junit.version>
     <mockito.version>1.9.5</mockito.version>
 
@@ -100,7 +100,7 @@
     </dependency>
     <dependency>
       <groupId>org.msgpack</groupId>
-      <artifactId>msgpack</artifactId>
+      <artifactId>msgpack-core</artifactId>
       <version>${msgpack.version}</version>
     </dependency>
     <dependency>
@@ -323,4 +323,34 @@
       </plugin>
     </plugins>
   </reporting>
+
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

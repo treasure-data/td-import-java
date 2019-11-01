@@ -6,17 +6,17 @@ import java.util.Date;
 import java.util.Map;
 
 import org.junit.Ignore;
-import org.msgpack.type.Value;
-import org.msgpack.type.ValueFactory;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 @Ignore
 public class SyslogFileGenerator extends FileGenerator {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm:ss");
 
-    static Value HOST_VALUE = ValueFactory.createRawValue("host");
-    static Value IDENT_VALUE = ValueFactory.createRawValue("ident");
-    static Value MESSAGE_VALUE = ValueFactory.createRawValue("message");
-    static Value PID_VALUE = ValueFactory.createRawValue("pid");
+    static Value HOST_VALUE = ValueFactory.newString("host");
+    static Value IDENT_VALUE = ValueFactory.newString("ident");
+    static Value MESSAGE_VALUE = ValueFactory.newString("message");
+    static Value PID_VALUE = ValueFactory.newString("pid");
 
     protected static final String SPACE = " ";
     protected static final String LF = "\n";

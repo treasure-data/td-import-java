@@ -28,13 +28,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
-import org.msgpack.MessagePack;
-import org.msgpack.packer.Packer;
-
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
 import com.treasure_data.td_import.prepare.PreparePartsException;
 import com.treasure_data.td_import.prepare.Task;
 import com.treasure_data.td_import.prepare.TaskResult;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessagePacker;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     static class DataSizeChecker extends FilterOutputStream {
@@ -65,8 +66,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     private static final Logger LOG = Logger
             .getLogger(MsgpackGZIPRecordWriter.class.getName());
 
-    protected MessagePack msgpack;
-    protected Packer packer;
+    protected MessagePacker packer;
     protected GZIPOutputStream gzout;
 
     private int splitSize;
@@ -83,8 +83,6 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void configure(Task task, TaskResult result) throws PreparePartsException {
         super.configure(task, result);
-
-        msgpack = new MessagePack();
 
         // outputFilePrefix
         String inName = task.getSource().getPath();
@@ -123,7 +121,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
             dout = new DataSizeChecker(new BufferedOutputStream(
                     new FileOutputStream(outputFile)));
             gzout = new GZIPOutputStream(dout);
-            packer = msgpack.createPacker(new BufferedOutputStream(gzout));
+            packer = MessagePack.newDefaultPacker(new BufferedOutputStream(gzout));
 
             LOG.fine("Created output file: " + outputFileName);
         } catch (IOException e) {
@@ -134,7 +132,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void writeBeginRow(int size) throws PreparePartsException {
         try {
-            packer.writeMapBegin(size);
+            packer.packMapHeader(size);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -143,7 +141,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void write(String v) throws PreparePartsException {
         try {
-            packer.write(v);
+            packer.packString(v);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -152,7 +150,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void write(int v) throws PreparePartsException {
         try {
-            packer.write(v);
+            packer.packInt(v);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -161,7 +159,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void write(long v) throws PreparePartsException {
         try {
-            packer.write(v);
+            packer.packLong(v);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -170,7 +168,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void write(double v) throws PreparePartsException {
         try {
-            packer.write(v);
+            packer.packDouble(v);
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -179,11 +177,10 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void write(List<Object> v) throws PreparePartsException {
         try {
-            packer.writeArrayBegin(v.size());
+            packer.packArrayHeader(v.size());
             for (Object e : v) {
-                packer.write(e);
+                packer.packValue((Value) e);
             }
-            packer.writeArrayEnd();
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -192,12 +189,12 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void write(Map<Object, Object> v) throws PreparePartsException {
         try {
-            packer.writeMapBegin(v.size());
+            packer.packMapHeader(v.size());
+            ValueFactory.MapBuilder b = ValueFactory.newMapBuilder();
             for (Map.Entry<Object, Object> e : v.entrySet()) {
-                packer.write(e.getKey());
-                packer.write(e.getValue());
+                b.put((Value) e.getKey(), (Value) e.getValue());
             }
-            packer.writeMapEnd();
+            packer.packValue(b.build());
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -206,7 +203,7 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
     @Override
     public void writeNil() throws PreparePartsException {
         try {
-            packer.writeNil();
+            packer.packNil();
         } catch (IOException e) {
             throw new PreparePartsException(e);
         }
@@ -214,13 +211,8 @@ public class MsgpackGZIPRecordWriter extends AbstractRecordWriter {
 
     @Override
     public void writeEndRow() throws PreparePartsException {
-        try {
-            packer.writeMapEnd();
-            if (dout.size() > splitSize) {
-                reopenOutputFile();
-            }
-        } catch (IOException e) {
-            throw new PreparePartsException(e);
+        if (dout.size() > splitSize) {
+            reopenOutputFile();
         }
     }
 

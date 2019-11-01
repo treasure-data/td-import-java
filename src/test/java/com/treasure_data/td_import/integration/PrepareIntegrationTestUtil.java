@@ -9,27 +9,28 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.msgpack.MessagePack;
-import org.msgpack.type.MapValue;
-import org.msgpack.type.Value;
-import org.msgpack.type.ValueFactory;
-import org.msgpack.unpacker.UnpackerIterator;
 
 import com.treasure_data.td_import.BulkImportCommand;
 import com.treasure_data.td_import.Configuration;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessageUnpacker;
+import org.msgpack.value.MapValue;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 @Ignore
 public class PrepareIntegrationTestUtil {
-    private static Value STRING_VALUE = ValueFactory.createRawValue("string_value");
-    private static Value INT_VALUE = ValueFactory.createRawValue("int_value");
-    private static Value DOUBLE_VALUE = ValueFactory.createRawValue("double_value");
-    private static Value TIME = ValueFactory.createRawValue("time");
+    private static Value STRING_VALUE = ValueFactory.newString("string_value");
+    private static Value INT_VALUE = ValueFactory.newString("int_value");
+    private static Value DOUBLE_VALUE = ValueFactory.newString("double_value");
+    private static Value TIME = ValueFactory.newString("time");
 
     static final String INPUT_DIR = "./src/test/resources/in/";
     static final String OUTPUT_DIR = "./src/test/resources/out/";
@@ -338,17 +339,15 @@ public class PrepareIntegrationTestUtil {
     }
 
     public void assertDataEquals(String srcFileName, String dstFileName, String format) throws Exception {
-        MessagePack msgpack = new MessagePack();
-
         InputStream srcIn = new BufferedInputStream(new GZIPInputStream(new FileInputStream(srcFileName)));
         InputStream dstIn = new BufferedInputStream(new GZIPInputStream(new FileInputStream(dstFileName)));
 
-        UnpackerIterator srcIter = msgpack.createUnpacker(srcIn).iterator();
-        UnpackerIterator dstIter = msgpack.createUnpacker(dstIn).iterator();
+        MessageUnpacker srcIter = MessagePack.newDefaultUnpacker(srcIn);
+        MessageUnpacker dstIter = MessagePack.newDefaultUnpacker(dstIn);
 
         while (srcIter.hasNext() && dstIter.hasNext()) {
-            MapValue srcMap = srcIter.next().asMapValue();
-            MapValue dstMap = dstIter.next().asMapValue();
+            MapValue srcMap = srcIter.unpackValue().asMapValue();
+            MapValue dstMap = dstIter.unpackValue().asMapValue();
 
             assertMapValueEquals(srcMap, dstMap, format);
         }
@@ -357,7 +356,9 @@ public class PrepareIntegrationTestUtil {
         assertFalse(dstIter.hasNext());
     }
 
-    private void assertMapValueEquals(MapValue src, MapValue dst, String format) {
+    private void assertMapValueEquals(MapValue srcValue, MapValue dstValue, String format) {
+        Map<Value, Value> src = srcValue.map();
+        Map<Value, Value> dst = dstValue.map();
         if (format.equals("none")) {
             assertTrue(src.containsKey(STRING_VALUE));
             assertEquals(src.get(STRING_VALUE), dst.get(STRING_VALUE));
