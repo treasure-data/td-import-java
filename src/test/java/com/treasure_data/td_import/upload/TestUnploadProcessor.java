@@ -1,29 +1,23 @@
 package com.treasure_data.td_import.upload;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
 
+import com.treasuredata.client.TDClient;
+import com.treasuredata.client.TDClientBuilder;
+import com.treasuredata.client.TDClientException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.treasure_data.client.ClientException;
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.client.bulkimport.BulkImportClient;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.source.LocalFileSource;
-import com.treasure_data.td_import.upload.TaskResult;
-import com.treasure_data.td_import.upload.UploadConfiguration;
-import com.treasure_data.td_import.upload.UploadProcessor;
-import com.treasure_data.td_import.upload.UploadTask;
 
 public class TestUnploadProcessor {
 
@@ -31,8 +25,9 @@ public class TestUnploadProcessor {
     public void test01() throws Exception {
         Properties props = System.getProperties();
         props.load(this.getClass().getClassLoader().getResourceAsStream("treasure-data.properties"));
-        TreasureDataClient tdclient = new TreasureDataClient(props);
-        BulkImportClient client = new BulkImportClient(tdclient);
+        TDClientBuilder builder = TDClient.newBuilder();
+        builder.setProperties(props);
+        TDClient client = builder.build();
 
         UploadConfiguration conf = new UploadConfiguration();
         conf.configure(props, options);
@@ -99,7 +94,7 @@ public class TestUnploadProcessor {
     public void returnIOErrorWhenExecuteMethodThrowsIOError() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new IOException("dummy")).when(proc).executeUpload(any(UploadTask.class));
+        doThrow(new TDClientException(TDClientException.ErrorType.CLIENT_ERROR, "dummy")).when(proc).executeUpload(any(UploadTask.class));
 
         // test
         for (int i = 0; i < numTasks; i++) {
@@ -112,7 +107,7 @@ public class TestUnploadProcessor {
     public void returnIOErrorWhenExecuteMethodThrowsClientError() throws Exception {
         // configure mock
         proc = spy(proc);
-        doThrow(new ClientException("dummy")).when(proc).executeUpload(any(UploadTask.class));
+        doThrow(new TDClientException(TDClientException.ErrorType.CLIENT_ERROR, "dummy")).when(proc).executeUpload(any(UploadTask.class));
 
         // test
         int count = 1;

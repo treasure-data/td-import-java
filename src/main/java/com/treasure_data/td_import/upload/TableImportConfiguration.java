@@ -52,7 +52,7 @@ public class TableImportConfiguration extends UploadConfigurationBase {
 
     @Override
     public UploadProcessorBase createNewUploadProcessor() {
-        return new ImportProcessor(createTreasureDataClient(), this);
+        return new ImportProcessor(createTDClient(), this);
     }
 
     @Override

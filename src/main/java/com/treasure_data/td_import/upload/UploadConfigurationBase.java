@@ -19,11 +19,10 @@ package com.treasure_data.td_import.upload;
 
 import java.util.Properties;
 
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.client.bulkimport.BulkImportClient;
-import com.treasure_data.td_import.Configuration;
 import com.treasure_data.td_import.Options;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
+import com.treasuredata.client.TDClient;
+import com.treasuredata.client.TDClientBuilder;
 
 public class UploadConfigurationBase extends PrepareConfiguration {
     protected int numOfUploadThreads;
@@ -38,15 +37,12 @@ public class UploadConfigurationBase extends PrepareConfiguration {
         throw new UnsupportedOperationException();
     }
 
-    public TreasureDataClient createTreasureDataClient() {
+    public TDClient createTDClient() {
         Properties props = getProperties();
-        props.setProperty(Configuration.TD_CLIENT_RETRY_COUNT, "" + getRetryCount());
-        return new TreasureDataClient(props);
-    }
+        TDClientBuilder builder = TDClient.newBuilder();
+        builder.setProperties(props);
 
-    public BulkImportClient createBulkImportClient(
-            TreasureDataClient tdClient) {
-        return new BulkImportClient(tdClient);
+        return builder.build();
     }
 
     public void configure(Properties props, Options options) {

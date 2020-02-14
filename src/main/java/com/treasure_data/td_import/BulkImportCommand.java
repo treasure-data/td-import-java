@@ -23,17 +23,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.client.bulkimport.BulkImportClient;
-import com.treasure_data.model.bulkimport.SessionSummary;
-import com.treasure_data.td_import.TaskResult;
 import com.treasure_data.td_import.prepare.MultiThreadPrepareProcessor;
 import com.treasure_data.td_import.prepare.PrepareConfiguration;
-import com.treasure_data.td_import.prepare.PrepareConfiguration.Format;
 import com.treasure_data.td_import.source.Source;
 import com.treasure_data.td_import.upload.MultiThreadUploadProcessor;
 import com.treasure_data.td_import.upload.UploadConfiguration;
 import com.treasure_data.td_import.upload.UploadProcessor;
+import com.treasuredata.client.TDClient;
+import com.treasuredata.client.model.TDBulkImportSession;
 
 public final class BulkImportCommand extends BulkImport {
     private static final Logger LOG = Logger.getLogger(BulkImportCommand.class.getName());
@@ -148,9 +145,8 @@ public final class BulkImportCommand extends BulkImport {
         // create configuration for 'upload' processing
         UploadConfiguration uploadConf = createUploadConf(args);
 
-        // create TreasureDataClient and BulkImportClient objects
-        TreasureDataClient tdClient = uploadConf.createTreasureDataClient();
-        BulkImportClient biClient = uploadConf.createBulkImportClient(tdClient);
+        // create TDClient objects
+        TDClient tdClient = uploadConf.createTDClient();
 
         // configure session name
         TaskResult<?> e = null;
@@ -158,7 +154,7 @@ public final class BulkImportCommand extends BulkImport {
         int srcPos;
         if (uploadConf.autoCreate()) { // '--auto-create my_db.my_tbl' option
             // create session automatically
-            sessionName = createBulkImportSessionName(uploadConf, tdClient, biClient);
+            sessionName = createBulkImportSessionName(uploadConf, tdClient);
 
             srcPos = 1;
         } else {
@@ -166,7 +162,7 @@ public final class BulkImportCommand extends BulkImport {
             sessionName = getBulkImportSessionName(uploadConf);
 
             // validate that the session is live or not
-            e = UploadProcessor.checkSession(biClient, uploadConf, sessionName);
+            e = UploadProcessor.checkSession(tdClient, sessionName);
             if (e.error != null) {
                 throw new IllegalArgumentException(e.error);
             }
@@ -174,13 +170,13 @@ public final class BulkImportCommand extends BulkImport {
             srcPos = 2;
         }
 
-        SessionSummary sess = UploadProcessor.showSession(biClient, uploadConf, sessionName);
+        TDBulkImportSession sess = UploadProcessor.showSession(tdClient, sessionName);
         if (sess == null) {
             throw new IllegalArgumentException(String.format(
                     "Bulk import session is not specified or created yet."));
         }
         // if session is already freezed, exception is thrown.
-        if (sess.uploadFrozen()) {
+        if (sess.isUploadFrozen()) {
             throw new IllegalArgumentException(String.format(
                     "Bulk import session '%s' is already freezed. Please check it with 'td import:show %s'",
                     sessionName, sessionName));
@@ -263,12 +259,11 @@ public final class BulkImportCommand extends BulkImport {
         }
 
         // 'auto-perform' and 'auto-commit'
-        results.add(UploadProcessor.processAfterUploading(
-                biClient, tdClient, uploadConf, sessionName));
+        results.add(UploadProcessor.processAfterUploading(tdClient, uploadConf, sessionName));
 
         // 'auto-delete'
         if (hasNoUploadError(results) && uploadConf.autoDelete() && uploadConf.autoCommit()) {
-            results.add(UploadProcessor.deleteSession(biClient, uploadConf, sessionName));
+            results.add(UploadProcessor.deleteSession(tdClient, sessionName));
         }
 
         LOG.info(String.format("Finished '%s' command", Configuration.CMD_UPLOAD));

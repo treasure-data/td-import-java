@@ -17,23 +17,19 @@
 //
 package com.treasure_data.td_import.upload;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Logger;
 
-import com.treasure_data.client.ClientException;
-import com.treasure_data.client.TreasureDataClient;
+import com.treasuredata.client.TDClient;
+import com.treasuredata.client.TDClientException;
 
 public class ImportProcessor extends UploadProcessorBase {
 
     private static final Logger LOG = Logger.getLogger(ImportProcessor.class.getName());
 
-    protected TreasureDataClient client;
+    protected TDClient client;
 
-    public ImportProcessor(TreasureDataClient client, UploadConfigurationBase conf) {
+    public ImportProcessor(TDClient client, UploadConfigurationBase conf) {
         super(conf);
         this.client = client;
     }
@@ -42,55 +38,25 @@ public class ImportProcessor extends UploadProcessorBase {
         final ImportTask task = (ImportTask) base;
         TaskResult result = new TaskResult();
         result.task = task;
+        long time = System.currentTimeMillis();
 
         try {
             System.out.println(String.format("Importing %s (%d bytes)...", task.fileName, task.size));
             LOG.info(String.format("Importing %s (%d bytes) to %s.%s",
                     task.fileName, task.size, task.databaseName, task.tableName));
 
-            long time = System.currentTimeMillis();
-            client.importData(task.databaseName, task.tableName, getData(task));
+            client.uploadBulkImportPart(task.databaseName, task.tableName, new File(task.fileName));
             time = System.currentTimeMillis() - time;
             task.finishHook(task.fileName);
 
             LOG.info(String.format(
-                    "Imported file %s (%d bytes) to %s.%s (time: %d sec.)", 
+                    "Imported file %s (%d bytes) to %s.%s (time: %d sec.)",
                     task.fileName, task.size, task.databaseName, task.tableName, (time / 1000)));
-        } catch (ClientException e) {
-            LOG.severe(e.getMessage());
-            result.error = e;
-        } catch (IOException e) {
+        } catch (TDClientException e) {
             LOG.severe(e.getMessage());
             result.error = e;
         }
+
         return result;
     }
-
-    private byte[] getData(final ImportTask task) throws IOException {
-        if (!task.isTest) {
-            InputStream fin = null;
-            try {
-                File f = new File(task.fileName);
-                fin = new BufferedInputStream(new FileInputStream(f));
-                byte[] bytes = new byte[(int) f.length()];
-
-                byte[] buf = new byte[1024];
-                int pos = 0;
-                int len;
-                while ((len = fin.read(buf)) != -1) {
-                    System.arraycopy(buf, 0, bytes, pos, len);
-                    pos += len;
-                }
-
-                return bytes;
-            } finally {
-                if (fin != null) {
-                    fin.close();
-                }
-            }
-        } else {
-            return task.testBinary;
-        }
-    }
-
 }

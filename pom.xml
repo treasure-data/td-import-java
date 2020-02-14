@@ -53,7 +53,7 @@
     <jopt-simple.version>4.5</jopt-simple.version>
     <msgpack.version>0.8.16</msgpack.version>
     <super-csv.version>2.1.0</super-csv.version>
-    <td-client.version>0.5.5</td-client.version>
+    <td-client.version>0.9.0</td-client.version>
     <aws-java-sdk.version>1.11.578</aws-java-sdk.version>
     <junit.version>4.8.2</junit.version>
     <mockito.version>1.9.5</mockito.version>
@@ -109,7 +109,7 @@
       <version>${super-csv.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.treasuredata</groupId>
+      <groupId>com.treasuredata.client</groupId>
       <artifactId>td-client</artifactId>
       <version>${td-client.version}</version>
     </dependency>

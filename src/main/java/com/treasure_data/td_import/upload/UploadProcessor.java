@@ -17,35 +17,34 @@
 //
 package com.treasure_data.td_import.upload;
 
+import com.treasuredata.client.TDClient;
+import com.treasuredata.client.TDClientException;
+import com.treasuredata.client.model.TDBulkImportSession;
+import com.treasuredata.client.model.TDDatabase;
+import com.treasuredata.client.model.TDJob;
+import com.treasuredata.client.model.TDTable;
+
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.treasure_data.client.ClientException;
-import com.treasure_data.client.TreasureDataClient;
-import com.treasure_data.client.bulkimport.BulkImportClient;
-import com.treasure_data.model.DatabaseSummary;
-import com.treasure_data.model.Job;
-import com.treasure_data.model.JobSummary;
-import com.treasure_data.model.NotFoundException;
-import com.treasure_data.model.TableSummary;
-import com.treasure_data.model.bulkimport.Session;
-import com.treasure_data.model.bulkimport.SessionSummary;
-
 public class UploadProcessor extends UploadProcessorBase {
 
     private static final Logger LOG = Logger.getLogger(UploadProcessor.class.getName());
 
-    private static SessionSummary summary;
+    private static TDBulkImportSession summary;
 
-    protected BulkImportClient client;
+    protected TDClient client;
 
-    public UploadProcessor(BulkImportClient client, UploadConfiguration conf) {
+    public UploadProcessor(TDClient client, UploadConfiguration conf) {
         super(conf);
         this.client = client;
     }
@@ -74,24 +73,37 @@ public class UploadProcessor extends UploadProcessorBase {
             task.finishHook(task.fileName);
 
             LOG.info(String.format(
-                    "Uploaded file %s (%d bytes) to session %s as part %s (time: %d sec.)", 
+                    "Uploaded file %s (%d bytes) to session %s as part %s (time: %d sec.)",
                     task.fileName, task.size, task.sessName, task.partName, (time / 1000)));
-        } catch (ClientException e) {
+        } catch (TDClientException e) {
             LOG.log(Level.SEVERE, e.getMessage(), e);
             result.error = new IOException(e);
-        } catch (IOException e) {
-            LOG.log(Level.SEVERE, e.getMessage(), e);
-            result.error = e;
         }
         return result;
     }
 
-    protected void executeUpload(final UploadTask task) throws ClientException, IOException {
-        Session session = new Session(task.sessName, null, null);
+    protected void executeUpload(final UploadTask task) throws TDClientException {
         if (!task.isTest) {
-            client.uploadPart(session, task.partName, task.fileName);
+            client.uploadBulkImportPart(task.sessName, task.partName, new File(task.fileName));
         } else {
-            client.uploadPart(session, task.partName, task.testBinary);
+            BufferedOutputStream outputStream = null;
+            try {
+                File tempFile = File.createTempFile("test", ".tmp");
+                outputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
+                outputStream.write(task.testBinary);
+                client.uploadBulkImportPart(task.sessName, task.partName, tempFile);
+            } catch (Exception ex) {
+                // ignorable since this situation only happens while testing
+            }
+            finally {
+                try {
+                    if (outputStream != null) {
+                        outputStream.close();
+                    }
+                } catch (Exception ex) {
+                    // ignorable since this situation only happens while testing
+                }
+            }
         }
     }
 
@@ -103,8 +115,7 @@ public class UploadProcessor extends UploadProcessorBase {
         }
     }
 
-    public static TaskResult processAfterUploading(BulkImportClient client,
-            TreasureDataClient tdClient, UploadConfiguration conf, String sessName)
+    public static TaskResult processAfterUploading(final TDClient client, UploadConfiguration conf, String sessName)
             throws UploadPartsException {
         TaskResult err = null;
 
@@ -113,25 +124,25 @@ public class UploadProcessor extends UploadProcessorBase {
         }
 
         // freeze
-        err = freezeSession(client, conf, sessName);
+        err = freezeSession(client, sessName);
         if (err.error != null) {
             return err;
         }
 
         // perform
-        err = performSession(client, conf, sessName);
+        err = performSession(client, sessName);
         if (err.error != null) {
             return err;
         }
 
         // check session status
-        SessionSummary summary = null;
+        TDBulkImportSession summary = null;
         try {
-            summary = showSession(client, conf, sessName);
+            summary = showSession(client, sessName);
 
             StringBuilder sbuf = new StringBuilder();
             sbuf.append(String.format("Show status of bulk import session %s", summary.getName())).append("\n");
-            sbuf.append("  Performing job ID : " + summary.getJobID()).append("\n");
+            sbuf.append("  Performing job ID : " + summary.getJobId()).append("\n");
             sbuf.append("  Name              : " + summary.getName()).append("\n");
             sbuf.append("  Status            : " + summary.getStatus()).append("\n");
 
@@ -155,19 +166,18 @@ public class UploadProcessor extends UploadProcessorBase {
         }
 
         // wait performing
-        err = waitPerform(client, tdClient, conf, sessName);
+        err = waitPerform(client, sessName);
         if (err.error != null) {
             return err;
         }
 
         // check error of perform
-        summary = null;
         try {
-            summary = showSession(client, conf, sessName);
+            summary = showSession(client, sessName);
 
             StringBuilder sbuf = new StringBuilder();
             sbuf.append(String.format("Show the result of bulk import session %s", summary.getName())).append("\n");
-            sbuf.append("  Performing job ID : " + summary.getJobID()).append("\n");
+            sbuf.append("  Performing job ID : " + summary.getJobId()).append("\n");
             sbuf.append("  Valid parts       : " + summary.getValidParts()).append("\n");
             sbuf.append("  Error parts       : " + summary.getErrorParts()).append("\n");
             sbuf.append("  Valid records     : " + summary.getValidRecords()).append("\n");
@@ -192,11 +202,11 @@ public class UploadProcessor extends UploadProcessorBase {
                 msg = String.format(
                         "The td import command stopped because the perform job (%s) reported 0 valid records.\n"
                       + "Please execute the 'td import:error_records %s' command to check the invalid records.",
-                      summary.getJobID(), summary.getName());
+                      summary.getJobId(), summary.getName());
             } else { // both of valid records and error records are 0.
                 msg = String.format(
                         "The td import command stopped because the perform job (%s) reported 0 valid records. Commit operation will be skipped.",
-                        summary.getJobID());
+                        summary.getJobId());
             }
 
             System.out.println(msg);
@@ -211,7 +221,7 @@ public class UploadProcessor extends UploadProcessorBase {
                   + "If you want to check error records by the job, please execute command 'td import:error_records %s'.\n"
                   + "If you ignore error records and want to commit your performed data to your table, you manually can execute command 'td import:commit %s'.\n"
                   + "If you want to delete your bulk_import session, you also can execute command 'td import:delete %s'.",
-                  summary.getJobID(), summary.getErrorParts(), summary.getErrorRecords(),
+                  summary.getJobId(), summary.getErrorParts(), summary.getErrorRecords(),
                   summary.getName(), summary.getName(), summary.getName());
             System.out.println(msg);
             LOG.severe(msg);
@@ -221,7 +231,7 @@ public class UploadProcessor extends UploadProcessorBase {
         }
 
         // commit and wait commit
-        err = commitAndWaitCommit(client, conf, sessName);
+        err = commitAndWaitCommit(client, sessName);
         if (err.error != null) {
             return err;
         }
@@ -229,31 +239,26 @@ public class UploadProcessor extends UploadProcessorBase {
         return new TaskResult();
     }
 
-    public static SessionSummary showSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessionName) throws IOException {
+    public static TDBulkImportSession showSession(final TDClient client, final String sessionName) throws IOException {
         LOG.fine(String.format("Show bulk import session %s", sessionName));
 
-        summary = null;
         try {
-            summary = client.showSession(sessionName);
-        } catch (ClientException e) {
+            return client.getBulkImportSession(sessionName);
+        } catch (TDClientException e) {
             LOG.severe(e.getMessage());
             throw new IOException(e);
         }
-        return summary;
     }
 
-    public static TaskResult freezeSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessionName) {
+    public static TaskResult freezeSession(final TDClient client, final String sessionName) {
         String m = String.format("Freeze bulk import session %s", sessionName);
         System.out.println(m);
         LOG.info(m);
 
         TaskResult err = new TaskResult();
         try {
-            Session session = new Session(sessionName, null, null);
-            client.freezeSession(session);
-        } catch (ClientException e) {
+            client.freezeBulkImportSession(sessionName);
+        } catch (TDClientException e) {
             m = String.format("Cannot freeze session %s, %s", sessionName, e.getMessage());
             System.out.println(m);
             LOG.severe(m);
@@ -262,17 +267,15 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult performSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessionName) {
+    public static TaskResult performSession(final TDClient client, final String sessionName) {
         String m = String.format("Perform bulk import session %s", sessionName);
         System.out.println(m);
         LOG.info(m);
 
         TaskResult err = new TaskResult();
         try {
-            Session session = new Session(sessionName, null, null);
-            client.performSession(session);
-        } catch (ClientException e) {
+            client.performBulkImportSession(sessionName);
+        } catch (TDClientException e) {
             m = String.format("Cannot perform bulk import session %s, %s", sessionName, e.getMessage());
             System.out.println(m);
             LOG.severe(m);
@@ -281,9 +284,7 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult waitPerform(final BulkImportClient client,
-            final TreasureDataClient tdClient, final UploadConfiguration conf, final String sessionName)
-            throws UploadPartsException {
+    public static TaskResult waitPerform(final TDClient client, final String sessionName) {
         String m = String.format("Wait %s bulk import session performing...", sessionName);
         System.out.println(m);
         LOG.info(m);
@@ -292,20 +293,20 @@ public class UploadProcessor extends UploadProcessorBase {
         long waitTime = System.currentTimeMillis();
         while (true) {
             try {
-                summary = client.showSession(sessionName);
+                summary = client.getBulkImportSession(sessionName);
 
-                if (summary.getStatus().equals("ready")){
+                if (summary.getStatus().equals(TDBulkImportSession.ImportStatus.READY)){
                     break;
-                } else if (summary.getStatus().equals("uploading")) {
+                } else if (summary.getStatus().equals(TDBulkImportSession.ImportStatus.UPLOADING)) {
                     throw new IOException("performing failed");
                 }
 
-                String jobId = summary.getJobID();
-                JobSummary.Status jobStatus = tdClient.showJobStatus(new Job(jobId));
-                if (!(jobStatus.equals(JobSummary.Status.BOOTING) ||
-                        jobStatus.equals(JobSummary.Status.QUEUED) ||
-                        jobStatus.equals(JobSummary.Status.RUNNING) ||
-                        jobStatus.equals(JobSummary.Status.SUCCESS))) {
+                String jobId = summary.getJobId();
+                TDJob.Status jobStatus = client.jobStatus(jobId).getStatus();
+                if (!(jobStatus.equals(TDJob.Status.BOOTING) ||
+                        jobStatus.equals(TDJob.Status.QUEUED) ||
+                        jobStatus.equals(TDJob.Status.RUNNING) ||
+                        jobStatus.equals(TDJob.Status.SUCCESS))) {
                     throw new IOException("performing failed: the job status was changed to "
                             + jobStatus.toString());
                 }
@@ -317,7 +318,7 @@ public class UploadProcessor extends UploadProcessorBase {
                 } catch (InterruptedException e) {
                     // ignore
                 }
-            } catch (ClientException e) {
+            } catch (TDClientException e) {
                 m = String.format("Give up waiting %s bulk import session performing, %s", sessionName, e.getMessage());
                 System.out.println(m);
                 LOG.severe(m);
@@ -335,8 +336,7 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult commitAndWaitCommit(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+    public static TaskResult commitAndWaitCommit(final TDClient client, final String sessionName) throws UploadPartsException {
         TaskResult err = new TaskResult();
         boolean firstRequest = true;
         int retryCount = 0;
@@ -348,13 +348,13 @@ public class UploadProcessor extends UploadProcessorBase {
                 }
 
                 try {
-                    summary = client.showSession(sessionName);
-                } catch (ClientException e) {
+                    summary = client.getBulkImportSession(sessionName);
+                } catch (TDClientException e) {
                     LOG.severe(e.getMessage());
                     err.error = new IOException(e);
                 }
 
-                if (summary.getStatus().equals("committed")) {
+                if (summary.getStatus().equals(TDBulkImportSession.ImportStatus.COMMITTED)) {
                     return err;
                 } else {
                     retryCount++;
@@ -362,28 +362,26 @@ public class UploadProcessor extends UploadProcessorBase {
             }
 
             // commit
-            err = commitSession(client, conf, sessionName);
+            err = commitSession(client, sessionName);
             firstRequest = false;
             if (err.error != null) {
                 return err;
             }
 
             // wait commit
-            err = waitCommit(client, conf, sessionName);
+            err = waitCommit(client, sessionName);
         }
     }
 
-    public static TaskResult commitSession(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+    public static TaskResult commitSession(final TDClient client, final String sessionName) {
         String msg = String.format("Commit %s bulk import session", sessionName);
         System.out.println(msg);
         LOG.info(msg);
 
         TaskResult err = new TaskResult();
         try {
-            Session session = new Session(sessionName, null, null);
-            client.commitSession(session);
-        } catch (ClientException e) {
+            client.commitBulkImportSession(sessionName);
+        } catch (TDClientException e) {
             String emsg = String.format("Cannot commit '%s' bulk import session, %s", sessionName, e.getMessage());
             System.out.println(emsg);
             LOG.severe(emsg);
@@ -392,8 +390,7 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult waitCommit(final BulkImportClient client,
-            final UploadConfiguration conf, final String sessionName) throws UploadPartsException {
+    public static TaskResult waitCommit(final TDClient client, final String sessionName) {
         String m = String.format("Wait %s bulk import session committing...", sessionName);
         System.out.println(m);
         LOG.info(m);
@@ -402,11 +399,11 @@ public class UploadProcessor extends UploadProcessorBase {
         long waitTime = System.currentTimeMillis();
         while (true) {
             try {
-                summary = client.showSession(sessionName);
+                summary = client.getBulkImportSession(sessionName);
 
-                if (summary.getStatus().equals("committed")){
+                if (summary.getStatus().equals(TDBulkImportSession.ImportStatus.COMMITTED)){
                     break;
-                } else if (summary.getStatus().equals("ready")) {
+                } else if (summary.getStatus().equals(TDBulkImportSession.ImportStatus.READY)) {
                     throw new IOException("committing failed");
                 }
 
@@ -417,7 +414,7 @@ public class UploadProcessor extends UploadProcessorBase {
                 } catch (InterruptedException e) {
                     // ignore
                 }
-            } catch (ClientException e) {
+            } catch (TDClientException e) {
                 m = String.format("Give up waiting %s bulk import session committing, %s", sessionName, e.getMessage());
                 System.out.println(m);
                 LOG.severe(m);
@@ -435,15 +432,14 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult checkDatabase(final TreasureDataClient client, final UploadConfiguration conf,
-            final String sessionName, final String databaseName) throws UploadPartsException {
+    public static TaskResult checkDatabase(final TDClient client, final String databaseName) {
         LOG.info(String.format("Check database %s", databaseName));
 
         TaskResult err = new TaskResult();
         try {
-            List<DatabaseSummary> dbs = client.listDatabases();
+            List<TDDatabase> dbs = client.listDatabases();
             boolean exist = false;
-            for (DatabaseSummary db : dbs) {
+            for (TDDatabase db : dbs) {
                 if (db.getName().equals(databaseName)) {
                     exist = true;
                     break;
@@ -454,11 +450,11 @@ public class UploadProcessor extends UploadProcessorBase {
                 throw new IOException(String.format("Not found database %s",
                         databaseName));
             }
-        } catch (ClientException e) {
+        } catch (TDClientException e) {
             String msg = String.format(
                     "Cannot access database %s, %s. " +
-                    "Please check it with 'td database:list'. " +
-                    "If it doesn't exist, please create it with 'td database:create %s'.",
+                            "Please check it with 'td database:list'. " +
+                            "If it doesn't exist, please create it with 'td database:create %s'.",
                     databaseName, e.getMessage(), databaseName);
             System.out.println(msg);
             LOG.severe(msg);
@@ -477,15 +473,14 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult checkTable(final TreasureDataClient client, final UploadConfiguration conf,
-            final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
+    public static TaskResult checkTable(final TDClient client, final String databaseName, final String tableName) {
         LOG.info(String.format("Check table %s", tableName));
 
         TaskResult err = new TaskResult();
         try {
-            List<TableSummary> tbls = client.listTables(databaseName);
+            List<TDTable> tbls = client.listTables(databaseName);
             boolean exist = false;
-            for (TableSummary tbl : tbls) {
+            for (TDTable tbl : tbls) {
                 if (tbl.getName().equals(tableName)) {
                     exist = true;
                     break;
@@ -495,11 +490,11 @@ public class UploadProcessor extends UploadProcessorBase {
             if (!exist) {
                 throw new IOException(String.format("Not found table %s", tableName));
             }
-        } catch (ClientException e) {
+        } catch (TDClientException e) {
             String msg = String.format(
                     "Cannot access table '%s', %s. " +
-                    "Please check it with 'td table:list %s'. " +
-                    "If it doesn't exist, please create it with 'td table:create %s %s'.",
+                            "Please check it with 'td table:list %s'. " +
+                            "If it doesn't exist, please create it with 'td table:create %s %s'.",
                     tableName, e.getMessage(), databaseName, databaseName, tableName);
             System.out.println(msg);
             LOG.severe(msg);
@@ -517,23 +512,17 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult createSession(final BulkImportClient client, final UploadConfiguration conf,
-            final String sessionName, final String databaseName, final String tableName) throws UploadPartsException {
+    public static TaskResult createSession(final TDClient client, final String sessionName,
+                                           final String databaseName, final String tableName) {
         String msg = String.format("Create %s bulk_import session", sessionName);
         System.out.println(msg);
         LOG.info(msg);
 
         TaskResult err = new TaskResult();
         try {
-            client.createSession(sessionName, databaseName, tableName);
-        } catch (NotFoundException e) {
-            String emsg = String.format(
-                    "Cannot create bulk_import session %s: database '%s' or table '%s' cannot be found.",
-                    sessionName, databaseName, tableName);
-            System.out.println(emsg);
-            LOG.severe(emsg);
-            err.error = new IOException(e);
-        } catch (ClientException e) {
+            client.createBulkImportSession(sessionName, databaseName, tableName);
+        }
+        catch (TDClientException e) {
             String emsg = String.format(
                     "Cannot create bulk_import session %s by using %s:%s, %s. ",
                     sessionName, databaseName, tableName, e.getMessage());
@@ -544,14 +533,13 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult checkSession(final BulkImportClient client, final UploadConfiguration conf,
-            final String sessionName) throws UploadPartsException {
+    public static TaskResult checkSession(final TDClient client, final String sessionName) {
         LOG.info(String.format("Check bulk_import session %s", sessionName));
 
         TaskResult err = new TaskResult();
         try {
-            client.showSession(sessionName);
-        } catch (ClientException e) {
+            client.getBulkImportSession(sessionName);
+        } catch (TDClientException e) {
             String msg = String.format(
                     "Cannot access bulk_import session %s, %s. " +
                     "Please check it with 'td bulk_import:list'. " +
@@ -564,16 +552,15 @@ public class UploadProcessor extends UploadProcessorBase {
         return err;
     }
 
-    public static TaskResult deleteSession(final BulkImportClient client, final UploadConfiguration conf,
-            final String sessionName) throws UploadPartsException {
+    public static TaskResult deleteSession(final TDClient client, final String sessionName) {
         String msg = String.format("Delete bulk_import session %s", sessionName);
         System.out.println(msg);
         LOG.info(msg);
 
         TaskResult err = new TaskResult();
         try {
-            client.deleteSession(sessionName);
-        } catch (ClientException e) {
+            client.deleteBulkImportSession(sessionName);
+        } catch (TDClientException e) {
             String emsg = String.format(
                     "Cannot delete bulk_import session %s, %s. " +
                     "Please check it with 'td bulk_import:list'.",
