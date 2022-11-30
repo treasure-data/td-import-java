@@ -24,6 +24,7 @@ public class TestBulkImportOptions {
     private final String sampleTimeColumn = "timestamp";
     private final String sampleTimeFormat = "timeformat";
     private final String sampleTimeValue = "100";
+    private final String sampleTimeOffset = "86400";
     private final String sampleOutput = "output_dir";
     private final String sampleSplitSize = "100";
     private final String sampleErrorRecordsHandling = "skip";
@@ -73,6 +74,7 @@ public class TestBulkImportOptions {
                 "--time-column", sampleTimeColumn,
                 "--time-format", sampleTimeFormat,
                 "--time-value", sampleTimeValue,
+                "--time-offset", sampleTimeOffset,
                 "--output", sampleOutput,
                 "--split-size", sampleSplitSize,
                 "--error-records-handling", sampleErrorRecordsHandling,
@@ -114,6 +116,7 @@ public class TestBulkImportOptions {
         assertOptionEquals("T", sampleTimeFormat, actualOpts);
         assertOptionEquals("time-format", sampleTimeFormat, actualOpts);
         assertOptionEquals("time-value", sampleTimeValue, actualOpts);
+        assertOptionEquals("time-offset", sampleTimeOffset, actualOpts);
         assertOptionEquals("output", sampleOutput, actualOpts);
         assertOptionEquals("split-size", sampleSplitSize, actualOpts);
         assertOptionEquals("error-records-handling", sampleErrorRecordsHandling, actualOpts);

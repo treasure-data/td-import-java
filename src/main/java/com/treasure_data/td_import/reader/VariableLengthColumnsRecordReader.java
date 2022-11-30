@@ -141,9 +141,9 @@ public abstract class VariableLengthColumnsRecordReader<T extends PrepareConfigu
             }
         } else {
             if (timeColumnIndex >= 0) {
-                timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat());
+                timeColumnValue = new TimeColumnValue(timeColumnIndex, conf.getTimeFormat(), conf.getTimeOffset());
             } else if (aliasTimeColumnIndex >= 0) {
-                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat());
+                timeColumnValue = new AliasTimeColumnValue(aliasTimeColumnIndex, conf.getTimeFormat(), conf.getTimeOffset());
             } else if (conf.getTimeValue().getTimeValue() >= 0) {
                 timeColumnValue = conf.getTimeValue();
             } else {
