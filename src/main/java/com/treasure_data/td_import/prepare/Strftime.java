@@ -53,7 +53,7 @@ public class Strftime {
         translate.put("j", "DDD");
         translate.put("k", "HH"); // will show as '07' instead of ' 7'
         translate.put("l", "hh"); //will show as '07' instead of ' 7'
-        translate.put("L", "S");
+        translate.put("L", "SSS");
         translate.put("m", "MM");
         translate.put("M", "mm");
         translate.put("n", "\n");
