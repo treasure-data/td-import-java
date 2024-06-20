@@ -20,7 +20,7 @@ package com.treasure_data.td_import.model;
 import com.treasure_data.td_import.prepare.Strftime;
 
 public class AliasTimeColumnValue extends TimeColumnValue {
-    public AliasTimeColumnValue(int index, Strftime timeFormat) {
-        super(index, timeFormat);
+    public AliasTimeColumnValue(int index, Strftime timeFormat, long offset) {
+        super(index, timeFormat, offset);
     }
 }

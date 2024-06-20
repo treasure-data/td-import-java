@@ -241,6 +241,14 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
         }
     }
 
+    public static class Context07 extends Context06 {
+
+        public void assertContextEquals(TestCSVFileReader test) {
+            super.assertContextEquals(test);
+            assertEquals(test.reader.getTimeColumnValue().getOffset(), 86400);
+        }
+    }
+
     protected String fileName = "./file.csv";
     protected int numLine;
 
@@ -389,6 +397,30 @@ public class TestCSVFileReader extends FileReaderTestUtil<CSVPrepareConfiguratio
                 "--column-header",
                 "--time-format",
                 context.getSTRFTimeFormat(),
+        });
+
+        createPrepareConfiguration();
+        createFileWriter();
+        createFileReader();
+
+        checkContextWhenReaderConfiguration(context);
+    }
+
+    @Test
+    public void checkContextWhenReaderConfigurationWithTimeFormatWithTimeOffset() throws Exception {
+        Context07 context = new Context07();
+
+        // override system properties:-(
+        options = new Options();
+        options.initPrepareOptionParser(props);
+        options.setOptions(new String[] {
+                "--format",
+                "csv",
+                "--column-header",
+                "--time-format",
+                context.getSTRFTimeFormat(),
+                "--time-offset",
+                "86400"
         });
 
         createPrepareConfiguration();

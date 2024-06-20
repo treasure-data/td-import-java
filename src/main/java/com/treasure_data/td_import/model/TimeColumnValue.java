@@ -25,10 +25,16 @@ import com.treasure_data.td_import.writer.RecordWriter;
 public class TimeColumnValue {
     protected int index;
     protected Strftime timeFormat;
+    protected final long offset;
 
     public TimeColumnValue(int index, Strftime timeFormat) {
+        this(index, timeFormat, 0);
+    }
+
+    public TimeColumnValue(int index, Strftime timeFormat, long offset) {
         this.index = index;
         this.timeFormat = timeFormat;
+        this.offset = offset;
     }
 
     public int getIndex() {
@@ -37,6 +43,10 @@ public class TimeColumnValue {
 
     public Strftime getTimeFormat() {
         return timeFormat;
+    }
+
+    public long getOffset() {
+        return offset;
     }
 
     public void write(ColumnValue v, RecordWriter with) throws PreparePartsException {

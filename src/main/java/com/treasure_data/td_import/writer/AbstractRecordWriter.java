@@ -184,6 +184,8 @@ public abstract class AbstractRecordWriter implements RecordWriter {
             }
         }
 
+        time += filter.getOffset();
+
         write(time);
     }
 

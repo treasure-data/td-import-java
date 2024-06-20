@@ -549,6 +549,7 @@ public class PrepareConfiguration extends Configuration {
     protected String aliasTimeColumn;
     protected TimeValueTimeColumnValue timeValue = new TimeValueTimeColumnValue(-1);
     protected String timeFormat;
+    protected long timeOffset;
 
     protected boolean hasPrimaryKey = false;
     protected String primaryKey = null;
@@ -609,6 +610,9 @@ public class PrepareConfiguration extends Configuration {
 
         // time value
         setTimeValue();
+
+        // time offset
+        setTimeOffset();
 
         // time format
         setTimeFormat();
@@ -931,6 +935,31 @@ public class PrepareConfiguration extends Configuration {
 
     public TimeValueTimeColumnValue getTimeValue() {
         return timeValue;
+    }
+
+    public void setTimeOffset() {
+        if (!optionSet.has(BI_PREPARE_PARTS_TIMEOFFSET)) {
+            return;
+        }
+
+        if (optionSet.has(BI_PREPARE_PARTS_TIMEVALUE)) {
+            throw new IllegalArgumentException(
+                    "cannot specify both of 'time-value' and 'time-offset' options");
+        }
+
+        String v = (String) optionSet.valueOf(BI_PREPARE_PARTS_TIMEOFFSET);
+        if (v != null) {
+            try {
+                timeOffset = Long.parseLong(v);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(
+                        "'time-offset option requires the long type argument'", e);
+            }
+        }
+    }
+
+    public long getTimeOffset() {
+        return timeOffset;
     }
 
     public void setTimeFormat() {
