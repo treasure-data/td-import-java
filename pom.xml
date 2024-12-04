@@ -82,7 +82,7 @@
     <maven-surefire-plugin.threadCount>1</maven-surefire-plugin.threadCount>
     <maven-surefire-plugin.useSystemCL>false</maven-surefire-plugin.useSystemCL>
     <maven-surefire-plugin.testFailureIgnore>false</maven-surefire-plugin.testFailureIgnore>
-    <mysql-connector-java.version>5.1.18</mysql-connector-java.version>
+    <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
   </properties>
 
   <repositories>
