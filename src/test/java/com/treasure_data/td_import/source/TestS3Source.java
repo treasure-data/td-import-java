@@ -1,16 +1,16 @@
 package com.treasure_data.td_import.source;
 
-import static org.junit.Assert.assertEquals;
-
-import com.amazonaws.services.s3.AmazonS3;
 import org.junit.Test;
+import software.amazon.awssdk.services.s3.S3Client;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestS3Source {
     @Test
     public void createAmazonS3Client() {
-        AmazonS3 client;
-        client = S3Source.createAmazonS3Client(SourceDesc
+        S3Client client;
+        client = S3Source.createS3Client(SourceDesc
                 .create("s3://kkk:sss@s3-ap-northeast-1.amazonaws.com/bucket-name/path/to/file.csv"), "ap-northeast-1");
-        assertEquals("ap-northeast-1", client.getRegion().getFirstRegionId());
+        assertEquals("ap-northeast-1", client.serviceClientConfiguration().region().id());
     }
 }

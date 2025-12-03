@@ -17,8 +17,6 @@
 //
 package com.treasure_data.td_import;
 
-import com.amazonaws.Protocol;
-
 public interface Constants {
     long MAX_LOG_TIME = 253402300799L;
 
@@ -439,7 +437,6 @@ public interface Constants {
     ////////////////////////////////////////
 
     // S3
-    Protocol BI_PREPARE_S3_PROTOCOL = Protocol.HTTPS;
     int BI_PREPARE_S3_MAX_CONNECTIONS = 10; // SDK default: 50
     int BI_PREPARE_S3_MAX_ERRORRETRY = 5; // SDK default: 3
     int BI_PREPARE_S3_SOCKET_TIMEOUT = 8 * 60 * 1000; // SDK default: 50 * 1000
